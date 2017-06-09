@@ -91,7 +91,7 @@ classdef ReferenceLogan < ReferenceModel
 
 
                % Book keeping, set frameMarkers
-               obj.setFrameMarker( :, cell2mat(obj.inputParameters(3:end)))
+               obj.setFrameMarker( ':', cell2mat(obj.inputParameters(3:end)))
        end
        function Y = getModelY(obj)
            % Make your own model:

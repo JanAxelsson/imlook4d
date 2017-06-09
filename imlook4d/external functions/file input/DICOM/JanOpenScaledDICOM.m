@@ -357,8 +357,14 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                 
                 fileSize=fileNames(nr).bytes;
 
-                %headerSize=fileSize-2*pixelsize*pixelsize;
-                headerSize=fileSize-numberOfBytesInData;
+                %headerSize=fileSize-numberOfBytesInData;  % Assume data at end of file
+                
+                % Assume nothing about data position
+                out3=dirtyDICOMHeaderData(headers, 1, '7FE0', '0010',mode);  % Find start of data
+                startOfPixelData = out3.indexLow;
+                headerSize = startOfPixelData - 1;
+                numberOfBytesInData=out3.valueLength;
+                
                 
                 if  (headerSize>0)  % Ignore really small files
 
@@ -368,7 +374,7 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                     % Determine number of bytes per pixel
                     
                    % tempData= fread(fid, numberOfBytesInData, 'int16');     % Data in memory 
-                    tempData= fread(fid, numberOfBytesInData, numberFormat);     % Data in memory   
+                    tempData = fread(fid, numberOfBytesInData / numberOfBytesPerPixel, numberFormat);     % Data in memory   
 
                     fclose(fid);
                     

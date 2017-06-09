@@ -883,7 +883,7 @@ function update(handles)
         end
 
         % legends
-        legend( axes, tactObject.getRoiNames(:), 'Interpreter', 'none'); % Write legend without LaTex interpretation
+        legend( axes, tactObject.getRoiNames(':'), 'Interpreter', 'none'); % Write legend without LaTex interpretation
         
         % labels
             set( handles.tactTitleText, 'String', tactObject.MainLabel);
