@@ -1,7 +1,0 @@
-
-<h1>milliSUV calculation Script</h1>
-<HR></HR>
-<!------------------->
-	<P>This script generates a new volume with milliSUV (1000 x Standardized Uptake Value) for PET, instead of Bq/ml uptake.  
-
-    </P><P>The milliSUV value is calculated based on injected activity and body mass, taken from the DICOM file header.</P>

@@ -1,5 +1,0 @@
-<h1>Load ROI </h1>
-<HR></HR>
-<!------------------->
-Loads a ROI definition file.
-

@@ -1,7 +1,0 @@
-<h1>Brush Size</h1>
-<HR></HR>
-<!------------------->
-	<P>
-	Sets the radius of the ROI brush. 
-	</P>
-

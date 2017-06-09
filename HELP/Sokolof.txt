@@ -1,5 +1,0 @@
-
-<h1>Sokolof color map</h1>
-<HR></HR>
-<!------------------->
-	Change color scale.  

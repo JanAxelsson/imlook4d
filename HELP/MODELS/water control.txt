@@ -1,8 +1,0 @@
-<h1>Water model (simplified model)</h1>
-<HR></HR>
-<!------------------->
-	<P>
-	Sets colorscale between lowest and highest pixel values, in current image.  
-	"Remove negatives", and "Invert" operations are performed before the minimum and maximum values are determined.   
-	</P>
-

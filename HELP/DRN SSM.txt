@@ -1,7 +1,0 @@
-<h1>DRN_SSM</h1>
-<HR></HR>
-<!------------------->
-	<P>
-	DRN_SSM help file. 
-	</P>
-

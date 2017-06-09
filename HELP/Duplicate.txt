@@ -1,5 +1,0 @@
-
-<h1>Duplicate Script</h1>
-<HR></HR>
-<!------------------->
-	This script generates a duplicate imlook4d window.  ROIs are preserved.

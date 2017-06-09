@@ -1,6 +1,0 @@
-<h1>Zoom in </h1>
-<HR></HR>
-<!------------------->
-When down, image zoom is activated.
-When up, image zoom is off.
-

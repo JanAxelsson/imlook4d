@@ -1,7 +1,0 @@
-
-<h1>SCRIPTS menu</h1>
-<HR></HR>
-<!------------------->
-	The selected script does not have any help file yet.  <BR>
-
-	The SCRIPTS menu contains user defined scripts, which can be used to add functionality to imlook4d.   

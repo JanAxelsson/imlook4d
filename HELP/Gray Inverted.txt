@@ -1,8 +1,0 @@
-<h1>Inverted gray color scale</h1>
-<HR></HR>
-<!------------------->
-	<P>
-	Change color scale.  
-	</P>
-
-

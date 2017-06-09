@@ -1,9 +1,0 @@
-<h1>Slice slider</h1>
-<HR></HR>
-<!------------------->
-	<P>
-	Sets the slice number.  Using the mouse scroll-wheel, or UPARROW / DOWNARROW keyboard keys can also be used to move up and down the slices.
-	</P>
-	
-
-

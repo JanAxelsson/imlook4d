@@ -1,3 +1,0 @@
-subjects	a	b	c	abc
-Anna	1	2	3	6
-Pelle	2	4	6	48

@@ -1,7 +1,0 @@
-<h1>GE color scale</h1>
-<HR></HR>
-<!------------------->
-	<P>
-	Change color scale.  
-	</P>
-

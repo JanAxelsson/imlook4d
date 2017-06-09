@@ -1,7 +1,0 @@
-<h1>Edit Window Title</h1>
-<HR></HR>
-<!------------------->
-	<P>
-	Changes the window title.  This helps organizing many imlook4d windows.   
-	</P>
-

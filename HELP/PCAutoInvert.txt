@@ -1,9 +1,0 @@
-<h1>Auto checkbox</h1>
-<HR></HR>
-<!------------------->
-	<P>
-	Due to the nature of principal component analysis, principal component (PC) images may be randomly negative or positive.  
-	When Auto checkbox is selected, an algorithm tries to determine the best way to visualize a PC image.
-	The principal component PC Images will be automatically set to the most probable normal/inverted state.   
-	</P>
-
