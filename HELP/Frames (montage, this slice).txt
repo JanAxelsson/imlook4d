@@ -1,0 +1,10 @@
+<h1>Frames (montage, this slice)</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	Displays a montage of all frames, at the current slice.  
+	</P>
+
+	<P>
+	The window has to be resized manually.
+	</P>

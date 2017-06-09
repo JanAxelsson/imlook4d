@@ -1,0 +1,11 @@
+<h1>Edit scale</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	Sets the low and high value to colorbar scale.  
+	Suggested values are based on the mininum and maximum values in currently displayed image.  
+	<P>
+	</P>
+	The "Auto colorscale" and "Remove negatives" radio-buttons are cleared.   
+	</P>
+

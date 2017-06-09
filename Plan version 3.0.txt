@@ -1,0 +1,12 @@
+
+Loop scripts, 
+	allow input paramters to scripts to be cell vectors
+	and loop through until vector length
+	
+	variable imlook4d_loopIndex
+
+Open command
+	opens new imlook4d instance, and puts imlook4d_current_handle, imlook4d_current_handles to workspace
+
+Close command
+	closes imlook4d instance in imlook4d_current_handle

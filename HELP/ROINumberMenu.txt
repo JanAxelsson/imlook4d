@@ -1,0 +1,63 @@
+<h1>Add ROI drop-down list</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	If "Add ROI" is pressed, a new ROI dialog appears.  Write a name, and press OK. 
+	Whenever this ROI name is selected, from this menu, it is active.  ROI drawing, on any number of slices, or erasing can be achieved.
+	</P>
+	
+	<P>
+	Selecting a ROI name from the drop-down list, displays the lowest slice number where this ROI is drawn.
+	</P>
+	
+	<P>
+	Right-click the ROI menu shows a contextual menu with the following options:
+       
+		<UL>
+			<LI> <B>Rename</B>, which renames the currently selected ROI
+
+			<LI>  <B>Hide </B>, which hides the currently selected ROI from ROI analysis
+			<LI>  <B>Hide All</B>, which hides the currently selected ROI from ROI analysis
+
+			<LI>  <B>Show </B>, displays the currently selected ROI (if hidden)
+			<LI>  <B>Show All </B>, displays all hidden ROIs
+
+			<LI>  <B>Lock </B>, locks a ROI from editing
+			<LI>  <B>Unlock </B>, unlocks a ROI from editing
+
+			<LI>  <B>Remove </B>, removes the currently selected ROI
+			<LI>  <B>Remove All </B>, removes all ROIs
+		</UL>
+ 
+	</P>
+	
+	<P>
+	<B>NOTE:</B> On some computers, the right-click works only when simultaneously pressing [Ctrl] key on keyboard
+
+	</P>		
+
+<h1>General information about ROIs</h1>
+<!------------------->
+	<P>
+	The term ROI should be understood as a Region Of Interest.  This is sometimes called VOI (Volume Of Interest).  
+    In imlook4d, the ROI is defined in 3 dimensions, including pixels from multiple slices.  Therefore talking about a region of interest
+    in single slices, and a volume of interest being a composite of these has no meaning.  Instead the word ROI and VOI can be interchanged.
+	</P>
+    <P>
+	ROIs are drawn by a Brush, where the size can be modified by the <code>Brush</code> size input
+	</P>
+	<P>
+	ROIs can be displayed in multiple ways, as defined by the menu <code>Edit/ROI</code>.
+	</P>
+	<P>
+	Each selection from  <code>Edit/ROI</code> menu can be displayed in two ways: as a contour or as a shaded area.  This is selected by the  <code>Contour</code> check-box
+	</P>
+	<P>
+	The ROI overlay can be temporarily hidden from view by the <code>Hide</code> check-box.  Sometimes it is useful to "blink" the ROI by clicking the <code>Hide</code> check-box multiple times.
+	</P>
+	<P>
+	Multiple scripts extend the ROI functionality.  See the <code>SCRIPTS/ROI</code> menu.
+	</P>
+	
+	
+

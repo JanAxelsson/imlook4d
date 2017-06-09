@@ -1,0 +1,8 @@
+<h1>Colorful ROI</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	Draw ROIs in bright colors.  The selected ROI is draw in a color on the higher part of the color scale.  Other ROIs are drawn with colors from the lower end of the color scale.
+	</P>
+
+

@@ -1,0 +1,86 @@
+<h1>Help </h1>
+<HR></HR>
+<!------------------->
+	<P>
+		Imlook4d is a research grade 4-dimensional image browser, with the following capabilities:
+	</P><P>
+		It is strong in medical imaging where it can be used for static (3D volumes) as well as dynamic/gated (4D volumes).
+		What makes imlook4d stand out is its scripting capabilities.  Due to its strong integration with the Matlab environment, 
+		it is very easy to integrate menu-driven home-built algorithms, simply by saving a short Matlab m-file in a special folder.
+	</P>
+<HR>			
+		<H3>imlook4d documentation</H3>
+			<UL>
+			<LI> <A href="matlab:open( which('GettingStarted-imlook4d.pdf') );">Getting started</A>. 
+			<LI> <A href="matlab:open( which('Thresholding_complex_images.pdf') );">ROI thresholding from complex images</A>. 
+			<LI> <A href="matlab:open( which('Scripting-imlook4d.pdf') );">Scripting imlook4d</A>.
+			</UL>
+
+<HR>	
+		<H3>imlook4d capabilities</H3>	
+	<P> 
+	    This is just a brief description of the capabilities of the base imlook4d.  Lots and lots of extensions are added in the SCRIPTS menu,
+	    which is the mechanism to add functionality without having to change the base imlook4d software.
+	</P><P>
+
+		<UL>
+
+			<LI> Opening the following file formats: DICOM, ECAT, Hamamatsu SHR, Analyze (experimental), Interfile (experimental)
+			<LI> Saving to original file format (DICOM, ECAT, Analyze supported)
+			<LI> Opening data from medical PACS storage. <BR><BR>
+
+			<LI> Interactive help button
+			<LI> Easy mouse-wheel scrolling in slice or time dimension.
+			<LI> Powerful window handling.<BR><BR>
+
+
+			<LI> Brush tool for easy VOI (Volume-of-interest) giving activity curves in the 4-th dimension (time)<BR><BR>
+
+			<LI> Generation of Principal-component images.
+			<LI> Noise-reducing Hotelling filter (PCA-filter).<BR><BR>
+
+			<LI> Definition of own colorscales.
+			<LI> Definition of own preset window levels.<BR><BR>
+
+			<LI> Export and import to Matlab workspace.<BR><BR>
+				
+				
+			<LI> Export and import to ImageJ, if installed.<BR><BR>
+
+			<LI> Easy scripting, using Matlab (see below)
+
+			<LI> Possible to write interactive image-processing model, for instance instant click-and-see pharmaco-kinetic models.
+		</UL>
+
+<HR>
+		<H3>Extra features:</H3>		
+        <UL>
+			<LI> Installing ImageJ (only if you want to use ImageJ for image processing)<BR>
+                <A href="http://bigwww.epfl.ch/sage/soft/mij/">MIJ -- A Java package for bi-directional communication and data exchange from Matlab to ImageJ</A>. <BR>
+                Especially important: Increase the Java heap memory to its maximum from Matlab menu File/Preferences/General/Java Heap Memory.
+		</UL>
+
+<HR>
+         <H3>Workaround for right-click on ROI menu</H3>
+        <UL>
+		<LI> On some unix-based computers right-click on ROI dropdown menu does not work<BR>
+                Press [Ctrl] key on keyboard, at same time as right-click on mouse.
+		</UL>        
+	</P>
+	       
+        <H3>Workaround if using old Matlab/Java:</H3>
+        <UL>
+		<LI> Blank buttons in DICOM Save dialog<BR>
+                Change to using an external java runtime, by setting the windows environmental variabe MATLAB_JAVA.  The value of MATLAB_JAVA reflects the path of a java installation on the computer, for instance C:\Program Files\Java\jre6
+		</UL>        
+        
+	</P>
+<HR>
+        <H3>Requirements:</H3>	
+	<P> 
+        Windows, OS X, or Linux with installed Matlab and Java,
+        and a not too old computer, with at least 2 GB of memory.  
+	Memory requirements depends on number of images in an exam.
+	OpenGL graphics card may accelerate graphics updates.
+	</P>
+

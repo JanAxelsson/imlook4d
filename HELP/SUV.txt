@@ -1,0 +1,7 @@
+
+<h1>SUV calculation Script</h1>
+<HR></HR>
+<!------------------->
+	<P>This script generates a new volume with SUV (Standardized Uptake Value) for PET, instead of Bq/ml uptake.  
+
+    </P><P>The SUV value is calculated based on injected activity and body mass, taken from the DICOM file header.</P>

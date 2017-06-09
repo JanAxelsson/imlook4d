@@ -1,0 +1,19 @@
+%
+% disp2 - same as MATLAB built in function, but does not display if global
+% variable SETTINGS.QUIET==false
+%
+% Jan Axelsson, 070420
+function quiet=QuietMode()
+    global SETTINGS;
+    
+    quiet=false;        % Guess
+    if exist('SETTINGS') 
+         try     % If SETTINGS.QUIET==false, then display
+            if SETTINGS.QUIET==true
+                quiet=true;
+            end;
+        catch;  % If SETTINGS.QUIET does not exist, then display
+            disp('SETTINGS.QUIET '
+        end
+    end
+ 

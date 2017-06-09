@@ -1,0 +1,75 @@
+<html>
+
+<h1>Workspace Export - how it works</h1>
+<HR></HR>
+<!------------------->
+
+
+	
+	<P>
+	<h3>The following variables are directly exposed (they are also available for import):</h3>
+		<UL>
+			<LI>  <B>imlook4d_Cdata *</B> <BR>
+				  This is the 4D image matrix with dimensions x,y,z,time or phase.  <BR>
+				  The displayed image is in x-y plane.
+				  The image is the original image, as used internally to derive the viewed image
+			
+			<LI>  <B>imlook4d_ROI *</B> <BR>
+				  This is the ROIs (region-of-interests) represented as a 3D matrix with dimensions x,y,z.  
+				  The values in this matrix are 1 for first ROI, 2 for second ROI, etc.
+				  Thus, ROIs cannot overlap.
+			
+			<LI>  <B>imlook4d_ROINames *</B> <BR>
+				  This is a cell structure containing the ROI names.  <BR>
+				  The first element is the "Add ROI" function, which should never be manipulated.
+
+				  <BR><BR>
+
+			<LI>  <B>imlook4d_time *</B><BR>
+				  Frame time, if available (this depends on scanner, and modality).  Typically available for dynamic PET.  Unit is in seconds, as read from file header.
+				  
+			<LI>  <B>imlook4d_duration *</B><BR>
+				  Frame duration, if available (this depends on scanner, and modality).  Typically available for dynamic PET.  Unit is in seconds, as read from file header.			  
+				   
+		</UL>
+	</P>
+
+	<P>
+	<h3>The following variables are available for information, and will not affect the display if imported:</h3>	
+		<UL>
+				   
+			<LI>  <B>imlook4d_frame</B><BR>
+				  Current frame (same as slider). 
+			
+			<LI>  <B>imlook4d_slice</B><BR>
+				  Current slice (same as slider).
+		</UL>
+	</P>
+
+	<P>
+	<h3>The following variables gives access to Matlab-handles used internally by imlook4d:</h3>	
+		<UL>
+		  		
+			<LI>  <B>imlook4d_current_handle</B>
+				  Handle to current imlook4d instance.
+			
+			<LI>  <B>imlook4d_current_handles</B>
+				  This is a struct containing handles to all GUI elements, and data for this instance.  <BR>
+				  This exactly the same as the "handles" found in the imlook4d code. <BR>
+				  The imlook4d_current_handles is structured as follows:
+					<UL>
+						<LI>  GUI data is stored under handles
+						<LI>  All image data is stored under handles.image
+						<LI>  All model data is stored under handles.model <BR>
+							  This is used for kinetic models.
+					</UL>
+				   More information can be found in the document 
+				   "imlook4d\HELP\imlook4d documentation.doc"</a>
+		</UL>
+	</P>
+	
+	<P>
+	See the Import to workspace feature, to reload manipulated variables from workspace to imlook4d. 
+	</P>
+
+</html>

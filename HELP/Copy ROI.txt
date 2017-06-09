@@ -1,0 +1,35 @@
+<h1>Copy ROI</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	This script copies a ROI into multiple slices.  The inputs in the dialog are:
+	
+		<TABLE>
+			<TR>
+			<TD> <B> First destination slice &nbsp;</B></TD>
+			<TD> This is the first slice the ROI will be copied into. </TD>
+			</TR>
+			
+			<TR>
+			<TD> <B> Last destination slice</B></TD>
+			<TD> This is the last slice the ROI will be copied into.</TD>
+			</TR>
+			
+			<TR>
+			<TD> <B> Destination ROI</B></TD>
+			<TD> The ROI number that the copied ROI will be pasted into.</TD>
+			</TR>
+
+		</TABLE>
+
+	</P>
+	<p>
+		The destination slice can be specified either as an absolute slice number, or as a slice number relative to the current displayed slice.  
+		A relative slice number starts with one of the signs + or -.  
+	</P>
+	<p>		
+		<B>An example:</B><BR>
+		Assume that the current displayed slice=120.  
+		Then, setting "First destination slice"=-10 and 
+		"Last destination slice"=+9  means that the ROI will be pasted into slices 110 to 130 (120-10 to 120+9). 
+	</P>

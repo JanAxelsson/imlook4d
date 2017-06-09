@@ -1,0 +1,17 @@
+<h1>Step 2 - WB Patlak </h1>
+<HR></HR>
+<!------------------->
+	<P>
+		Draw a blood ROI
+	</P>
+
+<HR></HR>
+<!------------------->
+<a href="matlab: 
+		displayHTML('', 'Step 3 - Dynamic WB', fileread('WB_Patlak_Step3.txt'), '');
+        imlook4d('OpenFile_Callback', handles1.OpenAndMerge,{},handles1);
+        handle2=gcf; 
+        handles2=guidata(handle2);
+        displayHTML('', 'Step 4 - Dynamic WB', fileread('WB_Patlak_Step4.txt'), '');" 
+>Continue </a>
+	

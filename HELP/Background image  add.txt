@@ -1,0 +1,25 @@
+
+<h1>Background image - add</h1>
+<HR></HR>
+<!------------------->
+<p> 
+This script is used to add a background image to the currently viewed image. It then becomes a fusion image. 
+</p>
+
+<p> 
+The following applies to this image:
+</p>
+
+		<UL>
+			<LI> The added image must be exactly the same matrix as the currently viewed image.  (Use the script <code>/SCRIPTS/Matrix/Put in other matrix </code> to achieve this)
+			<LI> The background image is entirely living in its original imlook4d window.  It is only displayed as a background in the fusion image.
+			<LI> The above implies that:
+            <UL>
+                <LI>  The original-background imlook4d-window cannot be closed (because then the background image is not existing anymore)
+                <LI>  A change in the original-background imlook4d-window is also displayed int the fusion image  
+                <LI>  If you wish to change for instance window levels on a background CT, this is done by changing window levels in the original-background imlook4d-window.
+            </UL>
+		</UL>
+
+
+

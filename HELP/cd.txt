@@ -1,0 +1,9 @@
+<h1>cd button </h1>
+<HR></HR>
+<!------------------->
+	<P>
+	This button sets the Matlab working directory to where the file/files in the imlook4d window were opened.
+	</P>
+	
+
+

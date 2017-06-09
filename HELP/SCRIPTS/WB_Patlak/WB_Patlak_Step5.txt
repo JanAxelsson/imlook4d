@@ -1,0 +1,11 @@
+<h1>Step 5 - WB Patlak </h1>
+<HR></HR>
+<!------------------->
+	<P>
+		You have now defined the parameters for a Patlak slope image.  Press "Done" use these parameters.
+	</P>
+
+<HR></HR>
+<!------------------->
+<a href="matlab:WB_Patlak; ">Done </a>
+	

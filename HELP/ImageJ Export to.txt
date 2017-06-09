@@ -1,0 +1,45 @@
+<h1>ImageJ Export to</h1>
+<HR></HR>
+
+<!------------------->
+
+
+<h2>Use</h2>
+
+	<P>
+		Exports the current 3D image matrix (current frame) into <a href="http://rsbweb.nih.gov/ij/"> ImageJ </a>.
+	</P>
+	<P>
+		This allows analysis using all the features of ImageJ, and possibility to use all the available plugins for ImageJ.
+        Another option is to use ImageJ to manipulate the images, and then use the script "ImageJ Import to" to import back to imlook4d.
+	</P>
+
+
+<!-------------------------------------->
+<h2>Installation</h2>
+
+	<P>
+        <ol>
+        <li>
+            Download ImageJ from <a href="http://rsbweb.nih.gov/ij/download.html"> http://rsbweb.nih.gov/ij/download.html </a>. 
+            You can choose to run the installer, or to download the ij zip-file and extract it.
+        </li>
+        <li>
+            Copy ij.jar (from ImageJ) to directory:  imlook4d\external functions\ImageJ
+         </li>
+        <li>    
+            Increase java heap memory to 1 GB (Matlab menu: Preferences > General >  Java Heap Memory )
+        </li>
+        </ol>
+
+    </P>
+<!-------------------------------------->
+
+<h2>Acknowledgement</h2>
+
+	<P>
+		<B>MIJ</B> by Daniel Sage, is used for interfacing imlook4d with ImageJ.  
+					See website (<A HREF="http://bigwww.epfl.ch/sage/soft/mij/"> http://bigwww.epfl.ch/sage/soft/mij/ </A>).  The conditions to use this plugin is found on the website.
+					This means that if you use the ImageJ scrips and publish results, you need to include a citation to MIJ
+
+    </P>

@@ -1,0 +1,11 @@
+<h1>ViewROIs</h1>
+<HR></HR>
+<!------------------->
+	<P>
+		Creates a new imlook4d window with ROIs displayed as pixel values
+	</P>
+
+
+	<P> 
+        See also SCRIPTS / Matrix / Matrix to ROI
+	</P>

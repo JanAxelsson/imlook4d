@@ -1,0 +1,39 @@
+<h1>Copy Image </h1>
+<HR></HR>
+<!------------------->
+	<P>
+	Copies an image to clipboard, and displays the clipboard image.  
+	The image format is "Windows enhanced metafile".
+	Pressing "CTRL-C" keys may be used as a keyboard shortcut, but with the drawback that the main Matlab window will become visible.
+	</P>
+	
+	
+	<P>
+	The following texts are displayed in image area:
+	
+	
+		<UL>
+			<LI> <B>Image type </B> 
+				  (Image, Filtered image (PC1-3), etc  )
+			<LI>  <B>Frame </B>
+				   (Frame number)
+			<LI>  <B>Slice </B> 
+				   (Slice number)
+		</UL>
+	</P>
+
+
+	<P>
+	Showing the window title can be toggled by selecting menu "Edit/Preferences/Show Patient Info".
+	When checked, the window title is displayed above the image.  
+	</P>
+
+	<P>
+	The window title can be changed from the "Edit/Edit Window Title" menu.
+	</P>	
+
+	
+	<P>
+	Tip:  Some applications may have trouble to paste Windows enhanced metafiles.  Either try "Paste Special", if that exists, or 
+	try pasting into another program, and then using copy-paste to the desired program.
+	</P>

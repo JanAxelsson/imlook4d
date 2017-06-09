@@ -1,0 +1,13 @@
+<h1>Window resize</h1>
+<HR></HR>
+<!------------------->
+<P>
+	Press this button to make window larger.
+</P>
+<P>
+	Hold CTRL-key (or SHIFT-key) and press this button to make window smaller.
+</P>
+
+<P>
+ 	Window can also be resized by dragging right-lower corner.
+</P>

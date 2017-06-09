@@ -1,0 +1,1 @@
+function outputImage=test( handles, matrix, sliceRange)

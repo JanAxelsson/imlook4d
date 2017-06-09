@@ -1,0 +1,16 @@
+<h1>Clean ROI</h1>
+<HR></HR>
+<!------------------->
+	<P>
+		Cleans up a ROI with respect to narrow features, and holes.  A typical application is to clean up ROIs such as in the lung-tissue interface in CT
+		where medium intensity values that are due to the partial volume effect will be falsely incorporated into a thresholded ROI.
+		Running this script, will clean up these ROI pixels.
+	</P>
+	<P>
+		Furthermore, in a second pass, this filter will remove noise speckles within large ROI regions.
+ 
+	</P>	
+	<P>
+		The filter width is hard coded into the script, in units of pixels. The script uses a flat square kernel with the side being the width in pixels.
+		Hence, the filter width can be changed by changing the width value in the script itself.  The filter works in 2D slices, and loops through the full volume.
+	</P>

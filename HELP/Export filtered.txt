@@ -1,0 +1,30 @@
+<h1>Export filtered</h1>
+<HR></HR>
+<!------------------->
+
+	<P>
+	Exports the <B>manipulated</B> (filtered) data to MATLAB workspace.
+		<UL>
+			<LI> The image data is manipulated by filters or models.
+			<LI> The image data is <B>not</B> manipulated by settings changing the color scale (scale min/max, remove negatives, invert).
+		</UL>
+	</P>
+
+
+
+
+	<P>
+	Exports all the internal variables of the current imlook4d instance to the MATLAB workspace.  
+	Variables may be used for subsequent analysis, and can be imported using the "Workspace/Import" menu.
+	</P>
+	
+
+	<P>
+	<a href="export_details.html">Detailed information</a> 
+
+	</P>
+
+	
+	<P>
+	See the Import to workspace feature, to reload manipulated variables from workspace to imlook4d. 
+	</P>
