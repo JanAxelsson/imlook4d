@@ -1,0 +1,24 @@
+<h1>SPM write</h1>
+<HR></HR>
+<!------------------->
+	<P>
+		Saves a file using SPM routines
+	</P>
+
+	<P> 
+        This mode requires SPM packages to be added to the path.
+	</P>
+
+	<P> 
+        The SPM package can be found at <a href="http://www.fil.ion.ucl.ac.uk/spm/software/download.html">http://www.fil.ion.ucl.ac.uk/spm/software/download.html </a>
+	</P>
+
+	<P> 
+        Note that conversions between file formats is not supported by imlook4d.  Similarely, it is not advised to open and
+        save using different routines.  That is, opening with imlook4d's routine, you should also save a modified image by imlook4d's routine.
+        If you are opening an image with the SPM script, you should also save using the SPM script.
+	</P>
+
+	<P> 
+        See also SPM open
+	</P>

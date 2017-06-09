@@ -1,0 +1,6 @@
+<h1>Pan tool</h1>
+<HR></HR>
+<!------------------->
+When down, image panning is activated.  Click and hold mouse button on image, move mouse, then release mouse button.
+When up, panning is off.
+

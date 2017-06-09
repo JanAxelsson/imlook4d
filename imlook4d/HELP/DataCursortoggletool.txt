@@ -1,0 +1,6 @@
+<h1>Data cursor tool</h1>
+<HR></HR>
+<!------------------->
+When down, data cursor is activated.  Click on a pixel to display value.
+When up, data cursor is off.
+

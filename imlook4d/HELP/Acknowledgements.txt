@@ -1,0 +1,35 @@
+<h1>Acknowledgements </h1>
+<HR></HR>
+<!------------------->
+	<P>
+		The following software is included in imlook4d, all which are freely redistributable or which I have got permissions to redistribute:<BR><BR>
+
+		<UL>
+			<LI> <B>imlook3d</B> code by Omer Demirkaya's , who inspired me both to start this development and for the name.  
+				  Imlook4d is since heavily changed, but nevertheless imlook4d would not have existed without Omer's work. <BR><BR>
+			<LI> <B>dcm4che2 DICOM Toolkit </B>
+				 DICOM implementation in Java.  Used for DICOM network and tag info. <BR><BR>
+			<LI>  <B>MIJ</B> by Daniel Sage, for interfacing imlook4d with ImageJ.  
+					See website (<A HREF=http://bigwww.epfl.ch/sage/soft/mij/"> http://bigwww.epfl.ch/sage/soft/mij/ </A> ), at Biomedical Imaging Group (BIG), Ecole Polytechnique Federale de Lausanne (EPFL), Lausanne, Switzerland<BR><BR>
+			<LI>  <B>numutil </B> by Peter John Acklam.  Used for number conversion.<BR><BR>
+			<LI>  <B>save_cellarray, loadtable </B> by Armin Günter.  Used to save and load text table files.<BR><BR>
+			<LI>  <B>Analyze/NIfTI Toolbox</B> by Jimmy Shen for import and export of Analyze/Nifti file formats 
+					(<A HREF=http://www.rotman-baycrest.on.ca/~jimmy/NIfTI"> http://www.rotman-baycrest.on.ca/~jimmy/NIfTI </A> ).<BR><BR>
+
+
+		</UL>
+		Many web pages were useful in learning DICOM, especially the following link:
+		<UL>
+			<LI>  <A HREF="http://www.dclunie.com/medical-image-faq/html/index.html"> Medical image faq </A> , by David A. Clunie.<BR><BR>
+		</UL>
+
+
+		The first steps in developing this software were performed during my employed at Uppsala Imanet, and work has continued at Ume&aring; University and Norrland's University Hospital (NUS)<BR><BR>
+
+
+		I truly appreciate the works and support of the above mentioned,
+		who made it possible for me to both create this software, and avoid to reinvent the wheel too often.
+	<P></P>
+		/Jan Axelsson (<A HREF="mailto://axelsson.jan@gmail.com">axelsson.jan@gmail.com </A>)
+	</P>
+

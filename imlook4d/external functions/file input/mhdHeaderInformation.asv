@@ -1,0 +1,97 @@
+function [defaultanswer fullPath]=mhdHeaderInformation( filePath)
+try
+
+    % Image file path
+        try
+            [pathstr, name, ext] = fileparts(filePath);
+
+            temp=mhdHeader( filePath, 'ElementDataFile');  % Get data file path from header
+            fullPath=[pathstr filesep temp];
+
+            disp(['Name of data file=' temp]);
+        catch
+            disp('WARNING:  mhdHeader.m  : Could not find "name of data file"'); 
+        end
+
+    % Number of pixels
+        defaultanswer{1}='?'; % Signal that number of pixels were not found
+        defaultanswer{2}='?';
+        try
+            pixelString=mhdHeader( filePath, 'DimSize');    % Pixels in x y z
+            [xPixels, remain] = strtok(pixelString,' ');    % xPixels
+            [yPixels, zPixels] = strtok(remain,' ');        % yPixels, zPixels
+
+            defaultanswer{1}=xPixels; % xPixels
+            defaultanswer{2}=yPixels; % yPixels
+        catch
+            disp('ERROR:  mhdHeader.m  : Could not find matrix size'); 
+        end  
+
+    % Number of frames 
+        defaultanswer{4}='1'; % Default number of frames, if not found in header
+        try
+            try
+                % Dynamic SPECT
+                defaultanswer{4}=mhdHeader( filePath, 'number of images this frame group');     % Frames
+            catch
+            end
+            try
+                % Dynamic PET (Triumph animal scanner)
+                defaultanswer{4}=mhdHeader( filePath, 'tomo number of frames');     % Frames
+            catch
+            end   
+            try
+                % Dynamic PET (from STIR)
+                defaultanswer{4}=mhdHeader( filePath, 'number of time frames');     % Frames
+            catch
+            end   
+        catch
+            disp('WARNING:  mhdHeader.m  : Could not find number of frames'); 
+        end   
+
+        numberOfFrames=str2num(defaultanswer{4});
+
+    % Number of slices  
+        defaultanswer{3}='?';   % Signal that number of slices were not found
+        try
+            numberOfImages=str2num( mhdHeader( filePath, 'total number of images') );  % Total number of images
+            defaultanswer{3}=num2str( numberOfImages/numberOfFrames) ;                      % Slices    
+
+        catch
+            disp('WARNING:  interfileHeaderInformation.m  : Could not find total number of images'); 
+        end   
+
+
+    % Byte order
+        try
+            temp=mhdHeader( filePath, 'imagedata byte order'); 
+            switch temp
+                case 'LITTLEENDIAN'
+                    defaultanswer{5}='l';
+                case 'BIGENDIAN'
+                    defaultanswer{5}='b';
+                case 'bigendian'
+                    defaultanswer{5}='b';
+            end
+
+        catch
+            disp('ERROR:  interfileHeaderInformation.m  : Could not find imagedata byte order'); 
+        end   
+
+    % Format
+        defaultanswer{6}='int16';  % Guess int16, if not found in header
+        try
+            temp=mhdHeader( filePath, 'number format'); 
+            switch temp
+                case 'short float'
+                    defaultanswer{6}='float32';
+                case 'unsigned integer'
+                    defaultanswer{6}='int16';
+            end
+
+        catch
+            disp('WARNING:  mhdHeader.m  : Could not find number format'); 
+        end    
+catch
+    disp('ERROR:  mhdHeader.m failed');
+end

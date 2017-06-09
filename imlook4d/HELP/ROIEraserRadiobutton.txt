@@ -1,0 +1,8 @@
+<h1>Eraser</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	When selected, the ROI brush works as an eraser.
+	</P>
+
+

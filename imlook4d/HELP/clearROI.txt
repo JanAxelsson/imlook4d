@@ -1,0 +1,8 @@
+<h1>Clear ROI</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	Removes the drawn pixels, from the selected ROI.
+	</P>
+
+

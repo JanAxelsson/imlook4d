@@ -1,0 +1,12 @@
+<h1>Flip and rotate</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	Flips image and rotates by 90 degrees, just before the current image is displayed. 
+	This does not affect the orientation when saving images.
+	</P>
+		
+	<P>
+	This is the default for ECAT images.   
+	</P>
+

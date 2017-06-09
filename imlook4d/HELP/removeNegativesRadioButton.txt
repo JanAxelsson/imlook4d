@@ -1,0 +1,7 @@
+<h1>Remove negatives</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	Sets negative pixel values to zero, before the color scale is calculated.  This is only for display purposes, and does not affect any calculations. 
+	</P>
+

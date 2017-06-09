@@ -1,0 +1,92 @@
+<h1>ROI pixel data to workspace</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	This script writes the following to the MATLAB command window:<BR>
+	<UL>
+	<LI> all pixel values
+	<LI> ROI statistics 
+	</UL>
+    It also writes this to the workspace variable  <CODE>imlook4d_ROI_data </CODE> (which is a struct). <BR>
+    The struct contains the following variables:
+	</P>
+
+		<TABLE>
+			<TR>
+			<TD> <B> imlook4d_ROI_data.names &nbsp;</B></TD>
+			<TD> A cell matrix [ROI] with names for each ROI </TD>
+			</TR>
+
+			<TR>
+			<TD> <B> imlook4d_ROI_data.mean &nbsp;</B></TD>
+			<TD> A 2D matrix [ROI, frame] with mean values for each frame and ROI </TD>
+			</TR>
+			
+			<TR>
+			<TD valign="top"> <B> imlook4d_ROI_data.std</B></TD>
+			<TD valign="top"> A 2D matrix [ROI, frame] with standard deviation calculated for each frame and ROI</TD>
+			</TR>
+			
+			<TR>
+			<TD> <B> imlook4d_ROI_data.max</B></TD>
+			<TD>  A 2D matrix [ROI, frame] with maximum pixel value for each frame and ROI</TD>
+			</TR>
+
+			<TR>
+			<TD> <B> imlook4d_ROI_data.min</B></TD>
+			<TD>  A 2D matrix [ROI, frame] with minimum pixel value for each frame and ROI</TD>
+			</TR>
+
+			<TR>
+			<TD> <B> imlook4d_ROI_data.skewness</B> (requires statistical toolbox)</TD>
+			<TD>  A 2D matrix [ROI, frame] with skewness value calculated for pixels in each frame and ROI</TD>
+			</TR>
+
+			<TR>
+			<TD> <B> imlook4d_ROI_data.kurtosis</B> (requires statistical toolbox)</TD>
+			<TD>  A 2D matrix [ROI, frame] with kurtosis value calculated for pixels in each frame and ROI</TD>
+			</TR>
+
+			<TR>
+			<TD> <B> imlook4d_ROI_data.uniformity</B></TD>
+			<TD>  A 2D matrix [ROI, frame] with uniformity value calculated for pixels in each frame and ROI</TD>
+			</TR>
+
+			<TR>
+			<TD> <B> imlook4d_ROI_data.uniformity</B></TD>
+			<TD>  A 2D matrix [ROI, frame] with the entropy value calculated for pixels in each frame and ROI</TD>
+			</TR>
+			
+			<TR>
+			<TD valign="top"> <B> imlook4d_ROI_data.pixels</B></TD>
+			<TD valign="top"> A cell array with one 2D matrix per ROI.  The cell for a ROI contains a matrix [pixel,frame] with: 
+            <UL>
+            <LI> rows = one row per pixel in ROI
+            <LI> column= one column per frame
+            </UL>
+
+
+            </TD>
+			</TR>
+		</TABLE>
+
+	<P>
+	<B>The pixel values from a ROI can be extracted using the following formulas:</B>
+	</P>
+
+	<P>
+	Pixel values for ROI=roiNumber can be extracted into a matrix (one column per frame) with the command:  <BR>
+         <CODE> MyMatrix=imlook4d_ROI_data.pixels{roiNumber}</CODE> <BR><BR>
+	</P>
+
+	<P>
+	Pixel  values for frame=frameNumber and ROI=roiNumber can be extracted into a vector with the command:   <BR>
+         <CODE> MyVector=imlook4d_ROI_data.pixels{roiNumber}(:,frameNumber);</CODE> <BR>
+	</P>	
+
+	<P>
+	<B>The histogram for ROI-2 pixel values can be plotted as:</B><BR>
+           <CODE>figure;hist(imlook4d_ROI_data.pixels{2}(:,frameNumber))</CODE> <BR>
+           <CODE>figure;hist(imlook4d_ROI_data.pixels{2}(:,frameNumber),[-0.04:0.0025:0.04])</CODE> %(using a fixed range on the x-axis of histogram)<BR>
+	</P>
+

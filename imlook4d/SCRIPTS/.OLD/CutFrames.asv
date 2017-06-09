@@ -1,0 +1,152 @@
+% CutFrames.m
+%
+% SCRIPT for imlook4d
+% Jan Axelsson
+
+% INITIALIZE
+
+    %  imlook4d_current_handles is updated whenever SCRIPTS menu in imlook4d is
+    %  selected
+    disp('SCRIPTS/CutFrames.m entered');
+
+   
+    % Export to workspace
+    imlook4d('exportToWorkspace_Callback', imlook4d_current_handle,{},imlook4d_current_handles);  % Export to workspace
+    
+    % Initalize common constants
+    numberOfSlices=size(imlook4d_current_handles.image.Cdata,3);
+    numberOfFrames=size(imlook4d_current_handles.image.Cdata,4);
+    
+
+    % Get user input
+    prompt={'First frame to keep',...
+                'Last frame to keep'};
+        title='Cut frames';
+        numlines=1;
+        defaultanswer={'1',num2str(size(imlook4d_Cdata,4))};
+        %defaultanswer={har( mainHeader(296+1:296+32))',...
+        %        char( mainHeader(434+1:434+10))'};
+        answer=inputdlg(prompt,title,numlines,defaultanswer);
+        
+
+% 
+% PROCESS
+%
+    % Reformat data (cut frames)
+    
+        range=str2num(answer{1}):str2num(answer{2});
+
+        disp(['Original matrix size: ' num2str(size(imlook4d_Cdata)) ]);
+        imlook4d_Cdata=imlook4d_Cdata(:,:,:,range);
+        disp(['New matrix size:      ' num2str(size(imlook4d_Cdata)) ]);
+        lastElementInDirStructure=4*(1+ size(range,2) );  % Directory structure is 4 bytes per frame, plus 4 bytes at beginning
+        imlook4d_current_handles.image.ECATDirStruct( (lastElementInDirStructure+1):end)=0; % Make directory structure reflect new number of frames
+        
+    % Update frame times
+        imlook4d_time=imlook4d_time(range);
+        imlook4d_duration=imlook4d_duration(range);
+        
+    % If ECAT, delete subHeaders
+        try
+            imlook4d_current_handles.image.subHeader=imlook4d_current_handles.image.subHeader(:,range);
+        catch
+            disp('SCRIPTS/CutFrames WARNING:  Not ECAT data');
+        end
+        
+    % If dirtyDICOM, delete headers
+        try
+            % Reshape to 2D matrix (slices,frames)
+            tempHeader=imlook4d_current_handles.image.dirtyDICOMHeader;
+            tempHeader=reshape(tempHeader, numberOfSlices, numberOfFrames);
+            tempHeader=tempHeader(:, range);
+            
+            % Write linear matrix again
+            imlook4d_current_handles.image.dirtyDICOMHeader=reshape(tempHeader,1,[]);
+            
+            
+            
+            tempFileNames=imlook4d_current_handles.image.dirtyDICOMFileNames;
+            tempFileNames=reshape(tempFileNames, numberOfSlices, numberOfFrames);
+            tempFileNames=tempFileNames(:, range);
+            
+            % Write linear matrix again
+            imlook4d_current_handles.image.dirtyDICOMFileNames=reshape(tempFileNames,1,[]);
+            
+            
+            
+            
+            tempIndeces=imlook4d_current_handles.image.dirtyDICOMIndecesToScaleFactor;
+            tempIndeces=reshape(tempIndeces, numberOfSlices, numberOfFrames);
+            tempIndeces=tempIndeces(:, range);
+            
+            % Write linear matrix again
+            imlook4d_current_handles.image.dirtyDICOMIndecesToScaleFactor=reshape(tempIndeces,1,[]);
+        catch
+            disp('SCRIPTS/CutFrames WARNING:  Not dirtyDICOM data');
+        end
+        
+    % Import into imlook4d
+        imlook4d('importFromWorkspace_Callback', imlook4d_current_handle,{},imlook4d_current_handles); % Import from workspace to current imlook4d instance
+    % Set GUI to frame 1
+        set(imlook4d_current_handles.FrameNumEdit,'String','1');
+        set(imlook4d_current_handles.FrameNumSlider,'Value',1);
+        
+     % Set window name    
+        oldName=get(imlook4d_current_handle,'Name');
+        set(imlook4d_current_handle,'Name', [oldName '(Frames' answer{1} '-' answer{2} ')' ]);
+%   
+% FINALIZE
+%
+        
+        
+        clear range NewVal
+
+% 
+% GUIDANCE ON HOW TO CONTROL AN IMLOOK4D INSTANCE FROM SCRIPTS
+% ------------------------------------------------------------
+%  
+% WORK WITH IMLOOK4D INSTANCE IN MATLAB - THE SIMPLE WAY
+%
+%   1a) imlook4d/SCRIPT menu to make active window handles in workspace:
+%       imlook4d_current_handle     handle to imlook4d equivalent to hObject in imlook4d callback functions
+%       imlook4d_current_handles    equivalent to handles in this code (This is what you work with)
+%
+%   1b) imlook4d/Workspace/Export or Import menu to push active window data to workspace or pull from workspace:
+%
+%         This method applies to common data.  Otherwise methods 2) and 3)
+%         below must be used.
+%
+%         imlook4d_time        vector of frame times (exists only when time data exists)
+%         imlook4d_duration    vector of frame duration (exists only when duration data exists)
+%         imlook4d_Cdata       4D matrix of image data [x, y, slice,frame]
+%         imlook4d_ROI         3D matrix of ROI data [x, y, slice] where the pixel value equals the ROI number (thus, only one ROI possible in each pixel)
+%         imlook4d_ROINames    ROI names
+%
+%         NOT IMPORTED:  imlook4d_frame       current frame
+%         NOT IMPORTED:  imlook4d_slice       current slice
+%         NOT IMPORTED:  imlook4d_current_handle     handle to imlook4d equivalent to hObject in imlook4d callback functions
+%         NOT IMPORTED:  imlook4d_current_handles    equivalent to handles in this code (This is what you work with)
+%
+%   2) Example:  Modify handles.image.CachedImage from matlab workspace
+%       imlook4d_current_handles.image.CachedImage=1000;
+%
+%   3) Save changed handles to current Imlook4d instance.  This call
+%      attaches the modified imlook4d_current_handles to the current imlook4d
+%      instance: 
+%       guidata(imlook4d_current_handle, imlook4d_current_handles)
+%
+%
+% CALL FUNCTIONS FROM SCRIPT
+%
+% This applies to calling a function in the current imlook4d instance.
+% Relevant examples are calling the Export and Imports from workspace via
+% their respective menu callback functions.
+%
+% EXPORT from current imlook4d
+%    imlook4d('exportToWorkspace_Callback', imlook4d_current_handle,{},imlook4d_current_handles); % Exports to workspace from current imlook4d instance
+%
+% IMPORT to new imlook4d  
+%     tempHandle=imlook4d;  % New imlook4d instance
+%     tempHandles=guidata(tempHandle);
+%     imlook4d('importFromWorkspace_Callback', tempHandle,{},tempHandles);   % Import from workspace
+%

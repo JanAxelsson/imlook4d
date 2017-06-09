@@ -1,0 +1,41 @@
+<h1>Record </h1>
+<HR></HR>
+<!------------------->
+<p> 
+NOTE: This is an experimental feature!
+</p><p>
+When button is down -- recording is activated.
+When button is up -- recording is de-activated.
+</p>
+Please read <A href="matlab:open( which('Scripting-imlook4d.pdf') );">Scripting imlook4d</A> to learn about imlook4d scripts.
+</p><p>
+
+<h2> Recording </h2>
+<!-------------------------------------->
+<p>
+The recording is meant to make it easier to create your own scripts, and should be viewed as a skeleton for such scripts.
+A recorded script is created in MATLAB's own editor.  The script may be modified afterwards to fit your needs.
+</p>
+
+<h2> Script engine </h2>
+<!-------------------------------------->
+<p>
+The script engine uses normal MATLAB code.  All scripts in the SCRIPTS folder work on the following two variables:
+<UL>	
+	<LI><code>imlook4d_current_handle</code> is a handle to the active imlook4d window.</LI>
+	<LI><code>imlook4d_current_handles</code> is a handle structure to the active imlook4d window.</LI>
+</UL>
+
+<h2> Duplicate </h2>
+<!-------------------------------------->
+The Duplicate script is special.  Its purpose is to create a copy of an imlook4d window, which you may alter.  
+After Duplicate has created a duplicated imlook4d window, it assigns the following two variables to that window.
+<UL>
+	<LI><code>newHandle</code> is a handle after to a new imlook4d window (after Duplicate script)</LI>
+	<LI><code>newHandles</code> is a handle structure to a new imlook4d window (after Duplicate script)</LI>
+</UL>
+At this point, no scripts can work on the duplicated scripts.  The point is that you are free to work on the newly created imlook4d instance, 
+before calling <code>MakeCurrent</code>, and most often also <code>Import</code>.
+The script <code>MakeCurrent</code> lets the duplicated script become the current script.
+
+

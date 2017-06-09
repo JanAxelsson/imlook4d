@@ -1,0 +1,7 @@
+<h1>Windows</h1>
+<HR></HR>
+<!------------------->
+<P>
+Gives a list of figure windows.  The selected window is moved to top.
+</P>
+

@@ -1,0 +1,12 @@
+<h1>Contor ROI</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	If checked, the ROIs are drawn as contours <u>outside<u> the pixels representing the ROI.
+	</P>
+	<P>
+	If not checked, the ROIs are drawn as shaded areas <u>exactly<u> representing the the pixels of the ROI.
+	</P>
+
+
+

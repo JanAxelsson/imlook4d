@@ -1,0 +1,8 @@
+<h1>Hide ROI</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	Hides the ROIs from display.  They are active for time-activity curve calculations, also when hidden.
+	</P>
+
+
