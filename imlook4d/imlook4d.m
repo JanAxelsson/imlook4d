@@ -5555,7 +5555,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             printpreview(gcf);
             close(gcf);
             
-   % Close window(s)        
+   % Close window(s)             
+         function Close_one_Callback(hObject, eventdata, handles)
+         % Display HELP and get out of callback
+             if DisplayHelp(hObject, eventdata, handles) 
+                 return 
+             end
+        
+            close( handles.figure1 );
         function Close_many_Callback(hObject, eventdata, handles)
          % Display HELP and get out of callback
              if DisplayHelp(hObject, eventdata, handles) 
