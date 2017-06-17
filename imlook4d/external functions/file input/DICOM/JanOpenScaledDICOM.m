@@ -353,31 +353,40 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
 
             
             try    
-                tempFilename= [directoryPath fileNames(nr).name];
-                
+                tempFilename= [directoryPath fileNames(nr).name];              
                 fileSize=fileNames(nr).bytes;
+% %                 headerSize1=fileSize-numberOfBytesInData;  % Assume data at end of file
+                
+                % NEW Read Data, Assume nothing about data position
+                fid = fopen(tempFilename,'r');
+                A = fread(fid,'uint8');
+                out4=dirtyDICOMHeaderData({A}, 1, '7FE0', '0010',mode);
+                startOfPixelData = out4.indexLow;
+                headerSize2 = startOfPixelData - 1;
+                numberOfBytesInData=out4.valueLength; 
+                fclose(fid);
+                
+                % Use OLD or NEW fileSize
+                %headerSize = headerSize1;  % From file size
+                headerSize = headerSize2;  % From (7FE0,0010)
 
-                %headerSize=fileSize-numberOfBytesInData;  % Assume data at end of file
-                
-                % Assume nothing about data position
-                out3=dirtyDICOMHeaderData(headers, 1, '7FE0', '0010',mode);  % Find start of data
-                startOfPixelData = out3.indexLow;
-                headerSize = startOfPixelData - 1;
-                numberOfBytesInData=out3.valueLength;
-                
                 
                 if  (headerSize>0)  % Ignore really small files
-
-                    fid = fopen(tempFilename, 'r',machineFormat);
-                    tempHeader= fread(fid, headerSize);                     % Binary header in memory  
-                    
-                    % Determine number of bytes per pixel
-                    
-                   % tempData= fread(fid, numberOfBytesInData, 'int16');     % Data in memory 
-                    tempData = fread(fid, numberOfBytesInData / numberOfBytesPerPixel, numberFormat);     % Data in memory   
-
-                    fclose(fid);
-                    
+% %                  % Read header and data
+% %                     fid = fopen(tempFilename, 'r',machineFormat);
+% %                     tempHeader= fread(fid, headerSize);                     % Binary header in memory  
+% %                     
+% %                     % Determine number of bytes per pixel
+% %                     
+% %                    % tempData= fread(fid, numberOfBytesInData, 'int16');     % Data in memory 
+% %                     tempData = fread(fid, numberOfBytesInData / numberOfBytesPerPixel, numberFormat);     % Data in memory 
+% % 
+% %                     fclose(fid);
+                     
+                    % NEW - Read header and data
+                    tempHeader = A(1:headerSize-1);
+                    tempData = typecast( uint8(A(startOfPixelData:startOfPixelData+numberOfBytesInData-1)), numberFormat);
+                   
                     % Test if DICOM file or Hermes export
                     if strcmp(char(tempHeader(129:132))', 'DICM') || strcmp(char(tempHeader(129:132))', '1000') 
                         
@@ -395,8 +404,9 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                             count=count+1;    % Succesful read
                             try
                                 matrix(:,:,count)=single(reshape(tempData(:),columns,rows,1));
+                                %disp(['      - tempData=[' num2str(size(tempData)) '] rows=' num2str(rows) ' columns=' num2str(columns) ' rows*columns=' num2str(rows*columns) ' file=' tempFilename]);
                             catch
-                                disp(['ERROR - tempData=[' num2str(size(tempData)) ' rows=' num2str(rows) ' columns=' num2str(columns) ' rows*columns=' num2str(rows*columns)]);
+                                %disp(['ERROR - tempData=[' num2str(size(tempData)) '] rows=' num2str(rows) ' columns=' num2str(columns) ' rows*columns=' num2str(rows*columns) ' file=' tempFilename]);
                             end
                             header{count}=tempHeader;
                             %fileName{count}=tempFilename;
