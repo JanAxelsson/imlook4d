@@ -8511,7 +8511,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 
                  str =  fileread('version.txt');
                  t=str2double( regexp(str,'\d+', 'match') ); % get all double values
-                 version = num2str( t(end) + 1);  
+                 version = num2str( t(end) );  
                  
                  
                  
