@@ -4,5 +4,9 @@
 	<P>
 	When selected, the ROI brush works as an eraser.
 	</P>
+	<P>
+	The ROI brush can also be temporarily activated by holding the SHIFT key while drawing.  
 
+    (Eraser radiobutton does not display when SHIFT key is held) 
+	</P>
 

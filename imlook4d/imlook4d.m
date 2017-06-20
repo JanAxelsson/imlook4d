@@ -2893,7 +2893,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             nonLockedROIPixels = find( ROILock==0 & handles.image.brush>0 );
 
 
-                            if get(handles.ROIEraserRadiobutton,'Value')   
+                            if get(handles.ROIEraserRadiobutton,'Value')  | strcmp( get(handles.figure1, 'currentmodifier'),'shift') 
                                 subMatrix( nonLockedROIPixels ) = 0;
                             else
                                 subMatrix( nonLockedROIPixels ) = activeROI;  % Draw over any pixels in brush

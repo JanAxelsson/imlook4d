@@ -11,4 +11,10 @@ Data consists of pixels, with a given position in x,y,z, and optionally frame di
 A slice of this data, at a given z, and frame is drawn in the view port.
 </P>
 
+<P>
+When a ROI has been created (See Add ROI drop-down list), a region-of-interest (ROI) can be drawn by moving the cursor with pressed left button.
+Pressing SHIFT while left-click and moving the mouse makes the cursor act as an eraser instead.
+</P>
+
+
 
