@@ -1160,7 +1160,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         %       See ISPC and COMPUTER.
         if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
             set(hObject,'BackgroundColor','white');
-        end
+        end 
+    function ROILevelEdit_CreateFcn(hObject, eventdata, handles)
+        if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+            set(hObject,'BackgroundColor','white');
+        end        
     function ROINumberMenu_CreateFcn(hObject, eventdata, handles)
         % hObject    handle to ROINumberMenu (see GCBO)
         % eventdata  reserved - to be defined in a future version of MATLAB
