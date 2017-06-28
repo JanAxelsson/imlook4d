@@ -2037,6 +2037,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                  %set(hObject,'State', 'off')
                  return 
              end
+     function ROILevelEdit_Callback(hObject, eventdata, handles)      
+        % Display HELP and get out of callback
+             if DisplayHelp(hObject, eventdata, handles) 
+                 return 
+             end
              
      
     % --------------------------------------------------------------------
@@ -2299,7 +2304,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              
         %TACT(hObject, eventdata, handles);
         newTACT(hObject, eventdata, handles); 
-    function clearROI_Callback(hObject, eventdata, handles)
+    function clearROI_Callback2(hObject, eventdata, handles)
        % Display HELP and get out of callback
              if DisplayHelp(hObject, eventdata, handles) 
                  return 
@@ -2987,7 +2992,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             if get(handles.ROIEraserRadiobutton,'Value')  | strcmp( get(handles.figure1, 'currentmodifier'),'shift') 
                                 subMatrix( nonLockedROIPixels ) = 0;
                             else
-                                subMatrix( nonLockedROIPixels ) = activeROI;  % Draw over any pixels in brush
+                                % Draw over any pixels in brush
+                                %subMatrix( nonLockedROIPixels ) = activeROI;  % Draw over any pixels in brush
+                                
+                                % Draw over pixels above level
+                                level = str2num( get(handles.ROILevelEdit,'String') );
+                                subDataMatrix= handles.image.Cdata( ixx:(ixx+rx-1),(iyy):(iyy+ry-1), slice, frame);
+                                subMatrix( find( subDataMatrix> level) ) = activeROI;  % Draw over any pixels in brush
                             end
                             
                             handles.image.ROI( (ixx):(ixx+rx-1),(iyy):(iyy+ry-1), slice) = subMatrix;

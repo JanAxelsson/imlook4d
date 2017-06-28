@@ -1,0 +1,9 @@
+<h1>ROI level</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	ROI brush only draws pixels above the given ROI level.  Set the level to a value below the lowest pixel value to allow drawing everywhere.
+	</P>
+
+
+
