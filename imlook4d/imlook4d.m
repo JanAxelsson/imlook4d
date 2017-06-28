@@ -2831,11 +2831,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             UNDOSIZE = length(handles.image.UndoROI.ROI);
             ROI3D = handles.image.ROI;
             try
-                tic
                 for i=(UNDOSIZE-1):-1:1
                     handles.image.UndoROI.ROI{i+1} = handles.image.UndoROI.ROI{i};
                 end
-                toc
             catch
                 handles.image.UndoROI.ROI{1} = ROI3D;
                 handles.image.UndoROI.position = 1;
@@ -2852,12 +2850,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 end
                 % zero
                 for i = (UNDOSIZE-numberOfRoisToDelete+1):UNDOSIZE
-                    handles.image.UndoROI.ROI{i} = 0;
+                    handles.image.UndoROI.ROI{i} = zeros(handles.image.UndoROI.ROI{i});
                 end
-                handles.image.UndoROI.position = 1; % Always set to 1 when drawing
+                handles.image.UndoROI.position = ones(handles.image.UndoROI.ROI{i}); % Always set to 1 when drawing
             end
             
-%             for i=1:10;temp=handles.image.UndoROI.ROI{i};s(i)=sum(temp(:));end;disp(s);
+            for i=1:UNDOSIZE;temp=handles.image.UndoROI.ROI{i};s(i)=sum(temp(:));end;disp([ '(' num2str(handles.image.UndoROI.position) ') ' num2str(s)]);
 %             disp(handles.image.UndoROI.position);
 %             disp(size(handles.image.ROI));
 %             disp(size(handles.image.UndoROI.ROI));
@@ -2872,9 +2870,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         
         handles.image.ROI = handles.image.UndoROI.ROI{position}; % Copy ROI
         handles.image.UndoROI.position = position; % Remember position
+        disp(size(handles.image.ROI));
         
-%         for i=1:10;temp=handles.image.UndoROI.ROI{i};s(i)=sum(temp(:));end;disp(s);
-%         disp(handles.image.UndoROI.position);
+        for i=1:undoMax;temp=handles.image.UndoROI.ROI{i};s(i)=sum(temp(:));end;disp([ '(' num2str(handles.image.UndoROI.position) ') ' num2str(s)]);
+
         guidata(handles.figure1,handles);  
     function handles = redoRoi(handles)
         undoMax = length(handles.image.UndoROI.ROI);
@@ -2886,9 +2885,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         
         handles.image.ROI = handles.image.UndoROI.ROI{position}; % Copy ROI
         handles.image.UndoROI.position = position; % Remember position
+        disp(size(handles.image.ROI));
         
-%         for i=1:10;temp=handles.image.UndoROI.ROI{i};s(i)=sum(temp(:));end;disp(s);
-%         disp(handles.image.UndoROI.position);
+        
+        for i=1:undoMax;temp=handles.image.UndoROI.ROI{i};s(i)=sum(temp(:));end;disp([ '(' num2str(handles.image.UndoROI.position) ') ' num2str(s)]);
         guidata(handles.figure1,handles);                
     
     function drawROI(hObject, eventdata, handles)
