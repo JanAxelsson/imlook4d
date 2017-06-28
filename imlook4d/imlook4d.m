@@ -2850,9 +2850,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 end
                 % zero
                 for i = (UNDOSIZE-numberOfRoisToDelete+1):UNDOSIZE
-                    handles.image.UndoROI.ROI{i} = zeros(handles.image.UndoROI.ROI{i});
+                    handles.image.UndoROI.ROI{i} = zeros(size(handles.image.UndoROI.ROI{i}),'uint8');
                 end
-                handles.image.UndoROI.position = ones(handles.image.UndoROI.ROI{i}); % Always set to 1 when drawing
+                handles.image.UndoROI.position = 1; % Always set to 1 when drawing
             end
             
             for i=1:UNDOSIZE;temp=handles.image.UndoROI.ROI{i};s(i)=sum(temp(:));end;disp([ '(' num2str(handles.image.UndoROI.position) ') ' num2str(s)]);
