@@ -1598,6 +1598,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                  set(hObject,'State', 'off')
                  return 
              end
+
     function ZoomOuttoggletool_ClickedCallback(hObject, eventdata, handles)
         % Display HELP and get out of callback
              if DisplayHelp(hObject, eventdata, handles) 
@@ -1610,21 +1611,21 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                  set(hObject,'State', 'off')
                  return 
              end
-             
     function DataCursortoggletool_ClickedCallback(hObject, eventdata, handles)
         % Display HELP and get out of callback
              if DisplayHelp(hObject, eventdata, handles) 
                  set(hObject,'State', 'off')
                  return 
-             end                   
-    function DataCursortoggletool_ReleasedCallback(hObject, eventdata, handles)
+             end          
+             
+   function DataCursortoggletool_ReleasedCallback(hObject, eventdata, handles)
         % Display HELP and get out of callback
              if DisplayHelp(hObject, eventdata, handles) 
                  set(hObject,'State', 'off')
                  return 
              end            
              a=findall(gcf,'Type','hggroup');
-             delete(a);        
+             delete(a);         111
      
     function helpToggleTool_OnCallback(hObject, eventdata, handles)
         % Make text boxes and other things that shouldn't be callbacked inactive
@@ -1640,7 +1641,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         set(handles.FirstFrame,'Enable', 'inactive');
         set(handles.ColorBar, 'ButtonDownFcn', @(hObject,eventdata)imlook4d('ColorBar_Callback',hObject,eventdata,guidata(hObject)) ); 
     function helpToggleTool_OffCallback(hObject, eventdata, handles)
-        % Set textboxes etc on, to allow normal work when help button is not pressed
+        % Set textboxes etc on, to allow normal work when help button is not activated
         set(handles.ROILevelEdit,'Enable', 'on');
         set(handles.BrushSize,'Enable', 'on');
         set(handles.FrameNumEdit,'Enable', 'on');
@@ -1739,8 +1740,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                  currentYoke=get( getappdata(imlook4d_instances(i),'currentYoke'), 'Tag');
                  %disp([ num2str(imlook4d_instances(i)) '(' currentYoke ')   ' '   yokes=' num2str(yokes(:)')]);
              end
-             
-    function recordOnButton_ClickedCallback(hObject, eventdata, handles)
+    function recordOnButton_ClickedCallback(hObject, eventdata, handles)            
              % Display HELP and get out of callback
              if DisplayHelp(hObject, eventdata, handles) 
                  set(hObject,'State', 'off')
@@ -1815,7 +1815,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              end
                          
              guidata(handles.figure1, handles);
-        function fig = getParentFigure(fig)
+                function fig = getParentFigure(fig)
                     % if the object is a figure or figure descendent, return the
                     % figure. Otherwise return [].
                     while ~isempty(fig) && ~strcmp('figure', get(fig,'type'))

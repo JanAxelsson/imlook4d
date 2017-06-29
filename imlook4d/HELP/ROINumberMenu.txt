@@ -15,7 +15,7 @@
        
 		<UL>
 
-			<LI> <B>Clear ROI</B>, which clears the currently selected ROI, to contain no ROI pixels.
+			<LI> <B>Clear ROI</B>, which clears the currently selected ROI, to remove all defined ROI pixels in selected ROI.
 			<LI> <B>Rename</B>, which renames the currently selected ROI
 
 
@@ -48,6 +48,9 @@
 	</P>
     <P>
 	ROIs are drawn by a Brush, where the size can be modified by the <code>Brush</code> size input
+	</P>
+    <P>
+	Right-click the ROI drop-down-menu, and select Clear ROI to empty all the ROI pixels for the current ROI.
 	</P>
 	<P>
 	ROIs can be displayed in multiple ways, as defined by the menu <code>Edit/ROI</code>.
