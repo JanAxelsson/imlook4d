@@ -47,7 +47,7 @@
     in single slices, and a volume of interest being a composite of these has no meaning.  Instead the word ROI and VOI can be interchanged.
 	</P>
     <P>
-	ROIs are drawn by a Brush, where the size can be modified by the <code>Brush</code> size input
+	ROIs are drawn by a Brush, where the size can be modified by the <code>Brush</code> size input.  The ROI is drawn only on pixels with values above the Level.  
 	</P>
     <P>
 	Right-click the ROI drop-down-menu, and select Clear ROI to empty all the ROI pixels for the current ROI.
