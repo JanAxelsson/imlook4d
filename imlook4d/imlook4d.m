@@ -1427,9 +1427,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
     
     function figure1_ScrollWheelFcn(hObject, eventdata, handles)
         direction=-eventdata.VerticalScrollCount;
-        scrollSlices(hObject, eventdata, handles, direction);
-        
-    
+        scrollSlices(hObject, eventdata, handles, direction); 
         function scrollSlices(hObject, eventdata, handles, direction)
 
         % Initialize
@@ -2041,7 +2039,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                  %set(hObject,'State', 'off')
                  return 
              end
-     function ROILevelEdit_Callback(hObject, eventdata, handles)      
+    function ROILevelEdit_Callback(hObject, eventdata, handles)      
         % Display HELP and get out of callback
              if DisplayHelp(hObject, eventdata, handles) 
                  return 

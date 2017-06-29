@@ -14,7 +14,10 @@
 	Right-click the ROI menu shows a contextual menu with the following options:
        
 		<UL>
+
+			<LI> <B>Clear ROI</B>, which clears the currently selected ROI, to contain no ROI pixels.
 			<LI> <B>Rename</B>, which renames the currently selected ROI
+
 
 			<LI>  <B>Hide </B>, which hides the currently selected ROI from ROI analysis
 			<LI>  <B>Hide All</B>, which hides the currently selected ROI from ROI analysis
