@@ -995,6 +995,9 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 %                'Location', 'EastOutside')
 
  set(handles.ColorBar, 'Position',initpos','Location', 'EastOutside')
+ 
+ % Set HitTest (Matlab 2016b is sensitive to this, see my support issue to MathWorks #0235001)
+ h=handles.figure1;h.HitTest='on';
 
 % Output to command line                    
 function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
