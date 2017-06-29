@@ -1160,7 +1160,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         %       See ISPC and COMPUTER.
         if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
             set(hObject,'BackgroundColor','white');
-        end
+        end 
+    function ROILevelEdit_CreateFcn(hObject, eventdata, handles)
+        if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+            set(hObject,'BackgroundColor','white');
+        end        
     function ROINumberMenu_CreateFcn(hObject, eventdata, handles)
         % hObject    handle to ROINumberMenu (see GCBO)
         % eventdata  reserved - to be defined in a future version of MATLAB
@@ -1423,9 +1427,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
     
     function figure1_ScrollWheelFcn(hObject, eventdata, handles)
         direction=-eventdata.VerticalScrollCount;
-        scrollSlices(hObject, eventdata, handles, direction);
-        
-    
+        scrollSlices(hObject, eventdata, handles, direction); 
         function scrollSlices(hObject, eventdata, handles, direction)
 
         % Initialize
@@ -2037,6 +2039,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                  %set(hObject,'State', 'off')
                  return 
              end
+    function ROILevelEdit_Callback(hObject, eventdata, handles)      
+        % Display HELP and get out of callback
+             if DisplayHelp(hObject, eventdata, handles) 
+                 return 
+             end
              
      
     % --------------------------------------------------------------------
@@ -2299,7 +2306,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              
         %TACT(hObject, eventdata, handles);
         newTACT(hObject, eventdata, handles); 
-    function clearROI_Callback(hObject, eventdata, handles)
+    function clearROI_Callback2(hObject, eventdata, handles)
        % Display HELP and get out of callback
              if DisplayHelp(hObject, eventdata, handles) 
                  return 
@@ -2831,11 +2838,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             UNDOSIZE = length(handles.image.UndoROI.ROI);
             ROI3D = handles.image.ROI;
             try
-                tic
                 for i=(UNDOSIZE-1):-1:1
                     handles.image.UndoROI.ROI{i+1} = handles.image.UndoROI.ROI{i};
                 end
-                toc
             catch
                 handles.image.UndoROI.ROI{1} = ROI3D;
                 handles.image.UndoROI.position = 1;
@@ -2852,12 +2857,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 end
                 % zero
                 for i = (UNDOSIZE-numberOfRoisToDelete+1):UNDOSIZE
-                    handles.image.UndoROI.ROI{i} = 0;
+                    handles.image.UndoROI.ROI{i} = zeros(size(handles.image.UndoROI.ROI{i}),'uint8');
                 end
                 handles.image.UndoROI.position = 1; % Always set to 1 when drawing
             end
             
-%             for i=1:10;temp=handles.image.UndoROI.ROI{i};s(i)=sum(temp(:));end;disp(s);
+            for i=1:UNDOSIZE;temp=handles.image.UndoROI.ROI{i};s(i)=sum(temp(:));end;disp([ '(' num2str(handles.image.UndoROI.position) ') ' num2str(s)]);
 %             disp(handles.image.UndoROI.position);
 %             disp(size(handles.image.ROI));
 %             disp(size(handles.image.UndoROI.ROI));
@@ -2872,9 +2877,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         
         handles.image.ROI = handles.image.UndoROI.ROI{position}; % Copy ROI
         handles.image.UndoROI.position = position; % Remember position
+        disp(size(handles.image.ROI));
         
-%         for i=1:10;temp=handles.image.UndoROI.ROI{i};s(i)=sum(temp(:));end;disp(s);
-%         disp(handles.image.UndoROI.position);
+        for i=1:undoMax;temp=handles.image.UndoROI.ROI{i};s(i)=sum(temp(:));end;disp([ '(' num2str(handles.image.UndoROI.position) ') ' num2str(s)]);
+
         guidata(handles.figure1,handles);  
     function handles = redoRoi(handles)
         undoMax = length(handles.image.UndoROI.ROI);
@@ -2886,9 +2892,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         
         handles.image.ROI = handles.image.UndoROI.ROI{position}; % Copy ROI
         handles.image.UndoROI.position = position; % Remember position
+        disp(size(handles.image.ROI));
         
-%         for i=1:10;temp=handles.image.UndoROI.ROI{i};s(i)=sum(temp(:));end;disp(s);
-%         disp(handles.image.UndoROI.position);
+        
+        for i=1:undoMax;temp=handles.image.UndoROI.ROI{i};s(i)=sum(temp(:));end;disp([ '(' num2str(handles.image.UndoROI.position) ') ' num2str(s)]);
         guidata(handles.figure1,handles);                
     
     function drawROI(hObject, eventdata, handles)
@@ -2987,7 +2994,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             if get(handles.ROIEraserRadiobutton,'Value')  | strcmp( get(handles.figure1, 'currentmodifier'),'shift') 
                                 subMatrix( nonLockedROIPixels ) = 0;
                             else
-                                subMatrix( nonLockedROIPixels ) = activeROI;  % Draw over any pixels in brush
+                                % Draw over any pixels in brush
+                                %subMatrix( nonLockedROIPixels ) = activeROI;  % Draw over any pixels in brush
+                                
+                                % Draw over pixels above level
+                                level = str2num( get(handles.ROILevelEdit,'String') );
+                                subDataMatrix= handles.image.Cdata( ixx:(ixx+rx-1),(iyy):(iyy+ry-1), slice, frame);
+                                subMatrix( find( subDataMatrix> level) ) = activeROI;  % Draw over any pixels in brush
                             end
                             
                             handles.image.ROI( (ixx):(ixx+rx-1),(iyy):(iyy+ry-1), slice) = subMatrix;
