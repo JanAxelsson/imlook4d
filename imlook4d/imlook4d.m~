@@ -1160,11 +1160,15 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         %       See ISPC and COMPUTER.
         if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
             set(hObject,'BackgroundColor','white');
+<<<<<<< Updated upstream
         end 
     function ROILevelEdit_CreateFcn(hObject, eventdata, handles)
         if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
             set(hObject,'BackgroundColor','white');
         end        
+=======
+        end
+>>>>>>> Stashed changes
     function ROINumberMenu_CreateFcn(hObject, eventdata, handles)
         % hObject    handle to ROINumberMenu (see GCBO)
         % eventdata  reserved - to be defined in a future version of MATLAB
@@ -1427,7 +1431,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
     
     function figure1_ScrollWheelFcn(hObject, eventdata, handles)
         direction=-eventdata.VerticalScrollCount;
+<<<<<<< Updated upstream
         scrollSlices(hObject, eventdata, handles, direction); 
+=======
+        scrollSlices(hObject, eventdata, handles, direction);
+        
+    
+>>>>>>> Stashed changes
         function scrollSlices(hObject, eventdata, handles, direction)
 
         % Initialize
@@ -1628,8 +1638,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              delete(a);         111
      
     function helpToggleTool_OnCallback(hObject, eventdata, handles)
+<<<<<<< Updated upstream
         % Make text boxes and other things that shouldn't be callbacked inactive
         set(handles.ROILevelEdit,'Enable', 'inactive');
+=======
+        % Make text boxes and other things that can't be callbacked inactive
+>>>>>>> Stashed changes
         set(handles.BrushSize,'Enable', 'inactive');
         set(handles.FrameNumEdit,'Enable', 'inactive');
         set(handles.SliceNumEdit,'Enable', 'inactive');
@@ -1642,7 +1656,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         set(handles.ColorBar, 'ButtonDownFcn', @(hObject,eventdata)imlook4d('ColorBar_Callback',hObject,eventdata,guidata(hObject)) ); 
     function helpToggleTool_OffCallback(hObject, eventdata, handles)
         % Set textboxes etc on, to allow normal work when help button is not activated
+<<<<<<< Updated upstream
         set(handles.ROILevelEdit,'Enable', 'on');
+=======
+>>>>>>> Stashed changes
         set(handles.BrushSize,'Enable', 'on');
         set(handles.FrameNumEdit,'Enable', 'on');
         set(handles.SliceNumEdit,'Enable', 'on');
@@ -1864,6 +1881,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
              end
              
+<<<<<<< Updated upstream
+=======
+             
+>>>>>>> Stashed changes
 
     % --------------------------------------------------------------------
     % SLIDERS
@@ -1950,7 +1971,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         set(handles.PC_high_edit,'String',num2str(NewVal));
         updateImage(hObject, eventdata, handles)                   
         
+<<<<<<< Updated upstream
         
+=======
+>>>>>>> Stashed changes
     % --------------------------------------------------------------------
     % TEXTBOXES
     % --------------------------------------------------------------------
@@ -2021,7 +2045,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         if str2num(strg)>=1 && str2num(strg)<=z
             set(handles.FirstFrame,'String',strg);
             updateImage(hObject, eventdata, handles)
+<<<<<<< Updated upstream
         end 
+=======
+        end
+        
+>>>>>>> Stashed changes
     function BrushSize_Callback(hObject, eventdata, handles)         
         % Display HELP and get out of callback
              if DisplayHelp(hObject, eventdata, handles) 
@@ -2032,13 +2061,19 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              r=round( str2num( get(handles.BrushSize,'String') ) );
              %handles.image.brush=circleROI(zeros(2*r+1,2*r+1),1,r+1,r+1,r);
              handles.image.brush=circleROI(zeros(2*r,2*r),1,r,r,r);
+<<<<<<< Updated upstream
              guidata(hObject,handles);% Save handles          
+=======
+             guidata(hObject,handles);% Save handles
+             
+>>>>>>> Stashed changes
     function text7_ButtonDownFcn(hObject, eventdata, handles)      
         % Display HELP and get out of callback
              if DisplayHelp(hObject, eventdata, handles) 
                  %set(hObject,'State', 'off')
                  return 
              end
+<<<<<<< Updated upstream
     function ROILevelEdit_Callback(hObject, eventdata, handles)      
         % Display HELP and get out of callback
              if DisplayHelp(hObject, eventdata, handles) 
@@ -2046,6 +2081,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              end       
      
              
+=======
+             
+     
+>>>>>>> Stashed changes
     % --------------------------------------------------------------------
     % CHECKBOXES & RADIOBUTTONS
     % --------------------------------------------------------------------
@@ -2157,6 +2196,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         set(handles.ResidualRadiobutton,'Value',0)
         set(handles.imageRadioButtonGroupActiveButton,'Value',1)
         
+<<<<<<< Updated upstream
+=======
+        
+        
+        
+>>>>>>> Stashed changes
     function removeNegativesRadioButton_Callback(hObject, eventdata, handles)
        % Display HELP and get out of callback
              if DisplayHelp(hObject, eventdata, handles) 
@@ -2292,7 +2337,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                  return 
              end
 
+<<<<<<< Updated upstream
              
+=======
+>>>>>>> Stashed changes
     % --------------------------------------------------------------------
     % BUTTONS
     % --------------------------------------------------------------------
@@ -2304,7 +2352,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              
         %TACT(hObject, eventdata, handles);
         newTACT(hObject, eventdata, handles); 
+<<<<<<< Updated upstream
     function clearROI_Callback2(hObject, eventdata, handles)
+=======
+    function clearROI_Callback(hObject, eventdata, handles)
+>>>>>>> Stashed changes
        % Display HELP and get out of callback
              if DisplayHelp(hObject, eventdata, handles) 
                  return 
@@ -2322,7 +2374,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
          updateImage(hObject, eventdata, handles); 
          updateROIs(handles);
    
+<<<<<<< Updated upstream
          
+=======
+>>>>>>> Stashed changes
     % --------------------------------------------------------------------
     % SELECTIONS
     % --------------------------------------------------------------------
@@ -2861,8 +2916,15 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 handles.image.UndoROI.position = 1; % Always set to 1 when drawing
             end
             
+<<<<<<< Updated upstream
             % Print current Undo Level and number of pixels in all Undo-ROIs
             for i=1:UNDOSIZE;temp=handles.image.UndoROI.ROI{i};s(i)=sum(temp(:));end;disp([ '(' num2str(handles.image.UndoROI.position) ') ' num2str(s)]);
+=======
+            for i=1:UNDOSIZE;temp=handles.image.UndoROI.ROI{i};s(i)=sum(temp(:));end;disp([ '(' num2str(handles.image.UndoROI.position) ') ' num2str(s)]);
+%             disp(handles.image.UndoROI.position);
+%             disp(size(handles.image.ROI));
+%             disp(size(handles.image.UndoROI.ROI));
+>>>>>>> Stashed changes
     
     function handles = undoRoi(handles)
         undoMax = length(handles.image.UndoROI.ROI);
@@ -2876,7 +2938,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         handles.image.UndoROI.position = position; % Remember position
         disp(size(handles.image.ROI));
         
+<<<<<<< Updated upstream
         % Print current Undo Level and number of pixels in all Undo-ROIs
+=======
+>>>>>>> Stashed changes
         for i=1:undoMax;temp=handles.image.UndoROI.ROI{i};s(i)=sum(temp(:));end;disp([ '(' num2str(handles.image.UndoROI.position) ') ' num2str(s)]);
 
         guidata(handles.figure1,handles);  
@@ -2892,7 +2957,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         handles.image.UndoROI.position = position; % Remember position
         disp(size(handles.image.ROI));
         
+<<<<<<< Updated upstream
         % Print current Undo Level and number of pixels in all Undo-ROIs
+=======
+        
+>>>>>>> Stashed changes
         for i=1:undoMax;temp=handles.image.UndoROI.ROI{i};s(i)=sum(temp(:));end;disp([ '(' num2str(handles.image.UndoROI.position) ') ' num2str(s)]);
         guidata(handles.figure1,handles);                
     
@@ -2987,11 +3056,16 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                             
                             nonLockedROIPixels = find( ROILock==0 & handles.image.brush>0 );
+<<<<<<< Updated upstream
+=======
+                            nonLockedROIPixels = find( ROILock==0 & handles.image.brush>0 );
+>>>>>>> Stashed changes
 
 
                             if get(handles.ROIEraserRadiobutton,'Value')  | strcmp( get(handles.figure1, 'currentmodifier'),'shift') 
                                 subMatrix( nonLockedROIPixels ) = 0;
                             else
+<<<<<<< Updated upstream
                                 % Draw over any pixels in brush
                                 %subMatrix( nonLockedROIPixels ) = activeROI;  % Draw over any pixels in brush
                                 
@@ -2999,6 +3073,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                 level = str2num( get(handles.ROILevelEdit,'String') );
                                 subDataMatrix= handles.image.Cdata( ixx:(ixx+rx-1),(iyy):(iyy+ry-1), slice, frame);
                                 subMatrix( find( subDataMatrix> level) ) = activeROI;  % Draw over any pixels in brush
+=======
+                                subMatrix( nonLockedROIPixels ) = activeROI;  % Draw over any pixels in brush
+>>>>>>> Stashed changes
                             end
                             
                             handles.image.ROI( (ixx):(ixx+rx-1),(iyy):(iyy+ry-1), slice) = subMatrix;
@@ -5653,7 +5730,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                 save(fullPath, 'rois', 'roiNames', 'roiSize','VisibleROIs','LockedROIs', 'version' );
                              
+<<<<<<< Updated upstream
     % Print image
+=======
+% Print image
+>>>>>>> Stashed changes
         function Print_Image_Callback(hObject, eventdata, handles)
             DISPLAY_ON_SCREEN = true;
             GenerateScreenDump(hObject, eventdata, handles,DISPLAY_ON_SCREEN);
@@ -7686,10 +7767,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
     % Help and HTML functions
     % --------------------------------------------------------------------
        function trueIfChecked = DisplayHelp(hObject, eventdata, handles)
+<<<<<<< Updated upstream
            %
            % Note: To make a new Help text work:
            % 1) Make a text file in HELP directory named after the element Tag, or Name
            % 2) Modify helpToggleTool_OnCallback, and helpToggleTool_OffCallback functions above
+=======
+>>>>>>> Stashed changes
             
                %ScriptFlag=true;  % Turn scripting ON (true)  or  OFF (false)
                ScriptFlag = handles.record.enabled;
