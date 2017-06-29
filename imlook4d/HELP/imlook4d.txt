@@ -16,5 +16,14 @@ When a ROI has been created (See Add ROI drop-down list), a region-of-interest (
 Pressing SHIFT while left-click and moving the mouse makes the cursor act as an eraser instead.
 </P>
 
+<P>
+	Right-click shows a contextual menu with the following options:
+       
+		<UL>
 
+			<LI> <B>Set ROI Level</B>, sets the ROI-drawing level (the ROI is drawn only on pixels above this value).
+			<LI> <B>Close this menu</B>, closes the contextual menu
+
+		</UL>
+</P>
 

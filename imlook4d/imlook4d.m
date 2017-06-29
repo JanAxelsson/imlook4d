@@ -553,6 +553,9 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 set(handles.ImgObject3,'Cdata', zeros(size(cimg)));  
                 set(handles.ImgObject3,'Xdata',[0 r]+0.5);
                 set(handles.ImgObject3,'Ydata',[0 c]+0.5);
+                
+                set(handles.ImgObject3,'UIContextMenu',handles.AxesContextualMenu);
+
 
                 % Set the properties of the axes
                 set(handles.axes1,'XLim',[0 r]+0.5);
@@ -1404,7 +1407,32 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                  %set(hObject,'Value',oldVal);
                  %return 
              end
-       
+             
+    % --------------------------------------------------------------------
+    % Axes
+    % --------------------------------------------------------------------    
+    % --- Executes on mouse press over axes background.
+    function SetROILevel_Callback(hObject, eventdata, handles)
+        handles = guidata(gcf);                
+        
+        coordinates=get(gca,'currentpoint');
+        
+        x=round(coordinates(1,1)+0.5);
+        y=round(coordinates(1,2)+0.5);     
+        
+        z = round(get(handles.SliceNumSlider,'Value'));
+        t = round(get(handles.FrameNumSlider,'Value'));
+        
+        % Exchange x and y if image in original orientation (not FlipAndRotate)
+        if ~get(handles.FlipAndRotateRadioButton,'Value')
+            temp=x;   x=y; y=temp;
+        end
+        
+        value = handles.image.Cdata(x,y,z,t);
+
+        set(handles.ROILevelEdit,'String', num2str(value));
+    function CloseAxesContextMenu_Callback(hObject, eventdata, handles)
+        return
     % --------------------------------------------------------------------
     % KEY PRESSED
     % --------------------------------------------------------------------             
@@ -2615,7 +2643,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             guidata(hObject,handles);% Save handles
             updateROIs(handles);
         end
-        
+    function ResetROILevel_Callback(hObject, eventdata, handles, name)
+        lowestValue = min( handles.image.Cdata(:));
+        set(handles.ROILevelEdit,'String', num2str(lowestValue));
+
     function orientationMenu_Callback(hObject, eventdata, handles, name)
         
         orientationNumber=get(hObject,'Value');
@@ -2784,6 +2815,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              end
           
          activeROI=get(handles.ROINumberMenu,'Value');
+
+         
+        % Do not draw if Right Click
+        if strcmp( get(handles.figure1,'selectionType') , 'alt')
+            return
+        end        
+
          
          % Get out if trying to draw ROI when "Add ROI" is chosen
          if strcmp(  get(handles.ROINumberMenu,'String'), 'Add ROI')
@@ -7563,7 +7601,6 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         tempAlphaData = get(handles.ImgObject3,'AlphaData');
                         set(handles.ImgObject3,'CData', zeros( [size(rois) 3]), 'AlphaData', zeros(size(rois) ) );
                     end
-
                     
                     % Work matrices
 

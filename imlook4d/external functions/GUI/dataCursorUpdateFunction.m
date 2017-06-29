@@ -14,6 +14,11 @@
         z = round(get(handles.SliceNumSlider,'Value'));
         t = round(get(handles.FrameNumSlider,'Value'));
         
+        % Exchange x and y if image in original orientation (not FlipAndRotate)
+        if ~get(handles.FlipAndRotateRadioButton,'Value')
+            temp=x;   x=y; y=temp;
+        end
+        
         output_txt = {['X=',num2str(x) '  Y=',num2str(y)  '  Z=',num2str(z) ]};
 
         % ROI   
