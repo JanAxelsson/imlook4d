@@ -5632,26 +5632,27 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 
             end
             
-            numberOfROIs = size(roiNames,1) -1 ;
+            numberOfROIs = size(roiNames,2) -1 ;
 
             set(handles.ROINumberMenu,'String', roiNames);
             set(handles.ROINumberMenu,'Value', 1 ); %Set to highest ROI number
 
             
             % VisibleROIs
-            try
-                handles.image.VisibleROIs = VisibleROIs;
-            catch
+            if ( exist('VisibleROIs') )
+                handles.image.VisibleROIs = VisibleROIs;  % From .roi file
+            else
                 handles.image.VisibleROIs = ones( [ 1 numberOfROIs ] );
             end
  
             
             % LockedROIs
-            try
-                handles.image.LockedROIs=LockedROIs;
-            catch
-                handles.image.LockedROIs = zeros( [ 1 numberOfROIs ] );             
-            end    
+            if ( exist('LockedROIs') )
+                handles.image.LockedROIs = LockedROIs; % From .roi file
+            else
+                handles.image.LockedROIs = zeros( [ 1 numberOfROIs ] );
+            end
+            
             
             guidata(handles.ROINumberMenu,handles);  % Save handles
 
