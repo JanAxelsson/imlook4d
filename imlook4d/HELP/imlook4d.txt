@@ -22,6 +22,7 @@ Pressing SHIFT while left-click and moving the mouse makes the cursor act as an 
 		<UL>
 
 			<LI> <B>Set ROI Level</B>, sets the ROI-drawing level (the ROI is drawn only on pixels above this value).
+			<LI> <B>Reset ROI Level</B>, sets the ROI-drawing level below the lowest pixel value in the whole file.  This makes the brush draw ROIs without taking the image pixel-intensity value into consideration. 
 			<LI> <B>Close this menu</B>, closes the contextual menu
 
 		</UL>
