@@ -3027,10 +3027,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             end
 
                             
-                            nonLockedROIPixels = find( ROILock==0 & handles.image.brush>0 );
-
+                           
 
                             if get(handles.ROIEraserRadiobutton,'Value')  | strcmp( get(handles.figure1, 'currentmodifier'),'shift') 
+                                % In brush AND non-locked pixel
+                                nonLockedROIPixels = find( ROILock==0 & handles.image.brush>0 );  
+                                % Set pixels
                                 subMatrix( nonLockedROIPixels ) = 0;
                             else
                                 % Draw over any pixels in brush
@@ -3039,7 +3041,15 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                 % Draw over pixels above level
                                 level = str2num( get(handles.ROILevelEdit,'String') );
                                 subDataMatrix= handles.image.Cdata( ixx:(ixx+rx-1),(iyy):(iyy+ry-1), slice, frame);
-                                subMatrix( find( subDataMatrix> level) ) = activeROI;  % Draw over any pixels in brush
+                                
+                                % In brush AND non-locked AND above level
+                                nonLockedAboveLevelPixels = find( (ROILock==0) & (handles.image.brush>0) & (subDataMatrix>level) ); 
+                                
+                                % Set pixels
+                                subMatrix( nonLockedAboveLevelPixels ) = activeROI;  % Draw over any pixels in brush
+
+                                %subMatrix( find( subDataMatrix> level) ) = activeROI;  % Draw over any pixels in brush
+                                
                             end
                             
                             handles.image.ROI( (ixx):(ixx+rx-1),(iyy):(iyy+ry-1), slice) = subMatrix;
