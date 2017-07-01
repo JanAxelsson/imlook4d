@@ -1,8 +1,9 @@
 
 imlook4d/\.DS_Store
 
-\.DS_Store
+*.DS_Store
 
+*.txt~
 *.m~
 
 imlook4d/empty\.m
