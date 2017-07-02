@@ -11,13 +11,21 @@ The following applies to this image:
 </p>
 
 		<UL>
-			<LI> The added image must be exactly the same matrix as the currently viewed image.  (Use the script <code>/SCRIPTS/Matrix/Put in other matrix </code> to achieve this)
+			<LI> The added image must be exactly the same matrix as the currently viewed image.  This is achieved automatically,
+                 by modifying the matrix of the current image to match that of the selected background image.
+			<LI> Alternatively, if you wish to have more control, and for instance instead keep the number of pixels in the current image,
+                do the following:
+                 <OL> 
+                    <LI> Modify the matrix of the image you want in the background by running the script <code>/SCRIPTS/Matrix/Put in other matrix </code> on that image.
+                    <LI> Following this change, you can select this script <code>/SCRIPTS/View/Background image add </code> from the foreground image
+                </OL>
 			<LI> The background image is entirely living in its original imlook4d window.  It is only displayed as a background in the fusion image.
 			<LI> The above implies that:
             <UL>
                 <LI>  The original-background imlook4d-window cannot be closed (because then the background image is not existing anymore)
                 <LI>  A change in the original-background imlook4d-window is also displayed int the fusion image  
                 <LI>  If you wish to change for instance window levels on a background CT, this is done by changing window levels in the original-background imlook4d-window.
+                <LI>  The modified current image now had different matrix to the original image.  It is therefore advisable to save this image
             </UL>
 		</UL>
 
