@@ -10,7 +10,7 @@ imlook4d_current_handles.image.backgroundImageHandle=SelectWindow({'Select image
             
 % Get sizes            
 currentSize = size(imlook4d_current_handles.image.Cdata);
-backgroundHandles = guidata(imlook4d_current_handles.image.backgroundImageHandle);
+backgroundHandles = guidata(imlook4d_current_handles.image.backgroundImageHandle);  % Handles from imlook4d instance of static background image
 backgroundSize = size(backgroundHandles.image.Cdata);
 
 % Link if same matrix sizes
@@ -19,23 +19,39 @@ if ( currentSize(1:3) == backgroundSize(1:3) )
     Import
 else
         % Align movingImage to staticImage
+        % Example PT on MR from PET/MR-exam.  Started this script from PT-imlook4d instane
         
-        movingImage = imlook4d_current_handles; % Change this image
-        staticImage = backgroundHandles; % Keep background image dimensions
+        % imlook4d_current_handles is the image we started from. Change this image (PT)
+        staticImage = backgroundHandles; % Keep background image (MR)
+        
+        %
+        % Change matrix of current image to align to background image
+        %
     
         % Reslice
-        [outImageStruct indeces] = reslice( staticImage.image , movingImage.image );  % outImageStruct is now updated.
+        [outImageStruct indeces] = reslice( staticImage.image , imlook4d_current_handles.image );  % outImageStruct is now updated.
         
         % Change matrix dimensions and FOV
-        outImageStruct  = resize_matrix2( staticImage.image, outImageStruct );
+        outImageStruct  = resize_matrix2( staticImage.image, outImageStruct );  % Aligned to space of staticImage (PT aligned to MR)
         
+        %
         % Write back
+        %
         
         % Modify imlook4d variables that should be changed
-        imlook4d_current_handles.image=outImageStruct;  % Use outImageStruct (DICOM headers, data matrix etc)
+        % START
+        imlook4d_current_handles.image=outImageStruct;  % Use outImageStruct in new space (DICOM headers, data matrix etc) (MR)
         
-        imlook4d_Cdata=imlook4d_current_handles.image.Cdata;       
-        imlook4d_ROI=imlook4d_current_handles.image.ROI;
+        % Set display window to match what we started from
+        imlook4d_current_handles.axes1.XLim = staticImage.axes1.XLim;
+        imlook4d_current_handles.axes1.YLim = staticImage.axes1.YLim;
+        
+        % Set display interpolation to match what we started from
+        imlook4d_current_handles.interpolate2 = staticImage.interpolate2;
+        imlook4d_current_handles.interpolate4 = staticImage.interpolate4;
+        
+        imlook4d_Cdata=outImageStruct.Cdata;  % Set up Import with variables from new space (matrix from aligned-PT)     
+        imlook4d_ROI=outImageStruct.ROI;      % 
         
         Import
     
