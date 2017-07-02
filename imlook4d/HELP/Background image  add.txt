@@ -11,8 +11,9 @@ The following applies to this image:
 </p>
 
 		<UL>
-			<LI> The added image must be exactly the same matrix as the currently viewed image.  This is achieved automatically,
+			<LI> The added image must be exactly the same matrix as the currently viewed image.  This is (for DICOM images) achieved automatically,
                  by modifying the matrix of the current image to match that of the selected background image.
+            <LI> This automatic mode only works for static images. Thus, if you have a dynamic scan, either make it static first (pharmacokinetic modelling, sum frames, etc), or modify the background image dimensions first.
 			<LI> Alternatively, if you wish to have more control, and for instance instead keep the number of pixels in the current image,
                 do the following:
                  <OL> 
