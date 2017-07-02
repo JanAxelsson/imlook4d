@@ -61,9 +61,12 @@
         
         close(waitBarHandle);
         
-     % Calculate new values    
+     % Calculate new values 
+     try
         newHandles.image.pixelSizeX=imlook4d_current_handles.image.pixelSizeX * ( size(imlook4d_Cdata,1)/Xpixels);
         newHandles.image.pixelSizeY=imlook4d_current_handles.image.pixelSizeY * ( size(imlook4d_Cdata,2)/Ypixels);
+     catch
+     end
 
 %
 % FINALIZE

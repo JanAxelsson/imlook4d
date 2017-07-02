@@ -16,8 +16,8 @@ function outImageStruct  = resize_matrix( templateImageStruct, oldImageStruct )
 
 % Verify that static image
 if size(oldImageStruct.Cdata,4)>1
-   warndlg('Dynamic images cannot be resliced - reslice the static image instead'); 
-   return
+   %warndlg('Dynamic images cannot be resliced - reslice the static image instead'); 
+   %return
 end
 
 
@@ -133,13 +133,13 @@ numberOfFrames=( size(oldImageStruct.Cdata , 4) );  % Should remain also after r
     
     
 waitBarHandle = waitbar(0,'Resizing images');	% Initiate waitbar with text
-        
+for j=1:numberOfFrames        
     for i=1:numberOfSlices
 
         %disp(i)
-        waitbar(i/numberOfSlices);          % Update waitbar
+        waitbar(i*j/(numberOfSlices*numberOfFrames));          % Update waitbar
         
-            outImageStruct.Cdata(:,:,i)=interp2(y1, x1', oldImageStruct.Cdata(:,:,i), y2, x2','linear',0); 
+            outImageStruct.Cdata(:,:,i,j)=interp2(y1, x1', oldImageStruct.Cdata(:,:,i,j), y2, x2','linear',0); 
 
             % update image variables    
                % outImageStruct=truncateDICOM(oldImageStruct, 1:numberOfSlices, 1:numberOfFrames); % Use return range for slices and frames (=1)
@@ -151,7 +151,7 @@ waitBarHandle = waitbar(0,'Resizing images');	% Initiate waitbar with text
 
 
     end
-
+end
 % Set outside FOV pixels (NaN) to zero
    outImageStruct.Cdata(isnan(outImageStruct.Cdata)) = 0 ;
     
