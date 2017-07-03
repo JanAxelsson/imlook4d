@@ -39,13 +39,20 @@ disp(['reslice - Coverting from ' num2str(size(oldImageStruct.Cdata,3)) ' to '  
 
 % Loop positions in template z-axis
 numberOfSlices=size(templateImageStruct.Cdata,3);  % We want these many slices in the new image set
-numberOfFrames=size(oldImageStruct.Cdata,4);  % We want these many slices in the new image set
+oldNumberOfSlices=size(oldImageStruct.Cdata,3); 
+numberOfFrames=size(oldImageStruct.Cdata,4);  
             
-waitBarHandle = waitbar(0,'Reslicing frames');	% Initiate waitbar with text
+waitBarHandle = waitbar(0,'Reslicing frames (pass 1)');	% Initiate waitbar with text
      
 
 outImageStruct.time2D = zeros(numberOfSlices,numberOfFrames);
 outImageStruct.duration2D = zeros(numberOfSlices,numberOfFrames);
+
+outImageStruct.Cdata = zeros( [ size(oldImageStruct.Cdata,1), ...
+    size(oldImageStruct.Cdata,2), ...
+    size(templateImageStruct.Cdata,3 ) ...
+    size(oldImageStruct.Cdata,4), ...
+    ]);
 
 for i=1:numberOfSlices
         if mod(i,round(numberOfSlices/20) )
@@ -57,12 +64,12 @@ for i=1:numberOfSlices
         [dummy,index]=min(abs(oldPositions-newPositions(i)) );
         indeces(i)=index;  % for a templateSlice i, indeces(i) is the nearest slice in oldImage
         
-        if index > numberOfSlices 
-           index = numberOfSlices 
-        end
-        if index < 1 
-           index = 1 
-        end        
+%         if index > numberOfSlices 
+%            index = numberOfSlices 
+%         end
+%         if index < 1 
+%            index = 1 
+%         end        
         
 %         
 %         % Linear interpolation (distance-weighted average)
@@ -76,10 +83,14 @@ for i=1:numberOfSlices
             weight2=distances(1)/totDistance;
             weight1=distances(2)/totDistance;
          end
-         outImageStruct.Cdata(:,:,i,:)=weight1*oldImageStruct.Cdata(:,:,ind(1),:)+weight2*oldImageStruct.Cdata(:,:,ind(2),:);
-%        outImageStruct.Cdata(:,:,i,:)=(distances(1)*oldImageStruct.Cdata(:,:,ind(1),:)+distances(2)*oldImageStruct.Cdata(:,:,ind(2),:) )...
-%            /(distances(1)+distances(2));
-
+         
+         %outImageStruct.Cdata(:,:,i,:)=weight1*oldImageStruct.Cdata(:,:,ind(1),:)+weight2*oldImageStruct.Cdata(:,:,ind(2),:);
+         
+         if ( ind(1)>1 ) & ( ind(1)<oldNumberOfSlices )
+            outImageStruct.Cdata(:,:,i,:)=weight1*oldImageStruct.Cdata(:,:,ind(1),:)+weight2*oldImageStruct.Cdata(:,:,ind(2),:);
+         else
+            outImageStruct.Cdata(:,:,i,:) = 0;
+         end 
 
 end
 
@@ -112,10 +123,15 @@ end
 outImageStruct.DICOMsortedIndexList = zeros( numberOfFrames, size(oldImageStruct.DICOMsortedIndexList,2) );
 outImageStruct.dirtyDICOMIndecesToScaleFactor = cell( 1, numberOfFrames*numberOfSlices ); 
 
+close(waitBarHandle); 
+waitBarHandle = waitbar(0,'Reslicing frames (pass 2)');	% Initiate waitbar with text
 for j=1:numberOfFrames
+    waitbar( j /numberOfFrames);
+    
     for i=1:numberOfSlices
-        oldIndex = indeces(i) + (j - 1) * numberOfFrames;
-        newIndex = i + (j - 1) * numberOfFrames;
+        
+        oldIndex = indeces(i) + (j - 1) * numberOfSlices;
+        newIndex = i + (j - 1) * numberOfSlices;
 
         % Modify outputImageStruct - Matlab Cells
         outImageStruct.dirtyDICOMHeader{newIndex} = oldImageStruct.dirtyDICOMHeader{oldIndex};
@@ -130,15 +146,15 @@ for j=1:numberOfFrames
         
         % Position 1)  Image Position Patient
         try
-            out1=dirtyDICOMHeaderData(templateImageStruct.dirtyDICOMHeader, i, '0020', '0032',templateImageStruct.dirtyDICOMMode);  % This is only for test output
-            outImageStruct.dirtyDICOMHeader{newIndex}=dirtyDICOMModifyHeaderString(oldImageStruct.dirtyDICOMHeader{oldIndex},'0020', '0032',oldImageStruct.dirtyDICOMMode, out1.string);
+            out1 = dirtyDICOMHeaderData(templateImageStruct.dirtyDICOMHeader, i, '0020', '0032',templateImageStruct.dirtyDICOMMode);  % This is only for test output
+            outImageStruct.dirtyDICOMHeader{newIndex} = dirtyDICOMModifyHeaderString(oldImageStruct.dirtyDICOMHeader{oldIndex},'0020', '0032',oldImageStruct.dirtyDICOMMode, out1.string);
         catch   
         end
         
         % Position 2)  Slice Location
         try
-            out2=dirtyDICOMHeaderData(templateImageStruct.dirtyDICOMHeader, i, '0020', '1041',templateImageStruct.dirtyDICOMMode);
-            outImageStruct.dirtyDICOMHeader{newIndex}=dirtyDICOMModifyHeaderString(oldImageStruct.dirtyDICOMHeader{oldIndex},'0020', '1041',oldImageStruct.dirtyDICOMMode, out2.string);
+            out2 = dirtyDICOMHeaderData(templateImageStruct.dirtyDICOMHeader, i, '0020', '1041',templateImageStruct.dirtyDICOMMode);
+            outImageStruct.dirtyDICOMHeader{newIndex} = dirtyDICOMModifyHeaderString(oldImageStruct.dirtyDICOMHeader{oldIndex},'0020', '1041',oldImageStruct.dirtyDICOMMode, out2.string);
         catch
         end
         
@@ -147,7 +163,7 @@ for j=1:numberOfFrames
 
         
         % Change DICOM header - instance number
-        outImageStruct.dirtyDICOMHeader{newIndex}=dirtyDICOMModifyHeaderString(oldImageStruct.dirtyDICOMHeader{oldIndex},'0020','0013',oldImageStruct.dirtyDICOMMode, num2str(newIndex));
+        outImageStruct.dirtyDICOMHeader{newIndex} = dirtyDICOMModifyHeaderString(oldImageStruct.dirtyDICOMHeader{oldIndex},'0020','0013',oldImageStruct.dirtyDICOMMode, num2str(newIndex));
 
     end
 end

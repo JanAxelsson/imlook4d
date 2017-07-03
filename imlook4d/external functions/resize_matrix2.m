@@ -15,10 +15,10 @@ function outImageStruct  = resize_matrix( templateImageStruct, oldImageStruct )
 
 
 % Verify that static image
-if size(oldImageStruct.Cdata,4)>1
-   %warndlg('Dynamic images cannot be resliced - reslice the static image instead'); 
-   %return
-end
+% if size(oldImageStruct.Cdata,4)>1
+%    warndlg('Dynamic images cannot be resliced - reslice the static image instead'); 
+%    return
+% end
 
 
 % Copy header, and zero what should be changed
@@ -26,7 +26,7 @@ outImageStruct=oldImageStruct;
 outImageStruct.dirtyDICOMHeader=oldImageStruct.dirtyDICOMHeader;
 outImageStruct.dirtyDICOMFileNames=oldImageStruct.dirtyDICOMFileNames;
 
-outImageStruct.dirtyDICOMIndecesToScaleFactor={};
+%outImageStruct.dirtyDICOMIndecesToScaleFactor={};
 outImageStruct.Cdata=[];
 
 % Read positions to match
@@ -132,12 +132,12 @@ numberOfFrames=( size(oldImageStruct.Cdata , 4) );  % Should remain also after r
     outImageStruct.ROI=zeros(nx2,ny2,numberOfSlices,'uint8');  % ROI's can't be interpolated, since they are integers
     
     
-waitBarHandle = waitbar(0,'Resizing images');	% Initiate waitbar with text
+waitBarHandle = waitbar(0,'Resizing matrices');	% Initiate waitbar with text
 for j=1:numberOfFrames        
     for i=1:numberOfSlices
 
         %disp(i)
-        waitbar(i*j/(numberOfSlices*numberOfFrames));          % Update waitbar
+        waitbar( j / numberOfFrames);          % Update waitbar
         
             outImageStruct.Cdata(:,:,i,j)=interp2(y1, x1', oldImageStruct.Cdata(:,:,i,j), y2, x2','linear',0); 
 

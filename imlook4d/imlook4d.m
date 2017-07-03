@@ -2655,8 +2655,22 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             return
         end
   
+        % Set for foreground image
         handles = setOrientation(handles, orientationNumber);
-        guidata(handles.figure1, handles);       
+        guidata(handles.figure1, handles); 
+
+        
+        % Set for background image (call orientationMenu_Callback for background image)
+        try
+            backgroundHandles = guidata(handles.image.backgroundImageHandle);  % Handles from imlook4d instance of static background image
+            set( backgroundHandles.orientationMenu,'Value', get(handles.orientationMenu,'Value'));
+            orientationMenu_Callback(backgroundHandles.orientationMenu, {}, backgroundHandles);
+        catch
+            % if not backgroundimage (this will happen when the
+            % backgroundimage itself is processed)
+        end
+        
+        updateImage(hObject,{},handles);
       function handles = setOrientation(handles, newNumericOrientation)
 
         % Numerical constants
