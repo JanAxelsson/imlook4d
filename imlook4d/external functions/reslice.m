@@ -29,7 +29,7 @@ outImageStruct.dirtyDICOMIndecesToScaleFactor={};
 outImageStruct.Cdata=[];
 outImageStruct.imagePosition={};
 
-
+outImageStruct.dirtyDICOMMode = oldImageStruct.dirtyDICOMMode;
 
 % Read positions to match
 oldPositions=unique(oldImageStruct.sliceLocations); % unique, to allow dynamic scans to give one position (ignoring that position repeats for multiple frames)
@@ -142,19 +142,19 @@ for j=1:numberOfFrames
         outImageStruct.DICOMsortedIndexList(newIndex,:) = oldImageStruct.DICOMsortedIndexList(oldIndex,8);
         
         
-        % Change DICOM header - copy positions from templateImage to outImage 
+        % Change DICOM new headers - read positions from templateImage, copy to new headers
         
         % Position 1)  Image Position Patient
         try
             out1 = dirtyDICOMHeaderData(templateImageStruct.dirtyDICOMHeader, i, '0020', '0032',templateImageStruct.dirtyDICOMMode);  % This is only for test output
-            outImageStruct.dirtyDICOMHeader{newIndex} = dirtyDICOMModifyHeaderString(oldImageStruct.dirtyDICOMHeader{oldIndex},'0020', '0032',oldImageStruct.dirtyDICOMMode, out1.string);
+            outImageStruct.dirtyDICOMHeader{newIndex} = dirtyDICOMModifyHeaderString(outImageStruct.dirtyDICOMHeader{newIndex},'0020', '0032',outImageStruct.dirtyDICOMMode, out1.string);
         catch   
         end
         
         % Position 2)  Slice Location
         try
             out2 = dirtyDICOMHeaderData(templateImageStruct.dirtyDICOMHeader, i, '0020', '1041',templateImageStruct.dirtyDICOMMode);
-            outImageStruct.dirtyDICOMHeader{newIndex} = dirtyDICOMModifyHeaderString(oldImageStruct.dirtyDICOMHeader{oldIndex},'0020', '1041',oldImageStruct.dirtyDICOMMode, out2.string);
+            outImageStruct.dirtyDICOMHeader{newIndex} = dirtyDICOMModifyHeaderString(outImageStruct.dirtyDICOMHeader{newIndex},'0020', '1041',outImageStruct.dirtyDICOMMode, out2.string);
         catch
         end
         
@@ -163,7 +163,7 @@ for j=1:numberOfFrames
 
         
         % Change DICOM header - instance number
-        outImageStruct.dirtyDICOMHeader{newIndex} = dirtyDICOMModifyHeaderString(oldImageStruct.dirtyDICOMHeader{oldIndex},'0020','0013',oldImageStruct.dirtyDICOMMode, num2str(newIndex));
+        outImageStruct.dirtyDICOMHeader{newIndex} = dirtyDICOMModifyHeaderString(outImageStruct.dirtyDICOMHeader{newIndex},'0020','0013',outImageStruct.dirtyDICOMMode, num2str(newIndex));
 
     end
 end
