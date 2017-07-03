@@ -1,0 +1,11 @@
+
+<h1>Resize 2D matrix</h1>
+<HR></HR>
+<!------------------->
+<p> 
+This script is used to resize an image slice by slice into a new matrix size.  
+</p>
+
+
+
+
