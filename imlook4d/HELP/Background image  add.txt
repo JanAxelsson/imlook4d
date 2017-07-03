@@ -3,7 +3,8 @@
 <HR></HR>
 <!------------------->
 <p> 
-This script is used to add a background image to the currently viewed image. It then becomes a fusion image. 
+This script is used to add a background image in same space to the currently viewed image. It then becomes a fusion image. 
+The background image can be removed by the script <CODE>Background image - remove</CODE>
 </p>
 
 <p> 
@@ -11,9 +12,11 @@ The following applies to this image:
 </p>
 
 		<UL>
-			<LI> The added image must be exactly the same matrix as the currently viewed image.  This is (for DICOM images) achieved automatically,
-                 by modifying the matrix of the current image to match that of the selected background image.
-            <LI> This automatic mode only works for static images. Thus, if you have a dynamic scan, either make it static first (pharmacokinetic modelling, sum frames, etc), or modify the background image dimensions first.
+			<LI> DICOM images have space information, which allows imlook4d to reformat hybrid imaging (PET/CT, PET/MR, ..) which are acquired in a common space to exactly fit the same image matrix.
+            <LI> To display a background image this image must be exactly the same matrix as the currently viewed image.  
+                 This is thus achieved automatically for DICOM images.  
+                 In reality, the pixel matrix of the current image is modified to match the matrix of the selected background image.
+            <LI> It is worth noting, that the image may become big. 
 			<LI> Alternatively, if you wish to have more control, and for instance instead keep the number of pixels in the current image,
                 do the following:
                  <OL> 
@@ -24,9 +27,9 @@ The following applies to this image:
 			<LI> The above implies that:
             <UL>
                 <LI>  The original-background imlook4d-window cannot be closed (because then the background image is not existing anymore)
-                <LI>  A change in the original-background imlook4d-window is also displayed int the fusion image  
+                <LI>  A change in the original-background imlook4d-window is also displayed in the fusion image  
                 <LI>  If you wish to change for instance window levels on a background CT, this is done by changing window levels in the original-background imlook4d-window.
-                <LI>  The modified current image now had different matrix to the original image.  It is therefore advisable to save this image
+                <LI>  <B> NOTE:</B>The modified current image now had different matrix to the original image.  It is therefore advisable to save this image
             </UL>
 		</UL>
 

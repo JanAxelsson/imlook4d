@@ -5226,10 +5226,18 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             iNumberOfSelectedFiles = size(headers,2);
                             iNumberOfSelectedFiles=size(matrix,3);  % This definition allows for truncated matrices, as for instance from Patlak model
 
+                            
+                            
+                            
+                            
+                            waitBarHandle = waitbar(0,'Saving DICOM files');	% Initiate waitbar with text
+
 
                             seriesInstanceUID=generateUID();
+                            interval = round( iNumberOfSelectedFiles/50);
                              for i=1:iNumberOfSelectedFiles
                                  %disp(i)
+                                 if (mod(i, interval)==0) waitbar(i/iNumberOfSelectedFiles); end 
 
                                  % Change image properties
                                      headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0008', '0008',mode, 'DERIVED\SECONDARY'); % ImageType
@@ -5327,7 +5335,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                                  %
                              end
-
+                            close(waitBarHandle);
+                            
+                            
                         % If multiple images in one dicom file, reshape
                             %if size(fileNames,2)~=size( unique(fileNames),2 )   % Multiple images in the same file is characterized by having the same file name for each slice
                             if size( unique(fileNames),2 )==1   % Multiple images in the same file is characterized by having the same file name for each slice

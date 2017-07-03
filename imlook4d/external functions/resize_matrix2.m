@@ -23,6 +23,7 @@ function outImageStruct  = resize_matrix( templateImageStruct, oldImageStruct )
 
 % Copy header, and zero what should be changed
 outImageStruct=oldImageStruct;
+outImageStruct=oldImageStruct;
 outImageStruct.dirtyDICOMHeader=oldImageStruct.dirtyDICOMHeader;
 outImageStruct.dirtyDICOMFileNames=oldImageStruct.dirtyDICOMFileNames;
 
@@ -128,6 +129,7 @@ numberOfFrames=( size(oldImageStruct.Cdata , 4) );  % Should remain also after r
     
 % Loop positions in template z-axis
     numberOfSlices=size(templateImageStruct.Cdata,3);  % We want these many slices in the new image set
+    numberOfFrames=size(oldImageStruct.Cdata,4);  % We want these many slices in the new image set
     outImageStruct.Cdata=zeros(nx2,ny2,numberOfSlices);
     outImageStruct.ROI=zeros(nx2,ny2,numberOfSlices,'uint8');  % ROI's can't be interpolated, since they are integers
     
@@ -152,6 +154,9 @@ for j=1:numberOfFrames
 
     end
 end
+close(waitBarHandle);
+
+
 % Set outside FOV pixels (NaN) to zero
    outImageStruct.Cdata(isnan(outImageStruct.Cdata)) = 0 ;
     
@@ -162,6 +167,19 @@ end
     outImageStruct.pixelSizeX=templateImageStruct.pixelSizeX;
     outImageStruct.pixelSizeY=templateImageStruct.pixelSizeY;
     outImageStruct.sliceSpacing=templateImageStruct.sliceSpacing;
+
+% Modify position cell array
+    waitBarHandle = waitbar(0,'Resizing images (pass 2)');	% Initiate waitbar with text
+    for j=1:numberOfFrames
+        waitbar( j /numberOfFrames);
+
+        for i=1:numberOfSlices 
+            newIndex = i + (j - 1) * numberOfSlices;
+            outImageStruct.imagePosition{newIndex}=templateImageStruct.imagePosition{i}; % Multiple slices, should always have same position as template slices
+
+        end
+    end   
+
 
 
     close(waitBarHandle);                           % Close waitbar

@@ -130,7 +130,7 @@ for j=1:numberOfFrames
     
     for i=1:numberOfSlices
         
-        oldIndex = indeces(i) + (j - 1) * numberOfSlices;
+        oldIndex = indeces(i) + (j - 1) * oldNumberOfSlices;
         newIndex = i + (j - 1) * numberOfSlices;
 
         % Modify outputImageStruct - Matlab Cells
