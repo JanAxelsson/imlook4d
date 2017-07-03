@@ -8708,10 +8708,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 % These numbers are one digit behind.
                 % I want to extract the last number and add one to it
                 
-                 str =  fileread('version.txt');
-                 t=str2double( regexp(str,'\d+', 'match') ); % get all double values
-                 version = num2str( t(end) );  
-                 
+                 %str =  fileread('version.txt');
+                 %t=str2double( regexp(str,'\d+', 'match') ); % get all double values
+                 %version = num2str( t(end) );  
+                 version =  fileread('version.txt');
                  
                  
  
