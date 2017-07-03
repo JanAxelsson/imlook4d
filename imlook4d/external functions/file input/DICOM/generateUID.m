@@ -51,7 +51,7 @@ function uuid=generateUID()
         % Fix for the following reason:
         % OSX Sierra had a java bug, making
         % "java.net.InetAddress.getLocalHost()" fail.
-        networkinterfaces = java.net.NetworkInterface.getNetworkInterfaces
+        networkinterfaces = java.net.NetworkInterface.getNetworkInterfaces;
         while networkinterfaces.hasMoreElements
              networkinterface = networkinterfaces.nextElement;
              tempHwAddress = typecast(networkinterface.getHardwareAddress, 'uint8');

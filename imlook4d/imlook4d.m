@@ -5262,7 +5262,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                         headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0028', '1053',mode, valueString);
                                         headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0028', '1052',mode, '0');
                                  catch
-                                        disp('caught error in imlook4d/LocalSaveDICOM - scale factor problem');
+                                        disp('Scale factor probably missing');
                                  end
 
 

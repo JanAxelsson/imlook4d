@@ -384,7 +384,7 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
 % %                     fclose(fid);
                      
                     % NEW - Read header and data
-                    tempHeader = A(1:headerSize-1);
+                    tempHeader = A(1:headerSize);
                     tempData = typecast( uint8(A(startOfPixelData:startOfPixelData+numberOfBytesInData-1)), numberFormat);
                    
                     % Test if DICOM file or Hermes export
