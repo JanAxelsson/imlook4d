@@ -10,9 +10,10 @@ function uuid=generateUID()
             uuid='1.2.826.0.1.3680043.8.971.';  % 26 characters
 
         % Mac adress using java  (max 16 characters)
-            ip = java.net.InetAddress.getLocalHost();
-            network = java.net.NetworkInterface.getByInetAddress(ip);
-            hardwareAdress=double(network.getHardwareAddress());       
+%             ip = java.net.InetAddress.getLocalHost();
+%             network = java.net.NetworkInterface.getByInetAddress(ip);
+%             hardwareAdress=double(network.getHardwareAddress());       
+            hardwareAdress = double( getMAC() );
 
             rowVector=num2str(256+hardwareAdress(:)');
 
@@ -43,4 +44,19 @@ function uuid=generateUID()
              big = java.math.BigInteger(uuidString, 16);      % Integer UUID as Java Object
              uuid=[imlook4d_rootUID char(big)];
         end
+     
         
+        
+    function hwAddress = getMAC()
+        % Fix for the following reason:
+        % OSX Sierra had a java bug, making
+        % "java.net.InetAddress.getLocalHost()" fail.
+        networkinterfaces = java.net.NetworkInterface.getNetworkInterfaces
+        while networkinterfaces.hasMoreElements
+             networkinterface = networkinterfaces.nextElement;
+             tempHwAddress = typecast(networkinterface.getHardwareAddress, 'uint8');
+             if ~isempty(tempHwAddress)
+                hwAddress = tempHwAddress;
+             end
+        end
+
