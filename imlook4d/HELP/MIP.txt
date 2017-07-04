@@ -1,0 +1,7 @@
+<h1>MIP</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	Creates a Maximum Intensity Projection (MIP) of the currently selected image.  Often, it is useful to select COR or SAG images first.  
+	</P>
+
