@@ -1,9 +1,5 @@
+# Ignore Mac DS_Store files
+.DS_Store
 
-imlook4d/\.DS_Store
-
-*.DS_Store
-
-*.txt~
-*.m~
-
-imlook4d/empty\.m
+# Ignore MATLAB backup files
+*~
