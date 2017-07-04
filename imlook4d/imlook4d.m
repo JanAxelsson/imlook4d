@@ -591,7 +591,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 
             %
             % Make SCRIPT MENUS (from files in imlook4d SCRIPTS directory)
-            %
+            %      ------------
             %    (Scripts are m-files saved in SCRIPTS subdirectories)
             %
             %   SCRIPTS menu            scriptsMenuHandle -                      
@@ -647,25 +647,47 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                  end
             %
             % Make USER SCRIPT MENUS (from files in imlook4d/../USER_SCRIPTS directory)
-            %
-            %    (Scripts are m-files saved in SCRIPTS subdirectories)
-            %
-            %   SCRIPTS menu            scriptsMenuHandle -                      
-            %       USER menu               scriptsMenuSubHandle -
-            %           script-file.m           scriptsMenuSubItemHandle
+            %      -----------------
+        %    
 
-                 
+                 % Path to look (imlook4d/../USER_SCRIPTS)
+                 [pathstr1,name,ext] = fileparts(which('imlook4d'));
+                 userScriptFolderPath = [pathstr1 filesep '..' filesep 'USER_SCRIPTS'];            
+            
+                 %
+                 % Make directory if not existing
+                 %
+                     if ~exist(userScriptFolderPath, 'dir');
+                         try
+                            dispRed(['USER_SCRIPTS folder did not exist.  Try to create one in : ' userScriptFolderPath] );
+                            mkdir(userScriptFolderPath);
+                         catch
+                             warning(['Could not create folder = ' userScriptFolderPath] );
+                         end
+                     end
+
+         
                  %
                  % Menu SCRIPTS/USER
                  %
 
                       % Main menu item
                      handles.scriptsMenuUserHandle = uimenu(handles.scriptsMenuHandle,'Label','USER','Separator','on'); % Under SCRIPTS
-                     set(handles.scriptsMenuUserHandle, 'Callback', 'imlook4d(''ScriptsMenu_Callback'',gcbo,[],guidata(gcbo))');          
+                     %%set(handles.scriptsMenuUserHandle, 'Callback', 'imlook4d(''ScriptsMenu_Callback'',gcbo,[],guidata(gcbo))');          
 
-                     % Path to look (imlook4d/../USER_SCRIPTS)
-                     [pathstr1,name,ext] = fileparts(which('imlook4d'));
-                     [files dirs]=listDirectory([pathstr1 filesep '..' filesep 'USER_SCRIPTS']);
+                     [files dirs]=listDirectory(userScriptFolderPath);
+                     
+                     % Add script menu
+                            % Advanced callback to allow help files for scripts
+                            nameWithSpaces = 'New Script';
+                            scriptName = 'Duplicate';
+                            handles.userScriptsMenuItemHandle(j) = ...
+                                uimenu(handles.scriptsMenuUserHandle,'Label',nameWithSpaces, 'Callback', [ ...
+                                'if imlook4d(''DisplayHelp'',gcbo,[],guidata(gcbo));return;end;' ...
+                                'cd(''' userScriptFolderPath '''); imlook4d(''newScriptFunction'')' ...
+                                ]);    
+                            
+
 
                  %
                  % Menu SCRIPTS/USER/JAN
@@ -684,8 +706,8 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                             %
                             
                             % Submenu scripts (Look inside folders, and make submenu items (script names)  )
-                             [files2 dirs2]=listDirectory([pathstr1 filesep '..' filesep 'USER_SCRIPTS' filesep dirs{i}]);
-                             addpath([pathstr1 filesep '..' filesep 'USER_SCRIPTS' filesep dirs{i}]);      % Add folder to path (in case you made a new one) 
+                             [files2 dirs2]=listDirectory([userScriptFolderPath filesep dirs{i}]);
+                             addpath([userScriptFolderPath filesep dirs{i}]);      % Add folder to path (in case you made a new one) 
 
                              for j=1:length(files2)
 
@@ -731,7 +753,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
               
             %
             % Make MODELS menu (from files in imlook4d MODELS directory)
-            %
+            %      ------------
             %   (Models are m-file functions saved in MODELS directory)
                  [pathstr1,name,ext] = fileparts(which('imlook4d'));
                  %temp=ls([pathstr1 filesep 'MODELS']);             % Read files in SCRIPTS directory
@@ -764,7 +786,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 
             %
             % Make COLOR menu (from files in imlook4d COLORMAPS directory)
-            %
+            %     ------------
                  [pathstr1,name,ext] = fileparts(which('imlook4d'));
 %                  temp=ls([pathstr1 filesep 'COLORMAPS']);          % Read files in SCRIPTS directory
 %                  temp=([pathstr1 filesep 'COLORMAPS']);
@@ -792,7 +814,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                  end  
             %
             % Make WINDOW LEVEL menu (from files in imlook4d WINDOW_LEVELS directory)
-            %
+            %     ------------------
                  [pathstr1,name,ext] = fileparts(which('imlook4d'));
 %                  temp=ls([pathstr1 filesep 'WINDOW_LEVELS']);      % Read files in WINDOW_LEVELS directory
 %                  temp=([pathstr1 filesep 'WINDOW_LEVELS']);
@@ -818,7 +840,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                  
             %
             % Make NETWORK HOSTS menu (from files in imlook4d PACS directory)
-            %
+            %     -------------------
                  [pathstr1,name,ext] = fileparts(which('imlook4d'));
 %                  temp=ls([pathstr1 filesep 'WINDOW_LEVELS']);      % Read files in WINDOW_LEVELS directory
 %                  temp=([pathstr1 filesep 'WINDOW_LEVELS']);
@@ -6689,6 +6711,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         % Export handles to base workspace
         assignin('base', 'imlook4d_current_handle', get(hObject,'Parent'))
         assignin('base', 'imlook4d_current_handles', handles)         
+    function newScriptFunction()
+            EOL=sprintf('\r\n');
+            % Put text in new editor
+            text = fileread('UserScript1.m');
+            a = com.mathworks.mde.editor.MatlabEditorApplication.getInstance();
+            editor = a.newEditor( text );
+            %editor.insertTextAtCaret([text EOL EOL]);  % Insert text at caret
 
     % --------------------------------------------------------------------
     % MODELS 
