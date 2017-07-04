@@ -3,3 +3,5 @@
 
 # Ignore MATLAB backup files
 *~
+
+/USER_SCRIPTS
