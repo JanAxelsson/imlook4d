@@ -7866,6 +7866,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         end
                                         
                         if ( get(handles.hideROIcheckbox,'Value')==0 )
+                            ColorfulROI=0;
+                            GrayROI=0;
+                            MultiColorROI = 1;
   
                             % 1) ColorFul ROI  
                             if ColorfulROI
@@ -7899,6 +7902,34 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                             set(handles.ImgObject3,'AlphaData', 0.5*(activeRoiPicture>0) + 0.3*(inActiveRoiPicture>0)  );
                                        end
                               end
+                              
+                              
+                            % 3) MultiColor ROI 
+                             
+                            if MultiColorROI
+                                        xSize = size(get(handles.ImgObject3,'CData'),1);
+                                        ySize = size(get(handles.ImgObject3,'CData'),2);
+                                
+                                % Different colors
+                                colors = get(0,'DefaultAxesColorOrder'); % Matrix with colors in rows 1-7
+                                
+                                
+                                a  = zeros( size(activeRoiPicture));
+                                for i = 1:length(handles.image.VisibleROIs)
+                                    colorIndex = mod(i, size(colors,1)-1)+1;
+                                    color = colors(colorIndex,:);
+                                    a = a +  reshape( reshape( rois==i ,1,[])' * color , xSize, ySize, []) ;
+                                end
+                                
+                                set(handles.ImgObject3,'Cdata', a  );
+                               if ( get(handles.ContourCheckBox,'Value')==1 )
+                                    set(handles.ImgObject3,'AlphaData', 0.8*(activeRoiPicture>0) + 0.8*(inActiveRoiPicture>0)  );
+                               else
+                                    set(handles.ImgObject3,'AlphaData', 0.3*(activeRoiPicture>0) + 0.3*(inActiveRoiPicture>0)  );
+                               end
+
+                                max(a(:));
+                            end
                               
                         else
                               set(handles.ImgObject3,'Cdata', zeros(size(activeRoiPicture)));  
