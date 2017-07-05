@@ -657,16 +657,22 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 
             
                  %
-                 % Make directory if not existing
+                 % Prepare directory USER_SCRIPTS
                  %
+                    % Make directory if not existing
                      if ~exist(userScriptFolderPath, 'dir');
                          try
                             dispRed(['USER_SCRIPTS folder did not exist.  Try to create one in : ' userScriptFolderPath] );
                             mkdir(userScriptFolderPath);
+                            
                          catch
                              warning(['Could not create folder = ' userScriptFolderPath] );
                          end
                      end
+                     
+                     % Copy README-file
+                     copyfile(which('README-USER_SCRIPTS.txt'), [userScriptFolderPath filesep 'README.txt']);
+                     copyfile(which('Scripting-imlook4d.pdf'), [userScriptFolderPath filesep 'Scripting-imlook4d.pdf']);
 
          
                  %
