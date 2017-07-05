@@ -671,8 +671,11 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                      end
                      
                      % Copy README-file
-                     copyfile(which('README-USER_SCRIPTS.txt'), [userScriptFolderPath filesep 'README.txt']);
-                     copyfile(which('Scripting-imlook4d.pdf'), [userScriptFolderPath filesep 'Scripting-imlook4d.pdf']);
+                     try
+                        copyfile(which('README-USER_SCRIPTS.txt'), [userScriptFolderPath filesep 'README.txt']);
+                        copyfile(which('Scripting-imlook4d.pdf'), [userScriptFolderPath filesep 'Scripting-imlook4d.pdf']);  % Throws error if already existing (since I don't rename it)
+                     catch
+                     end
 
          
                  %
