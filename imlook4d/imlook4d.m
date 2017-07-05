@@ -652,7 +652,9 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 
                  % Path to look (imlook4d/../USER_SCRIPTS)
                  [pathstr1,name,ext] = fileparts(which('imlook4d'));
-                 userScriptFolderPath = [pathstr1 filesep '..' filesep 'USER_SCRIPTS'];            
+                 userScriptFolderPath = [pathstr1 filesep '..' filesep 'USER_SCRIPTS'];   
+                 addpath(userScriptFolderPath);      % Add folder to path (in case you made a new one) 
+
             
                  %
                  % Make directory if not existing
@@ -673,20 +675,10 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 
                       % Main menu item
                      handles.scriptsMenuUserHandle = uimenu(handles.scriptsMenuHandle,'Label','USER','Separator','on'); % Under SCRIPTS
-                     %%set(handles.scriptsMenuUserHandle, 'Callback', 'imlook4d(''ScriptsMenu_Callback'',gcbo,[],guidata(gcbo))');          
-
-                     [files dirs]=listDirectory(userScriptFolderPath);
+                     %set(handles.scriptsMenuUserHandle, 'Callback', 'imlook4d(''ScriptsMenu_Callback'',gcbo,[],guidata(gcbo))');          
                      
-                     % Add script menu
-                            % Advanced callback to allow help files for scripts
-                            nameWithSpaces = 'New Script';
-                            scriptName = 'Duplicate';
-                            handles.userScriptsMenuItemHandle(j) = ...
-                                uimenu(handles.scriptsMenuUserHandle,'Label',nameWithSpaces, 'Callback', [ ...
-                                'if imlook4d(''DisplayHelp'',gcbo,[],guidata(gcbo));return;end;' ...
-                                'cd(''' userScriptFolderPath '''); imlook4d(''newScriptFunction'')' ...
-                                ]);    
-                            
+                     % Find files and folders in USER_SCRIPTS
+                     [files dirs]=listDirectory(userScriptFolderPath);
 
 
                  %
@@ -750,7 +742,43 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 
                         end
                      end                  
-              
+ 
+                     %
+                     % Add script menu "SCRIPTS/USER/Create Script"  
+                     %
+                            
+                            handles.scriptsMenuNewScriptUserHandle = uimenu(handles.scriptsMenuUserHandle,'Label','Create Script','Separator','on'); % Under SCRIPTS
+
+                             % If no files or folders, remove divider
+                             if (length(files)==0) & (length(dirs)==2)
+                                 set(handles.scriptsMenuNewScriptUserHandle,'Separator','off');
+                             end
+
+                            
+                            
+                            % Advanced callback to allow help files for scripts
+                            nameWithSpaces = 'New Script';
+                            handles.userScriptsMenuNewScriptItemHandle = ...
+                                uimenu(handles.scriptsMenuNewScriptUserHandle,'Label',nameWithSpaces, 'Callback', [ ...
+                                'if imlook4d(''DisplayHelp'',gcbo,[],guidata(gcbo));return;end;' ...
+                                'cd(''' userScriptFolderPath '''); imlook4d(''newScriptFunction'')' ...
+                                ]);    
+                            
+                            % Advanced callback to allow help files for scripts
+                            nameWithSpaces = 'Scripting Manual';
+                            handles.userScriptsMenuNewScriptItemHandle2 = ...
+                                uimenu(handles.scriptsMenuNewScriptUserHandle,'Label',nameWithSpaces, 'Callback', [ ...
+                                'open(''Scripting-imlook4d.pdf'')' ...
+                                ]);   
+                                                                             
+                            % Advanced callback to allow help files for scripts
+                            nameWithSpaces = 'Open USER_SCRIPTS folder';
+                            handles.userScriptsMenuNewScriptItemHandle3 = ...
+                                uimenu(handles.scriptsMenuNewScriptUserHandle,'Label',nameWithSpaces, 'Callback', [ ...
+                                'if imlook4d(''DisplayHelp'',gcbo,[],guidata(gcbo));return;end;' ...
+                                'openInFileManager(''' userScriptFolderPath ''')' ...
+                                ]);   
+                            
             %
             % Make MODELS menu (from files in imlook4d MODELS directory)
             %      ------------
