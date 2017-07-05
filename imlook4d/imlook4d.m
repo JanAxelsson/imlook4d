@@ -1378,6 +1378,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             if strcmp( get(handles.GrayROI,'Checked'),'on')
                 handles.image.ROIColor = 'Gray';
             end
+            
+            if strcmp( get(handles.MultiColoredROIs,'Checked'),'on')
+                handles.image.ROIColor = 'MultiColoredROIs';
+            end            
+            
 
             guidata(handles.figure1, handles);
             
@@ -2589,9 +2594,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                 %end
             end
-            
-            %disp([ 'Visible = ' num2str(handles.image.VisibleROIs) ]);
-            %disp([ 'Locked  = ' num2str(handles.image.LockedROIs) ]);
+
+
             guidata(handles.figure1,handles);% Save handles 
             updateROIs(handles);
        catch
@@ -6241,8 +6245,30 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
            guidata(hObject,newhandles)
            
            updateROIs(newhandles)
-       function GuessRoiColor_Callback(hObject, eventdata, handles)
+        function GuessRoiColor_Callback(hObject, eventdata, handles)
            
+           % Display HELP and get out of callback
+                 if DisplayHelp(hObject, eventdata, handles) 
+                     return 
+                 end
+ 
+           
+           % Checkmarks
+           hROIObjects=get( get(hObject,'Parent'), 'Children');  % All other
+           for i=1:size(hROIObjects)
+               set(hROIObjects(i),'Checked','off')
+           end
+           set(hObject,'Checked','on')
+           
+           imlook4d_set_ROIColor(handles.figure1, eventdata, handles)
+           newhandles = guidata(handles.figure1);
+
+           updateImage(newhandles.axes1, eventdata, newhandles) 
+           guidata(hObject,newhandles)
+           
+           updateROIs(newhandles)
+           
+        function MultiColoredROIs_Callback(hObject, eventdata, handles)
            % Display HELP and get out of callback
                  if DisplayHelp(hObject, eventdata, handles) 
                      return 
@@ -7773,7 +7799,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     slice=round(get(handles.SliceNumSlider,'Value'));
                     frame=round(get(handles.FrameNumSlider,'Value'));
                     
-                    rois=handles.image.ROI(:,:,slice);                           % ROIs
+                    rois=handles.image.ROI(:,:,slice);                           % ROIs in this slice
                     
                     % Rotate and flip
                     if get(handles.FlipAndRotateRadioButton,'Value')
@@ -7838,7 +7864,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                             
                             level = 3*a;
-                            activeRoiPicture( activeRoiPicture > level ) = 0; % hide inside pixels
+                           activeRoiPicture( activeRoiPicture > level ) = 0; % hide inside pixels
                             
                                 
                             inActiveRoiPicture( xrange, yrange) = ...
@@ -7859,18 +7885,17 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         try
                             ColorfulROI = strcmp( handles.image.ROIColor, 'Colored');
                             GrayROI = strcmp( handles.image.ROIColor, 'Gray');
+                            MultiColoredROIs = strcmp( handles.image.ROIColor, 'MultiColoredROIs');
                         catch
                             handles.image.ROIColor = 'Colored';
                             ColorfulROI = true;
                             GrayROI = false;
+                            MultiColoredROIs = false;
                         end
                                         
                         if ( get(handles.hideROIcheckbox,'Value')==0 )
-                            ColorfulROI=0;
-                            GrayROI=0;
-                            MultiColorROI = 1;
   
-                            % 1) ColorFul ROI  
+                            % 1) ColorFul ROI  (Green for active, Red for inactive)
                             if ColorfulROI
                                         tempData = activeRoiPicture;
                                         xSize = size(get(handles.ImgObject3,'CData'),1);
@@ -7895,7 +7920,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                        
                                        % 2a) Gray ROI - contour 
                                        if ( get(handles.ContourCheckBox,'Value')==1 )
-                                            set(handles.ImgObject3,'AlphaData', 1*(activeRoiPicture>0) + 0.4*(inActiveRoiPicture>0)  );
+                                            set(handles.ImgObject3,'AlphaData', 0.5*(activeRoiPicture>0) + 0.4*(inActiveRoiPicture>0)  );
 
                                        % 2b) Gray ROI - solid  
                                        else
@@ -7906,36 +7931,32 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                               
                             % 3) MultiColor ROI 
                              
-                            if MultiColorROI
-                                        xSize = size(get(handles.ImgObject3,'CData'),1);
-                                        ySize = size(get(handles.ImgObject3,'CData'),2);
+                            if MultiColoredROIs
+                                xSize = size(get(handles.ImgObject3,'CData'),1);
+                                ySize = size(get(handles.ImgObject3,'CData'),2);
                                 
-                                % Different colors
-                                colors = get(0,'DefaultAxesColorOrder'); % Matrix with colors in rows 1-7
-                                
-                                
-                                a  = zeros( size(activeRoiPicture));
+                                % Set colors
+                                a  = zeros( [size(activeRoiPicture) 3 ]);
+
                                 for i = 1:length(handles.image.VisibleROIs)
-                                    colorIndex = mod(i, size(colors,1)-1)+1;
-                                    color = colors(colorIndex,:);
+                                    color = getColor(i);
                                     a = a +  reshape( reshape( rois==i ,1,[])' * color , xSize, ySize, []) ;
                                 end
-                                
                                 set(handles.ImgObject3,'Cdata', a  );
-                               if ( get(handles.ContourCheckBox,'Value')==1 )
-                                    set(handles.ImgObject3,'AlphaData', 0.8*(activeRoiPicture>0) + 0.8*(inActiveRoiPicture>0)  );
-                               else
+                                level = 0;
+                                if ( get(handles.ContourCheckBox,'Value') == 1 )
+                                    set(handles.ImgObject3,'AlphaData', 1*(activeRoiPicture> level) + 1*(inActiveRoiPicture>level)  );
+                                else
                                     set(handles.ImgObject3,'AlphaData', 0.3*(activeRoiPicture>0) + 0.3*(inActiveRoiPicture>0)  );
-                               end
-
-                                max(a(:));
+                                end
+                                
                             end
                               
                         else
                               set(handles.ImgObject3,'Cdata', zeros(size(activeRoiPicture)));  
                               set(handles.ImgObject3,'AlphaData', 0.0);  
                         end % END DRAWING ROIS         
-     
+
     % --------------------------------------------------------------------
     % Help and HTML functions
     % --------------------------------------------------------------------
@@ -8410,6 +8431,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
     % --------------------------------------------------------------------
     % Other functions
     % --------------------------------------------------------------------
+        function color = getColor(index)
+           % Different colors
+           colors = get(0,'DefaultAxesColorOrder'); % Matrix with colors in rows 1-7
+           colorIndex = mod(index, size(colors,1))+1;
+           color = colors(colorIndex,:);
         function activity=newTACT(hObject, eventdata, handles)
             %
             % Initialize
