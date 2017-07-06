@@ -476,7 +476,6 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                     % Calculating frame mid-time (assuming frame start-time)
                     %handles.image.time=handles.image.time+handles.image.duration/2;
                 end
-
                 
 %                 %%%% Anders code for m4 %%%%%
 %                 if (isa(inpargs,'Matrix4D'))
@@ -514,10 +513,16 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 
                 %handles.image.ROI=zeros(size(inpargs),'int8'); % Matrix for ROIs
                 handles.image.ROI=zeros(size(inpargs,1),size(inpargs,2),size(inpargs,3),'uint8'); % 3D Matrix for ROIs
-                UNDOSIZE = 5;
-                for i=1:UNDOSIZE
-                    handles.image.UndoROI.ROI{i} = handles.image.ROI;
-                end
+                 UNDOSIZE = 5;
+% %                 for i=1:UNDOSIZE
+% %                     handles.image.UndoROI.ROI{i} = handles.image.ROI;;
+% %                 end
+%                 handles.image.UndoROI.ROI = cell(1,UNDOSIZE);
+                ROIMETHOD = 'matrix';
+                ROIMETHOD = 'sparse';
+                ROIMETHOD = 'test';
+                handles = createUndoROI( handles, UNDOSIZE, ROIMETHOD);
+                
                 handles.image.UndoROI.position = 1; % Position in UndoROI.ROI fourth dimension, for current displayed undo level
                 
                 handles.image.VisibleROIs=uint8([]);   % Allow 255 ROIs, make them all visible
@@ -2905,12 +2910,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             % Coronal
             if ( numericOrientation == CORONAL )  
                 % Reorient data and ROI
+                handles = permuteUndoROI(handles,PERMUTE{CORONAL});
                 handles.image.Cdata=permute(handles.image.Cdata, PERMUTE{CORONAL});  % Image
                 handles.image.ROI=permute(handles.image.ROI, PERMUTE{CORONAL});      % ROI
                 tic
-                for i=1:UNDOSIZE
-                    handles.image.UndoROI.ROI{i}=permute(handles.image.UndoROI.ROI{i}, PERMUTE{CORONAL});% UndoROI
-                end
+                
+%                 for i=1:UNDOSIZE
+%                     handles.image.UndoROI.ROI{i}=permute(handles.image.UndoROI.ROI{i}, PERMUTE{CORONAL});% UndoROI
+%                 end
                 toc
                 newOrientation = 'Coronal';
                 V = PERMUTE{CORONAL};
@@ -2921,12 +2928,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             % Sagital
             if ( numericOrientation == SAGITAL ) 
                 % Reorient data and ROI    
+                handles = permuteUndoROI(handles,PERMUTE{SAGITAL}); % Must be first call, since reads dimensions from original matrices in handles
+ 
                 handles.image.Cdata=permute(handles.image.Cdata, PERMUTE{SAGITAL});  % Image
                 handles.image.ROI=permute(handles.image.ROI,  PERMUTE{SAGITAL});      % ROI      
                 tic
-                for i=1:UNDOSIZE
-                    handles.image.UndoROI.ROI{i}=permute(handles.image.UndoROI.ROI{i}, PERMUTE{SAGITAL});% UndoROI
-                end
+%                 for i=1:UNDOSIZE
+%                     handles.image.UndoROI.ROI{i}=permute(handles.image.UndoROI.ROI{i}, PERMUTE{SAGITAL});% UndoROI
+%                 end
                 toc
                 newOrientation = 'Sagital';
                 V = PERMUTE{SAGITAL};
@@ -2940,7 +2949,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         
             % Test
             disp(['rotateOrientation       size(ROI)=' num2str(size(handles.image.ROI)) ]);
-            disp(['rotateOrientation       size(UndoROI)=' num2str(size(handles.image.UndoROI.ROI)) ]);
+            disp(['rotateOrientation       size(UndoROI)=' num2str(size(handles.image.UndoROI.ROI{1}.roiSlices{1})) ]);
             disp(['rotateOrientation  SliceNumSlider=' num2str(get(handles.SliceNumSlider,'Max')) ]);
       function handles = resetOrientation(handles)
 %             disp(['resetOrientation  size(ROI)=' num2str(size(handles.image.ROI)) ]);
@@ -3032,70 +3041,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
          catch
              disp('Exception in wbu');
          end
-        function handles = storeUndoROI(handles)
-            
-            UNDOSIZE = length(handles.image.UndoROI.ROI);
-            ROI3D = handles.image.ROI;
-            try
-                for i=(UNDOSIZE-1):-1:1
-                    handles.image.UndoROI.ROI{i+1} = handles.image.UndoROI.ROI{i};
-                end
-            catch
-                handles.image.UndoROI.ROI{1} = ROI3D;
-                handles.image.UndoROI.position = 1;
-            end
-            handles.image.UndoROI.ROI{1} = ROI3D;
-            
-            % If drawing and position in Undo was different from 1, then
-            % the previous are crap
-            if (handles.image.UndoROI.position ~= 1)
-                numberOfRoisToDelete = handles.image.UndoROI.position - 1;
-                % Shift
-                for i = 1:(UNDOSIZE-numberOfRoisToDelete)
-                    handles.image.UndoROI.ROI{i} = handles.image.UndoROI.ROI{i+numberOfRoisToDelete};
-                end
-                % zero
-                for i = (UNDOSIZE-numberOfRoisToDelete+1):UNDOSIZE
-                    handles.image.UndoROI.ROI{i} = zeros(size(handles.image.UndoROI.ROI{i}),'uint8');
-                end
-                handles.image.UndoROI.position = 1; % Always set to 1 when drawing
-            end
-            
-            % Print current Undo Level and number of pixels in all Undo-ROIs
-            for i=1:UNDOSIZE;temp=handles.image.UndoROI.ROI{i};s(i)=sum(temp(:));end;disp([ '(' num2str(handles.image.UndoROI.position) ') ' num2str(s)]);
-    
-    function handles = undoRoi(handles)
-        undoMax = length(handles.image.UndoROI.ROI);
-        position = handles.image.UndoROI.position;
-        position = position + 1; % Point at next position
-        if (position > undoMax)
-            position = undoMax;
-        end
-        
-        handles.image.ROI = handles.image.UndoROI.ROI{position}; % Copy ROI
-        handles.image.UndoROI.position = position; % Remember position
-        disp(size(handles.image.ROI));
-        
-        % Print current Undo Level and number of pixels in all Undo-ROIs
-        for i=1:undoMax;temp=handles.image.UndoROI.ROI{i};s(i)=sum(temp(:));end;disp([ '(' num2str(handles.image.UndoROI.position) ') ' num2str(s)]);
-
-        guidata(handles.figure1,handles);  
-    function handles = redoRoi(handles)
-        undoMax = length(handles.image.UndoROI.ROI);
-        position = handles.image.UndoROI.position;
-        position = position - 1; % Point at next position
-        if (position < 1)
-            position = 1;
-        end
-        
-        handles.image.ROI = handles.image.UndoROI.ROI{position}; % Copy ROI
-        handles.image.UndoROI.position = position; % Remember position
-        disp(size(handles.image.ROI));
-        
-        % Print current Undo Level and number of pixels in all Undo-ROIs
-        for i=1:undoMax;temp=handles.image.UndoROI.ROI{i};s(i)=sum(temp(:));end;disp([ '(' num2str(handles.image.UndoROI.position) ') ' num2str(s)]);
-        guidata(handles.figure1,handles);                
-    
+         
     function drawROI(hObject, eventdata, handles)
         
                 contents = get(handles.ROINumberMenu,'String'); % Cell array  
@@ -3293,6 +3239,179 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                %end
             end           
             
+    % ROI undo
+    function handles = storeUndoROI(handles)
+        tic
+        UNDOSIZE = length(handles.image.UndoROI.ROI);
+        UNDOMETHOD = handles.image.undoMethod;
+        ROI3D = handles.image.ROI;
+        try
+            for i=(UNDOSIZE-1):-1:1
+                handles.image.UndoROI.ROI{i+1} = handles.image.UndoROI.ROI{i};
+            end
+        catch
+            handles.image.UndoROI.ROI{1} = ROI3D;
+            handles.image.UndoROI.position = 1;
+        end
+
+        % + Quick  
+        % - much memory
+        if strcmp(UNDOMETHOD, 'matrix')
+            for i=1:UNDOSIZE
+                handles.image.UndoROI.ROI{1} = ROI3D;
+            end
+        end
+        % - Slow  
+        % + little memory
+        if strcmp(UNDOMETHOD, 'sparse')
+             handles.image.UndoROI.ROI{1} = sparse(double(handles.image.ROI(:)));
+             toc
+             tic
+             indeces = find( handles.image.ROI == 1);
+             handles.image.UndoROI.ROI{1}(indeces) = 1;
+        end           
+        % Experiment
+        if strcmp(UNDOMETHOD,'test')
+            activeROI = get(handles.ROINumberMenu,'Value');
+            slice = round(get(handles.SliceNumSlider,'Value'));
+            slicesWithRois = sum( sum(handles.image.ROI,1) >0 , 2);
+            for i = 1: size(handles.image.ROI,3)
+                if slicesWithRois(i)
+                    handles.image.UndoROI.ROI{1}.roiSlices{i} = handles.image.ROI(:,:,i);
+                    handles.image.UndoROI.ROI{1}.nonzeroSlices(i) = 1;  % Vector
+                end
+            end
+        end
+
+        % If drawing and position in Undo was different from 1, then
+        % the previous are crap
+        if (handles.image.UndoROI.position ~= 1)
+            numberOfRoisToDelete = handles.image.UndoROI.position - 1;
+            % Shift
+            for i = 1:(UNDOSIZE-numberOfRoisToDelete)
+                handles.image.UndoROI.ROI{i} = handles.image.UndoROI.ROI{i+numberOfRoisToDelete};
+            end
+            % zero
+            for i = (UNDOSIZE-numberOfRoisToDelete+1):UNDOSIZE
+                handles.image.UndoROI.ROI{i} = zeros(size(handles.image.UndoROI.ROI{i}),'uint8');
+            end
+            handles.image.UndoROI.position = 1; % Always set to 1 when drawing
+        end
+
+        % Print current Undo Level and number of pixels in all Undo-ROIs
+        try
+            for i=1:UNDOSIZE;temp=handles.image.UndoROI.ROI{i};s(i)=sum(temp(:));end;disp([ '(' num2str(handles.image.UndoROI.position) ') ' num2str(s)]);
+        catch
+        end
+       toc
+    function handles = retrieveUndoROI(handles, steps)
+      % Call with steps = +1 to undo, steps = -1 to redo
+      % 
+        tic
+    UNDOMETHOD = handles.image.undoMethod;
+    undoMax = length(handles.image.UndoROI.ROI);  
+    roiSize = size( handles.image.ROI);
+    position = handles.image.UndoROI.position;
+    position = position + steps; % Point at next position
+    if (position > undoMax)
+        position = undoMax;
+    end
+    if (position < 1)
+        position = 1;
+    end
+        % + Quick  
+        % - much memory
+        if strcmp(UNDOMETHOD, 'matrix')
+            handles.image.ROI = handles.image.UndoROI.ROI{position}; % Copy ROI
+        end
+        % - Slow  
+        % + little memory
+        if strcmp(UNDOMETHOD, 'sparse')
+             handles.image.ROI= reshape(uint8(full( handles.image.UndoROI.ROI{position})), roiSize);
+        end 
+        % Experiment
+        if strcmp(UNDOMETHOD,'test')
+            activeROI = get(handles.ROINumberMenu,'Value');
+            handles.image.ROI = zeros( size(handles.image.ROI),'uint8'); 
+            for i = 1:length(handles.image.UndoROI.ROI{position}.nonzeroSlices)
+                if handles.image.UndoROI.ROI{position}.nonzeroSlices(i) == 1;
+                    handles.image.ROI(:,:,i) = handles.image.UndoROI.ROI{position}.roiSlices{i};
+                end
+            end
+        end
+
+    handles.image.UndoROI.position = position; % Remember position
+    disp(size(handles.image.ROI));
+
+    % Print current Undo Level and number of pixels in all Undo-ROIs
+    try
+        for i=1:undoMax;temp=handles.image.UndoROI.ROI{i};s(i)=sum(temp(:));end;disp([ '(' num2str(handles.image.UndoROI.position) ') ' num2str(s)]);
+    catch
+    end
+    guidata(handles.figure1,handles);
+
+    % Print current Undo Level and number of pixels in all Undo-ROIs
+    try
+        for i=1:undoMax;temp=handles.image.UndoROI.ROI{i};s(i)=sum(temp(:));end;disp([ '(' num2str(handles.image.UndoROI.position) ') ' num2str(s)]);
+    catch
+    end
+        toc
+    function handles = createUndoROI( handles, UNDOSIZE, UNDOMETHOD)
+        handles.image.undoMethod= UNDOMETHOD;
+        % + Quick  
+        % - much memory
+        if  strcmp(UNDOMETHOD,'matrix')
+            for i=1:UNDOSIZE
+                handles.image.UndoROI.ROI{i} = handles.image.ROI;
+            end
+        end
+        % - Slow  
+        % + little memory
+        if  strcmp(UNDOMETHOD,'sparse')
+             handles.image.UndoROI.ROI = cell(1,UNDOSIZE);
+        end
+        % Experiment
+        if strcmp(UNDOMETHOD,'test')
+            handles.image.UndoROI.ROI = cell(1,UNDOSIZE);
+            handles.image.UndoROI.ROI{1}.roiSlices = cell(1,size(handles.image.ROI,3));
+            handles.image.UndoROI.ROI{1}.nonzeroSlices = zeros( 1, size(handles.image.ROI,3));  % Vector
+        end
+    function handles = permuteUndoROI(handles,permutation)
+        UNDOSIZE = length(handles.image.UndoROI.ROI);
+        for j=1:UNDOSIZE
+            if ~isempty(handles.image.UndoROI.ROI{j}) % can't rotate empty cells!
+                
+                % Unpack undoROI
+                roi = zeros( size( handles.image.ROI )  ,'uint8');
+                % Loop nonzero slices
+                
+                for i = 1:size(handles.image.ROI,3)
+                    if handles.image.UndoROI.ROI{j}.nonzeroSlices(i) == 1;
+                        roi(:,:,i) = handles.image.UndoROI.ROI{j}.roiSlices{i};
+                    end
+                end
+                
+                
+                % Rotate
+                roi = permute( roi, permutation); % UndoROI
+                
+                % Pack back undo ROI
+                slicesWithRois = sum( sum(roi,1) >0 , 2); % New slices for this orientation
+                handles.image.UndoROI.ROI{j}.roiSlices = cell( 1, length(slicesWithRois));
+                handles.image.UndoROI.ROI{j}.nonzeroSlices = zeros( 1, length(slicesWithRois));
+                for i = 1: size(roi,3)
+                    if slicesWithRois(i)
+                        handles.image.UndoROI.ROI{j}.roiSlices{i} = roi(:,:,i);
+                        handles.image.UndoROI.ROI{j}.nonzeroSlices(i) = 1;  % Vector
+                    end
+                end
+            end
+        end
+        
+    function handles = undoRoi(handles)
+        handles = retrieveUndoROI(handles, +1); 
+    function handles = redoRoi(handles)   
+        handles = retrieveUndoROI(handles, -1);
 % --------------------------------------------------------------------
 %
 % MENUES
@@ -5777,9 +5896,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             
 
             handles.image.ROI= reshape(uint8(full(rois)), roiSize); % Make (sparse double 1D) matrix to (int 8 4D) matrix 
-            UNDOSIZE = length(handles.image.UndoROI.ROI);
-            handles.image.UndoROI.ROI{1} = handles.image.ROI;
-            handles.image.UndoROI.position = 1; % Position in UndoROI.ROI fourth dimension, for current displayed undo level
+            %UNDOSIZE = length(handles.image.UndoROI.ROI);
+            %handles.image.UndoROI.ROI{1} = handles.image.ROI;
+            handles = storeUndoROI(handles);
+            %handles.image.UndoROI.position = 1; % Position in UndoROI.ROI fourth dimension, for current displayed undo level
             
             % Flip y if old ROI format
             if strcmp(ext,'.roi')|| strcmp(ext,'.mat')
@@ -6774,7 +6894,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
     
         % Export handles to base workspace
         assignin('base', 'imlook4d_current_handle', get(hObject,'Parent'))
-        assignin('base', 'imlook4d_current_handles', handles)         
+        assignin('base', 'imlook4d_current_handles', handles)   
+        a = whos('handles');disp([ 'Size = ' num2str( round( a.bytes/1e6 )) ' MB']);
     function newScriptFunction()
             EOL=sprintf('\r\n');
             % Put text in new editor
