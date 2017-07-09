@@ -1,0 +1,39 @@
+#!/usr/bin/env bash                                                
+
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" # script's directory
+OUTDIR="$DIR/../imlook4d-exports"
+echo "DIR = " $DIR
+echo "OUTDIR = " $OUTDIR
+
+
+# Get revision number
+cd $DIR
+echo "DESCRIPTION = $(git show --oneline)"
+rev=$(git show --oneline | cut -f1 -d' ')
+version=$(cat "$DIR/imlook4d/version.txt")
+echo "VERSION = $version"
+echo "REV = $rev"
+
+ZIPFILE="$OUTDIR/imlook4d_($version-$rev).zip"
+
+# Export to zip file
+git archive $rev --output "$ZIPFILE"  
+zip -u "$ZIPFILE"
+
+# Make version file inside zip file
+cd "$OUTDIR"
+mkdir imlook4d
+echo "$version-$rev" > imlook4d/version.txt
+zip -u "$ZIPFILE" "imlook4d/version.txt"
+echo zip -u "$ZIPFILE" "imlook4d/version.txt"
+
+# Clean up temporary files
+rm "imlook4d/version.txt"
+rmdir imlook4d
+
+echo "------------------------------------------------------------------------------------ "
+echo "CREATED ARCHIVE $NAME "
+echo "IN FOLDER = $OUTDIR/$NAME"
+echo "------------------------------------------------------------------------------------ "
+
