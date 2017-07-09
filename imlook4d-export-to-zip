@@ -1,5 +1,4 @@
-#!/usr/bin/env bash                                                
-
+#!/usr/bin/env bash    
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" # script's directory
 OUTDIR="$DIR/../imlook4d-exports"
@@ -9,13 +8,16 @@ echo "OUTDIR = " $OUTDIR
 
 # Get revision number
 cd $DIR
-echo "DESCRIPTION = $(git show --oneline)"
-rev=$(git show --oneline | cut -f1 -d' ')
-version=$(cat "$DIR/imlook4d/version.txt")
-echo "VERSION = $version"
-echo "REV = $rev"
 
-ZIPFILE="$OUTDIR/imlook4d_($version-$rev).zip"
+rev=$(zenity --list  --column "tag"  $(git tag --sort=-creatordate ))  # Tags sorted by date
+rc=$?; if [[ $rc != 0 ]]; then echo 'Canceled'; exit $rc; fi  # Exit if cancelled
+
+echo "Selected tag =  $rev"
+
+
+# Create name
+NAME="imlook4d_($rev).zip"
+ZIPFILE="$OUTDIR/$NAME"
 
 # Export to zip file
 git archive $rev --output "$ZIPFILE"  
@@ -24,7 +26,7 @@ zip -u "$ZIPFILE"
 # Make version file inside zip file
 cd "$OUTDIR"
 mkdir imlook4d
-echo "$version-$rev" > imlook4d/version.txt
+echo "$rev" > imlook4d/version.txt
 zip -u "$ZIPFILE" "imlook4d/version.txt"
 echo zip -u "$ZIPFILE" "imlook4d/version.txt"
 
@@ -33,7 +35,9 @@ rm "imlook4d/version.txt"
 rmdir imlook4d
 
 echo "------------------------------------------------------------------------------------ "
-echo "CREATED ARCHIVE $NAME "
-echo "IN FOLDER = $OUTDIR/$NAME"
+echo "CREATED ARCHIVE = \"$NAME\""
+echo "IN FOLDER       = \"$OUTDIR\""
 echo "------------------------------------------------------------------------------------ "
 
+read -n 1 -s -r -p "DONE!  (Press any key to quit!)"
+exit
