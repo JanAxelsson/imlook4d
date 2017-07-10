@@ -109,10 +109,6 @@
    % imlook4d('importFromWorkspace_Callback', imlook4d_current_handle,{},imlook4d_current_handles); % Import from workspace to current imlook4d instance
     %ImportUntouched
     Import % Adds ROI to handles in import function
-    
-    % Store Undo for ROI
-    imlook4d_current_handles = imlook4d('storeUndoROI', guidata(imlook4d_current_handle));
-    guidata(gcf, imlook4d_current_handles)
 
     
     % Clear 

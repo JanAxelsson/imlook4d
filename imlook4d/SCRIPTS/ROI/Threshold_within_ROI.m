@@ -65,10 +65,7 @@ temp_variable_list=imlook4d_variables_before_script;
    % ImportUntouched
     Import
     
-        
-    % Store Undo for ROI
-    %imlook4d_current_handles = imlook4d('storeUndoROI', guidata(imlook4d_current_handle));
-    %guidata(gcf, imlook4d_current_handles)
+
     
     
 imlook4d_variables_before_script=temp_variable_list;    

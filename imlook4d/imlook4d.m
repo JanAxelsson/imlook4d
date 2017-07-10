@@ -3293,7 +3293,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             end
             % zero
             for i = (UNDOSIZE-numberOfRoisToDelete+1):UNDOSIZE
-                handles.image.UndoROI.ROI{i} = zeros(size(handles.image.UndoROI.ROI{i}),'uint8');
+                %handles.image.UndoROI.ROI{i} = zeros(size(handles.image.UndoROI.ROI{i}),'uint8');
+                % TODO
+                handles.image.UndoROI.ROI{i}.roiSlices = cell(1,size(handles.image.ROI,3));
+                handles.image.UndoROI.ROI{i}.nonzeroSlices = zeros( UNDOSIZE, size(handles.image.ROI,3));
             end
             handles.image.UndoROI.position = 1; % Always set to 1 when drawing
         end
@@ -6796,7 +6799,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
          % Import imlook4d ROIs from base workspace
          %disp('Import handles.image.ROI from imlook4d_ROI');
          try 
-             handles.image.ROI=evalin('base', 'imlook4d_ROI');
+             importedROIs=evalin('base', 'imlook4d_ROI');
+
+             % If ROI changed, store Undo ROI
+             if ~isequal(handles.image.ROI, importedROIs)
+                handles.image.ROI = importedROIs;
+                handles = storeUndoROI(handles);
+             end
+         
          catch
              disp('failed importing imlook4d_ROI');
          end;
@@ -6816,8 +6826,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 handles.image.VisibleROIs=[ handles.image.VisibleROIs 1];
                 handles.image.LockedROIs=[ handles.image.LockedROIs 0];
          end
-         
-         
+
          
 
          % NOT imported: imlook4d current slice and frame 
