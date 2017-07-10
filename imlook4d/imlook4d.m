@@ -2075,7 +2075,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             if ( newSlice>=1 && newSlice<=highestSlice )
                 set(handles.SliceNumEdit,'String',num2str(newSlice));
                 set(handles.SliceNumSlider,'Value',newSlice);
-                updateImage(this_imlook4d_instance, {}, handles);  %  handles as called to this function, ignoring that handles have been saved in updateImage (thus loosing from updateImage CachedImage)
+                %updateImage(this_imlook4d_instance, {}, handles);  %  handles as called to this function, ignoring that handles have been saved in updateImage (thus loosing from updateImage CachedImage)
                 setSlicesInYokes(slice, this_imlook4d_instance);
                 %setSlicesInYokes(slice, gcf);
                 %setSlicesInYokes(slice, hObject.figure1);
