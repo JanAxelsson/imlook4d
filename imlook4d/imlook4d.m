@@ -845,7 +845,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 
                        % html text
                        [pathstr2,name2,ext2] = fileparts( which(name));
-                       label = [ '<html> <img width=100 height=15  src="file://' pathstr1 filesep 'COLORMAPS' filesep name2 '.png" >: '  nameWithSpaces]
+                       label = [ '<html> <img width=100 height=15  src="file://' pathstr1 filesep 'COLORMAPS' filesep name2 '.png" ></img><font color="white">--</font>'  nameWithSpaces '</html>'];
 
                        handles.image.colorSubMenuHandle(i) = uimenu(handles.Cmaps, 'Label',label,'Tag',name, 'Callback', callbackString);
                     end
