@@ -1,4 +1,6 @@
-function tab=GMT_split(n)
+function tab=Red_black_blue(n)
+% http://www.ncl.ucar.edu/Document/Graphics/color_table_gallery.shtml
+% From http://www.ncl.ucar.edu/Document/Graphics/ColorTables/GMT_split.shtml
 
 % Default N:=255;
 if nargin == 0
