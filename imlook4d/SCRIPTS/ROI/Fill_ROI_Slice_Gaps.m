@@ -61,10 +61,7 @@ Export
 %
     imlook4d_ROI = newImlook4d_ROI;
     Import % Adds ROI to handles in import function
-    
-    % Store Undo for ROI
-    imlook4d_current_handles = imlook4d('storeUndoROI', guidata(imlook4d_current_handle));
-    guidata(gcf, imlook4d_current_handles)
+
 
     ClearVariables
 

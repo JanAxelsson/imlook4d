@@ -45,10 +45,7 @@ imlook4d_ROI( bROIout ) = imlook4d_frame;
     %EndScript
     
         Import % Adds ROI to handles in import function
-    
-    % Store Undo for ROI
-    imlook4d_current_handles = imlook4d('storeUndoROI', guidata(imlook4d_current_handle));
-    guidata(gcf, imlook4d_current_handles)
+
 
     
     % Clear 
