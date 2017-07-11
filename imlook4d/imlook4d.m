@@ -840,18 +840,17 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                     nameWithSpaces= regexprep(name,'_', ' ');  % Replace '_' with ' '
 
                     if strcmp(ext,'.m')
-                        % Setup submenu callback 
-                        % WAS callbackString=['imlook4d(''Color_Callback'',gcf,[],guidata(gcf),''' name ''')'];
-%                         callbackString=['@(hObject,eventdata)imlook4d(''Color_Callback'',hObject,eventdata,guidata(hObject), ''' name ''' )'];
-%                         callbackString=['@(hObject,eventdata)imlook4d(''Color_Callback'',gcf,{},guidata(gcf), ''' name ''' )'];
-%                         
-                        callbackString=['imlook4d(''Color_Callback'',gcf,[],guidata(gcf), ''' name ''' )'];
+                        % Setup submenu callback              
                        callbackString=['imlook4d(''Color_Callback'',gcbo,[],guidata(gcbo), ''' name ''' )'];
 
-                        %disp(['name=' name '   ColorCallback=' callbackString]);% Display paths
-                        handles.image.colorSubMenuHandle(i) = uimenu(handles.Cmaps, 'Label',nameWithSpaces, 'Callback', callbackString);
+                       % html text
+                       [pathstr2,name2,ext2] = fileparts( which(name));
+                       nameWithSpaces = [ '<html> <img width=100 height=15  src="file://' pathstr1 filesep 'COLORMAPS' filesep name2 '.png" >: '  nameWithSpaces]
+
+                       handles.image.colorSubMenuHandle(i) = uimenu(handles.Cmaps, 'Label',nameWithSpaces,'Tag',name, 'Callback', callbackString);
                     end
                  end  
+
             %
             % Make WINDOW LEVEL menu (from files in imlook4d WINDOW_LEVELS directory)
             %     ------------------
@@ -6308,9 +6307,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             function Color(hObject, eventdata, handles, functionName)
               % General callback for Colormap in COLORMAPS folder, which
               % has name functionName
-
+try
                % Determine correct object (dynamically generated callbacks)
-               temp=findobj('Label', strrep(functionName,'_', ' '));
+               temp=findobj('Tag', strrep(functionName,'_', ' '));
+               temp=findobj('Tag', functionName);
                tempObject=temp(1);
 
 
@@ -6330,7 +6330,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 
                 handles.image.ColormapName = functionName;
                 imlook4d_set_ROIColor(handles.figure1, eventdata, handles)
-
+catch
+    dispRed('Problem if you see this: Fix function color');
+end
 
     % EDIT/ROI submenu
         function ColorfulROI_Callback(hObject, eventdata, handles)
