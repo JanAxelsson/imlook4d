@@ -30,6 +30,9 @@ echo "$rev" > imlook4d/version.txt
 zip -u "$ZIPFILE" "imlook4d/version.txt"
 echo zip -u "$ZIPFILE" "imlook4d/version.txt"
 
+# Remove from zip file
+zip -d "$ZIPFILE" imlook4d-export-to-zip TODO.txt
+
 # Clean up temporary files
 rm "imlook4d/version.txt"
 rmdir imlook4d
