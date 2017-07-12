@@ -6043,11 +6043,15 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             [windowDescriptions h]= htmlWindowDescriptions(h);  % Sorted html list
         
         % Find index to current window
-            thisWindow=1;
+            thisWindow=[];
             for i=1:size(h)
-                % Mark current window with a checkbox
-                if (h(i) == handles.figure1)
-                     thisWindow=i;
+%                % Mark current window with a checkbox
+                 if (h(i) == handles.figure1)
+                      windowDescriptions{i} = strrep( windowDescriptions{i},'<HTML>','<HTML> --> <B> <I>');
+                 end
+                % Mark all except current window with a checkbox
+                if (h(i) ~= handles.figure1)
+                     thisWindow=[ thisWindow i];
                 end
             end
             
