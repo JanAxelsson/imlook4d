@@ -26,7 +26,7 @@ zip -u "$ZIPFILE"
 # Make version file inside zip file
 cd "$OUTDIR"
 mkdir imlook4d
-echo "$rev" > imlook4d/version.txt
+echo -n "$rev" > imlook4d/version.txt
 zip -u "$ZIPFILE" "imlook4d/version.txt"
 echo zip -u "$ZIPFILE" "imlook4d/version.txt"
 
