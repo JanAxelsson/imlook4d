@@ -845,9 +845,9 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 
                        % html text
                        [pathstr2,name2,ext2] = fileparts( which(name));
-                       nameWithSpaces = [ '<html> <img width=100 height=15  src="file://' pathstr1 filesep 'COLORMAPS' filesep name2 '.png" >: '  nameWithSpaces]
+                       label = [ '<html> <img width=100 height=15  src="file://' pathstr1 filesep 'COLORMAPS' filesep name2 '.png" ></img><font color="white">--</font>'  nameWithSpaces '</html>'];
 
-                       handles.image.colorSubMenuHandle(i) = uimenu(handles.Cmaps, 'Label',nameWithSpaces,'Tag',name, 'Callback', callbackString);
+                       handles.image.colorSubMenuHandle(i) = uimenu(handles.Cmaps, 'Label',label,'Tag',name, 'Callback', callbackString);
                     end
                  end  
 
@@ -2633,6 +2633,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         %disp([ 'Visible = ' num2str(handles.image.VisibleROIs) ]);
         %disp([ 'Locked  = ' num2str(handles.image.LockedROIs) ]);
         guidata(hObject,handles);% Save handles
+        updateROIs(handles);
     function ROI_Hide_Callback(hObject, eventdata, handles, name)
         if DisplayHelp(hObject, eventdata, handles)
             return
