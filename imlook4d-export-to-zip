@@ -20,7 +20,7 @@ NAME="imlook4d_($rev).zip"
 ZIPFILE="$OUTDIR/$NAME"
 
 # Export to zip file
-git archive $rev --output "$ZIPFILE"  
+git archive "$rev:imlook4d" --output "$ZIPFILE"  
 zip -u "$ZIPFILE"
 
 # Make version file inside zip file

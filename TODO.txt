@@ -1,3 +1,1 @@
 Add things to do:
-
-- Look for USER_SCRIPTS up one and two directories
