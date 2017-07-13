@@ -22,7 +22,7 @@ try imageHandles.duration2D=imageHandles.duration2D(sliceRange,frameRange); catc
 
 try imageHandles.time2D=imageHandles.time2D(sliceRange,frameRange);catch end
 
-imageHandles.DICOMsortedIndexList=imageHandles.DICOMsortedIndexList(linearIndeces);
+imageHandles.DICOMsortedIndexList=imageHandles.DICOMsortedIndexList(linearIndeces,:);
 imageHandles.sliceLocations=imageHandles.sliceLocations(linearIndeces);
 imageHandles.imagePosition=imageHandles.imagePosition(1,linearIndeces);
 imageHandles.dirtyDICOMFileNames=imageHandles.dirtyDICOMFileNames(linearIndeces);

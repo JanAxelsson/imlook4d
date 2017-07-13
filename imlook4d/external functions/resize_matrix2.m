@@ -1,4 +1,4 @@
-function outImageStruct  = resize_matrix( templateImageStruct, oldImageStruct )
+function outImageStruct  = resize_matrix2( templateImageStruct, oldImageStruct )
 % RESLICE Resizes the matrix of an image volume (oldImageStruct) so that number of pixels and field-of-view are the same
 % as a template (templateImageStruct).
 %
