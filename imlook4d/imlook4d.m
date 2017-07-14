@@ -3394,8 +3394,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 % Loop nonzero slices
                 
                 for i = 1:size(handles.image.ROI,3)
+                    try
                     if handles.image.UndoROI.ROI{j}.nonzeroSlices(i) == 1;
                         roi(:,:,i) = handles.image.UndoROI.ROI{j}.roiSlices{i};
+                    end
+                    catch
+                        disp('Catch error in permutateUndoROI');
                     end
                 end
                 
