@@ -515,10 +515,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 handles.image.ROI=zeros(size(inpargs,1),size(inpargs,2),size(inpargs,3),'uint8'); % 3D Matrix for ROIs
                  
                 UNDOSIZE = 5;
-                % ROIMETHOD = 'matrix'; % Remove in whole file
-                % ROIMETHOD = 'sparse'; % Remove
-                ROIMETHOD = 'test';
-                handles = createUndoROI( handles, UNDOSIZE, ROIMETHOD);
+                handles = createUndoROI( handles, UNDOSIZE);
                 
                 handles.image.UndoROI.position = 1; % Position in UndoROI.ROI fourth dimension, for current displayed undo level
                 
@@ -3239,13 +3236,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
     % ROI undo
     function handles = resetUndoROI(handles)
         UNDOSIZE = length(handles.image.UndoROI.ROI);
-        UNDOMETHOD = handles.image.undoMethod;
-        handles = createUndoROI( handles, UNDOSIZE, UNDOMETHOD);
-        
+        handles = createUndoROI( handles, UNDOSIZE);       
     function handles = storeUndoROI(handles)
         tic
         UNDOSIZE = length(handles.image.UndoROI.ROI);
-        UNDOMETHOD = handles.image.undoMethod;
         ROI3D = handles.image.ROI;
         try
             for i=(UNDOSIZE-1):-1:1
@@ -3256,24 +3250,6 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             handles.image.UndoROI.position = 1;
         end
 
-        % + Quick  
-        % - much memory
-        if strcmp(UNDOMETHOD, 'matrix')
-            for i=1:UNDOSIZE
-                handles.image.UndoROI.ROI{1} = ROI3D;
-            end
-        end
-        % - Slow  
-        % + little memory
-        if strcmp(UNDOMETHOD, 'sparse')
-             handles.image.UndoROI.ROI{1} = sparse(double(handles.image.ROI(:)));
-             toc
-             tic
-             indeces = find( handles.image.ROI == 1);
-             handles.image.UndoROI.ROI{1}(indeces) = 1;
-        end           
-        % Experiment
-        if strcmp(UNDOMETHOD,'test')
             activeROI = get(handles.ROINumberMenu,'Value');
             slice = round(get(handles.SliceNumSlider,'Value'));
             slicesWithRois = sum( sum(handles.image.ROI,1) >0 , 2);
@@ -3283,7 +3259,6 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     handles.image.UndoROI.ROI{1}.nonzeroSlices(i) = 1;  % Vector
                 end
             end
-        end
 
         % If drawing and position in Undo was different from 1, then
         % the previous are crap
@@ -3304,16 +3279,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         end
 
         % Print current Undo Level and number of pixels in all Undo-ROIs
-        try
-            for i=1:UNDOSIZE;temp=handles.image.UndoROI.ROI{i};s(i)=sum(temp(:));end;disp([ '(' num2str(handles.image.UndoROI.position) ') ' num2str(s)]);
-        catch
-        end
-       toc
+        printUndoInfo(handles);
     function handles = retrieveUndoROI(handles, steps)
       % Call with steps = +1 to undo, steps = -1 to redo
       % 
-        tic
-        UNDOMETHOD = handles.image.undoMethod;
+
         undoMax = length(handles.image.UndoROI.ROI);  
         roiSize = size( handles.image.ROI);
         position = handles.image.UndoROI.position;
@@ -3324,18 +3294,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         if (position < 1)
             position = 1;
         end
-            % + Quick  
-            % - much memory
-            if strcmp(UNDOMETHOD, 'matrix')
-                handles.image.ROI = handles.image.UndoROI.ROI{position}; % Copy ROI
-            end
-            % - Slow  
-            % + little memory
-            if strcmp(UNDOMETHOD, 'sparse')
-                 handles.image.ROI= reshape(uint8(full( handles.image.UndoROI.ROI{position})), roiSize);
-            end 
-            % Experiment
-            if strcmp(UNDOMETHOD,'test')
+
                 activeROI = get(handles.ROINumberMenu,'Value');
                 handles.image.ROI = zeros( size(handles.image.ROI),'uint8'); 
                 try
@@ -3346,44 +3305,18 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     end
                 catch
                 end
-            end
 
         handles.image.UndoROI.position = position; % Remember position
-        disp(size(handles.image.ROI));
 
-        % Print current Undo Level and number of pixels in all Undo-ROIs
-        try
-            for i=1:undoMax;temp=handles.image.UndoROI.ROI{i};s(i)=sum(temp(:));end;disp([ '(' num2str(handles.image.UndoROI.position) ') ' num2str(s)]);
-        catch
-        end
+        
         guidata(handles.figure1,handles);
 
         % Print current Undo Level and number of pixels in all Undo-ROIs
-        try
-            for i=1:undoMax;temp=handles.image.UndoROI.ROI{i};s(i)=sum(temp(:));end;disp([ '(' num2str(handles.image.UndoROI.position) ') ' num2str(s)]);
-        catch
-        end
-        toc
-    function handles = createUndoROI( handles, UNDOSIZE, UNDOMETHOD)
-        handles.image.undoMethod= UNDOMETHOD;
-        % + Quick  
-        % - much memory
-        if  strcmp(UNDOMETHOD,'matrix')
-            for i=1:UNDOSIZE
-                handles.image.UndoROI.ROI{i} = handles.image.ROI;
-            end
-        end
-        % - Slow  
-        % + little memory
-        if  strcmp(UNDOMETHOD,'sparse')
-             handles.image.UndoROI.ROI = cell(1,UNDOSIZE);
-        end
-        % Experiment
-        if strcmp(UNDOMETHOD,'test')
+        printUndoInfo(handles);
+    function handles = createUndoROI( handles, UNDOSIZE)
             handles.image.UndoROI.ROI = cell(1,UNDOSIZE);
             handles.image.UndoROI.ROI{1}.roiSlices = cell(1,size(handles.image.ROI,3));
             handles.image.UndoROI.ROI{1}.nonzeroSlices = zeros( 1, size(handles.image.ROI,3));  % Vector
-        end
     function handles = permuteUndoROI(handles,permutation)
         UNDOSIZE = length(handles.image.UndoROI.ROI);
         for j=1:UNDOSIZE
@@ -3419,7 +3352,34 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 end
             end
         end
-        
+    function printUndoInfo(handles)
+            undoMax = length(handles.image.UndoROI.ROI);  
+            N=length(handles.image.UndoROI.ROI{1}.nonzeroSlices);
+            
+            position = handles.image.UndoROI.position;
+            
+            % Print current Undo Level and number of pixels in all Undo-ROIs
+            try
+                R = [];
+                for i=1:undoMax
+                    S = 0; % Sum
+                    for j=1:N
+                        if handles.image.UndoROI.ROI{i}.nonzeroSlices(j)
+                            S = S + sum( handles.image.UndoROI.ROI{i}.roiSlices{j}(:) > 0 );
+                        end
+                    end
+                    
+                    if position ~= i
+                        R = [ R ' ' num2str(S) ' ']; % Store sum for each Undo Level
+                    else
+                        R = [ R '[' num2str(S) ']']; % Store sum for each Undo Level
+                    end
+                end
+                    
+                %disp([ '(' num2str(handles.image.UndoROI.position) ') ' R]);
+                disp([ 'ROI: ' num2str( sum(handles.image.ROI(:)>0)) '    Undo: ' R]);
+            catch
+            end
     function handles = undoRoi(handles)
         handles = retrieveUndoROI(handles, +1); 
     function handles = redoRoi(handles)   
