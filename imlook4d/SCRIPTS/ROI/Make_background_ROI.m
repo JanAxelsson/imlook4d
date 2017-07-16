@@ -44,7 +44,6 @@ StartScript;
     % 
     guidata(imlook4d_current_handle,imlook4d_current_handles);
  
-
-    
+ 
 EndScript
 

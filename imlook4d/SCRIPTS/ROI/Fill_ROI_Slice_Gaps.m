@@ -45,11 +45,11 @@ Export
 
         % loop pairs of bottom, top
         for i = 1:numberOfSlicesWithROIs-1
-            bottom = imlook4d_ROI(:,:,bottomSlices(i)) == currentROI; % Logical
-            top = imlook4d_ROI(:,:,topSlices(i)) == currentROI;       % Logical
+            bottom = imlook4d_ROI(:,:,bottomSlices(i)) == currentROI;
+            top = imlook4d_ROI(:,:,topSlices(i)) == currentROI;
             numberOfSlicesToInterpolate = topSlices(i) - bottomSlices(i) + 1
             newImlook4d_ROI(:,:, bottomSlices(i) : topSlices(i) ) = ...
-                interp_shape(top,bottom,numberOfSlicesToInterpolate); % Double
+                interp_shape(top,bottom,numberOfSlicesToInterpolate);
         end
     end
 
@@ -59,10 +59,12 @@ Export
 %   
 % FINALIZE
 %
-    %imlook4d_ROI = newImlook4d_ROI;
-    imlook4d_ROI(newImlook4d_ROI==1) = currentROI;
+    imlook4d_ROI = newImlook4d_ROI;
     Import % Adds ROI to handles in import function
-
+    
+    % Store Undo for ROI
+    imlook4d_current_handles = imlook4d('storeUndoROI', guidata(imlook4d_current_handle));
+    guidata(gcf, imlook4d_current_handles)
 
     ClearVariables
 
