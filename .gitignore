@@ -4,4 +4,5 @@
 # Ignore MATLAB backup files
 *~
 
-/USER_SCRIPTS
+# Ignore soft-linked USER_SCRIPT
+/USER_SCRIPTS/*
