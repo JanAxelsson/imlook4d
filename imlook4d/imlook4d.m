@@ -6783,7 +6783,9 @@ end
                 handles.image.ROI = importedROIs;
                 handles = storeUndoROI(handles);
                 % If ROI size changed, then clean all Undo ROIs because undo only works back to same sized ROI
-                handles = resetUndoROI(handles);
+                if ~isequal( size(handles.image.ROI), size(importedROIs) )
+                    handles = resetUndoROI(handles);
+                end
              end
          
          catch
