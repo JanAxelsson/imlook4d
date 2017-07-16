@@ -14,7 +14,7 @@ fsize=5; % Odd number, otherwise it will be shifted one pixel
 h=ones(fsize);
 h=h/sum(h(:));  % Normalize to sum 1
 
-bROI = (imlook4d_ROI == imlook4d_frame);
+bROI = (imlook4d_ROI == imlook4d_ROI_number);
 bROIout = false( size(bROI));  % Preallocate logical matrix
 
 % Loop slices
@@ -35,8 +35,8 @@ for i=1:size(bROI,3)
 end
 
 % Clear current ROI, and set to filtered verion
-imlook4d_ROI(imlook4d_ROI == imlook4d_frame) = 0;
-imlook4d_ROI( bROIout ) = imlook4d_frame;
+imlook4d_ROI(imlook4d_ROI == imlook4d_ROI_number) = 0;
+imlook4d_ROI( bROIout ) = imlook4d_ROI_number;
 
 
 
