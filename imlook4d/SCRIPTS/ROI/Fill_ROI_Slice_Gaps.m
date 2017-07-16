@@ -45,11 +45,11 @@ Export
 
         % loop pairs of bottom, top
         for i = 1:numberOfSlicesWithROIs-1
-            bottom = imlook4d_ROI(:,:,bottomSlices(i)) == currentROI;
-            top = imlook4d_ROI(:,:,topSlices(i)) == currentROI;
+            bottom = imlook4d_ROI(:,:,bottomSlices(i)) == currentROI; % Logical
+            top = imlook4d_ROI(:,:,topSlices(i)) == currentROI;       % Logical
             numberOfSlicesToInterpolate = topSlices(i) - bottomSlices(i) + 1
             newImlook4d_ROI(:,:, bottomSlices(i) : topSlices(i) ) = ...
-                interp_shape(top,bottom,numberOfSlicesToInterpolate);
+                interp_shape(top,bottom,numberOfSlicesToInterpolate); % Double
         end
     end
 
@@ -59,7 +59,8 @@ Export
 %   
 % FINALIZE
 %
-    imlook4d_ROI = newImlook4d_ROI;
+    %imlook4d_ROI = newImlook4d_ROI;
+    imlook4d_ROI(newImlook4d_ROI==1) = currentROI;
     Import % Adds ROI to handles in import function
 
 
