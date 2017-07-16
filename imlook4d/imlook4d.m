@@ -3142,7 +3142,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                 subDataMatrix= handles.image.Cdata( ixx:(ixx+rx-1),(iyy):(iyy+ry-1), slice, frame);
                                 
                                 % In brush AND non-locked AND above level
-                                nonLockedAboveLevelPixels = find( (ROILock==0) & (handles.image.brush>0) & (subDataMatrix>level) ); 
+                                nonLockedAboveLevelPixels = find( (ROILock==0) & (handles.image.brush>0) & (subDataMatrix >= level) ); 
                                 
                                 % Set pixels
                                 subMatrix( nonLockedAboveLevelPixels ) = activeROI;  % Draw over any pixels in brush
