@@ -3294,17 +3294,18 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         if (position < 1)
             position = 1;
         end
+        
 
-                activeROI = get(handles.ROINumberMenu,'Value');
-                handles.image.ROI = zeros( size(handles.image.ROI),'uint8'); 
-                try
-                    for i = 1:length(handles.image.UndoROI.ROI{position}.nonzeroSlices)
-                        if handles.image.UndoROI.ROI{position}.nonzeroSlices(i) == 1;
-                            handles.image.ROI(:,:,i) = handles.image.UndoROI.ROI{position}.roiSlices{i};
-                        end
-                    end
-                catch
+        activeROI = get(handles.ROINumberMenu,'Value');
+        handles.image.ROI = zeros( size(handles.image.ROI),'uint8'); 
+        try
+            for i = 1:length(handles.image.UndoROI.ROI{position}.nonzeroSlices)
+                if handles.image.UndoROI.ROI{position}.nonzeroSlices(i) == 1;
+                    handles.image.ROI(:,:,i) = handles.image.UndoROI.ROI{position}.roiSlices{i};
                 end
+            end
+        catch
+        end
 
         handles.image.UndoROI.position = position; % Remember position
 
@@ -3361,24 +3362,29 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             % Print current Undo Level and number of pixels in all Undo-ROIs
             try
                 R = [];
-                for i=1:undoMax
-                    S = 0; % Sum
-                    for j=1:N
-                        if handles.image.UndoROI.ROI{i}.nonzeroSlices(j)
-                            S = S + sum( handles.image.UndoROI.ROI{i}.roiSlices{j}(:) > 0 );
+                try 
+                    for i=1:undoMax
+                        S = 0; % Sum
+                        for j=1:N
+                            if handles.image.UndoROI.ROI{i}.nonzeroSlices(j)
+                                S = S + sum( handles.image.UndoROI.ROI{i}.roiSlices{j}(:) > 0 );
+                            end
+                        end
+                        
+                        if position ~= i
+                            R = [ R ' ' num2str(S) ' ']; % Store sum for each Undo Level
+                        else
+                            R = [ R '[' num2str(S) ']']; % Store sum for each Undo Level
                         end
                     end
-                    
-                    if position ~= i
-                        R = [ R ' ' num2str(S) ' ']; % Store sum for each Undo Level
-                    else
-                        R = [ R '[' num2str(S) ']']; % Store sum for each Undo Level
-                    end
+                catch
+                    % handles.image.UndoROI.ROI == {}
                 end
-                    
+                
                 %disp([ '(' num2str(handles.image.UndoROI.position) ') ' R]);
                 disp([ 'ROI: ' num2str( sum(handles.image.ROI(:)>0)) '    Undo: ' R]);
             catch
+                disp('Error in printUndoInfo');
             end
     function handles = undoRoi(handles)
         handles = retrieveUndoROI(handles, +1); 
@@ -6779,11 +6785,12 @@ end
              importedROIs=evalin('base', 'imlook4d_ROI');
 
              % If ROI changed, store Undo ROI
+             previousROISize = size(handles.image.ROI);
              if ~isequal(handles.image.ROI, importedROIs)
                 handles.image.ROI = importedROIs;
                 handles = storeUndoROI(handles);
                 % If ROI size changed, then clean all Undo ROIs because undo only works back to same sized ROI
-                if ~isequal( size(handles.image.ROI), size(importedROIs) )
+                if ~isequal( previousROISize, size(importedROIs) )
                     handles = resetUndoROI(handles);
                 end
              end

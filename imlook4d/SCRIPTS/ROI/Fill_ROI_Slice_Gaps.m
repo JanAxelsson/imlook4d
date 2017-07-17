@@ -60,7 +60,7 @@ Export
 % FINALIZE
 %
     %imlook4d_ROI = newImlook4d_ROI;
-    imlook4d_ROI(newImlook4d_ROI==1) = currentROI;
+    imlook4d_ROI(newImlook4d_ROI == 1) = currentROI;
     Import % Adds ROI to handles in import function
 
 
