@@ -18,7 +18,7 @@
     %   imlook4d(matrix)
     %   imlook4d(matrix, time_vector, duration_vector)  % time points and duration
     %
-    % OPEN A m4 OBJECT
+    % OPEN A m4 OBJECTl
     %   imlook4d(m4)
     %
     % OPEN FILES 
@@ -955,7 +955,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 
                 if ismac()
                     % MAC OSX detected; increase font sizes
-                    SMALL = 8;
+                    SMALL = 10;
                     MEDIUM = 12;
                     FONTNAME = 'Arial';
                 end
@@ -972,15 +972,19 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                         
                         set(h,'FontName',FONTNAME)
                         
-                        % For all except edit boxes
+                        % For all except edit boxes and text 
                         if ~strcmp( 'edit', get(h,'Style'))&&~strcmp( 'text', get(h,'Style'))
                             set(h,'FontSize',MEDIUM)
+                        end
+                        
+                        % For text
+                        if strcmp( 'text', get(h,'Style'))
+                            set(h,'FontSize',SMALL)
                         end
                     catch
                     end
                 end
-                
-                set(handles.infoText1,'FontSize',SMALL)
+
 
                guiHandles=findobj(hObject,'-property','Units');
                for i=1:size(guiHandles,1)
