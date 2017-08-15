@@ -3039,7 +3039,6 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
          catch
              disp('Exception in wbu');
          end
-         
     function drawROI(hObject, eventdata, handles)
         
                 contents = get(handles.ROINumberMenu,'String'); % Cell array  
@@ -3081,7 +3080,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     YLim=get(gca,'YLim');               
                 end
                 
-                
+                ROIslice =  handles.image.ROI( :,:, slice);
 
                 % Draw ROI
                 r0=round( str2num(get(handles.BrushSize,'String')) );
@@ -3102,7 +3101,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     dY = ( y_new - y_old );
                     r = sqrt( dX^2 + dY^2 ); % length
                     brushSteps = r / r0;  % Number of brush radii
-                    rStep = 0.5 / brushSteps; % Steps
+                    rStep = 0.7 / brushSteps; % Steps
                     
                     indeces=find(handles.image.brush>0);  % Use only non-zero brush values
 
@@ -3121,7 +3120,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                         % Draw in 
                         if (ixx>XLim(1))&&(ixx<=XLim(2)-rx+1)&&(iyy>YLim(1))&&(iyy<=YLim(2)-ry+1)  
-                            subMatrix= handles.image.ROI( ixx:(ixx+rx-1),(iyy):(iyy+ry-1), slice);  % Same matrix size as brush
+                            subMatrix= ROIslice( ixx:(ixx+rx-1),(iyy):(iyy+ry-1));  % Same matrix size as brush
                             
                             % Make matrix with locked pixels
                             ROILock = zeros( size(subMatrix) ,'uint8');
@@ -3155,13 +3154,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                 
                             end
                             
-                            handles.image.ROI( (ixx):(ixx+rx-1),(iyy):(iyy+ry-1), slice) = subMatrix;
+                            ROIslice( (ixx):(ixx+rx-1),(iyy):(iyy+ry-1)) = subMatrix;
                         end
                     end
-                    
-
-
-
+                    handles.image.ROI( :,:, slice) = ROIslice;
+  
                     % Trim ROI matrix to fit image size 
                     xsize=size(handles.image.Cdata,1);
                     ysize=size(handles.image.Cdata,2);
@@ -3175,7 +3172,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 % Update image
                 %
  
-                   updateROIs(handles);
+                   updateROIs(handles);     
          function drawCursorInYokes(axesPoint, this_imlook4d_instance)
               yokes=getappdata( this_imlook4d_instance, 'yokes');
             for i=1:length(yokes) 
@@ -8017,37 +8014,42 @@ end
                         if ( get(handles.hideROIcheckbox,'Value')==0 )
   
                             % 1) ColorFul ROI  (Green for active, Red for inactive)
+                            
                             if ColorfulROI
-                                        tempData = activeRoiPicture;
-                                        xSize = size(get(handles.ImgObject3,'CData'),1);
-                                        ySize = size(get(handles.ImgObject3,'CData'),2);
-                                        
-                                        act =  ( reshape( reshape(activeRoiPicture,1,[])' * [ 0 1 0 ] , xSize, ySize, []) > 0  );
-                                        inact =  ( reshape( reshape(inActiveRoiPicture,1,[])' * [ 1 0 0 ]*0.6 , xSize, ySize, []) > 0  );
-                                        set(handles.ImgObject3,'Cdata', act + inact  );
-
-                                       if ( get(handles.ContourCheckBox,'Value')==1 )
-                                            set(handles.ImgObject3,'AlphaData', 1*(activeRoiPicture>0) + 1*(inActiveRoiPicture>0)  );
-                                       else
-                                            set(handles.ImgObject3,'AlphaData', 0.5*(activeRoiPicture>0) + 0.3*(inActiveRoiPicture>0)  );
-                                       end
-                                       
-                              end
-  
-                            % 2) Gray ROI 
-                              if GrayROI
-                                  
-                                       set(handles.ImgObject3,'Cdata', zeros(size(activeRoiPicture) ) );
-                                       
-                                       % 2a) Gray ROI - contour 
-                                       if ( get(handles.ContourCheckBox,'Value')==1 )
-                                            set(handles.ImgObject3,'AlphaData', 0.5*(activeRoiPicture>0) + 0.4*(inActiveRoiPicture>0)  );
-
-                                       % 2b) Gray ROI - solid  
-                                       else
-                                            set(handles.ImgObject3,'AlphaData', 0.5*(activeRoiPicture>0) + 0.3*(inActiveRoiPicture>0)  );
-                                       end
-                              end
+                                tempData = activeRoiPicture;
+                                xSize = size(get(handles.ImgObject3,'CData'),1);
+                                ySize = size(get(handles.ImgObject3,'CData'),2);
+                                
+                                act =  ( reshape( reshape(activeRoiPicture,1,[])' * [ 0 1 0 ] , xSize, ySize, []) > 0  );
+                                inact =  ( reshape( reshape(inActiveRoiPicture,1,[])' * [ 1 0 0 ]*0.6 , xSize, ySize, []) > 0  );
+                                set(handles.ImgObject3,'Cdata', act + inact  );
+                                
+                                % 1a) ColorFul ROI - contour
+                                if ( get(handles.ContourCheckBox,'Value')==1 )
+                                    set(handles.ImgObject3,'AlphaData', 1*(activeRoiPicture>0) + 1*(inActiveRoiPicture>0)  );
+                                    
+                                % 1b) ColorFul ROI - solid
+                                else
+                                    set(handles.ImgObject3,'AlphaData', 0.5*(activeRoiPicture>0) + 0.3*(inActiveRoiPicture>0)  );
+                                end
+                                
+                            end
+                            
+                            % 2) Gray ROI
+                            
+                            if GrayROI
+                                
+                                set(handles.ImgObject3,'Cdata', zeros(size(activeRoiPicture) ) );
+                                
+                                % 2a) Gray ROI - contour
+                                if ( get(handles.ContourCheckBox,'Value')==1 )
+                                    set(handles.ImgObject3,'AlphaData', 0.5*(activeRoiPicture>0) + 0.4*(inActiveRoiPicture>0)  );
+                                    
+                                % 2b) Gray ROI - solid
+                                else
+                                    set(handles.ImgObject3,'AlphaData', 0.5*(activeRoiPicture>0) + 0.3*(inActiveRoiPicture>0)  );
+                                end
+                            end
                               
                               
                             % 3) MultiColor ROI 
@@ -8056,19 +8058,27 @@ end
                                 xSize = size(get(handles.ImgObject3,'CData'),1);
                                 ySize = size(get(handles.ImgObject3,'CData'),2);
                                 
-                                % Set colors
+                                % Set colors for ROI layer
                                 a  = zeros( [size(activeRoiPicture) 3 ]);
 
-                                for i = 1:length(handles.image.VisibleROIs)
-                                    color = getColor(i);
-                                    a = a +  reshape( reshape( rois==i ,1,[])' * color , xSize, ySize, []) ;
+                                %for i = 1:length(handles.image.VisibleROIs)
+                                roisInSlice = unique( rois( find( rois >0)));
+                                if length(roisInSlice) > 0
+                                    for i = roisInSlice'  % Set ROI colors only for ROIs in slice
+                                        color = getColor(i);
+                                        a = a +  reshape( reshape( rois == i ,1,[])' * color , xSize, ySize, []) ;
+                                    end
+                                    set(handles.ImgObject3,'Cdata', a  );  % ROI RGB-matrix
                                 end
-                                set(handles.ImgObject3,'Cdata', a  );
-                                level = 0;
+                                
+                                % Set transparency
+                                
+                                % 3a) MultiColor ROI - contour
                                 if ( get(handles.ContourCheckBox,'Value') == 1 )
-                                    set(handles.ImgObject3,'AlphaData', 1*(activeRoiPicture> level) + 1*(inActiveRoiPicture>level)  );
+                                    set(handles.ImgObject3,'AlphaData', 1*(activeRoiPicture + inActiveRoiPicture)  );
+                                % 3b) MultiColor ROI - solid 
                                 else
-                                    set(handles.ImgObject3,'AlphaData', 0.3*(activeRoiPicture>0) + 0.3*(inActiveRoiPicture>0)  );
+                                    set(handles.ImgObject3,'AlphaData', 0.3*(activeRoiPicture + inActiveRoiPicture)  );
                                 end
                                 
                             end
