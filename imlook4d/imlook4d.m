@@ -8203,11 +8203,14 @@ end
                                 a  = zeros( [size(activeRoiPicture) 3 ]);
 
                                 %for i = 1:length(handles.image.VisibleROIs)
-                                for i = unique( rois( find( rois >0)))  % Set ROI colors only for ROIs in slice
-                                    color = getColor(i);
-                                    a = a +  reshape( reshape( rois == i ,1,[])' * color , xSize, ySize, []) ;
+                                roisInSlice = unique( rois( find( rois >0)));
+                                if length(roisInSlice) > 0
+                                    for i = roisInSlice'  % Set ROI colors only for ROIs in slice
+                                        color = getColor(i);
+                                        a = a +  reshape( reshape( rois == i ,1,[])' * color , xSize, ySize, []) ;
+                                    end
+                                    set(handles.ImgObject3,'Cdata', a  );  % ROI RGB-matrix
                                 end
-                                set(handles.ImgObject3,'Cdata', a  );  % ROI RGB-matrix
                                 
                                 % Set transparency
                                 
