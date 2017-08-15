@@ -3039,7 +3039,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
          catch
              disp('Exception in wbu');
          end
-    function drawROI_NEW(hObject, eventdata, handles)
+    function drawROI(hObject, eventdata, handles)
         
                 contents = get(handles.ROINumberMenu,'String'); % Cell array  
                 numberOfROIs=size(contents,1)-1;
@@ -3157,8 +3157,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             ROIslice( (ixx):(ixx+rx-1),(iyy):(iyy+ry-1)) = subMatrix;
                         end
                     end
-                    
+                    tic
                     handles.image.ROI( :,:, slice) = ROIslice;
+                    toc
                     
 
 
@@ -3177,7 +3178,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 %
  
                    updateROIs(handles);     
-    function drawROI(hObject, eventdata, handles)
+    function drawROI_OLD(hObject, eventdata, handles)
         
                 contents = get(handles.ROINumberMenu,'String'); % Cell array  
                 numberOfROIs=size(contents,1)-1;
@@ -8201,7 +8202,8 @@ end
                                 % Set colors for ROI layer
                                 a  = zeros( [size(activeRoiPicture) 3 ]);
 
-                                for i = 1:length(handles.image.VisibleROIs)
+                                %for i = 1:length(handles.image.VisibleROIs)
+                                for i = unique( rois( find( rois >0)))  % Set ROI colors only for ROIs in slice
                                     color = getColor(i);
                                     a = a +  reshape( reshape( rois == i ,1,[])' * color , xSize, ySize, []) ;
                                 end
