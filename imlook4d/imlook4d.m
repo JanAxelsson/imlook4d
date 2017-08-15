@@ -3022,7 +3022,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
     function wbm(h, evd, handles)
          % executes while the mouse moves and mouse button is pressed
         % tic;
-         drawROI(h, evd, handles);        
+        try
+         drawROI(h, evd, handles);   
+        catch
+        end
     function wbm2(h, evd, handles)
     function wbu(h, evd, handles)
          % executes when the mouse button is released
