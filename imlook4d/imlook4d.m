@@ -8017,37 +8017,42 @@ end
                         if ( get(handles.hideROIcheckbox,'Value')==0 )
   
                             % 1) ColorFul ROI  (Green for active, Red for inactive)
+                            
                             if ColorfulROI
-                                        tempData = activeRoiPicture;
-                                        xSize = size(get(handles.ImgObject3,'CData'),1);
-                                        ySize = size(get(handles.ImgObject3,'CData'),2);
-                                        
-                                        act =  ( reshape( reshape(activeRoiPicture,1,[])' * [ 0 1 0 ] , xSize, ySize, []) > 0  );
-                                        inact =  ( reshape( reshape(inActiveRoiPicture,1,[])' * [ 1 0 0 ]*0.6 , xSize, ySize, []) > 0  );
-                                        set(handles.ImgObject3,'Cdata', act + inact  );
-
-                                       if ( get(handles.ContourCheckBox,'Value')==1 )
-                                            set(handles.ImgObject3,'AlphaData', 1*(activeRoiPicture>0) + 1*(inActiveRoiPicture>0)  );
-                                       else
-                                            set(handles.ImgObject3,'AlphaData', 0.5*(activeRoiPicture>0) + 0.3*(inActiveRoiPicture>0)  );
-                                       end
-                                       
-                              end
-  
-                            % 2) Gray ROI 
-                              if GrayROI
-                                  
-                                       set(handles.ImgObject3,'Cdata', zeros(size(activeRoiPicture) ) );
-                                       
-                                       % 2a) Gray ROI - contour 
-                                       if ( get(handles.ContourCheckBox,'Value')==1 )
-                                            set(handles.ImgObject3,'AlphaData', 0.5*(activeRoiPicture>0) + 0.4*(inActiveRoiPicture>0)  );
-
-                                       % 2b) Gray ROI - solid  
-                                       else
-                                            set(handles.ImgObject3,'AlphaData', 0.5*(activeRoiPicture>0) + 0.3*(inActiveRoiPicture>0)  );
-                                       end
-                              end
+                                tempData = activeRoiPicture;
+                                xSize = size(get(handles.ImgObject3,'CData'),1);
+                                ySize = size(get(handles.ImgObject3,'CData'),2);
+                                
+                                act =  ( reshape( reshape(activeRoiPicture,1,[])' * [ 0 1 0 ] , xSize, ySize, []) > 0  );
+                                inact =  ( reshape( reshape(inActiveRoiPicture,1,[])' * [ 1 0 0 ]*0.6 , xSize, ySize, []) > 0  );
+                                set(handles.ImgObject3,'Cdata', act + inact  );
+                                
+                                % 1a) ColorFul ROI - contour
+                                if ( get(handles.ContourCheckBox,'Value')==1 )
+                                    set(handles.ImgObject3,'AlphaData', 1*(activeRoiPicture>0) + 1*(inActiveRoiPicture>0)  );
+                                    
+                                % 1b) ColorFul ROI - solid
+                                else
+                                    set(handles.ImgObject3,'AlphaData', 0.5*(activeRoiPicture>0) + 0.3*(inActiveRoiPicture>0)  );
+                                end
+                                
+                            end
+                            
+                            % 2) Gray ROI
+                            
+                            if GrayROI
+                                
+                                set(handles.ImgObject3,'Cdata', zeros(size(activeRoiPicture) ) );
+                                
+                                % 2a) Gray ROI - contour
+                                if ( get(handles.ContourCheckBox,'Value')==1 )
+                                    set(handles.ImgObject3,'AlphaData', 0.5*(activeRoiPicture>0) + 0.4*(inActiveRoiPicture>0)  );
+                                    
+                                % 2b) Gray ROI - solid
+                                else
+                                    set(handles.ImgObject3,'AlphaData', 0.5*(activeRoiPicture>0) + 0.3*(inActiveRoiPicture>0)  );
+                                end
+                            end
                               
                               
                             % 3) MultiColor ROI 
@@ -8056,19 +8061,23 @@ end
                                 xSize = size(get(handles.ImgObject3,'CData'),1);
                                 ySize = size(get(handles.ImgObject3,'CData'),2);
                                 
-                                % Set colors
+                                % Set colors for ROI layer
                                 a  = zeros( [size(activeRoiPicture) 3 ]);
 
                                 for i = 1:length(handles.image.VisibleROIs)
                                     color = getColor(i);
-                                    a = a +  reshape( reshape( rois==i ,1,[])' * color , xSize, ySize, []) ;
+                                    a = a +  reshape( reshape( rois == i ,1,[])' * color , xSize, ySize, []) ;
                                 end
-                                set(handles.ImgObject3,'Cdata', a  );
-                                level = 0;
+                                set(handles.ImgObject3,'Cdata', a  );  % ROI RGB-matrix
+                                
+                                % Set transparency
+                                
+                                % 3a) MultiColor ROI - contour
                                 if ( get(handles.ContourCheckBox,'Value') == 1 )
-                                    set(handles.ImgObject3,'AlphaData', 1*(activeRoiPicture> level) + 1*(inActiveRoiPicture>level)  );
+                                    set(handles.ImgObject3,'AlphaData', 1*(activeRoiPicture && inActiveRoiPicture)  );
+                                % 3b) MultiColor ROI - solid 
                                 else
-                                    set(handles.ImgObject3,'AlphaData', 0.3*(activeRoiPicture>0) + 0.3*(inActiveRoiPicture>0)  );
+                                    set(handles.ImgObject3,'AlphaData', 0.3*(activeRoiPicture && inActiveRoiPicture)  );
                                 end
                                 
                             end
