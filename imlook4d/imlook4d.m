@@ -2780,6 +2780,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             
             contents = {contents{end}}; % Remove all but 'Add ROI'
             set(handles.ROINumberMenu,'String', contents)
+            set(handles.ROINumberMenu,'Value', 1)
             handles.image.ROI(:) = 0;
             
             handles.image.VisibleROIs = [];
