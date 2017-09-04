@@ -21,8 +21,22 @@ Pressing SHIFT while left-click and moving the mouse makes the cursor act as an 
        
 		<UL>
 
+			<LI> Drawing:
+
+
+			<LI> <B>Clear ROI </B>, clears the current ROI.
 			<LI> <B>Set ROI Level</B>, sets the ROI-drawing level (the ROI is drawn only on pixels above this value).
 			<LI> <B>Reset ROI Level</B>, sets the ROI-drawing level below the lowest pixel value in the whole file.  This makes the brush draw ROIs without taking the image pixel-intensity value into consideration. 
+			<LI> <B>Copy ROI</B>, copies the current ROI into multiple slices.  See <code>SCRIPTS/ROI/Copy ROI</code>			
+
+			<LI> Processing:
+
+            <LI> <B>Threshold within ROI </B>, threshold pixels, searching within the boundaries of the current ROI. See <code>SCRIPTS/ROI/Threshold within ROI</code>	
+			<LI> <B>Threshold ROI</B>, threshold pixels in the whole volume. See <code>SCRIPTS/ROI/Threshold ROI</code>	
+
+			<LI> <B>Clean ROI</B>, cleans rough edges from current ROI.  See <code>SCRIPTS/ROI/Clean ROI</code>	
+			<LI> <B>Fill ROI Slice Gaps</B>, fill in ROI in empty slices.  This way you don't have to draw in every single slice, but can fill in an extrapolated volume in empty slices.  See <code>SCRIPTS/ROI/Fill ROI Slice Gaps</code>	
+
 			<LI> <B>Close this menu</B>, closes the contextual menu
 
 		</UL>
