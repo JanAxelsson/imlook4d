@@ -2780,6 +2780,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             
             contents = {contents{end}}; % Remove all but 'Add ROI'
             set(handles.ROINumberMenu,'String', contents)
+            set(handles.ROINumberMenu,'Value', 1)
             handles.image.ROI(:) = 0;
             
             handles.image.VisibleROIs = [];
@@ -3022,7 +3023,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
     function wbm(h, evd, handles)
          % executes while the mouse moves and mouse button is pressed
         % tic;
-         drawROI(h, evd, handles);        
+        try
+         drawROI(h, evd, handles);   
+        catch
+        end
     function wbm2(h, evd, handles)
     function wbu(h, evd, handles)
          % executes when the mouse button is released
@@ -3101,7 +3105,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     dY = ( y_new - y_old );
                     r = sqrt( dX^2 + dY^2 ); % length
                     brushSteps = r / r0;  % Number of brush radii
-                    rStep = 0.5 / brushSteps; % Steps
+                    rStep = 0.7 / brushSteps; % Steps
                     
                     indeces=find(handles.image.brush>0);  % Use only non-zero brush values
 
@@ -3157,13 +3161,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             ROIslice( (ixx):(ixx+rx-1),(iyy):(iyy+ry-1)) = subMatrix;
                         end
                     end
-                    tic
                     handles.image.ROI( :,:, slice) = ROIslice;
-                    toc
-                    
-
-
-
+  
                     % Trim ROI matrix to fit image size 
                     xsize=size(handles.image.Cdata,1);
                     ysize=size(handles.image.Cdata,2);
@@ -3178,142 +3177,6 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 %
  
                    updateROIs(handles);     
-    function drawROI_OLD(hObject, eventdata, handles)
-        
-                contents = get(handles.ROINumberMenu,'String'); % Cell array  
-                numberOfROIs=size(contents,1)-1;
-        
-                activeROI=get(handles.ROINumberMenu,'Value');
-                if ( handles.image.LockedROIs(activeROI) )                  
-                    return 
-                end
-                
-                % Get 4D coordinates
-
-                x_old = handles.image.lastMousePosition(1);
-                y_old = handles.image.lastMousePosition(2);
-                
-                coordinates=get(gca,'currentpoint')+1;
-
-                x=round(coordinates(1,1) );
-                y=round(coordinates(1,2) );  
-                x_new = x;
-                y_new = y;
-                handles.image.lastMousePosition = [x_new y_new];
-                
-                slice=round(get(handles.SliceNumSlider,'Value'));
-                frame=round(get(handles.FrameNumSlider,'Value'));                    
-
-                % Exchange x and y if image in original orientation (not FlipAndRotate)
-                if ~get(handles.FlipAndRotateRadioButton,'Value')
-                    xSize=size(handles.image.ROI,2);
-                    ySize=size(handles.image.ROI,1);
-                    XLim=get(gca,'YLim');
-                    YLim=get(gca,'XLim');
-                    temp=x_new;   x_new=y_new; y_new=temp;
-                    temp=x_old;  x_old=y_old; y_old=temp;
-                else
-                    xSize=size(handles.image.ROI,2);
-                    ySize=size(handles.image.ROI,1);
-                    XLim=get(gca,'XLim');
-                    YLim=get(gca,'YLim');               
-                end
-                
-                
-
-                % Draw ROI
-                r0=round( str2num(get(handles.BrushSize,'String')) );
-                r2=r0^2;
-                %center=r+1;
-
-
-                % Hints: contents = get(hObject,'String') returns ROINumberMenu contents as cell array
-                %contents{get(handles.ROINumberMenu,'String')} 
-                activeROI=get(handles.ROINumberMenu,'Value');
-
-                    % Cache the slice
-                    %roiImage = handles.image.ROI( :, :, slice); % Cache ROI for this slice
-
-                    
-                    % step along line
-                    dX = ( x_new - x_old );
-                    dY = ( y_new - y_old );
-                    r = sqrt( dX^2 + dY^2 ); % length
-                    brushSteps = r / r0;  % Number of brush radii
-                    rStep = 0.5 / brushSteps; % Steps
-                    
-                    indeces=find(handles.image.brush>0);  % Use only non-zero brush values
-
-                    for ir = 0:rStep:1
-                        % Equal steps along diagonal
-                        ix = round( x_old + 1 + ir * dX);
-                        iy = round( y_old + 1 + ir * dY);
-                        
-                        % Bounding box
-                        rx=size(handles.image.brush,1);
-                        ry=size(handles.image.brush,2);
-
-                        % New ROI center position
-                        ixx=ix-round(rx/2)+mod(rx,2);
-                        iyy=iy-round(ry/2)+mod(ry,2);
-
-                        % Draw in 
-                        if (ixx>XLim(1))&&(ixx<=XLim(2)-rx+1)&&(iyy>YLim(1))&&(iyy<=YLim(2)-ry+1)  
-                            subMatrix= handles.image.ROI( ixx:(ixx+rx-1),(iyy):(iyy+ry-1), slice);  % Same matrix size as brush
-                            
-                            % Make matrix with locked pixels
-                            ROILock = zeros( size(subMatrix) ,'uint8');
-                            for i=1:numberOfROIs
-                                ROILock(subMatrix == i ) =  handles.image.LockedROIs(i) ; % Set to 1 if Locked ROI
-                            end
-
-                            
-                           
-
-                            if get(handles.ROIEraserRadiobutton,'Value')  | strcmp( get(handles.figure1, 'currentmodifier'),'shift') 
-                                % In brush AND non-locked pixel
-                                nonLockedROIPixels = find( ROILock==0 & handles.image.brush>0 );  
-                                % Set pixels
-                                subMatrix( nonLockedROIPixels ) = 0;
-                            else
-                                % Draw over any pixels in brush
-                                %subMatrix( nonLockedROIPixels ) = activeROI;  % Draw over any pixels in brush
-                                
-                                % Draw over pixels above level
-                                level = str2num( get(handles.ROILevelEdit,'String') );
-                                subDataMatrix= handles.image.Cdata( ixx:(ixx+rx-1),(iyy):(iyy+ry-1), slice, frame);
-                                
-                                % In brush AND non-locked AND above level
-                                nonLockedAboveLevelPixels = find( (ROILock==0) & (handles.image.brush>0) & (subDataMatrix >= level) ); 
-                                
-                                % Set pixels
-                                subMatrix( nonLockedAboveLevelPixels ) = activeROI;  % Draw over any pixels in brush
-
-                                %subMatrix( find( subDataMatrix> level) ) = activeROI;  % Draw over any pixels in brush
-                                
-                            end
-                            
-                            handles.image.ROI( (ixx):(ixx+rx-1),(iyy):(iyy+ry-1), slice) = subMatrix;
-                        end
-                    end
-                    
-
-
-
-                    % Trim ROI matrix to fit image size 
-                    xsize=size(handles.image.Cdata,1);
-                    ysize=size(handles.image.Cdata,2);
-                   %handles.image.ROI=handles.image.ROI(1:xsize,1:ysize,:); % Trim ROI matrix (because indeces higher than image size may have enlarged ROI matrix)
-
-
-                   % Save changes to handles
-                   guidata(handles.figure1,handles);% Save handles
-                   
-                %
-                % Update image
-                %
- 
-                   updateROIs(handles);
          function drawCursorInYokes(axesPoint, this_imlook4d_instance)
               yokes=getappdata( this_imlook4d_instance, 'yokes');
             for i=1:length(yokes) 
