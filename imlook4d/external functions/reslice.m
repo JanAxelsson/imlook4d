@@ -28,12 +28,16 @@ outImageStruct.dirtyDICOMFileNames={};
 outImageStruct.dirtyDICOMIndecesToScaleFactor={};
 outImageStruct.Cdata=[];
 outImageStruct.imagePosition={};
-
+try
 outImageStruct.dirtyDICOMMode = oldImageStruct.dirtyDICOMMode;
+catch
+    return
+end
 
 % Read positions to match
 oldPositions=unique(oldImageStruct.sliceLocations); % unique, to allow dynamic scans to give one position (ignoring that position repeats for multiple frames)
 newPositions=templateImageStruct.sliceLocations;
+
 
 disp(['reslice - Coverting from ' num2str(size(oldImageStruct.Cdata,3)) ' to '  num2str(size(templateImageStruct.Cdata,3)) ' slices']);
 
