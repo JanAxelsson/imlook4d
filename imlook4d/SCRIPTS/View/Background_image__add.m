@@ -29,6 +29,7 @@ else
         %
     
         % Reslice
+        try
         [outImageStruct indeces] = reslice( staticImage.image , imlook4d_current_handles.image );  % outImageStruct is now updated.
         
         % Change matrix dimensions and FOV
@@ -64,6 +65,8 @@ else
 %          ' ',....
 %          'Use for instance "SCRIPTS/Matrix/Put in other matrix" on the smallest matrix prior to adding it as a background image' ...
 %          });
+        catch
+        end
 end
 
 ClearVariables
