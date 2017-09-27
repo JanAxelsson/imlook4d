@@ -5,13 +5,22 @@
 %
 % Jan Axelsson
 
-
+    ExportUntouched
+    waitfor( patlak_control(imlook4d_current_handle,[], imlook4d_current_handles));
+    ExportUntouched
+    imlook4d_current_handles.model.functionHandle=[];
+    guidata(imlook4d_current_handle, imlook4d_current_handles);
 
 %
 % Initialize
 %
-    endFrame=size(imlook4d_current_handles.image.Cdata,4);  % Number of frames
-    contents = get(imlook4d_current_handles.ROINumberMenu,'String'); % Cell array  
+    startFrame = imlook4d_current_handles.model.Patlak.startFrame;
+    endFrame = imlook4d_current_handles.model.Patlak.endFrame;
+    referenceData=imlook4d_current_handles.model.Patlak.referenceData;
+    
+    contents = get(imlook4d_current_handles.ROINumberMenu,'String'); % Cell array 
+    roiNames = contents;
+
     numberOfROIs=size(contents,1)-1;
 
 %
@@ -96,19 +105,19 @@
     
     
     
-        
-%
-% Enter range for straight line fit
-%
-    % Dialog option
-            prompt={'Enter low frame number:','Enter high frame number:' };
-            name='Enter low and high frame';
-            numlines=1;
-            defaultanswer={'1' num2str(size(newY,2 ))  };
-            answer=inputdlg(prompt,name,numlines,defaultanswer);
-            
-            startFrame=str2num(answer{1});
-            endFrame=str2num(answer{2});
+%         
+% %
+% % Enter range for straight line fit
+% %
+%     % Dialog option
+%             prompt={'Enter low frame number:','Enter high frame number:' };
+%             name='Enter low and high frame';
+%             numlines=1;
+%             defaultanswer={'1' num2str(size(newY,2 ))  };
+%             answer=inputdlg(prompt,name,numlines,defaultanswer);
+%             
+%             startFrame=str2num(answer{1});
+%             endFrame=str2num(answer{2});
     
 %
 % Fit straight lines (and plot)
@@ -128,8 +137,66 @@
             k=coefficients(1)
             m=coefficients(2)
             
-            plot( [0 newX(end)], [m m+k*newX(end)]);  % Plot straight line
+            slope(i)=k;
+            
+            plot( [newX(1) newX(end)], [m+k*newX(1) m+k*newX(end)]);  % Plot straight line
    end
+   
+   
+   % Prepare for annotation
+    Format='%10.6f';
+    positions=12;
+    myAnnotation{1}=[ string_pad('',7)  '    ' string_pad('slope(K)',positions) string_pad('intercept',positions)];
+   
+      
+   % Find line styles 
+   h=gca;
+   children = get(h, 'Children');
+   
+   % Plot lines
+   for i=1:numberOfROIs
+%        disp(i)
+%         newX2=newX(1,i,startFrame:endFrame);
+%         
+%         k=slope(i);
+%         m=intercept(i);
+
+        
+            tempY=newY(i,startFrame:endFrame);  % All frames
+            tempY=tempY(:);
+            
+            %coefficients = polyfit(newX(:),tempY(:),1); % SLOW            
+            coefficients=[newX ones(length(newX),1) ] \ tempY;  % Backslash operator
+            k=coefficients(1)
+            m=coefficients(2)
+        
+        %xValues=[0 newX2(end)];
+        %yValues=[m m+k*newX2(end)];
+        xValues=[ newX(1) newX(end)];
+        yValues=[ (m+k*newX(1)) (m+k*newX(end))];  
+        %xValues2=[ 0 newX2(end)];
+        %yValues2=[ m2 m2+k2*newX2(end)];      
+
+        color = get( children( 1 + numberOfROIs - i),'Color');  % Reverse order on lines contra markers
+        set( children( 1 + numberOfROIs - i), 'MarkerFaceColor', color);  % Make solid 
+        plot( xValues, yValues, 'Color', color );  % Plot straight line
+        
+        % Build annotation 
+        myAnnotation{i+1}= [sprintf( contents{i}, '%S7') ':   ' ...
+                num2str_pad( k,Format,positions ) '   ' ...
+                num2str_pad(m,Format,positions) ...
+                ];
+   end
+   
+%
+% Annotate 
+%
+            pos = get(gca,'Position'); % Position of axes
+            x_slack=0.02;
+            y_slack=0.02;
+            x = pos(1) + x_slack;
+            y = pos(2) + pos(4) - 0.10  - y_slack; % Convert from lower corner to upper corner
+            annotation('textbox', [pos(1)+0.02,pos(2)+pos(4)-0.12,0.1,0.1],'FontSize', 9, 'String', myAnnotation);
             
 
 %
@@ -141,6 +208,31 @@
         contents{i}=[contents{i} ' (' num2str(NPixels(i)) ' pixels)' ]; % Add pixel count to legend
     end
     legend(contents(1:end-1));
+    
+    
+%
+% Output to Matlab window
+%
+            disp('Patlak Slope (K)=');
+            
+            % ROI names
+            s='';
+            for i=1:numberOfROIs
+                 s=[ s roiNames{i} TAB];
+            end
+            s=[ s(1:end-1) ];
+            disp(s);
+            
+            % Slope values
+            s='';
+            for i=1:numberOfROIs
+                 s=[ s num2str(slope(i),'%7.6f') TAB];
+            end
+            s=[ s(1:end-1) EOL];
+            disp(s);
+
+    
+    
 
 %
 % Clean up
