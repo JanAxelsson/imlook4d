@@ -10,4 +10,4 @@
         The original image header is used as a template, and can be saved in the same file format as the original. Dicom images are created with the Modality=OT.
 	</P>
 
-  
+   
