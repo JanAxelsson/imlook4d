@@ -5484,8 +5484,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                              for i=1:iNumberOfSelectedFiles
                                  %disp(i)
                                  if (mod(i, interval)==0) waitbar(i/iNumberOfSelectedFiles); end 
+                                 
+                                    % Set Modality
+                                     headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0008', '0060',mode, handles.image.modality); % ImageType
 
-                                 % Change image properties
+                                     % Change image properties
                                      headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0008', '0008',mode, 'DERIVED\SECONDARY'); % ImageType
                                      headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0008' ,'2111',mode, 'imlook4d - not for clinical use'); % Derivation Description
 

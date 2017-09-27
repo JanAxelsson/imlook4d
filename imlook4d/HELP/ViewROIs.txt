@@ -2,10 +2,11 @@
 <HR></HR>
 <!------------------->
 	<P>
-		Creates a new imlook4d window with ROIs displayed as pixel values
+		Creates a new imlook4d window with ROIs displayed as pixel values 1,2,...
 	</P>
 
 
 	<P> 
-        See also SCRIPTS / Matrix / Matrix to ROI
+        The original image header is used as a template, and can be saved in the same file format as the original. Dicom images are created with the Modality=OT.
 	</P>
+

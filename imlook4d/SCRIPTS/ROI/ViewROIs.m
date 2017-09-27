@@ -5,13 +5,10 @@
 %
 % Jan Axelsson
 
-% INITIALIZE
-StoreVariables
+StartScript
 
-tempHandle=imlook4d( single(imlook4d_current_handles.image.ROI) );
-tempHandles=guidata(tempHandle);
+imlook4d_Cdata = single(imlook4d_current_handles.image.ROI);
+imlook4d_current_handles.image.modality = 'OT';
+WindowTitle('ROIs','prepend')
 
-set( tempHandles.figure1, 'Name', [ 'ROIs: ' get(imlook4d_current_handles.figure1, 'Name') ]);
-
-%clear tempHandle tempHandles
-ClearVariables
+EndScript
