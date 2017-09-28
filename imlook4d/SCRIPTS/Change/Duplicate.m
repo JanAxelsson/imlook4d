@@ -33,6 +33,10 @@
      % Copy Orientation (Ax,Cor,Sag) to GUI
      set(newHandles.orientationMenu,'Value',get(imlook4d_current_handles.orientationMenu,'Value') );  
      
+     % Copy settings from first GUI
+        set(newHandles.SliceNumSlider,'Value',get(imlook4d_current_handles.SliceNumSlider,'Value') );  
+        set(newHandles.FrameNumSlider,'Value',get(imlook4d_current_handles.FrameNumSlider,'Value') );  
+        set(newHandles.ROINumberMenu,'Value',get(imlook4d_current_handles.ROINumberMenu,'Value') );  
      % Copy window title
          set(newHandle, 'Name', ...
              get(imlook4d_current_handle,'Name') ...
