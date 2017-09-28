@@ -1,4 +1,4 @@
 Add things to do:
 
 DEVELOP
-- imageJ, flip and rotate
+- imageJ, flip and rotate 
