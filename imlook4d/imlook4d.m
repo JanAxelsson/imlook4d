@@ -5376,6 +5376,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                     accessionNumber.string='';
                                 end
                                 seriesNo1=dirtyDICOMHeaderData(headers, 1,'0020', '0011',mode);
+                                
+                                try  
+                                    modalityString=handles.image.modality;
+                                catch
+                                    modalityString='OT';
+                                end
 
                                 defaultSeriesDescription=[ handles.image.history ' ' seriesDesc1.string];
 
@@ -5383,10 +5389,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                         'Patient ID: ',...
                                         'Series Description: ',...
                                         'Series number',...
-                                        'Accesion number'};
+                                        'Accesion number',...
+                                        'Modality (2 chars)'};
                                 title='Modify DICOM header info';
                                 numlines=1;
-                                defaultanswer={patientName1.string,patientID1.string, defaultSeriesDescription ,seriesNo1.string, accessionNumber.string};
+                                defaultanswer={patientName1.string,patientID1.string, defaultSeriesDescription ,seriesNo1.string, accessionNumber.string, modalityString};
                                 answer=inputdlg(prompt,title,numlines,defaultanswer);
                                 % Strings containing the patientName etc
                                 patientName=answer{1};
@@ -5394,6 +5401,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                 seriesDesc=answer{3};
                                 seriesNo=answer{4};
                                 accessionNumberString=answer{5};
+                                modalityString=answer{6};
                             catch
                             end
 
@@ -5486,7 +5494,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                  if (mod(i, interval)==0) waitbar(i/iNumberOfSelectedFiles); end 
                                  
                                     % Set Modality
-                                     headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0008', '0060',mode, handles.image.modality); % ImageType
+                                     headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0008', '0060',mode, modalityString); % ImageType
 
                                      % Change image properties
                                      headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0008', '0008',mode, 'DERIVED\SECONDARY'); % ImageType

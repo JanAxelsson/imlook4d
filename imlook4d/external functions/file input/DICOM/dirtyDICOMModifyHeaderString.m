@@ -181,8 +181,12 @@ try
     % value2
     
         % Make even number of chars
-        if mod( length(newString),2)  
-            newString=[newString char(0)];
+        if mod( length(newString),2 )
+            if char(vr2') == 'UI'
+                newString=[newString char(0)]; % NULL
+            else
+                newString=[newString ' ']; % Space
+            end
         end
 
         diffLength=length(newString)-length(value2);    % Difference in length for group  
