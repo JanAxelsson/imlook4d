@@ -6094,7 +6094,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             copyobj(handles.axes1,h1); % Hx(2) is one of the axes objects on your
             
             % Copy colorbar
-            colormap( colormap(handles.axes1) );% Copy current colormap to current figure
+            colormap( colormap(handles.axes1) );                % Copy current colormap to current figure
             colorBarHandle=colorbar('FontSize', 9);            % Display
             
             
