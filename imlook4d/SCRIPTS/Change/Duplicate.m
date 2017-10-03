@@ -36,6 +36,8 @@
      % Copy settings from first GUI
         set(newHandles.SliceNumSlider,'Value',get(imlook4d_current_handles.SliceNumSlider,'Value') );  
         set(newHandles.FrameNumSlider,'Value',get(imlook4d_current_handles.FrameNumSlider,'Value') );  
+        set(newHandles.SliceNumEdit,'String',get(imlook4d_current_handles.SliceNumEdit,'String') );  
+        set(newHandles.FrameNumEdit,'String',get(imlook4d_current_handles.FrameNumEdit,'String') ); 
         set(newHandles.ROINumberMenu,'Value',get(imlook4d_current_handles.ROINumberMenu,'Value') );  
      % Copy window title
          set(newHandle, 'Name', ...
