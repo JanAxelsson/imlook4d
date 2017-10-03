@@ -1,6 +1,9 @@
 
 Menu('Export filtered')
 
+% Remember
+original.slice = imlook4d_slice;
+original.frame = imlook4d_frame;
 
 %
 % Get file, and type of export
@@ -72,5 +75,8 @@ for k = 1:numberOfFrames
 end
 
 close(v)
+
+EditField('FrameNumEdit', num2str(imlook4d_frame));  % Move to next frame
+EditField('SliceNumEdit', num2str(imlook4d_slice));  % Move to next slice
 
 
