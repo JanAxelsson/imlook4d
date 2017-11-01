@@ -5924,7 +5924,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 
             end
             
-            numberOfROIs = size(roiNames,1) -1 ;
+            numberOfROIs = size(roiNames,2) -1 ;
 
             set(handles.ROINumberMenu,'String', roiNames);
             set(handles.ROINumberMenu,'Value', 1 ); %Set to highest ROI number

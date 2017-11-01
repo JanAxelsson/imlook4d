@@ -106,6 +106,7 @@ StartScript;
            else
                 DecayCorrectionFactor=2^(( time(range(1))+ 0.5*summedDuration)/halflife);
            end
+           disp(['DecayCorrectionFactor = ' num2str(DecayCorrectionFactor) ]);
            
            summedData=summedData/summedDuration;  % summedData is now mean value in mid frame
            summedData=summedData*DecayCorrectionFactor;   %Decay corrected summedData
