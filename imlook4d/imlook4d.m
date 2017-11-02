@@ -3660,6 +3660,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     fullPath=[path file];                
                     disp([ 'Opening MGH/MGZ from path=' fullPath ]);
                     mri = MRIread(fullPath,0);    
+                    mri.vol = permute(mri.vol,[2 3 1]);  % Freesurfer direction
 
                 % Operate on the new imlook4d instance
                     h=imlook4d(mri.vol);
@@ -3673,9 +3674,15 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     newhandles.image.mri=mri;  % Save MGH data structure
                     
                 % Set pixel dimensions
+%                     newhandles.image.pixelSizeX=mri.ysize;
+%                     newhandles.image.pixelSizeY=mri.zsize;
+%                     newhandles.image.sliceSpacing=mri.xsize;    
+                    
+                    % Freesurfer direction
                     newhandles.image.pixelSizeX=mri.xsize;
                     newhandles.image.pixelSizeY=mri.ysize;
-                    newhandles.image.sliceSpacing=mri.zsize;    
+                    newhandles.image.sliceSpacing=mri.zsize; 
+                    
                     newhandles.image.unit='';  % Unit not in header, but needed in some scripts                   
                     
                     % Save guidata
@@ -5014,6 +5021,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     [path,name,ext] = fileparts([fullPath]); 
                     mri=handles.image.mri;  % recall saved mri struct
                     mri.vol=handles.image.Cdata;
+                    
+                    % TODO:
+                    % Correct directions, as they were modified in opening MGH
 
                     % Set pixel dimensions
                         mri.xsize=handles.image.pixelSizeX;
