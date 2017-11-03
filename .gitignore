@@ -5,4 +5,5 @@
 *~
 
 # Ignore soft-linked USER_SCRIPT
-/USER_SCRIPTS/*
+USER_SCRIPTS
+/USER_SCRIPTS
