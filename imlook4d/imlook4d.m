@@ -5997,6 +5997,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 
 
                 save(fullPath, 'rois', 'roiNames', 'roiSize','VisibleROIs','LockedROIs', 'version' );
+                
+                guidata(handles.figure1, handles);
                              
     % Print image
         function Print_Image_Callback(hObject, eventdata, handles)
