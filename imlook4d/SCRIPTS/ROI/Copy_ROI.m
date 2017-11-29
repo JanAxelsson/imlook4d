@@ -43,9 +43,15 @@
         numlines=1;
         defaultanswer={'1','end',num2str(ROINumber)};
         answer=inputdlg(prompt,title,numlines,defaultanswer);
+
+        if isempty(answer) 
+            % User clicked cancel. Bail out. 
+            ClearVariables
+            return; 
+        end 
         
         answer=makeAbsoluteSliceNumber(answer, imlook4d_slice, size(imlook4d_Cdata,3)); % Handle Relative or Absolute positions
-
+        
         firstSlice=str2num(answer{1});
         lastSlice=str2num(answer{2});
         

@@ -38,10 +38,7 @@ temp_variable_list=imlook4d_variables_before_script;
     % Threshold ROI on myActiveROI (myActiveROI=roi number)
     try
         Threshold_ROI
-    catch
-        % Canceled or crashed
-        imlook4d_ROI=oldROI;
-    end
+
     
     % Result so far:
     %   For the matrix elements with value=myActiveROI,
@@ -69,7 +66,11 @@ temp_variable_list=imlook4d_variables_before_script;
     % Store Undo for ROI
     %imlook4d_current_handles = imlook4d('storeUndoROI', guidata(imlook4d_current_handle));
     %guidata(gcf, imlook4d_current_handles)
-    
+    catch
+        % Canceled or crashed
+        imlook4d_ROI=oldROI;
+        Import;
+    end    
     
 imlook4d_variables_before_script=temp_variable_list;    
 ClearVariables    
