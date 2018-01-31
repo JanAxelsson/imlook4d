@@ -19,8 +19,11 @@ temp_variable_list=imlook4d_variables_before_script;
     myActiveROI=get(imlook4d_current_handles.ROINumberMenu,'Value');
     
     % Set max value (that will be used in Threshold_ROI
-     ROI_data_to_workspace;
-     maxLevel=imlook4d_ROI_data.max(imlook4d_frame, myActiveROI);
+     %was ROI_data_to_workspace;
+     %was maxLevel=imlook4d_ROI_data.max(imlook4d_frame, myActiveROI);
+     oneFrame=imlook4d_Cdata(:,:,:,imlook4d_frame);
+     roiPixels=oneFrame(imlook4d_ROI==myActiveROI);
+     maxLevel=max(roiPixels)';
     
     % Special for Emily
     % numberOfHighestPixels=9;
