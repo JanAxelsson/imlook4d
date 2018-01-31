@@ -154,7 +154,6 @@ function [outputData, X, Y]=imlook4d_zhou(dataMatrix, time, duration, startFrame
                end
 
                 %numPixels=numPixels+1;
-
        end % Loop columns j
    end % Loop rows i
 

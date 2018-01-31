@@ -4979,7 +4979,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 if( strcmp(FILETYPE,'ANALYZE'))  LocalSaveNifti(handles, tempData);end         % ANALYZE
                 if( strcmp(FILETYPE,'NIFTY_TWOFILES'))  LocalSaveNifti(handles, tempData);end  % NIFTY behaving as Analyze (img+hdr files)
                 if( strcmp(FILETYPE,'NIFTY_ONEFILE'))  LocalSaveNifti(handles, tempData);end  % Single-file NIFTY
-                if( strcmp(FILETYPE,'Matrix4D')) localSaveM4(handles, tempData); end  % M4 Umeå format
+                if( strcmp(FILETYPE,'Matrix4D')) localSaveM4(handles, tempData); end  % M4 Ume format
                 
                 if( strcmp(FILETYPE,'BINARY'))  warndlg('Saving Binary is not supported');end
                 if( strcmp(FILETYPE,'UNKNOWN')) end    
@@ -8788,7 +8788,7 @@ end
             %    can be ommitted or empty.
             % latex: (boolean)
 
-            % Rev.1.0, 02.11.98 (Armin Günter)
+            % Rev.1.0, 02.11.98 (Armin Gunter)
             % Rev.1.1, 16.02.99 (A.G.: 'header' can be ommitted or empty)
             % Rev.1.2, 11.11.99 (A.G.: '.txt' appended only if apparently no
             %    other extension exists)
