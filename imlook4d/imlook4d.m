@@ -3014,9 +3014,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
          set(h,'WindowButtonUpFcn','imlook4d(''wbu'',gcbo,[],guidata(gcbo))');    
          
           % Record last mouse position for drawROI track interpolation
-         coordinates=get(gca,'currentpoint') + 1;
-         x=round(coordinates(1,1) );
-         y=round(coordinates(1,2) ); 
+         coordinates=get(gca,'currentpoint');
+         
+         x=round(coordinates(1,1) + 0.5);
+         y=round(coordinates(1,2) + 0.5);
          handles.image.lastMousePosition = [x y];
          guidata(handles.figure1,handles);
          
@@ -3059,10 +3060,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 x_old = handles.image.lastMousePosition(1);
                 y_old = handles.image.lastMousePosition(2);
                 
-                coordinates=get(gca,'currentpoint')+1;
-
-                x=round(coordinates(1,1) );
-                y=round(coordinates(1,2) );  
+                coordinates=get(gca,'currentpoint');
+         
+                x=round(coordinates(1,1) + 0.5);
+                y=round(coordinates(1,2) + 0.5);
+         
                 x_new = x;
                 y_new = y;
                 handles.image.lastMousePosition = [x_new y_new];
