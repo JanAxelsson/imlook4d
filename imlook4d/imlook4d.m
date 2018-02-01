@@ -3014,9 +3014,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
          set(h,'WindowButtonUpFcn','imlook4d(''wbu'',gcbo,[],guidata(gcbo))');    
          
           % Record last mouse position for drawROI track interpolation
-         coordinates=get(gca,'currentpoint') + 1;
-         x=round(coordinates(1,1) );
-         y=round(coordinates(1,2) ); 
+         coordinates=get(gca,'currentpoint');
+         
+         x=round(coordinates(1,1) + 0.5);
+         y=round(coordinates(1,2) + 0.5);
          handles.image.lastMousePosition = [x y];
          guidata(handles.figure1,handles);
          
@@ -3029,6 +3030,15 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         catch
         end
     function wbm2(h, evd, handles)
+                            
+        % -------------------------------------------------
+        % drawCursorInYokes(axesPoint, this_imlook4d_instance)
+        % -------------------------------------------------
+         coordinates=get(gca,'currentpoint')
+         
+         x=round(coordinates(1,1) + 0.5);
+         y=round(coordinates(1,2) + 0.5);
+         drawCursorInYokes2([x y], handles.figure1)
     function wbu(h, evd, handles)
          % executes when the mouse button is released
          % get the properties and restore them         
@@ -3059,10 +3069,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 x_old = handles.image.lastMousePosition(1);
                 y_old = handles.image.lastMousePosition(2);
                 
-                coordinates=get(gca,'currentpoint')+1;
-
-                x=round(coordinates(1,1) );
-                y=round(coordinates(1,2) );  
+                coordinates=get(gca,'currentpoint');
+         
+                x=round(coordinates(1,1) + 0.5);
+                y=round(coordinates(1,2) + 0.5);
+         
                 x_new = x;
                 y_new = y;
                 handles.image.lastMousePosition = [x_new y_new];
@@ -3201,40 +3212,31 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             marker(1:11,6)=1;
             marker(6,1:11)=1;
             
+            %marker(1,1)=1;
+            
             
             yokes=getappdata( this_imlook4d_instance, 'yokes');
             for i=1:length(yokes) 
                 handles=guidata(yokes(i));
-                tempData=handles.image.CachedImage;  % Read cached image
-                    disp('drawCursorInYokes2 - Read CachedImage');
+                
+                    updateImage(handles.figure1, [], handles);
+                    tempData=handles.image.CachedImage;  % Read cached image      
+                
+                    x=(axesPoint(1,1));
+                    y=(axesPoint(1,2));
 
                 %if this_imlook4d_instance~=yokes(i)
                     handles=guidata(yokes(i));     % The i:th other imlook4d-instance
+
+                    crossIntensity = max(tempData(:));
                     
-                                        % Draw ROI (if inside image)
-                    x=round(axesPoint(1,1));
-                    y=round(axesPoint(1,2));
+                    tempData(x,:)=crossIntensity;
+                    tempData(:,y)=crossIntensity;
+                    tempData=orientImage(tempData); 
                     
-                    rx=size(marker,1);
-                    ry=size(marker,2);
+
                     
-                    ix=x-round(rx/2)+mod(rx,2);
-                    iy=y-round(ry/2)+mod(ry,2);
-                    
-                    xSize=size(tempData,1);
-                    ySize=size(tempData,2);
-                    
-                    
-                    if (ix>0)&&(ix<=xSize-rx)&&(iy>0)&&(iy<=ySize-ry)  
-                        subMatrix= tempData( (ix):(ix+rx-1),(iy):(iy+ry-1) );  % Same matrix size as brush
-                        indeces=find(marker>0);  % Use only non-zero brush values
-                        subMatrix(indeces)=10000;  % Draw over any pixels in brush
-                        tempData( (ix):(ix+rx-1),(iy):(iy+ry-1))=subMatrix; 
-                    end
-                    
-                    tempData=reshape(tempData, [size(tempData,2), size(tempData,1), size(tempData,3)] );
-                    tempData=orientImage(tempData);       
-                    set(handles.ImgObject,'Cdata',tempData);  
+                    set(handles.ImgObject,'Cdata',tempData); 
  
                %end
             end           
@@ -7962,6 +7964,8 @@ end
                     activeRoiPicture=zeros(size(handles.image.Cdata,1), size(handles.image.Cdata,2),'single');
                     activeRoiPicture=zeros(size(rois),'single');
                     inActiveRoiPicture=zeros(size(activeRoiPicture),'single');
+                    
+
 
                 % -------------------------------------------------
                 % Create image and ROI pixel values
