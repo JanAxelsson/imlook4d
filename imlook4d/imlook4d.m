@@ -3065,7 +3065,134 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         catch
         end
     function wbm2(h, evd, handles)
-         drawCursorInYokes2(handles)
+         drawCursorInYokes2(handles)                 
+        function drawCursorInYokes2(thisHandles)
+             yokes=getappdata( thisHandles.figure1, 'yokes');
+
+             % Bail out checks
+
+              if strcmp(get(thisHandles.markerToggleTool,'State'), 'off')
+                  return
+              end
+
+             % Lock cursor when pressing 'shift'
+             if strcmp( get(gcf,'CurrentModifier'),'shift')
+                 return
+             end
+
+            % -------------------------------------------------
+            % drawCursorInYokes(axesPoint, this_imlook4d_instance)
+            % -------------------------------------------------
+             coordinates=get(gca,'currentpoint');
+
+             x=round(coordinates(1,1) + 0.5);
+             y=round(coordinates(1,2) + 0.5);
+             z=round(get(thisHandles.SliceNumSlider,'Value'));
+             current3DPoint = [x,y,z];
+             ingoingCurrentPlane = thisHandles.image.plane;
+
+             %disp( [ 'x, y, z = ('  num2str(x)  ', '  num2str(y)  ', '  num2str(z) ')' ]);
+
+
+                % Loop through yoke'd images
+                for i=1:length(yokes) 
+                    handles=guidata(yokes(i));
+
+                    %tempData=zeros(size(handles.image.CachedImage));  % Read cached image
+
+                    %if this_imlook4d_instance~=yokes(i)
+                    handles=guidata(yokes(i));     % The i:th other imlook4d-instance
+
+                    % Get point in this plane
+                    outgoing3DPoint = get3DpointInPlane(handles, current3DPoint, ingoingCurrentPlane);
+
+                    newX = outgoing3DPoint(1);
+                    newY = outgoing3DPoint(2);
+                    slice = outgoing3DPoint(3);
+
+                    %disp(['x, y ,z =>(' num2str(newX) ', ' num2str(newY) ', ' num2str(z) ')' ]);
+
+                    % Move to new slice in other yokes
+                    imlook4d( 'setSlice', handles, slice, handles);
+
+
+                    % Draw cross marker
+                    tempData = zeros( size(handles.image.Cdata,1), size(handles.image.Cdata,2) );
+
+                    crossIntensity = 1;
+                    scale = 100000;
+                    alpha = 0.9;
+
+                    try
+                        tempData(newX,:)=crossIntensity;
+                    catch
+                    end
+
+                    try
+                        tempData(:,newY)=crossIntensity;
+                    catch
+                    end               
+
+                    tempData=orientImage(tempData); 
+
+                    set(handles.ImgObject4,'Cdata',scale * tempData); 
+                    set(handles.ImgObject4,'AlphaData',alpha * tempData);
+
+
+                    updateImage(yokes(i), [], guidata(yokes(i)));
+
+                   %end
+                end    
+            function outGoing3DPoint = get3DpointInPlane(handles, ingoing3DPoint, ingoingCurrentPlane)
+                        % Numerical constants
+                AXIAL=1;
+                CORONAL=2;
+                SAGITAL=3;
+
+            % Recipy for coordinate permutation and back-permutation
+                PERMUTE={[1 2 3 4], [1 3 2 4],  [2 3 1 4] };
+                BACKPERMUTE={[1 2 3 4], [1 3 2 4],  [3 1 2 4] };  
+
+            %
+            % Rotate back to Axial (by applying inverted transformation)
+            %
+
+                switch ingoingCurrentPlane
+                    case 'Axial'
+                        V = BACKPERMUTE{AXIAL};
+                    case 'Coronal'
+                        V = BACKPERMUTE{CORONAL};
+                    case 'Sagital'
+                        V = BACKPERMUTE{SAGITAL};
+                    otherwise 
+                end
+
+                axial3DPoint = [ ingoing3DPoint( V(1) ),  ingoing3DPoint( V(2) ),  ingoing3DPoint( V(3) ) ];
+
+
+                % Get current orientation
+                try 
+                    CurrentOrientation = handles.image.plane; 
+                catch
+                    CurrentOrientation = 'Axial';
+                end
+
+                switch CurrentOrientation
+                    case 'Axial'
+                        V = PERMUTE{AXIAL};
+                    case 'Coronal'
+                        V = PERMUTE{CORONAL};
+                    case 'Sagital'
+                        V = PERMUTE{SAGITAL};
+                    otherwise 
+                end
+
+
+                x = axial3DPoint( V(1) );
+                y = axial3DPoint( V(2) );
+                z = axial3DPoint( V(3) );
+
+                outGoing3DPoint = [x y z];
     function wbu(h, evd, handles)
          % executes when the mouse button is released
          % get the properties and restore them         
@@ -3216,134 +3343,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 %
  
                    updateROIs(handles);     
-                 
-    function drawCursorInYokes2(thisHandles)
-         yokes=getappdata( thisHandles.figure1, 'yokes');
-         
-         % Bail out checks
-        
-          if strcmp(get(thisHandles.markerToggleTool,'State'), 'off')
-              return
-          end
 
-         % Lock cursor when pressing 'shift'
-         if strcmp( get(gcf,'CurrentModifier'),'shift')
-             return
-         end
-                                      
-        % -------------------------------------------------
-        % drawCursorInYokes(axesPoint, this_imlook4d_instance)
-        % -------------------------------------------------
-         coordinates=get(gca,'currentpoint');
-         
-         x=round(coordinates(1,1) + 0.5);
-         y=round(coordinates(1,2) + 0.5);
-         z=round(get(thisHandles.SliceNumSlider,'Value'));
-         current3DPoint = [x,y,z];
-         ingoingCurrentPlane = thisHandles.image.plane;
-         
-         %disp( [ 'x, y, z = ('  num2str(x)  ', '  num2str(y)  ', '  num2str(z) ')' ]);
-
-                
-            % Loop through yoke'd images
-            for i=1:length(yokes) 
-                handles=guidata(yokes(i));
-
-                %tempData=zeros(size(handles.image.CachedImage));  % Read cached image
-
-                %if this_imlook4d_instance~=yokes(i)
-                handles=guidata(yokes(i));     % The i:th other imlook4d-instance
-
-                % Get point in this plane
-                outgoing3DPoint = get3DpointInPlane(handles, current3DPoint, ingoingCurrentPlane);
-
-                newX = outgoing3DPoint(1);
-                newY = outgoing3DPoint(2);
-                slice = outgoing3DPoint(3);
-
-                %disp(['x, y ,z =>(' num2str(newX) ', ' num2str(newY) ', ' num2str(z) ')' ]);
-
-                % Move to new slice in other yokes
-                imlook4d( 'setSlice', handles, slice, handles);
-
-
-                % Draw cross marker
-                tempData = zeros( size(handles.image.Cdata,1), size(handles.image.Cdata,2) );
-                
-                crossIntensity = 1;
-                scale = 100000;
-                alpha = 0.9;
-
-                try
-                    tempData(newX,:)=crossIntensity;
-                catch
-                end
- 
-                try
-                    tempData(:,newY)=crossIntensity;
-                catch
-                end               
-                
-                tempData=orientImage(tempData); 
-
-                set(handles.ImgObject4,'Cdata',scale * tempData); 
-                set(handles.ImgObject4,'AlphaData',alpha * tempData);
-                
-                
-                updateImage(yokes(i), [], guidata(yokes(i)));
-
-               %end
-            end    
-        function outGoing3DPoint = get3DpointInPlane(handles, ingoing3DPoint, ingoingCurrentPlane)
-                    % Numerical constants
-            AXIAL=1;
-            CORONAL=2;
-            SAGITAL=3;
-        
-        % Recipy for coordinate permutation and back-permutation
-            PERMUTE={[1 2 3 4], [1 3 2 4],  [2 3 1 4] };
-            BACKPERMUTE={[1 2 3 4], [1 3 2 4],  [3 1 2 4] };  
-        
-        %
-        % Rotate back to Axial (by applying inverted transformation)
-        %
-            
-            switch ingoingCurrentPlane
-                case 'Axial'
-                    V = BACKPERMUTE{AXIAL};
-                case 'Coronal'
-                    V = BACKPERMUTE{CORONAL};
-                case 'Sagital'
-                    V = BACKPERMUTE{SAGITAL};
-                otherwise 
-            end
-            
-            axial3DPoint = [ ingoing3DPoint( V(1) ),  ingoing3DPoint( V(2) ),  ingoing3DPoint( V(3) ) ];
-
- 
-            % Get current orientation
-            try 
-                CurrentOrientation = handles.image.plane; 
-            catch
-                CurrentOrientation = 'Axial';
-            end
-            
-            switch CurrentOrientation
-                case 'Axial'
-                    V = PERMUTE{AXIAL};
-                case 'Coronal'
-                    V = PERMUTE{CORONAL};
-                case 'Sagital'
-                    V = PERMUTE{SAGITAL};
-                otherwise 
-            end
-
-               
-            x = axial3DPoint( V(1) );
-            y = axial3DPoint( V(2) );
-            z = axial3DPoint( V(3) );
-         
-            outGoing3DPoint = [x y z];
             
     % ROI undo
     function handles = resetUndoROI(handles)
@@ -3500,6 +3500,29 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         handles = retrieveUndoROI(handles, +1); 
     function handles = redoRoi(handles)   
         handles = retrieveUndoROI(handles, -1);
+        
+    % ROI copy between yokes
+    function copyRoiBetweenYokes_Callback(h, evd, thisHandles)
+        
+        % 
+        % TODO: Change dimensions to right plane when copying ROI
+        % TODO: Write HELP
+            yokes=getappdata( thisHandles.figure1, 'yokes');
+            
+            roiMatrix = thisHandles.image.ROI;
+
+
+            % Loop through yoke'd images
+            for i=1:length(yokes) 
+                handles=guidata(yokes(i));
+                handles.image.ROI = roiMatrix;
+
+                guidata(yokes(i),handles);
+
+                updateImage(yokes(i), [], guidata(yokes(i)));
+
+               %end
+            end 
             
 % --------------------------------------------------------------------
 %
