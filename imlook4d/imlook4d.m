@@ -3507,21 +3507,36 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         % 
         % TODO: Change dimensions to right plane when copying ROI
         % TODO: Write HELP
-            yokes=getappdata( thisHandles.figure1, 'yokes');
             
-            roiMatrix = thisHandles.image.ROI;
-
+            
+            % Get ROI matrix in Axial orientation
+            origOrientation = get(thisHandles.orientationMenu,'Value');
+            AXIAL = 1;
+            thisHandles = setOrientation(thisHandles, AXIAL);
+            axialROI = thisHandles.image.ROI;
+            thisHandles = setOrientation(thisHandles, origOrientation);
+            %guidata(thisHandles.figure1, thisHandles);
+            %updateImage(thisHandles.figure1, [], thisHandles);
 
             % Loop through yoke'd images
+            yokes=getappdata( thisHandles.figure1, 'yokes');
             for i=1:length(yokes) 
+                if gcf ~= yokes(i)
                 handles=guidata(yokes(i));
-                handles.image.ROI = roiMatrix;
+
+                % Insert axialROI in Axial view, and rotate to original
+                % view
+                origOrientation = get(handles.orientationMenu,'Value');
+                AXIAL = 1;
+                handles = setOrientation(handles, AXIAL);
+                handles.image.ROI = axialROI;
+                handles = setOrientation(handles, origOrientation);
 
                 guidata(yokes(i),handles);
 
-                updateImage(yokes(i), [], guidata(yokes(i)));
+                %updateImage(yokes(i), [], handles);
 
-               %end
+               end
             end 
             
 % --------------------------------------------------------------------
