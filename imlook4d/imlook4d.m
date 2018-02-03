@@ -6383,18 +6383,18 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
     % Window-levels submenu   
         % Generated at program start
-        function EditScale_Callback(hObject, eventdata, handles,varargin)
+        function EditScale_Callback(hObject, eventdata, thisHandles,varargin)
          % Display HELP and get out of callback
-             if DisplayHelp(hObject, eventdata, handles) 
+             if DisplayHelp(hObject, eventdata, thisHandles) 
                  return 
              end
              
          try
-            h=handles.ColorBar;  % Get handle to colorbar
+            h=thisHandles.ColorBar;  % Get handle to colorbar
             CLim=get(h,'YLim');  % Read limits from current color bar
-            slice=round(get(handles.SliceNumSlider,'Value'));
-            frame=round(get(handles.FrameNumSlider,'Value'));
-            tempData=handles.image.CachedImage;      % Read cached image, Image data (not flipped or rotated)
+            slice=round(get(thisHandles.SliceNumSlider,'Value'));
+            frame=round(get(thisHandles.FrameNumSlider,'Value'));
+            tempData=thisHandles.image.CachedImage;      % Read cached image, Image data (not flipped or rotated)
             disp('drawCursorInYokes2 - Read CachedImage');
             %CLim=[min(tempData(:)) max(tempData(:) )]; % Calculated min and max
             %
@@ -6417,13 +6417,26 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             end
 
             CLim=[str2num(answer{1})  str2num(answer{2})]; % Convert to numbers
+            
+            
 
-            setColorBar( handles, CLim)
+            
+            % Loop through yoke'd images which have same folder and title
+            yokes=getappdata( thisHandles.figure1, 'yokes');
+            folder = thisHandles.image.folder;
+            title = get(thisHandles.figure1, 'Name');
+            for i=1:length(yokes) 
+                handles=guidata(yokes(i));
+                
+                if strcmp( get(handles.figure1, 'Name'), title) && strcmp( handles.image.folder, folder)
+                    setColorBar( handles, CLim)
+                    updateImage(yokes(i), [], handles);
+                end
+            end 
             
 
         catch
-         end
-         updateImage(hObject, eventdata, handles)
+        end
          
     
     % Color submenu   
