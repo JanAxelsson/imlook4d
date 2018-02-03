@@ -2067,11 +2067,17 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
            return
        end
        yokes=getappdata( handles.figure1, 'yokes');
-       length(yokes)
        for i=1:length(yokes)
            handles=guidata(yokes(i));
            set(handles.ImgObject4,'Visible','on');
            set(handles.markerToggleTool,'State', 'on');
+
+           % Have the pointer change to transparent when the mouse enters an axes object:
+           hFigure = yokes(i);
+           hAxes =  handles.axes1;
+           iptPointerManager(hFigure, 'enable');
+           set(hFigure, 'PointerShapeCData', NaN( [16 16]) );
+           iptSetPointerBehavior(hAxes, @(hFigure, currentPoint)set(hFigure, 'Pointer', 'custom'));
        end
    function markerToggleButtonOff_ClickedCallback(hObject, eventdata, handles)
        % Display HELP and get out of callback
@@ -2080,17 +2086,24 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
            return
        end
        yokes=getappdata( handles.figure1, 'yokes');
-       length(yokes)
        for i=1:length(yokes)
            handles=guidata(yokes(i));
            set(handles.ImgObject4,'Visible','off');
            set(handles.markerToggleTool,'State', 'off');
-       end              
-
-      % Clear the cursor layer
-      set( handles.ImgObject4, 'CData', zeros( size( get(handles.ImgObject4,'CData')) ));
-      set( handles.ImgObject4, 'AlphaData', zeros( size( get(handles.ImgObject4,'AlphaData')) ));
-      guidata(handles.figure1, handles);
+           
+           % Clear the marker when turning off markerToggleButton
+           set( handles.ImgObject4, 'CData', zeros( size( get(handles.ImgObject4,'CData')) ));
+           set( handles.ImgObject4, 'AlphaData', zeros( size( get(handles.ImgObject4,'AlphaData')) ));
+           guidata(handles.figure1, handles);
+           
+           
+           % Have the pointer change to cross-hair when the mouse enters an axes object:
+           hFigure = yokes(i);
+           hAxes =  handles.axes1;
+           iptPointerManager(hFigure, 'disable');
+           %set(hFigure, 'PointerShapeCData', NaN( [16 16]) );
+           %iptSetPointerBehavior(hAxes, @(hFigure, currentPoint)set(hFigure, 'Pointer', 'crosshair'));
+       end
        
        
 
@@ -3084,7 +3097,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              % Bail out checks
 
               if strcmp(get(thisHandles.markerToggleTool,'State'), 'off')
-                  return
+                  %return
               end
 
              % Lock cursor when pressing 'shift'
@@ -3126,34 +3139,41 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                     % Move to new slice in other yokes
                     imlook4d( 'setSlice', handles, slice, handles);
-
-
-                    % Draw cross marker
-                    tempData = zeros( size(handles.image.Cdata,1), size(handles.image.Cdata,2) );
-
-                    crossIntensity = 1;
-                    scale = 100000;
-                    alpha = 0.9;
-
-                    try
-                        tempData(newX,:)=crossIntensity;
-                    catch
+                    
+                    if strcmp(get(thisHandles.markerToggleTool,'State'), 'on')
+                        
+                        % Draw cross marker
+                        tempData = zeros( size(handles.image.Cdata,1), size(handles.image.Cdata,2) );
+                        
+                        crossIntensity = 1;
+                        scale = 100000;
+                        alpha = 0.9;
+                        
+                        try
+                            tempData(newX,:)=crossIntensity;
+                        catch
+                        end
+                        
+                        try
+                            tempData(:,newY)=crossIntensity;
+                        catch
+                        end
+                        
+                        try
+                            tempData(newX-1 : newX+1,newY-1 : newY+1)=0;
+                        catch
+                        end
+                        
+                        tempData=orientImage(tempData);
+                        
+                        set(handles.ImgObject4,'Cdata',scale * tempData);
+                        set(handles.ImgObject4,'AlphaData',alpha * tempData);
+                        
+                        
                     end
-
-                    try
-                        tempData(:,newY)=crossIntensity;
-                    catch
-                    end               
-
-                    tempData=orientImage(tempData); 
-
-                    set(handles.ImgObject4,'Cdata',scale * tempData); 
-                    set(handles.ImgObject4,'AlphaData',alpha * tempData);
-
-
                     updateImage(yokes(i), [], guidata(yokes(i)));
-
-                   %end
+                        
+                    %end
                 end    
             function outGoing3DPoint = get3DpointInPlane(handles, ingoing3DPoint, ingoingCurrentPlane)
                         % Numerical constants
