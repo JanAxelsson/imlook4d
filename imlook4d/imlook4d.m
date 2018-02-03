@@ -6417,24 +6417,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             end
 
             CLim=[str2num(answer{1})  str2num(answer{2})]; % Convert to numbers
-            
-            
-
-            
-            % Loop through yoke'd images which have same folder and title
-            yokes=getappdata( thisHandles.figure1, 'yokes');
-            folder = thisHandles.image.folder;
-            title = get(thisHandles.figure1, 'Name');
-            for i=1:length(yokes) 
-                handles=guidata(yokes(i));
-                
-                if strcmp( get(handles.figure1, 'Name'), title) && strcmp( handles.image.folder, folder)
-                    setColorBar( handles, CLim)
-                    updateImage(yokes(i), [], handles);
-                end
-            end 
-            
-
+            setColorBar( thisHandles, CLim)
+ 
         catch
         end
          
@@ -7925,23 +7909,47 @@ end
 
                             % Fix NaNs at border
                             newMatrix2D(isnan(newMatrix2D))=0;               
-            function setColorBar( handles, CLim)
+            function setColorBar( thisHandles, CLim)
             %
             % setColorBar from 
             % inputs 
             %           handles structure containing ColorBar, autoColorScaleRadioButton
             %           Clim    [low high] limits
             %
-            colorBarHandle=handles.ColorBar;                    % Get handle to colorbar
-            set(handles.autoColorScaleRadioButton,'Value', 0);  % Set autoscale to off
+            
+            
+            colorBarHandle=thisHandles.ColorBar;                    % Get handle to colorbar
+            set(thisHandles.autoColorScaleRadioButton,'Value', 0);  % Set autoscale to off
             
             if CLim(1)~=0
-                set(handles.removeNegativesRadioButton,'Value', 0);  % Set autoscale to off
+                set(thisHandles.removeNegativesRadioButton,'Value', 0);  % Set autoscale to off
             end
 
             set(colorBarHandle,'YLim', CLim);    % Set min and max scale values, for new colorbar
-          %set(colorBarHandle,'CLim', CLim);    % Set min and max of colorscale, for new colorbar
-           set(handles.axes1,'CLim', CLim);
+            set(thisHandles.axes1,'CLim', CLim);
+            
+            % Loop through yoke'd images which have same folder and title
+            yokes=getappdata( thisHandles.figure1, 'yokes');
+            folder = thisHandles.image.folder;
+            title = get(thisHandles.figure1, 'Name');
+            for i=1:length(yokes) 
+                handles=guidata(yokes(i));
+                
+                if strcmp( get(handles.figure1, 'Name'), title) && strcmp( handles.image.folder, folder)
+                    colorBarHandle=handles.ColorBar;                    % Get handle to colorbar
+                    set(handles.autoColorScaleRadioButton,'Value', 0);  % Set autoscale to off
+                    
+                    if CLim(1)~=0
+                        set(handles.removeNegativesRadioButton,'Value', 0);  % Set autoscale to off
+                    end
+                    
+                    set(colorBarHandle,'YLim', CLim);    % Set min and max scale values, for new colorbar
+                    set(handles.axes1,'CLim', CLim);
+                    
+                    updateImage(handles.figure1, [], handles);
+                end
+            end
+            
             function SetColorBarUpdateState( axis_handle, state)
             % Stop listeners for update (to save time when doing ROI updates)
             % Possible states are:
