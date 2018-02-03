@@ -1873,7 +1873,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
               
               % Clear all references IN this imlook4d-instance
               rmappdata(this_imlook4d_instance,'currentYoke');  
-              setappdata(this_imlook4d_instance,'yokes',[]);      
+              setappdata(this_imlook4d_instance,'yokes',[]);  
+              
+              % Clear the cursor layer
+              set( handles.ImgObject4, 'CData', zeros( size( get(handles.ImgObject4,'CData')) ));
+              set( handles.ImgObject4, 'AlphaData', zeros( size( get(handles.ImgObject4,'AlphaData')) ));
+              guidata(handles.figure1, handles);
     function yokeOnButton_ClickedCallback(hObject, eventdata, handles)
             % appdata:  
             %  currentYoke  handle to button
@@ -2080,7 +2085,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
            handles=guidata(yokes(i));
            set(handles.ImgObject4,'Visible','off');
            set(handles.markerToggleTool,'State', 'off');
-       end
+       end              
+
+      % Clear the cursor layer
+      set( handles.ImgObject4, 'CData', zeros( size( get(handles.ImgObject4,'CData')) ));
+      set( handles.ImgObject4, 'AlphaData', zeros( size( get(handles.ImgObject4,'AlphaData')) ));
+      guidata(handles.figure1, handles);
+       
+       
 
     % --------------------------------------------------------------------
     % SLIDERS
@@ -3518,7 +3530,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             %guidata(thisHandles.figure1, thisHandles);
             %updateImage(thisHandles.figure1, [], thisHandles);
 
-            % Loop through yoke'd images
+            % Loop through yoke'd images (but skip this one)
             yokes=getappdata( thisHandles.figure1, 'yokes');
             for i=1:length(yokes) 
                 if gcf ~= yokes(i)
@@ -3531,6 +3543,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 handles = setOrientation(handles, AXIAL);
                 handles.image.ROI = axialROI;
                 handles = setOrientation(handles, origOrientation);
+                
+                handles = storeUndoROI(handles);
 
                 guidata(yokes(i),handles);
 
