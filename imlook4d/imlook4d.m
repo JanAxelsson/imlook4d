@@ -2125,7 +2125,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              if DisplayHelp(hObject, eventdata, handles) 
                  return 
              end
-        setSlice( handles,round(get(hObject,'Value')) , handles.figure1)
+            setSlice( handles,round(get(hObject,'Value')) , handles.figure1)
+        function setSliceWithoutUpdatingYokes(handles, slice, this_imlook4d_instance)
+            highestSlice= size(handles.image.Cdata,3);
+            newSlice=round(slice);
+            if ( newSlice>=1 && newSlice<=highestSlice )
+                set(handles.SliceNumEdit,'String',num2str(newSlice));
+                set(handles.SliceNumSlider,'Value',newSlice);
+            end
         function setSlice(handles, slice, this_imlook4d_instance)
             % This function is called from all callbacks changing slice
             % When yokes (coupled imlook4d-instances):
@@ -2134,20 +2141,38 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             newSlice=round(slice);
             if ( newSlice>=1 && newSlice<=highestSlice )
                 set(handles.SliceNumEdit,'String',num2str(newSlice));
-                set(handles.SliceNumSlider,'Value',newSlice);
-                setSlicesInYokes(slice, this_imlook4d_instance);
+                set(handles.SliceNumSlider,'Value',newSlice);  
             end
+            
+            % Alternative 1: No markers
+            if strcmp(get(handles.markerToggleTool,'State'), 'off')
+                setSlicesInYokes(slice, handles.figure1);
+                %drawCursorInYokes2(handles) 
+            end
+            
+            
+            % Alternative 2: Markers, 
+            %   setSlice can be called from 
+            %       - slice-slider movement
+            %       - drawCursorInYokes2
+            if strcmp(get(handles.markerToggleTool,'State'), 'on')
+
+                setSlicesInYokes(slice, handles.figure1);
+                drawCursorInYokes2(handles) 
+            end
+            
         function setSlicesInYokes(slice, this_imlook4d_instance)
-            return  % TODO: Remove if new cross hair marker works
-            % This function is called from setSlice
-            % It iterates through and updates all coupled images
             yokes=getappdata( this_imlook4d_instance, 'yokes');
+            this_handles=guidata(this_imlook4d_instance);
             for i=1:length(yokes) 
                 handles=guidata(yokes(i));
                 if this_imlook4d_instance~=yokes(i)
-                    set(handles.SliceNumEdit,'String', num2str(slice));
-                    set(handles.SliceNumSlider,'Value',slice);
-                    imlook4d('updateImage', handles.figure1,{}, handles)
+                    if strcmp( handles.image.plane, this_handles.image.plane)
+                        set(handles.SliceNumEdit,'String', num2str(slice));
+                        set(handles.SliceNumSlider,'Value',slice);
+                        imlook4d('updateImage', handles.figure1,{}, handles);
+                        updateImage(yokes(i), [], handles);
+                    end
                 end
 
             end
@@ -3086,11 +3111,16 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
          % executes while the mouse moves and mouse button is pressed
         % tic;
         try
-         drawROI(h, evd, handles);   
+            drawROI(h, evd, handles);
+            if strcmp(get(handles.markerToggleTool,'State'), 'on')
+                drawCursorInYokes2(handles)
+            end
         catch
         end
     function wbm2(h, evd, handles)
-         drawCursorInYokes2(handles)                 
+        if strcmp(get(handles.markerToggleTool,'State'), 'on')
+            drawCursorInYokes2(handles) 
+        end
         function drawCursorInYokes2(thisHandles)
              yokes=getappdata( thisHandles.figure1, 'yokes');
 
@@ -3104,7 +3134,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              if strcmp( get(gcf,'CurrentModifier'),'shift')
                  return
              end
-
+             
             % -------------------------------------------------
             % drawCursorInYokes(axesPoint, this_imlook4d_instance)
             % -------------------------------------------------
@@ -3125,56 +3155,60 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                     %tempData=zeros(size(handles.image.CachedImage));  % Read cached image
 
-                    %if this_imlook4d_instance~=yokes(i)
-                    handles=guidata(yokes(i));     % The i:th other imlook4d-instance
+                   % if thisHandles.figure1~=yokes(i)
+                        handles=guidata(yokes(i));     % The i:th other imlook4d-instance
+                        
+                        % Get point in this plane
+                        outgoing3DPoint = get3DpointInPlane(handles, current3DPoint, ingoingCurrentPlane);
+                        
+                        newX = outgoing3DPoint(1);
+                        newY = outgoing3DPoint(2);
+                        slice = outgoing3DPoint(3);
+                        
+                        %disp(['x, y ,z =>(' num2str(newX) ', ' num2str(newY) ', ' num2str(z) ')' ]);
 
-                    % Get point in this plane
-                    outgoing3DPoint = get3DpointInPlane(handles, current3DPoint, ingoingCurrentPlane);
-
-                    newX = outgoing3DPoint(1);
-                    newY = outgoing3DPoint(2);
-                    slice = outgoing3DPoint(3);
-
-                    %disp(['x, y ,z =>(' num2str(newX) ', ' num2str(newY) ', ' num2str(z) ')' ]);
-
-                    % Move to new slice in other yokes
-                    imlook4d( 'setSlice', handles, slice, handles);
-                    
-                    if strcmp(get(thisHandles.markerToggleTool,'State'), 'on')
                         
-                        % Draw cross marker
-                        tempData = zeros( size(handles.image.Cdata,1), size(handles.image.Cdata,2) );
+                        %if strcmp(get(thisHandles.markerToggleTool,'State'), 'on')
+                            
+                            % Move to new slice in other yokes
+                            % (triggered by moving marker in current imlook4d window)
+                            if thisHandles.figure1~=yokes(i)
+                                imlook4d( 'setSliceWithoutUpdatingYokes', handles, slice, handles);
+                            end
+                            
+                            % Draw cross marker
+                            tempData = zeros( size(handles.image.Cdata,1), size(handles.image.Cdata,2) );
+                            
+                            crossIntensity = 1;
+                            scale = 100000;
+                            alpha = 0.9;
+                            
+                            try
+                                tempData(newX,:)=crossIntensity;
+                            catch
+                            end
+                            
+                            try
+                                tempData(:,newY)=crossIntensity;
+                            catch
+                            end
+                            
+                            try
+                                tempData(newX-1 : newX+1,newY-1 : newY+1)=0;
+                            catch
+                            end
+                            
+                            tempData=orientImage(tempData);
+                            
+                            set(handles.ImgObject4,'Cdata',scale * tempData);
+                            set(handles.ImgObject4,'AlphaData',alpha * tempData);
+                            
+                            
+                        %end
+                            updateImage(yokes(i), [], guidata(yokes(i)));
                         
-                        crossIntensity = 1;
-                        scale = 100000;
-                        alpha = 0.9;
-                        
-                        try
-                            tempData(newX,:)=crossIntensity;
-                        catch
-                        end
-                        
-                        try
-                            tempData(:,newY)=crossIntensity;
-                        catch
-                        end
-                        
-                        try
-                            tempData(newX-1 : newX+1,newY-1 : newY+1)=0;
-                        catch
-                        end
-                        
-                        tempData=orientImage(tempData);
-                        
-                        set(handles.ImgObject4,'Cdata',scale * tempData);
-                        set(handles.ImgObject4,'AlphaData',alpha * tempData);
-                        
-                        
-                    end
-                    updateImage(yokes(i), [], guidata(yokes(i)));
-                        
-                    %end
                 end    
+                
             function outGoing3DPoint = get3DpointInPlane(handles, ingoing3DPoint, ingoingCurrentPlane)
                         % Numerical constants
                 AXIAL=1;
@@ -3535,10 +3569,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         
     % ROI copy between yokes
     function copyRoiBetweenYokes_Callback(h, evd, thisHandles)
-        
-        % 
-        % TODO: Change dimensions to right plane when copying ROI
-        % TODO: Write HELP
+             % Display HELP and get out of callback
+                 if DisplayHelp(h, evd, thisHandles) 
+                     return 
+                 end
             
             
             % Get ROI matrix in Axial orientation
@@ -7493,7 +7527,7 @@ end
                 %
 
                     imAlphaData1 = 1;   % bottom-layer
-                    imAlphaData2 = 0.7; % overlay-layer
+                    imAlphaData2 = 0.5; % overlay-layer
                     imAlphaDataROI =0.5;% roi-layer
 
                     % First image

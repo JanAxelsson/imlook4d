@@ -6,7 +6,7 @@
 	</P>
 	
 	<P>
-	When the 3D marker button is enabled,
+	When the 3D marker button is <u>enabled</u>,
 	the linked imlook4d windows will all display a cross hair, which will move together marking the same 3-dimensional point in all linked views.
 	
 	The views may be in different planes, such as Axial, Sagital, or Coronal, and also in different modalities, as long as the image matrices have the same dimensions.
@@ -22,6 +22,14 @@
 	
 	<P>	
 	The ROIs are independent in each imlook4d window.  Thus, drawing in the Axial imlook4d window, does not draw in the Sagital or Coronal windows simultaneously. 
+	Right-click on the image, and select "Copy to linked ROI", copies the ROI to all other linked images.
+	</P>
+	
+	<P>
+	When the 3D marker button is <u>disabled</u>,
+	the linked imlook4d windows will not show the cross hair.  Instead, changing the slice will only move the slice in images that are in the <u>same</u> plane.
+
+	
 	</P>
 	
 
