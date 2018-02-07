@@ -6,9 +6,13 @@
 	</P>
 	
 	<P>
-	This menu copies the ROI to all linked images.
+	This menu copies the ROI to all linked images.  
 	
 	</P>
 	
+	<P>
+	ROI names are updated.  ROI-names will overwrite previous names, if different.
+	Also Visibility and Locking of ROIs are copied.
 
+	</P>
 

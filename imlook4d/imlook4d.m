@@ -3537,6 +3537,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             thisHandles = setOrientation(thisHandles, AXIAL);
             axialROI = thisHandles.image.ROI;
             thisHandles = setOrientation(thisHandles, origOrientation);
+            
+            ROINames = get(thisHandles.ROINumberMenu,'String');
+            VisibleROIs = thisHandles.image.VisibleROIs;
+            LockedROIs = thisHandles.image.LockedROIs;
+            
             %guidata(thisHandles.figure1, thisHandles);
             %updateImage(thisHandles.figure1, [], thisHandles);
 
@@ -3545,6 +3550,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             for i=1:length(yokes) 
                 if gcf ~= yokes(i)
                 handles=guidata(yokes(i));
+                
+                % Copy ROI menu, Visible and Lock info
+                set(handles.ROINumberMenu,'String',ROINames);            
+                handles.image.VisibleROIs = VisibleROIs;           
+                handles.image.LockedROIs = LockedROIs;
 
                 % Insert axialROI in Axial view, and rotate to original
                 % view
