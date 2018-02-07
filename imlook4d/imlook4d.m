@@ -6099,8 +6099,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             numberOfPixels = imageVolumeSize(1) * imageVolumeSize(2) * imageVolumeSize(3);
             
             if ( ~isequal( roiSize, imageVolumeSize ) )
-                warndlg({'ROI size does not match image matrix.', 'This ROI was made a different image volume', 'Will load anyway -- but expect problems'});
-                %return
+                warndlg({'ROI size does not match image matrix.', 'This ROI was made a different image volume'});
+                return
                 
                 % This is a more forgiving ROI loading.  Enable, by
                 % commenting out the return, above
