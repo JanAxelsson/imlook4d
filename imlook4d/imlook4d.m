@@ -363,52 +363,8 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                      % The handle to the imlook4d instance created by OpenFile_Callback 
                      % is found by function gcf, (see imlook4d_OutputFcn)
 
-                    button = questdlg('Open file or from PACS?','Select file source','File','PACS','File');
-                    
-                    guidata(hObject,handles); % Store 
-                    if strcmp(button,'File')
-                        % hObject is normally called back from menu item
-                        OpenFile_Callback(hObject, eventdata, handles);  % Open new file dialog, puts into new imlook4d instance
-                    end
-                    
-                    
-                    % BUILD A PACS LIST - this is a duplicate of what
-                    % happens below for the "Network Hosts" submenues.
-                    if strcmp(button,'PACS')
-                        
-                         [pathstr1,name,ext] = fileparts(which('imlook4d'));
-                         temp=listDirectory([pathstr1 filesep 'PACS']);
-
-                         % Build list of PACS:es
-                             counter=1;
-                             for i=1:length(temp)
-                                [pathstr,name,ext] = fileparts(temp{i});
-                                if strcmp(ext,'.m')
-                                    nameWithSpaces{i}= regexprep(name,'_', ' ');  % Replace '_' with ' '
-                                    fileName{counter}=[name ext];
-                                    counter=counter+1;
-                                end
-                             end  
-                         
-                         % Select PACS from list if more than one PACS,
-                         % otherwise use the single PACS
-                             if exist('fileName','var')  
-                                 selected=1;  % Default value
-
-                                 % Select PACS from list
-                                 if length(fileName)>1
-                                     [selected,v] = listdlg('PromptString','Select PACS:',...
-                                              'SelectionMode','single',...
-                                              'ListString',nameWithSpaces);
-                                 end
-
-                                  ok=getFromPacs(fileName{selected}); % Open from PACS
-                             else
-                                 errordlg({'NO PACS DEFINED', 'Define a PACS, or open from file'});
-                             end
-
-                    end                    
-                    
+                      OpenFile_Callback(hObject, eventdata, handles);  % Open new file dialog, puts into new imlook4d instance
+               
                     delete(hObject);  % Remove current imlook4d (the one called with empty arguments)
                     return
                  end
@@ -6214,6 +6170,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                              
     % Print image
         function Print_Image_Callback(hObject, eventdata, handles)
+         % Display HELP and get out of callback
+         if DisplayHelp(hObject, eventdata, handles) 
+             return 
+         end
             DISPLAY_ON_SCREEN = true;
             GenerateScreenDump(hObject, eventdata, handles,DISPLAY_ON_SCREEN);
             printpreview(gcf);
@@ -8516,10 +8476,13 @@ end
                                     figureHandle )...
                                     ]; 
                             % Link to Matlab code
+                            try
                                 developersText=[ developersText  parseHTMLTableRow(  ...
                                     '<B>Matlab code=</B>',...
                                      ['<a href="matlab:edit(''' which(name1) ''')">'   which(name1) '</a>']) ...
                                      ];
+                            catch
+                            end
                             % End table
                                 developersText=[ developersText '</table>' EOL];
 
