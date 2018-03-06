@@ -1,0 +1,18 @@
+<h1>Copy to linked ROI </h1>
+<HR></HR>
+<!------------------->
+	<P>
+	All imlook4d windows with a button [A], [B] or [C] pressed, are linked in a group.  
+	</P>
+	
+	<P>
+	This menu copies the ROI to all linked images.  
+	
+	</P>
+	
+	<P>
+	ROI names are updated.  ROI-names will overwrite previous names, if different.
+	Also Visibility and Locking of ROIs are copied.
+
+	</P>
+
