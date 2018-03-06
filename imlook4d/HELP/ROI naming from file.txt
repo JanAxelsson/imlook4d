@@ -15,4 +15,8 @@
 
 	<P> 
         If you have some common lookup tables, please send them to the author, and they will be incorporated in the next release of imlook4d
+	</P>   
+
+	<P> 
+        Lookup tables that do not follow the standard format have to be parsed separately (see file ROI_naming_from_file.m)
 	</P>

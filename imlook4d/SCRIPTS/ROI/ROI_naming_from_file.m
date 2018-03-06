@@ -36,10 +36,12 @@ cd(folder);
 switch file
     case 'AAL2.txt'
         newNames = loadtable( which('AAL2.txt') );
+        OLDCOLUMN = 1;
         NEWCOLUMN = 2;
         
     case 'FreeSurferColorLUT.txt'
         newNames = loadtable( which('FreeSurferColorLUT.txt'), ' ', 6);
+        OLDCOLUMN = 1;
         NEWCOLUMN = 2;
         
     otherwise
@@ -47,13 +49,12 @@ switch file
         return
 end
 
-OLDCOLUMN = 1;
 
 stop = length(imlook4d_ROINames)-1 % Exclude 'Add ROI'
 for i=1:stop
     currentName = imlook4d_ROINames{i};
-    row = find(strcmp(newNames,currentName ));
-    if ~isempty(row) && row <= stop 
+    row = find(strcmp(newNames(:,OLDCOLUMN),currentName ));
+    if ~isempty(row) 
         imlook4d_ROINames{i} = newNames{ row, NEWCOLUMN};
     end
 end

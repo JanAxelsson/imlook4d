@@ -69,3 +69,13 @@ fclose(fid);
 rows = floor((i-1)/columns);
 rem = mod(i-1, columns);
 A = reshape(A(1:rows*columns), columns, rows)';
+
+
+
+function out = startsWith(s1,s2) % Emulate Matlab 2017 function
+    try
+        out = strcmp( s1(1), s2); 
+    catch
+       out = 0; % false if fails
+    end
+    
