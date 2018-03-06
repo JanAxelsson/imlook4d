@@ -1,0 +1,18 @@
+<h1>ROI naming from file</h1>
+<HR></HR>
+<!------------------->
+	<P>
+		Reads a lookup table and converts ROI labels being numbers to their corresponding names.
+	</P>
+
+
+	<P> 
+        Lookup tables should be tab-separated with the left column containing numbers, and the second column containing a name corresponding to the numbered ROI.
+        The default location for lookup tables is opened by default (imlook4d/ROI_LUTs), but any location can be selected.
+	</P>
+
+   
+
+	<P> 
+        If you have some common lookup tables, please send them to the author, and they will be incorporated in the next release of imlook4d
+	</P>

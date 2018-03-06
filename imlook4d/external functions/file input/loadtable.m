@@ -20,10 +20,11 @@ function A = loadtable(filename, delimiter, hlines)
 %
 % See also: 'save_cellarray', 'numintable'
 
-% Rev.1.0, 16.02.99 (Armin Günter)
+% Rev.1.0, 16.02.99 (Armin G?nter)
 % Rev.2.0, 14.05.99 (A.G.: possibility to skip header lines,
 %    use 'fgetl' instead of parsing for lines with 'strtok')
 % Rev.2.1, 18.04.2001 (A.G. 'delimiter' can be empty)
+% Rev.2.2  06.03.2018 (Jan Axelsson, skip commnent rows starting with #)
 
 if ~exist('delimiter'), delimiter = 9; end
 if isempty('delimiter'), delimiter = 9; end
@@ -42,6 +43,7 @@ if isequal(line, -1)
    error('No lines in file!')
 end
 
+
 % determine number of columns
 i = 1;
 while ~isempty(line)
@@ -50,8 +52,10 @@ while ~isempty(line)
 end
 columns = i -1;
 
-while ~isequal(line,-1)
-   while ~isempty(line)
+while ~isequal(line,-1) 
+    
+   isComment = startsWith(  strtrim(line),'#' );
+   while ~isempty(line) && ~isComment
       [A{i}, line] = strtok(line, delimiter);
       i = i + 1;
    end
