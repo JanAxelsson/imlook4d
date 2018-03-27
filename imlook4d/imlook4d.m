@@ -363,52 +363,8 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                      % The handle to the imlook4d instance created by OpenFile_Callback 
                      % is found by function gcf, (see imlook4d_OutputFcn)
 
-                    button = questdlg('Open file or from PACS?','Select file source','File','PACS','File');
-                    
-                    guidata(hObject,handles); % Store 
-                    if strcmp(button,'File')
-                        % hObject is normally called back from menu item
-                        OpenFile_Callback(hObject, eventdata, handles);  % Open new file dialog, puts into new imlook4d instance
-                    end
-                    
-                    
-                    % BUILD A PACS LIST - this is a duplicate of what
-                    % happens below for the "Network Hosts" submenues.
-                    if strcmp(button,'PACS')
-                        
-                         [pathstr1,name,ext] = fileparts(which('imlook4d'));
-                         temp=listDirectory([pathstr1 filesep 'PACS']);
-
-                         % Build list of PACS:es
-                             counter=1;
-                             for i=1:length(temp)
-                                [pathstr,name,ext] = fileparts(temp{i});
-                                if strcmp(ext,'.m')
-                                    nameWithSpaces{i}= regexprep(name,'_', ' ');  % Replace '_' with ' '
-                                    fileName{counter}=[name ext];
-                                    counter=counter+1;
-                                end
-                             end  
-                         
-                         % Select PACS from list if more than one PACS,
-                         % otherwise use the single PACS
-                             if exist('fileName','var')  
-                                 selected=1;  % Default value
-
-                                 % Select PACS from list
-                                 if length(fileName)>1
-                                     [selected,v] = listdlg('PromptString','Select PACS:',...
-                                              'SelectionMode','single',...
-                                              'ListString',nameWithSpaces);
-                                 end
-
-                                  ok=getFromPacs(fileName{selected}); % Open from PACS
-                             else
-                                 errordlg({'NO PACS DEFINED', 'Define a PACS, or open from file'});
-                             end
-
-                    end                    
-                    
+                      OpenFile_Callback(hObject, eventdata, handles);  % Open new file dialog, puts into new imlook4d instance
+               
                     delete(hObject);  % Remove current imlook4d (the one called with empty arguments)
                     return
                  end
@@ -529,6 +485,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 handles.ImgObject = image(Img,'Parent',handles.axes1);
                 handles.ImgObject2 = image(Img,'Parent',handles.axes1);
                 handles.ImgObject3 = imagesc(Img,'Parent',handles.axes1);
+                handles.ImgObject4 = imagesc(Img,'Parent',handles.axes1);
 % Warning: The EraseMode property is no longer supported and will error in a future release. Use the
 % ANIMATEDLINE function for animating lines and points instead of EraseMode 'none'. Removing instances
 % of EraseMode set to 'normal', 'xor', and 'background' has minimal impact. 
@@ -556,6 +513,16 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 set(handles.ImgObject3,'UIContextMenu',handles.AxesContextualMenu);
 
 
+                
+                % Cursor layer (yokes)
+                
+                set(handles.ImgObject4,'Cdata', zeros(size(cimg)));  
+                set(handles.ImgObject4,'Xdata',[0 r]+0.5);
+                set(handles.ImgObject4,'Ydata',[0 c]+0.5);
+                set(handles.ImgObject4,'AlphaData',0);
+                set(handles.ImgObject4,'UIContextMenu',handles.AxesContextualMenu);
+                
+                
                 % Set the properties of the axes
                 set(handles.axes1,'XLim',[0 r]+0.5);
                 set(handles.axes1,'YLim',[0 c]+0.5);
@@ -1862,7 +1829,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
               
               % Clear all references IN this imlook4d-instance
               rmappdata(this_imlook4d_instance,'currentYoke');  
-              setappdata(this_imlook4d_instance,'yokes',[]);      
+              setappdata(this_imlook4d_instance,'yokes',[]);  
+              
+              % Clear the cursor layer
+              set( handles.ImgObject4, 'CData', zeros( size( get(handles.ImgObject4,'CData')) ));
+              set( handles.ImgObject4, 'AlphaData', zeros( size( get(handles.ImgObject4,'AlphaData')) ));
+              guidata(handles.figure1, handles);
     function yokeOnButton_ClickedCallback(hObject, eventdata, handles)
             % appdata:  
             %  currentYoke  handle to button
@@ -2044,6 +2016,52 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
              end
              
+   function markerToggleButtonOn_ClickedCallback(hObject, eventdata, handles)
+       % Display HELP and get out of callback
+       if DisplayHelp(hObject, eventdata, handles)
+           set(hObject,'State', 'off')
+           return
+       end
+       yokes=getappdata( handles.figure1, 'yokes');
+       for i=1:length(yokes)
+           handles=guidata(yokes(i));
+           set(handles.ImgObject4,'Visible','on');
+           set(handles.markerToggleTool,'State', 'on');
+
+           % Have the pointer change to transparent when the mouse enters an axes object:
+           hFigure = yokes(i);
+           hAxes =  handles.axes1;
+           iptPointerManager(hFigure, 'enable');
+           set(hFigure, 'PointerShapeCData', NaN( [16 16]) );
+           iptSetPointerBehavior(hAxes, @(hFigure, currentPoint)set(hFigure, 'Pointer', 'custom'));
+       end
+   function markerToggleButtonOff_ClickedCallback(hObject, eventdata, handles)
+       % Display HELP and get out of callback
+       if DisplayHelp(hObject, eventdata, handles)
+           set(hObject,'State', 'off')
+           return
+       end
+       yokes=getappdata( handles.figure1, 'yokes');
+       for i=1:length(yokes)
+           handles=guidata(yokes(i));
+           set(handles.ImgObject4,'Visible','off');
+           set(handles.markerToggleTool,'State', 'off');
+           
+           % Clear the marker when turning off markerToggleButton
+           set( handles.ImgObject4, 'CData', zeros( size( get(handles.ImgObject4,'CData')) ));
+           set( handles.ImgObject4, 'AlphaData', zeros( size( get(handles.ImgObject4,'AlphaData')) ));
+           guidata(handles.figure1, handles);
+           
+           
+           % Have the pointer change to cross-hair when the mouse enters an axes object:
+           hFigure = yokes(i);
+           hAxes =  handles.axes1;
+           iptPointerManager(hFigure, 'disable');
+           %set(hFigure, 'PointerShapeCData', NaN( [16 16]) );
+           %iptSetPointerBehavior(hAxes, @(hFigure, currentPoint)set(hFigure, 'Pointer', 'crosshair'));
+       end
+       
+       
 
     % --------------------------------------------------------------------
     % SLIDERS
@@ -2063,7 +2081,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              if DisplayHelp(hObject, eventdata, handles) 
                  return 
              end
-        setSlice( handles,round(get(hObject,'Value')) , handles.figure1)
+            setSlice( handles,round(get(hObject,'Value')) , handles.figure1)
+        function setSliceWithoutUpdatingYokes(handles, slice, this_imlook4d_instance)
+            highestSlice= size(handles.image.Cdata,3);
+            newSlice=round(slice);
+            if ( newSlice>=1 && newSlice<=highestSlice )
+                set(handles.SliceNumEdit,'String',num2str(newSlice));
+                set(handles.SliceNumSlider,'Value',newSlice);
+            end
         function setSlice(handles, slice, this_imlook4d_instance)
             % This function is called from all callbacks changing slice
             % When yokes (coupled imlook4d-instances):
@@ -2072,22 +2097,38 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             newSlice=round(slice);
             if ( newSlice>=1 && newSlice<=highestSlice )
                 set(handles.SliceNumEdit,'String',num2str(newSlice));
-                set(handles.SliceNumSlider,'Value',newSlice);
-                %updateImage(this_imlook4d_instance, {}, handles);  %  handles as called to this function, ignoring that handles have been saved in updateImage (thus loosing from updateImage CachedImage)
-                setSlicesInYokes(slice, this_imlook4d_instance);
-                %setSlicesInYokes(slice, gcf);
-                %setSlicesInYokes(slice, hObject.figure1);
+                set(handles.SliceNumSlider,'Value',newSlice);  
             end
+            
+            % Alternative 1: No markers
+            if strcmp(get(handles.markerToggleTool,'State'), 'off')
+                setSlicesInYokes(slice, handles.figure1);
+                %drawCursorInYokes2(handles) 
+            end
+            
+            
+            % Alternative 2: Markers, 
+            %   setSlice can be called from 
+            %       - slice-slider movement
+            %       - drawCursorInYokes2
+            if strcmp(get(handles.markerToggleTool,'State'), 'on')
+
+                setSlicesInYokes(slice, handles.figure1);
+                drawCursorInYokes2(handles) 
+            end
+            
         function setSlicesInYokes(slice, this_imlook4d_instance)
-            % This function is called from setSlice
-            % It iterates through and updates all coupled images
             yokes=getappdata( this_imlook4d_instance, 'yokes');
+            this_handles=guidata(this_imlook4d_instance);
             for i=1:length(yokes) 
                 handles=guidata(yokes(i));
                 if this_imlook4d_instance~=yokes(i)
-                    set(handles.SliceNumEdit,'String', num2str(slice));
-                    set(handles.SliceNumSlider,'Value',slice);
-                    imlook4d('updateImage', handles.figure1,{}, handles)
+                    if strcmp( handles.image.plane, this_handles.image.plane)
+                        set(handles.SliceNumEdit,'String', num2str(slice));
+                        set(handles.SliceNumSlider,'Value',slice);
+                        imlook4d('updateImage', handles.figure1,{}, handles);
+                        updateImage(yokes(i), [], handles);
+                    end
                 end
 
             end
@@ -2597,6 +2638,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                 %end
             end
+            
+            % Set tooltip
+            names = get(hObject,'String');
+            name = names(ROINumber);
+            set(hObject,'TooltipString', name{1});
 
 
             guidata(handles.figure1,handles);% Save handles 
@@ -3026,10 +3072,154 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
          % executes while the mouse moves and mouse button is pressed
         % tic;
         try
-         drawROI(h, evd, handles);   
+            drawROI(h, evd, handles);
+            if strcmp(get(handles.markerToggleTool,'State'), 'on')
+                drawCursorInYokes2(handles)
+            end
         catch
         end
     function wbm2(h, evd, handles)
+        if strcmp(get(handles.markerToggleTool,'State'), 'on')
+            drawCursorInYokes2(handles) 
+        end
+        function drawCursorInYokes2(thisHandles)
+             yokes=getappdata( thisHandles.figure1, 'yokes');
+
+             % Bail out checks
+
+              if strcmp(get(thisHandles.markerToggleTool,'State'), 'off')
+                  %return
+              end
+
+             % Lock cursor when pressing 'shift'
+             if strcmp( get(gcf,'CurrentModifier'),'shift')
+                 return
+             end
+             
+            % -------------------------------------------------
+            % drawCursorInYokes(axesPoint, this_imlook4d_instance)
+            % -------------------------------------------------
+             coordinates=get(gca,'currentpoint');
+
+             x=round(coordinates(1,1) + 0.5);
+             y=round(coordinates(1,2) + 0.5);
+             z=round(get(thisHandles.SliceNumSlider,'Value'));
+             current3DPoint = [x,y,z];
+             ingoingCurrentPlane = thisHandles.image.plane;
+
+             %disp( [ 'x, y, z = ('  num2str(x)  ', '  num2str(y)  ', '  num2str(z) ')' ]);
+
+
+                % Loop through yoke'd images
+                for i=1:length(yokes) 
+                    handles=guidata(yokes(i));
+
+                    %tempData=zeros(size(handles.image.CachedImage));  % Read cached image
+
+                   % if thisHandles.figure1~=yokes(i)
+                        handles=guidata(yokes(i));     % The i:th other imlook4d-instance
+                        
+                        % Get point in this plane
+                        outgoing3DPoint = get3DpointInPlane(handles, current3DPoint, ingoingCurrentPlane);
+                        
+                        newX = outgoing3DPoint(1);
+                        newY = outgoing3DPoint(2);
+                        slice = outgoing3DPoint(3);
+                        
+                        %disp(['x, y ,z =>(' num2str(newX) ', ' num2str(newY) ', ' num2str(z) ')' ]);
+
+                        
+                        %if strcmp(get(thisHandles.markerToggleTool,'State'), 'on')
+                            
+                            % Move to new slice in other yokes
+                            % (triggered by moving marker in current imlook4d window)
+                            if thisHandles.figure1~=yokes(i)
+                                imlook4d( 'setSliceWithoutUpdatingYokes', handles, slice, handles);
+                            end
+                            
+                            % Draw cross marker
+                            tempData = zeros( size(handles.image.Cdata,1), size(handles.image.Cdata,2) );
+                            
+                            crossIntensity = 1;
+                            scale = 100000;
+                            alpha = 0.9;
+                            
+                            try
+                                tempData(newX,:)=crossIntensity;
+                            catch
+                            end
+                            
+                            try
+                                tempData(:,newY)=crossIntensity;
+                            catch
+                            end
+                            
+                            try
+                                tempData(newX-1 : newX+1,newY-1 : newY+1)=0;
+                            catch
+                            end
+                            
+                            tempData=orientImage(tempData);
+                            
+                            set(handles.ImgObject4,'Cdata',scale * tempData);
+                            set(handles.ImgObject4,'AlphaData',alpha * tempData);
+                            
+                            
+                        %end
+                            updateImage(yokes(i), [], guidata(yokes(i)));
+                        
+                end    
+                
+            function outGoing3DPoint = get3DpointInPlane(handles, ingoing3DPoint, ingoingCurrentPlane)
+                        % Numerical constants
+                AXIAL=1;
+                CORONAL=2;
+                SAGITAL=3;
+
+            % Recipy for coordinate permutation and back-permutation
+                PERMUTE={[1 2 3 4], [1 3 2 4],  [2 3 1 4] };
+                BACKPERMUTE={[1 2 3 4], [1 3 2 4],  [3 1 2 4] };  
+
+            %
+            % Rotate back to Axial (by applying inverted transformation)
+            %
+
+                switch ingoingCurrentPlane
+                    case 'Axial'
+                        V = BACKPERMUTE{AXIAL};
+                    case 'Coronal'
+                        V = BACKPERMUTE{CORONAL};
+                    case 'Sagital'
+                        V = BACKPERMUTE{SAGITAL};
+                    otherwise 
+                end
+
+                axial3DPoint = [ ingoing3DPoint( V(1) ),  ingoing3DPoint( V(2) ),  ingoing3DPoint( V(3) ) ];
+
+
+                % Get current orientation
+                try 
+                    CurrentOrientation = handles.image.plane; 
+                catch
+                    CurrentOrientation = 'Axial';
+                end
+
+                switch CurrentOrientation
+                    case 'Axial'
+                        V = PERMUTE{AXIAL};
+                    case 'Coronal'
+                        V = PERMUTE{CORONAL};
+                    case 'Sagital'
+                        V = PERMUTE{SAGITAL};
+                    otherwise 
+                end
+
+
+                x = axial3DPoint( V(1) );
+                y = axial3DPoint( V(2) );
+                z = axial3DPoint( V(3) );
+
+                outGoing3DPoint = [x y z];
     function wbu(h, evd, handles)
          % executes when the mouse button is released
          % get the properties and restore them         
@@ -3180,66 +3370,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 %
  
                    updateROIs(handles);     
-         function drawCursorInYokes(axesPoint, this_imlook4d_instance)
-              yokes=getappdata( this_imlook4d_instance, 'yokes');
-            for i=1:length(yokes) 
-                handles=guidata(yokes(i));
-                tempData=handles.image.CachedImage; % Read cached image
-                    disp('drawCursorInYokes - Read CachedImage');
 
-                %if this_imlook4d_instance~=yokes(i)
-                    handles=guidata(yokes(i));     % The i:th other imlook4d-instance
-                    
-                    x=round(axesPoint(1,1))/128;
-                    y=round(axesPoint(1,2))/128;
-                    w=0.1;
-                    h=0.1;
-                    annotation('rectangle',[x y w h]) 
- 
-               %end
-            end                    
-         function drawCursorInYokes2(axesPoint, this_imlook4d_instance)
-            marker=zeros(11,11);
-            marker(1:11,6)=1;
-            marker(6,1:11)=1;
-            
-            
-            yokes=getappdata( this_imlook4d_instance, 'yokes');
-            for i=1:length(yokes) 
-                handles=guidata(yokes(i));
-                tempData=handles.image.CachedImage;  % Read cached image
-                    disp('drawCursorInYokes2 - Read CachedImage');
-
-                %if this_imlook4d_instance~=yokes(i)
-                    handles=guidata(yokes(i));     % The i:th other imlook4d-instance
-                    
-                                        % Draw ROI (if inside image)
-                    x=round(axesPoint(1,1));
-                    y=round(axesPoint(1,2));
-                    
-                    rx=size(marker,1);
-                    ry=size(marker,2);
-                    
-                    ix=x-round(rx/2)+mod(rx,2);
-                    iy=y-round(ry/2)+mod(ry,2);
-                    
-                    xSize=size(tempData,1);
-                    ySize=size(tempData,2);
-                    
-                    
-                    if (ix>0)&&(ix<=xSize-rx)&&(iy>0)&&(iy<=ySize-ry)  
-                        subMatrix= tempData( (ix):(ix+rx-1),(iy):(iy+ry-1) );  % Same matrix size as brush
-                        indeces=find(marker>0);  % Use only non-zero brush values
-                        subMatrix(indeces)=10000;  % Draw over any pixels in brush
-                        tempData( (ix):(ix+rx-1),(iy):(iy+ry-1))=subMatrix; 
-                    end
-                    
-                    tempData=reshape(tempData, [size(tempData,2), size(tempData,1), size(tempData,3)] );
-                    tempData=orientImage(tempData);       
-                    set(handles.ImgObject,'Cdata',tempData);  
- 
-               %end
-            end           
             
     % ROI undo
     function handles = resetUndoROI(handles)
@@ -3396,6 +3527,56 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         handles = retrieveUndoROI(handles, +1); 
     function handles = redoRoi(handles)   
         handles = retrieveUndoROI(handles, -1);
+        
+    % ROI copy between yokes
+    function copyRoiBetweenYokes_Callback(h, evd, thisHandles)
+             % Display HELP and get out of callback
+                 if DisplayHelp(h, evd, thisHandles) 
+                     return 
+                 end
+            
+            
+            % Get ROI matrix in Axial orientation
+            origOrientation = get(thisHandles.orientationMenu,'Value');
+            AXIAL = 1;
+            thisHandles = setOrientation(thisHandles, AXIAL);
+            axialROI = thisHandles.image.ROI;
+            thisHandles = setOrientation(thisHandles, origOrientation);
+            
+            ROINames = get(thisHandles.ROINumberMenu,'String');
+            VisibleROIs = thisHandles.image.VisibleROIs;
+            LockedROIs = thisHandles.image.LockedROIs;
+            
+            %guidata(thisHandles.figure1, thisHandles);
+            %updateImage(thisHandles.figure1, [], thisHandles);
+
+            % Loop through yoke'd images (but skip this one)
+            yokes=getappdata( thisHandles.figure1, 'yokes');
+            for i=1:length(yokes) 
+                if gcf ~= yokes(i)
+                handles=guidata(yokes(i));
+                
+                % Copy ROI menu, Visible and Lock info
+                set(handles.ROINumberMenu,'String',ROINames);            
+                handles.image.VisibleROIs = VisibleROIs;           
+                handles.image.LockedROIs = LockedROIs;
+
+                % Insert axialROI in Axial view, and rotate to original
+                % view
+                origOrientation = get(handles.orientationMenu,'Value');
+                AXIAL = 1;
+                handles = setOrientation(handles, AXIAL);
+                handles.image.ROI = axialROI;
+                handles = setOrientation(handles, origOrientation);
+                
+                handles = storeUndoROI(handles);
+
+                guidata(yokes(i),handles);
+
+                %updateImage(yokes(i), [], handles);
+
+               end
+            end 
             
 % --------------------------------------------------------------------
 %
@@ -5923,6 +6104,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             numberOfPixels = imageVolumeSize(1) * imageVolumeSize(2) * imageVolumeSize(3);
             
             if ( ~isequal( roiSize, imageVolumeSize ) )
+                warndlg({'ROI size does not match image matrix.', 'This ROI was made a different image volume'});
+                return
+                
+                % This is a more forgiving ROI loading.  Enable, by
+                % commenting out the return, above
                                 
                 if ( roiSize(3) > imageVolumeSize(3) )
                     % Truncate ROI slices
@@ -6004,6 +6190,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                              
     % Print image
         function Print_Image_Callback(hObject, eventdata, handles)
+         % Display HELP and get out of callback
+         if DisplayHelp(hObject, eventdata, handles) 
+             return 
+         end
             DISPLAY_ON_SCREEN = true;
             GenerateScreenDump(hObject, eventdata, handles,DISPLAY_ON_SCREEN);
             printpreview(gcf);
@@ -6227,18 +6417,18 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
     % Window-levels submenu   
         % Generated at program start
-        function EditScale_Callback(hObject, eventdata, handles,varargin)
+        function EditScale_Callback(hObject, eventdata, thisHandles,varargin)
          % Display HELP and get out of callback
-             if DisplayHelp(hObject, eventdata, handles) 
+             if DisplayHelp(hObject, eventdata, thisHandles) 
                  return 
              end
              
          try
-            h=handles.ColorBar;  % Get handle to colorbar
+            h=thisHandles.ColorBar;  % Get handle to colorbar
             CLim=get(h,'YLim');  % Read limits from current color bar
-            slice=round(get(handles.SliceNumSlider,'Value'));
-            frame=round(get(handles.FrameNumSlider,'Value'));
-            tempData=handles.image.CachedImage;      % Read cached image, Image data (not flipped or rotated)
+            slice=round(get(thisHandles.SliceNumSlider,'Value'));
+            frame=round(get(thisHandles.FrameNumSlider,'Value'));
+            tempData=thisHandles.image.CachedImage;      % Read cached image, Image data (not flipped or rotated)
             disp('drawCursorInYokes2 - Read CachedImage');
             %CLim=[min(tempData(:)) max(tempData(:) )]; % Calculated min and max
             %
@@ -6261,13 +6451,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             end
 
             CLim=[str2num(answer{1})  str2num(answer{2})]; % Convert to numbers
-
-            setColorBar( handles, CLim)
-            
-
+            setColorBar( thisHandles, CLim)
+ 
         catch
-         end
-         updateImage(hObject, eventdata, handles)
+        end
          
     
     % Color submenu   
@@ -7320,7 +7507,7 @@ end
                 %
 
                     imAlphaData1 = 1;   % bottom-layer
-                    imAlphaData2 = 0.7; % overlay-layer
+                    imAlphaData2 = 0.5; % overlay-layer
                     imAlphaDataROI =0.5;% roi-layer
 
                     % First image
@@ -7360,6 +7547,8 @@ end
                             set(handles.ImgObject2,'YData',YLim);
                             set(handles.ImgObject3,'XData',XLim);
                             set(handles.ImgObject3,'YData',YLim);
+                            set(handles.ImgObject4,'XData',XLim);
+                            set(handles.ImgObject4,'YData',YLim);
                             
                             %tempAlphaData = get(handles.ImgObject3,'AlphaData');
                             %set(handles.ImgObject3,'CData', zeros( [size(tempData) 3]), 'AlphaData', zeros(size(tempData) ) );
@@ -7754,23 +7943,47 @@ end
 
                             % Fix NaNs at border
                             newMatrix2D(isnan(newMatrix2D))=0;               
-            function setColorBar( handles, CLim)
+            function setColorBar( thisHandles, CLim)
             %
             % setColorBar from 
             % inputs 
             %           handles structure containing ColorBar, autoColorScaleRadioButton
             %           Clim    [low high] limits
             %
-            colorBarHandle=handles.ColorBar;                    % Get handle to colorbar
-            set(handles.autoColorScaleRadioButton,'Value', 0);  % Set autoscale to off
+            
+            
+            colorBarHandle=thisHandles.ColorBar;                    % Get handle to colorbar
+            set(thisHandles.autoColorScaleRadioButton,'Value', 0);  % Set autoscale to off
             
             if CLim(1)~=0
-                set(handles.removeNegativesRadioButton,'Value', 0);  % Set autoscale to off
+                set(thisHandles.removeNegativesRadioButton,'Value', 0);  % Set autoscale to off
             end
 
             set(colorBarHandle,'YLim', CLim);    % Set min and max scale values, for new colorbar
-          %set(colorBarHandle,'CLim', CLim);    % Set min and max of colorscale, for new colorbar
-           set(handles.axes1,'CLim', CLim);
+            set(thisHandles.axes1,'CLim', CLim);
+            
+            % Loop through yoke'd images which have same folder and title
+            yokes=getappdata( thisHandles.figure1, 'yokes');
+            folder = thisHandles.image.folder;
+            title = get(thisHandles.figure1, 'Name');
+            for i=1:length(yokes) 
+                handles=guidata(yokes(i));
+                
+                if strcmp( get(handles.figure1, 'Name'), title) && strcmp( handles.image.folder, folder)
+                    colorBarHandle=handles.ColorBar;                    % Get handle to colorbar
+                    set(handles.autoColorScaleRadioButton,'Value', 0);  % Set autoscale to off
+                    
+                    if CLim(1)~=0
+                        set(handles.removeNegativesRadioButton,'Value', 0);  % Set autoscale to off
+                    end
+                    
+                    set(colorBarHandle,'YLim', CLim);    % Set min and max scale values, for new colorbar
+                    set(handles.axes1,'CLim', CLim);
+                    
+                    updateImage(handles.figure1, [], handles);
+                end
+            end
+            
             function SetColorBarUpdateState( axis_handle, state)
             % Stop listeners for update (to save time when doing ROI updates)
             % Possible states are:
@@ -7964,6 +8177,8 @@ end
                     activeRoiPicture=zeros(size(handles.image.Cdata,1), size(handles.image.Cdata,2),'single');
                     activeRoiPicture=zeros(size(rois),'single');
                     inActiveRoiPicture=zeros(size(activeRoiPicture),'single');
+                    
+
 
                 % -------------------------------------------------
                 % Create image and ROI pixel values
@@ -8281,10 +8496,13 @@ end
                                     figureHandle )...
                                     ]; 
                             % Link to Matlab code
+                            try
                                 developersText=[ developersText  parseHTMLTableRow(  ...
                                     '<B>Matlab code=</B>',...
                                      ['<a href="matlab:edit(''' which(name1) ''')">'   which(name1) '</a>']) ...
                                      ];
+                            catch
+                            end
                             % End table
                                 developersText=[ developersText '</table>' EOL];
 

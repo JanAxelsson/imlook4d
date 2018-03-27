@@ -8,6 +8,7 @@
 %
 % Jan Axelsson
 
+    StoreVariables;
     ExportUntouched
     waitfor( zhou_control(imlook4d_current_handle,[], imlook4d_current_handles));
     ExportUntouched
@@ -97,20 +98,23 @@
 %
     figure('NumberTitle','off',...
         'Name', ['Regional Zhou: ' get(imlook4d_current_handles.figure1,'Name')] );
-    
+    numberOfVisibleROIs = 0;
     for i=1:numberOfROIs
-        disp(i)
-        % Plot current ROI
-           try
+        if (imlook4d_current_handles.image.VisibleROIs(i)>0)
+            numberOfVisibleROIs = numberOfVisibleROIs +1;
+            disp(i)
+            % Plot current ROI
+            try
                 newX2=newX(1,i,:);newX2=newX2(:);
                 newY2=newY(1,i,:);newY2=newY2(:);
                 plot( newX2, newY2 , 'o', 'MarkerSize',3);
                 hold all
-
-           catch
-               warning('Error in plot of Zhou plot');
-           end
-
+                
+            catch
+                warning('Error in plot of Zhou plot');
+            end
+        end
+        
     end
     
 %
@@ -120,8 +124,12 @@
     ylabel('\int_{0}^{t} ROI dt /C_{ref}');
     title(['Zhou for ROIs in ' get(imlook4d_current_handles.figure1,'Name')],'interpreter','none'); 
 
+    n = 0;
     for i=1:numberOfROIs 
-        contents{i}=[roiNames{i} ' (' num2str(NPixels(i)) ' pixels)' ]; % Add pixel count to legend
+        if (imlook4d_current_handles.image.VisibleROIs(i)>0)
+            n = n+1;
+            contents{n}=[roiNames{i} ' (' num2str(NPixels(i)) ' pixels)' ]; % Add pixel count to legend
+        end
     end
     legend(contents);
 
@@ -144,24 +152,28 @@
    
    % Plot lines
    for i=1:numberOfROIs
-       disp(i)
-        newX2=newX(1,i,startFrame:endFrame);
-        
-        k=slope(i);
-        m=intercept(i);
-        %k2=slope2(i);
-       % m2=intercept2(i);
-        
-        %xValues=[0 newX2(end)];
-        %yValues=[m m+k*newX2(end)];
-        xValues=[ newX2(1) newX2(end)];
-        yValues=[ (m+k*newX2(1)) (m+k*newX2(end))];  
-        %xValues2=[ 0 newX2(end)];
-        %yValues2=[ m2 m2+k2*newX2(end)];      
-
-        color = get( children( 1 + numberOfROIs - i),'Color');  % Reverse order on lines contra markers
-        set( children( 1 + numberOfROIs - i), 'MarkerFaceColor', color);  % Make solid 
-        plot( xValues, yValues, 'Color', color );  % Plot straight line
+       n = 0;
+       if (imlook4d_current_handles.image.VisibleROIs(i)>0)
+           n=n+1
+           disp(i)
+           newX2=newX(1,i,startFrame:endFrame);
+           
+           k=slope(i);
+           m=intercept(i);
+           %k2=slope2(i);
+           % m2=intercept2(i);
+           
+           %xValues=[0 newX2(end)];
+           %yValues=[m m+k*newX2(end)];
+           xValues=[ newX2(1) newX2(end)];
+           yValues=[ (m+k*newX2(1)) (m+k*newX2(end))];
+           %xValues2=[ 0 newX2(end)];
+           %yValues2=[ m2 m2+k2*newX2(end)];
+           
+           color = get( children( 1 + numberOfVisibleROIs - n),'Color');  % Reverse order on lines contra markers
+           set( children( 1 + numberOfVisibleROIs - n), 'MarkerFaceColor', color);  % Make solid
+           plot( xValues, yValues, 'Color', color );  % Plot straight line
+       end
    end
    
 %
@@ -179,12 +191,18 @@
   
             Format='%10.6f';
             positions=12;
-            myAnnotation{1}=[ string_pad('',7)  '    ' string_pad('slope(DVR)',positions) string_pad('intercept',positions)];
-            for i=1:numberOfROIs 
-                myAnnotation{i+1}= [sprintf( roiNames{i}, '%S7') ':   ' ...
-                num2str_pad( slope(i),Format,positions ) '   ' ...
-                num2str_pad(intercept(i),Format,positions) ...
-                ];
+            row=1;
+            myAnnotation{row}=[ string_pad('',7)  '    ' string_pad('BP',positions) string_pad('slope(DVR)',positions) string_pad('intercept',positions)];
+            for i=1:numberOfROIs
+                if (imlook4d_current_handles.image.VisibleROIs(i)>0)
+                    row=row+1;
+                    BP = slope(i)-1;
+                    myAnnotation{row}= [sprintf( roiNames{i}, '%S7') ':   ' ...
+                        num2str_pad( BP,Format,positions ) '   ' ...
+                        num2str_pad( slope(i),Format,positions ) '   ' ...
+                        num2str_pad(intercept(i),Format,positions) ...
+                        ];
+                end
             end
  
             
@@ -231,8 +249,10 @@
 %
 % Clean up
 %
-    clear a answer dataMatrix defaultanswer deltaT duration ...
-        intercept k m name newX2 newY2 numlines prompt referenceData roiNames slope  ...
-        startFrame tempY time zhouSlope contents endFrame i newX newY  numberOfROIs ...
-        TACT i NPixels
+    % Remove legends from lines
+    h=gca;
+    temp = get(h.Legend,'String');
+    set(h.Legend,'String', temp(1:numberOfVisibleROIs))
+
+    ClearVariables;
 

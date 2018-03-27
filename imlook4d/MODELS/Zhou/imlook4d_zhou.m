@@ -121,7 +121,14 @@ function [outputData, X, Y]=imlook4d_zhou(dataMatrix, time, duration, startFrame
 %                    slope(i,j)=0;
 %                    intercept(i,j)=0;
                else 
-                    if (strcmp(type, 'slope'))
+                    if (strcmp(type, 'BP'))
+                        %coefficients = polyfit(newX(:),tempY(:),1); % SLOW      
+                        %coefficients=pinv([newX ones(length(newX),1) ])* tempY;  % pinv
+                        coefficients=[newX ones(length(newX),1) ] \ tempY;  % Backslash operator
+                        slope(i,j)=coefficients(1);
+                        intercept(i,j)=coefficients(2);
+                    end
+                     if (strcmp(type, 'slope'))
                         %coefficients = polyfit(newX(:),tempY(:),1); % SLOW      
                         %coefficients=pinv([newX ones(length(newX),1) ])* tempY;  % pinv
                         coefficients=[newX ones(length(newX),1) ] \ tempY;  % Backslash operator
@@ -208,6 +215,10 @@ function [outputData, X, Y]=imlook4d_zhou(dataMatrix, time, duration, startFrame
 % Decide which image to show (Slope makes more sense)
 %
 
+    if (strcmp(type, 'BP'))
+        outputData=slope-1;  
+    end
+    
     if (strcmp(type, 'slope'))
         outputData=slope;  
     end
