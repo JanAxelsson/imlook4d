@@ -83,10 +83,20 @@ handles.output  =  hObject;
             %
             try
                 % Set radio buttons
+                if (strcmp(imlook4d_handles.model.Zhou.type, 'BP') )
+                    set(handles.BP_radiobutton,'Value',1);
+                    set(handles.slopeRadiobutton,'Value',0);
+                    set(handles.interceptRadiobutton,'Value',0);
+                end
+                
                 if (strcmp(imlook4d_handles.model.Zhou.type, 'slope') )
+                    set(handles.BP_radiobutton,'Value',0);
                     set(handles.slopeRadiobutton,'Value',1);
                     set(handles.interceptRadiobutton,'Value',0);
-                else
+                end
+                
+                if (strcmp(imlook4d_handles.model.Zhou.type, 'intercept') )
+                    set(handles.BP_radiobutton,'Value',0);
                     set(handles.slopeRadiobutton,'Value',0);
                     set(handles.interceptRadiobutton,'Value',1);
                 end
@@ -300,6 +310,11 @@ function donePushbutton_Callback(hObject, eventdata, handles)
             %imlook4d_handles.model.Zhou.integrationRange = startFrame:endFrame;
             
         % Determine if slope/intercept image
+        
+            if (get(handles.BP_radiobutton,'Value') == 1)
+                imlook4d_handles.model.Zhou.type = 'BP';
+            end
+            
             if (get(handles.slopeRadiobutton,'Value') == 1)
                 imlook4d_handles.model.Zhou.type = 'slope';
             end
