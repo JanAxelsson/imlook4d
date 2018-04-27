@@ -1,6 +1,6 @@
-function outputImage=logan( handles, matrix,outputFrameRange)
+function outputImage=zhou( handles, matrix,outputFrameRange)
 %
-% function Logan
+% function zhou
 %
 % (based on Patlak m-files)
 %

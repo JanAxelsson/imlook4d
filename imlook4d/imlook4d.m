@@ -2638,6 +2638,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                 %end
             end
+            
+            % Set tooltip
+            names = get(hObject,'String');
+            name = names(ROINumber);
+            set(hObject,'TooltipString', name{1});
 
 
             guidata(handles.figure1,handles);% Save handles 
