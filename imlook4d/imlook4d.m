@@ -1745,35 +1745,51 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                  set(hObject,'State', 'off')
                  return 
              end
+             pressedToggleButton( hObject);
+    function ZoomIntoggletool_ReleasedCallback(hObject, eventdata, handles) 
+        releasedToggleButton( hObject);
+        
     function ZoomOuttoggletool_ClickedCallback(hObject, eventdata, handles)
         % Display HELP and get out of callback
              if DisplayHelp(hObject, eventdata, handles) 
                  set(hObject,'State', 'off')
                  return 
              end
+             pressedToggleButton( hObject);
+    function ZoomOuttoggletool_ReleasedCallback(hObject, eventdata, handles)
+        releasedToggleButton( hObject);
+        
     function Pantoggletool_ClickedCallback(hObject, eventdata, handles)
         % Display HELP and get out of callback
              if DisplayHelp(hObject, eventdata, handles) 
                  set(hObject,'State', 'off')
                  return 
-             end
-             
+             end       
+             pressedToggleButton( hObject);
+    function Pantoggletool_ReleasedCallback(hObject, eventdata, handles)
+        releasedToggleButton( hObject);
+        
     function DataCursortoggletool_ClickedCallback(hObject, eventdata, handles)
         % Display HELP and get out of callback
              if DisplayHelp(hObject, eventdata, handles) 
                  set(hObject,'State', 'off')
                  return 
-             end                   
+             end        
+             pressedToggleButton( hObject);
     function DataCursortoggletool_ReleasedCallback(hObject, eventdata, handles)
         % Display HELP and get out of callback
              if DisplayHelp(hObject, eventdata, handles) 
                  set(hObject,'State', 'off')
                  return 
-             end            
+             end 
+             
+             releasedToggleButton( hObject);
+             
              a=findall(gcf,'Type','hggroup');
              delete(a);        
      
     function helpToggleTool_OnCallback(hObject, eventdata, handles)
+        pressedToggleButton( hObject);
         % Make text boxes and other things that shouldn't be callbacked inactive
         set(handles.ROILevelEdit,'Enable', 'inactive');
         set(handles.BrushSize,'Enable', 'inactive');
@@ -1787,6 +1803,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         set(handles.FirstFrame,'Enable', 'inactive');
         set(handles.ColorBar, 'ButtonDownFcn', @(hObject,eventdata)imlook4d('ColorBar_Callback',hObject,eventdata,guidata(hObject)) ); 
     function helpToggleTool_OffCallback(hObject, eventdata, handles)
+        releasedToggleButton( hObject);
         % Set textboxes etc on, to allow normal work when help button is not pressed
         set(handles.ROILevelEdit,'Enable', 'on');
         set(handles.BrushSize,'Enable', 'on');
@@ -1812,6 +1829,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                  set(hObject,'State', 'off')
                  return 
              end
+             releasedToggleButton( hObject);
+             
              imlook4d_instances=findobj('Tag','imlook4d');
              buttonsSameNameAsPressed=findobj('Tag',get(hObject, 'Tag'));
              this_imlook4d_instance=get(get(hObject,'Parent'),'Parent');
@@ -1846,6 +1865,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                  set(hObject,'State', 'off')
                  return 
              end
+            pressedToggleButton( hObject);
             
              %imlook4d_instances=findobj('Tag','imlook4d');
              buttonsSameNameAsPressed=findobj('Tag',get(hObject, 'Tag'));
@@ -1898,6 +1918,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                  set(hObject,'State', 'off')
                  return 
              end
+             
+             pressedToggleButton( hObject);
+             
+             
              EOL = sprintf('\n');
                     
              handles.record.enabled = true;
@@ -1979,6 +2003,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                  set(hObject,'State', 'off')
                  return 
              end
+             releasedToggleButton( hObject);
+             
+            
              handles.record.enabled = false;
              guidata(handles.figure1, handles);
              
@@ -1995,7 +2022,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              end
              guidata(handles.figure1, handles);
        
-   function cdPushButton_ClickedCallback(hObject, eventdata, handles)            
+    function cdPushButton_ClickedCallback(hObject, eventdata, handles)            
              % Display HELP and get out of callback
              if DisplayHelp(hObject, eventdata, handles) 
                  %set(hObject,'State', 'off')
@@ -2016,12 +2043,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
              end
              
-   function markerToggleButtonOn_ClickedCallback(hObject, eventdata, handles)
+    function markerToggleButtonOn_ClickedCallback(hObject, eventdata, handles)
        % Display HELP and get out of callback
        if DisplayHelp(hObject, eventdata, handles)
            set(hObject,'State', 'off')
            return
        end
+       pressedToggleButton( hObject);
        yokes=getappdata( handles.figure1, 'yokes');
        for i=1:length(yokes)
            handles=guidata(yokes(i));
@@ -2035,12 +2063,15 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
            set(hFigure, 'PointerShapeCData', NaN( [16 16]) );
            iptSetPointerBehavior(hAxes, @(hFigure, currentPoint)set(hFigure, 'Pointer', 'custom'));
        end
-   function markerToggleButtonOff_ClickedCallback(hObject, eventdata, handles)
+    function markerToggleButtonOff_ClickedCallback(hObject, eventdata, handles)
        % Display HELP and get out of callback
        if DisplayHelp(hObject, eventdata, handles)
            set(hObject,'State', 'off')
            return
        end
+       
+       releasedToggleButton( hObject);
+       
        yokes=getappdata( handles.figure1, 'yokes');
        for i=1:length(yokes)
            handles=guidata(yokes(i));
@@ -2060,8 +2091,29 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
            %set(hFigure, 'PointerShapeCData', NaN( [16 16]) );
            %iptSetPointerBehavior(hAxes, @(hFigure, currentPoint)set(hFigure, 'Pointer', 'crosshair'));
        end
-       
-       
+    
+   % Shading of Pressed Toolbar Buttons
+       function pressedToggleButton( hObject)
+           if ismac
+               icon = hObject.CData;
+               hObject.UserData = icon; % Remember original icon
+               
+               % Determine background from NaN in first dimension (which is
+               % what Matlab seems to use for built in togglebuttons)
+               background(:,:,3) = isnan( icon(:,:,1) );
+               background(:,:,2) = isnan( icon(:,:,1) );
+               background(:,:,1) = isnan( icon(:,:,1) );
+               
+               newIcon = icon;
+               newIcon( background) = 0.8;
+               
+               hObject.CData = newIcon;
+           end
+       function releasedToggleButton( hObject)
+           if ismac
+               hObject.CData = hObject.UserData;  % Restore
+           end
+               
 
     % --------------------------------------------------------------------
     % SLIDERS
