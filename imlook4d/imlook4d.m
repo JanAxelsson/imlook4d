@@ -6900,6 +6900,7 @@ end
     % WORKSPACE 
     % --------------------------------------------------------------------            
     function WorkspaceMenu_Callback(hObject, eventdata, handles)   
+        
     function exportAsViewedToWorkspace_Callback(hObject, eventdata, handles)
         % This function exports data as viewed
 
@@ -7008,7 +7009,8 @@ end
         catch
             disp ('failed exporting imlook4d_frame');
         end;
-    function importFromWorkspace_Callback(hObject, eventdata, handles,varargin)
+  
+    function importUntouched_Callback(hObject, eventdata, handles,varargin)
         % Imports everything where and letting imlook4d-variables override
         % imlook4d_current_handles
         
@@ -7018,20 +7020,10 @@ end
              end
             
         %
-        % Import handles structure
+        % Import handles structure (Except Cdata)
         %
            handles=evalin('base', 'imlook4d_current_handles');
 
-        %
-        % Overwrite data in handles structure with defined variables in
-        % base workspace
-        % 
-        
-         try  
-             handles.image.Cdata=evalin('base', 'imlook4d_Cdata');
-         catch
-             disp('failed importing imlook4d_Cdata');
-         end;
          
          %disp('Import handles.image.time from imlook4d_time');
          try 
@@ -7107,32 +7099,16 @@ end
 
          adjustSliderRanges(handles);
          updateImage(hObject, eventdata, handles);  
-         a = whos('handles');disp([ 'Size = ' num2str( round( a.bytes/1e6 )) ' MB']);
-    function importUntouched_Callback(hObject, eventdata, handles,varargin)
+         a = whos('handles');disp([ 'Size = ' num2str( round( a.bytes/1e6 )) ' MB']);            
+    function importFromWorkspace_Callback(hObject, eventdata, handles,varargin)
+        % This function Imports data from workspace INCLUDING Cdata
         
-        % NOTE: This function is not used right now, anywhere, and it is questionable if it works 
+        importFromWorkspace_Callback_OLD(hObject, eventdata, handles,varargin);
         
-        % Imports everything, but corrects the import of imlook4d_Cdata
-        % 
-        %  importFromWorkspace_Callback  has imported imlook4d_Cdata 
-        %  but this function should not do that
-        %
-        %  Fix this by: handles.image.Cdata is restored to value of imlook4d_current_handles.image.Cdata
-        
-       % Display HELP and get out of callback
-             if DisplayHelp(hObject, eventdata, handles) 
-                 return 
-             end
-         
-        % Import everything except Cdata matrix     
-        importFromWorkspace_Callback(hObject, eventdata, handles,varargin)
-         
-        % Restore so that the imlook4d_current_handles.image.Cdata is
-        % stored instead  of imlook4d_Cdata
          try  
-             handles.image.Cdata=evalin('base', 'imlook4d_current_handles.image.Cdata');
+             handles.image.Cdata=evalin('base', 'imlook4d_Cdata');
          catch
-             disp('failed restoring imlook4d_current_handles.image.Cdata');
+             disp('failed importing imlook4d_Cdata');
          end;
 
         
@@ -7141,7 +7117,7 @@ end
          
          adjustSliderRanges(handles);
          updateImage(hObject, eventdata, handles);
-                
+
     % --------------------------------------------------------------------
     % 
     % SCRIPTS 

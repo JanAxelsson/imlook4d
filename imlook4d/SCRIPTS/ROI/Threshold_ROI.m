@@ -107,8 +107,9 @@
        
     % Import into imlook4d from Workspace
    % imlook4d('importFromWorkspace_Callback', imlook4d_current_handle,{},imlook4d_current_handles); % Import from workspace to current imlook4d instance
-    %ImportUntouched
-    Import % Adds ROI to handles in import function
+    ImportUntouched
+    %Import % Adds ROI to handles in import function
+
 
 
     
