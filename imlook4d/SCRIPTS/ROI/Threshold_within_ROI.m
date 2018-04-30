@@ -35,8 +35,8 @@ temp_variable_list=imlook4d_variables_before_script;
     
     % clean ROI - get a fresh start
     imlook4d_ROI(imlook4d_ROI==myActiveROI)=0;
-    %ImportUntouched
-    Import
+    ImportUntouched
+    %Import
     
     % Threshold ROI on myActiveROI (myActiveROI=roi number)
     try
@@ -62,8 +62,8 @@ temp_variable_list=imlook4d_variables_before_script;
     % Set new pixels
     imlook4d_ROI=oldROI+newROI;
  
-   % ImportUntouched
-    Import
+    ImportUntouched
+    %Import
     
         
     % Store Undo for ROI
@@ -72,7 +72,9 @@ temp_variable_list=imlook4d_variables_before_script;
     catch
         % Canceled or crashed
         imlook4d_ROI=oldROI;
-        Import;
+        ImportUntouched;
+        %Import;
+        
     end    
     
 imlook4d_variables_before_script=temp_variable_list;    
