@@ -1,0 +1,15 @@
+<h1>Interactive Help</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	You have pressed the Interactive Help button.  This means that the program has changed mode to show help on selected features.  
+	</P>
+
+	<P>
+	You may click on GUI components such as buttons, menues, etc, to get help on the selected feature.  
+	</P>
+        
+	<P>
+	To get back using the program again, click the Question mark button again.
+	</P>
+        

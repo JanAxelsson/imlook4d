@@ -1802,6 +1802,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         set(handles.PC_low_slider,'Enable', 'inactive');
         set(handles.FirstFrame,'Enable', 'inactive');
         set(handles.ColorBar, 'ButtonDownFcn', @(hObject,eventdata)imlook4d('ColorBar_Callback',hObject,eventdata,guidata(hObject)) ); 
+              if DisplayHelp(hObject, eventdata, handles) 
+                 return 
+             end
     function helpToggleTool_OffCallback(hObject, eventdata, handles)
         releasedToggleButton( hObject);
         % Set textboxes etc on, to allow normal work when help button is not pressed
@@ -3858,10 +3861,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                %Remember path
                     cd(path);
                     handles.image.folder = path;
+                    handles.image.file = file;
                     
                     newHandle = gcf;
                     newHandles = guidata(newHandle);
                     newHandles.image.folder = path;
+                    newHandles.image.file = file;
                     guidata(newHandle,newHandles);
 
 
@@ -7103,8 +7108,8 @@ end
     function importFromWorkspace_Callback(hObject, eventdata, handles,varargin)
         % This function Imports data from workspace INCLUDING Cdata
         
-        importFromWorkspace_Callback_OLD(hObject, eventdata, handles,varargin);
-        
+        importUntouched_Callback(hObject, eventdata, handles,varargin);
+                
          try  
              handles.image.Cdata=evalin('base', 'imlook4d_Cdata');
          catch
