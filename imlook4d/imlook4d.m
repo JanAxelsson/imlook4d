@@ -3861,10 +3861,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                %Remember path
                     cd(path);
                     handles.image.folder = path;
+                    handles.image.file = file;
                     
                     newHandle = gcf;
                     newHandles = guidata(newHandle);
                     newHandles.image.folder = path;
+                    newHandles.image.file = file;
                     guidata(newHandle,newHandles);
 
 
@@ -7106,8 +7108,8 @@ end
     function importFromWorkspace_Callback(hObject, eventdata, handles,varargin)
         % This function Imports data from workspace INCLUDING Cdata
         
-        importFromWorkspace_Callback_OLD(hObject, eventdata, handles,varargin);
-        
+        importUntouched_Callback(hObject, eventdata, handles,varargin);
+                
          try  
              handles.image.Cdata=evalin('base', 'imlook4d_Cdata');
          catch
