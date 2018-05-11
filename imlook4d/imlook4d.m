@@ -3115,7 +3115,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
          set(h,'WindowButtonUpFcn','imlook4d(''wbu'',gcbo,[],guidata(gcbo))');    
          
           % Record last mouse position for drawROI track interpolation
-         coordinates=get(gca,'currentpoint');
+         coordinates=get(gca,'currentpoint')
          
          x=round(coordinates(1,1) + 0.5);
          y=round(coordinates(1,2) + 0.5);
@@ -7015,7 +7015,7 @@ end
             disp ('failed exporting imlook4d_frame');
         end;
   
-    function importUntouched_Callback(hObject, eventdata, handles,varargin)
+    function handles = importUntouched_Callback(hObject, eventdata, handles,varargin)
         % Imports everything where and letting imlook4d-variables override
         % imlook4d_current_handles
         
@@ -7103,12 +7103,13 @@ end
          %axis(handles.axes1, 'auto'); % Needs to set handle to auto to fit strange matrix sizes (i.e. RDF data)
 
          adjustSliderRanges(handles);
-         updateImage(hObject, eventdata, handles);  
+         updateImage(hObject, eventdata, handles); 
+         guidata(hObject,handles); 
          a = whos('handles');disp([ 'Size = ' num2str( round( a.bytes/1e6 )) ' MB']);            
     function importFromWorkspace_Callback(hObject, eventdata, handles,varargin)
         % This function Imports data from workspace INCLUDING Cdata
         
-        importUntouched_Callback(hObject, eventdata, handles,varargin);
+        handles = importUntouched_Callback(hObject, eventdata, handles,varargin);
                 
          try  
              handles.image.Cdata=evalin('base', 'imlook4d_Cdata');
@@ -7319,6 +7320,8 @@ end
                 % Generate 2D image according to slice and frame defined in GUI 
                 % (REAL pixel coordinates)
                 [tempData, explainedFraction, fullEigenValues]=generateImage(handles,slice,frame);  
+                
+                handles.image.eigenValues = fullEigenValues;
 
                 % -------------------------------------------------
                 % Information texts
@@ -7601,7 +7604,7 @@ end
                     displayMessageRowImageInfo(hObject, eventdata, handles)
                     
                 % Draw ROIs
-                    %guidata(hObject,handles); %Save handles
+                    guidata(hObject,handles); %Save handles
                     updateROIs(handles)     
         	function [modelOutput, explainedFraction, fullEigenValues] = generateImage(handles, outputSliceRange, outputFrameRange)  
             % function generateImage

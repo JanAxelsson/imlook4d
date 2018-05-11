@@ -9,7 +9,7 @@
 % INITIALIZE
 %
     StoreVariables  % Remember variables
-    Export
+    ExportUntouched
     ROI_data_to_workspace;
     
 %
@@ -30,5 +30,5 @@
 %
 % Finalize
 % 
-Import
+ImportUntouched
 ClearVariables  % Clear remembered variables

@@ -25,7 +25,7 @@ StoreVariables
 
     % Export to workspace
     %imlook4d('exportToWorkspace_Callback', imlook4d_current_handle,{},imlook4d_current_handles);  % Export to workspace
-    Export
+    ExportUntouched
     activeROI=get(imlook4d_current_handles.ROINumberMenu,'Value');
     
 %

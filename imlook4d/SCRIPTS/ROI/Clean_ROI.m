@@ -44,7 +44,7 @@ imlook4d_ROI( bROIout ) = imlook4d_ROI_number;
 % Finalize
     %EndScript
     
-        Import % Adds ROI to handles in import function
+        ImportUntouched % Adds ROI to handles in import function
 
 
     
