@@ -12,17 +12,17 @@
 
 StartScript;
 
-    % ROI size
+    % ROI extra size
     R=5;
-    dx=R;
-    dy=R;
-    dz=0;
     
     % Find center of current ROI
     ROI_data_to_workspace;
-    x=imlook4d_ROI_data.centroid{imlook4d_slice,imlook4d_frame}.x;
-    y=imlook4d_ROI_data.centroid{imlook4d_slice,imlook4d_frame}.y;
-    z=imlook4d_ROI_data.centroid{imlook4d_slice,imlook4d_frame}.z;
+    
+    dx = round( 0.5 * imlook4d_ROI_data.dimension{imlook4d_ROI_number}.x +R);
+    dy = round( 0.5 * imlook4d_ROI_data.dimension{imlook4d_ROI_number}.y +R);
+    dz = round( 0.5 * imlook4d_ROI_data.dimension{imlook4d_ROI_number}.z +R);
+    
+    R2 = dx*dx + dy*dy + dz*dz; % For sphere equation
     
     % Add new ROI
     temp=get(imlook4d_current_handles.ROINumberMenu,'String');
@@ -34,8 +34,8 @@ StartScript;
     for i=-dx:dx
         for j=-dy:dy
             for k=-dz:dz
-                if ( imlook4d_ROI(x+i,y+j,z+k)~=imlook4d_ROI_number )
-                    imlook4d_ROI(x+i,y+j,z+k)=newROINumber;
+                if ( ( i*i/dx^2 +j*j/dy^2 +k*k/dz^2 ) <= 1 ) & ( imlook4d_ROI(x+i,y+j,z+k)~=imlook4d_ROI_number )
+                        imlook4d_ROI(x+i,y+j,z+k)=newROINumber;
                 end
             end
         end

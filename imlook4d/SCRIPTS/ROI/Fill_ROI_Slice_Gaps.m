@@ -13,7 +13,7 @@
 
 % Export to workspace
 StoreVariables
-Export
+ExportUntouched
 % TESTCODE (REMOVE LATER)
 % 
 % num = 6;
@@ -33,7 +33,7 @@ Export
     currentROI = imlook4d_ROI_number;
     newImlook4d_ROI = zeros( size(imlook4d_ROI));
 
-    % Determine slices with ROI pixeös
+    % Determine slices with ROI pixe?s
     slicesWithROIs = sum( reshape(imlook4d_ROI==currentROI,[ ], numberOfSlices ),1 )>0 
     sliceNumbersWithROIs = find(slicesWithROIs==1); 
     numberOfSlicesWithROIs = length(sliceNumbersWithROIs);
@@ -61,7 +61,7 @@ Export
 %
     %imlook4d_ROI = newImlook4d_ROI;
     imlook4d_ROI(newImlook4d_ROI == 1) = currentROI;
-    Import % Adds ROI to handles in import function
+    ImportUntouched % Adds ROI to handles in import function
 
 
     ClearVariables

@@ -1,0 +1,27 @@
+<h1>SPM coregister</h1>
+<HR></HR>
+<!------------------->
+	<P>
+		Coregisters the current file with a structural MRI scan, that the user selects from the pop-up file dialog.
+	</P>
+
+	<P> 
+        This mode requires SPM packages to be added to the path.
+	</P>
+
+	<P> 
+        The SPM package can be found at <a href="http://www.fil.ion.ucl.ac.uk/spm/software/download.html">http://www.fil.ion.ucl.ac.uk/spm/software/download.html </a>
+	</P>
+
+	<P> 
+        The coregistration reads a nifti MRI file and uses the spm coregistration function. If a realignment has been done before, the mean image from the realignment process
+        will be used in determining the coregistration parameters (assuming a prefix 'mean').  Otherwise a mean image is created.
+	</P>
+
+	<P> 
+        The dynamic scan is transformed to the MRI space, and reslicing is performed, so that a pixel in the MRI represents the same location as in the dynamic scan.
+	</P>
+        
+	<P> 
+        A coregistered image will be prefixed with 'r', following the SPM convention.  If a realignment has been performed prior to the coregistration, the prefix will be 'rr'.
+	</P>

@@ -1,0 +1,21 @@
+<h1>SPM align</h1>
+<HR></HR>
+<!------------------->
+	<P>
+		Aligns a dynamic scan to minimize motion artifacts
+	</P>
+
+	<P> 
+        This mode requires SPM packages to be added to the path.
+	</P>
+
+	<P> 
+        The SPM package can be found at <a href="http://www.fil.ion.ucl.ac.uk/spm/software/download.html">http://www.fil.ion.ucl.ac.uk/spm/software/download.html </a>
+	</P>
+
+	<P> 
+        The alignment reads a 4D nifti file and uses the spm spatial realignment functions. 
+	</P>
+
+	<P> 
+	</P>

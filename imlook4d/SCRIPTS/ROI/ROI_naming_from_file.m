@@ -13,7 +13,7 @@
 
 % Start a script and record variables
 StoreVariables
-Export; 
+ExportUntouched; 
 
 % Data fields that can be modified in your own code:
 % --------------------------------------------------
@@ -66,7 +66,7 @@ end
 % --------------------------------------------------
 
 % Import your changes into new instance and clean up your variables
-Import; 
+ImportUntouched; 
 %ClearVariables
 cd(oldFolder)
 

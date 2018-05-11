@@ -9,7 +9,7 @@
     %  selected
     disp('SCRIPTS/ScreePlot.m entered');
 
-    ScreePlotEigenValues=imlook4d_current_handles.image.eigenValues    % Fetch normalized eigenvalues (which are updated for each time imlook4d image is updated)
+    ScreePlotEigenValues=imlook4d_current_handles.image.eigenValues/ sum(imlook4d_current_handles.image.eigenValues');   % Fetch normalized eigenvalues (which are updated for each time imlook4d image is updated)
 
 
 % PLOT Scree plot
@@ -20,7 +20,7 @@
     plot(repmat(1,1,size(ScreePlotEigenValues,1))) ; % Plot line representing normalized eigenvalue=1
  
     xlabel('Principal component number')
-    ylabel('Normalized eigenvalue')
+    ylabel('Proportion of variance explained (Normalized eigenvalue)')
     title('Scree plot')  
     
 

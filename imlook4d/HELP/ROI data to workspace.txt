@@ -14,7 +14,17 @@
 		<TABLE>
 			<TR>
 			<TD> <B> imlook4d_ROI_data.names &nbsp;</B></TD>
-			<TD> A cell matrix [ROI] with names for each ROI </TD>
+			<TD> A cell struct [ROI] with names for each ROI </TD>
+			</TR>
+
+			<TR>
+			<TD> <B> imlook4d_ROI_data.centroid</B></TD>
+			<TD>  A cell struct with ROI centroid for x,y,z</TD>
+			</TR>
+
+			<TR>
+			<TD> <B> imlook4d_ROI_data.dimension</B></TD>
+			<TD>  A cell struct with ROI width (in pixels) for x,y,z</TD>
 			</TR>
 
 			<TR>
@@ -37,6 +47,7 @@
 			<TD>  A 2D matrix [ROI, frame] with minimum pixel value for each frame and ROI</TD>
 			</TR>
 
+
 			<TR>
 			<TD> <B> imlook4d_ROI_data.skewness</B> (requires statistical toolbox)</TD>
 			<TD>  A 2D matrix [ROI, frame] with skewness value calculated for pixels in each frame and ROI</TD>
@@ -53,7 +64,7 @@
 			</TR>
 
 			<TR>
-			<TD> <B> imlook4d_ROI_data.uniformity</B></TD>
+			<TD> <B> imlook4d_ROI_data.entropy</B></TD>
 			<TD>  A 2D matrix [ROI, frame] with the entropy value calculated for pixels in each frame and ROI</TD>
 			</TR>
 			
