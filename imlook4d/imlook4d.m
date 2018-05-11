@@ -8553,6 +8553,8 @@ end
                            
                            % Create and display html file
                                 webhandle=displayHTML(pathstr1, title, text,footer,developersText);  % Display html, adding footer and developers reference
+                                % Action on Web-window close button 
+                                set(webhandle, 'AncestorRemovedCallback', @closeWebRequest);  % OK
 
                            % Store handle to web browser
 
