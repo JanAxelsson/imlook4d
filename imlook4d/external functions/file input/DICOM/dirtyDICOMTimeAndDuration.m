@@ -63,7 +63,11 @@
                 %indecesToTime{i}.high=out.indexHigh;
                 time(slice,i)=str2num(out.string)/1000; 
             end
-        end        
+        end
+        
+        % Calculate times relative first frame, first slice
+        time = time - time(1,1);
+        
         
         DICOMStruct.time2D=time;
         DICOMStruct.time=time(1,1:numberOfFrames);
