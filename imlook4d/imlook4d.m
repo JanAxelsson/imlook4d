@@ -7577,7 +7577,7 @@ end
                 %
 
                     imAlphaData1 = 1;   % bottom-layer
-                    imAlphaData2 = 0.5; % overlay-layer
+                    imAlphaData2 = 0.8; % overlay-layer (background image in imlook4d vocabulary)
                     imAlphaDataROI =0.5;% roi-layer
 
                     % First image

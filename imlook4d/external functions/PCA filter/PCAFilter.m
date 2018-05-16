@@ -58,7 +58,7 @@ function [Data, explainedFraction, fullEigenValues, fullEigenVectors, PCMatrix]=
 
 %tic
 
-
+disp('PCA-filter');
     %
     %  Initialize
     %
