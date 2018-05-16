@@ -1,0 +1,16 @@
+<h1>Measure Tool </h1>
+<HR></HR>
+<!------------------->
+	<P>
+	This tools measures lengths.  It is activated by pressing the measure button, and you click the start and end position.
+The length is displayed in the image format's unit, which often is in millimeters.  The line representing the measurement is shown in the image.
+	</P>
+
+	<P>
+The measured data is shown at the bottom of the imlook4d window, and also in the Matlab workspace.
+	</P>
+	
+	<P>
+The line may be removed by Shift-clicking, or Right-clicking on the line.
+	</P>
+	
