@@ -2067,34 +2067,68 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
            iptSetPointerBehavior(hAxes, @(hFigure, currentPoint)set(hFigure, 'Pointer', 'custom'));
        end
     function markerToggleButtonOff_ClickedCallback(hObject, eventdata, handles)
-       % Display HELP and get out of callback
-       if DisplayHelp(hObject, eventdata, handles)
-           set(hObject,'State', 'off')
-           return
-       end
-       
-       releasedToggleButton( hObject);
-       
-       yokes=getappdata( handles.figure1, 'yokes');
-       for i=1:length(yokes)
-           handles=guidata(yokes(i));
-           set(handles.ImgObject4,'Visible','off');
-           set(handles.markerToggleTool,'State', 'off');
-           
-           % Clear the marker when turning off markerToggleButton
-           set( handles.ImgObject4, 'CData', zeros( size( get(handles.ImgObject4,'CData')) ));
-           set( handles.ImgObject4, 'AlphaData', zeros( size( get(handles.ImgObject4,'AlphaData')) ));
-           guidata(handles.figure1, handles);
-           
-           
-           % Have the pointer change to cross-hair when the mouse enters an axes object:
-           hFigure = yokes(i);
-           hAxes =  handles.axes1;
-           iptPointerManager(hFigure, 'disable');
-           %set(hFigure, 'PointerShapeCData', NaN( [16 16]) );
-           %iptSetPointerBehavior(hAxes, @(hFigure, currentPoint)set(hFigure, 'Pointer', 'crosshair'));
-       end
-    
+            % Display HELP and get out of callback
+            if DisplayHelp(hObject, eventdata, handles)
+                set(hObject,'State', 'off')
+                return
+            end
+            
+            releasedToggleButton( hObject);
+            
+            yokes=getappdata( handles.figure1, 'yokes');
+            for i=1:length(yokes)
+                handles=guidata(yokes(i));
+                set(handles.ImgObject4,'Visible','off');
+                set(handles.markerToggleTool,'State', 'off');
+                
+                % Clear the marker when turning off markerToggleButton
+                set( handles.ImgObject4, 'CData', zeros( size( get(handles.ImgObject4,'CData')) ));
+                set( handles.ImgObject4, 'AlphaData', zeros( size( get(handles.ImgObject4,'AlphaData')) ));
+                guidata(handles.figure1, handles);
+                
+                
+                % Have the pointer change to cross-hair when the mouse enters an axes object:
+                hFigure = yokes(i);
+                hAxes =  handles.axes1;
+                iptPointerManager(hFigure, 'disable');
+                %set(hFigure, 'PointerShapeCData', NaN( [16 16]) );
+                %iptSetPointerBehavior(hAxes, @(hFigure, currentPoint)set(hFigure, 'Pointer', 'crosshair'));
+            end
+            
+    function measureTapeToggleButton_ClickedCallback(hObject, eventdata, handles)
+                % Display HELP and get out of callback
+                if DisplayHelp(hObject, eventdata, handles)
+                    %set(hObject,'State', 'off')
+                    return
+                end
+                
+                pressedToggleButton( hObject);
+                [x,y]= ginput(2);
+                
+                
+                % side in mm
+                dx = x(2) - x(1);
+                dy = y(2) - y(1);
+                length  = sqrt( dx^2 + dy^2 ); % length in mm
+                
+                % side in pixels
+                try
+                    px = dx * handles.image.pixelSizeX;
+                    py = dy * handles.image.pixelSizeY;
+                catch
+                    px = dx;
+                    py = dy;
+                end
+                pixels = sqrt( px^2 + py^2 ); % length in pixels
+                
+                msg = [ 'Length = ' num2str( length) ' mm    (' num2str( pixels) ' pixels long)'];
+                disp( msg);
+                displayMessageRow(msg)
+                
+                line( x,y,'ButtonDownFcn','delete(gcbo)');
+                
+                releasedToggleButton( hObject);
+                
    % Shading of Pressed Toolbar Buttons
        function pressedToggleButton( hObject)
            if ismac
@@ -8421,6 +8455,9 @@ end
                             helpFilePath=[get(hObject,'Tag') '.txt' ];
 
                        end
+                       
+                       intendedhelpFilePath = helpFilePath;
+                       
                        %disp(['Help file path=' helpFilePath]); 
 
                        % Read text and footer
@@ -8479,6 +8516,15 @@ end
                                     '<B>Help file=</B>',...
                                      ['<a href="matlab:edit ''' helpFilePath '''">'   helpFilePath '</a>']) ...
                                      ];  
+                               
+                                 
+                                [basepath,name,ext] = fileparts(which('A.txt'));
+                                developersText=[ developersText  parseHTMLTableRow(  ...
+                                    '<B>Intended help file=</B>',...
+                                     ['<a href="matlab:edit ''' [ basepath filesep intendedhelpFilePath ] '''">'  intendedhelpFilePath  '</a>']) ...
+                                     ];    
+                                 
+                                 
                             % Object tag
                                developersText=[ developersText  parseHTMLTableRow(  ...
                                     '<B>Object tag=</B>',...
@@ -8553,6 +8599,8 @@ end
                            
                            % Create and display html file
                                 webhandle=displayHTML(pathstr1, title, text,footer,developersText);  % Display html, adding footer and developers reference
+                                % Action on Web-window close button 
+                                set(webhandle, 'AncestorRemovedCallback', @closeWebRequest);  % OK
 
                            % Store handle to web browser
 
