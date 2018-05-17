@@ -2125,7 +2125,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 disp( msg);
                 displayMessageRow(msg)
                 
-                line( x,y,'ButtonDownFcn','delete(gcbo)');
+                line( x,y,'ButtonDownFcn','delete(gcbo)','LineWidth',3);
                 
                 releasedToggleButton( hObject);
                 
