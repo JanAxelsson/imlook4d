@@ -33,9 +33,14 @@ Pre-release version 5 (recommended):
 **Install:**
 
 Install by saving and unzipping. Then in Matlab, press "Path" button, and "Add
-with subfolders" to mark the unzipped folder.
+with subfolders" to let Matlab recognize imlook4d.
 
-Older versions: version 4
+**Run:**
+
+Type `imlook4d` in Matlab window, and select a file to open
+
+**Older versions:**  
+version 4
 
 Features
 --------
