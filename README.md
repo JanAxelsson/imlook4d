@@ -30,7 +30,9 @@ Pre-release version 5 (recommended):
 [imlook4d version
 5.0.0-rc18](https://drive.google.com/uc?export=download&id=12uG7-vkIFHpvWtMohuo3O-oszpjFGL98)
 
-**Install: **
+ 
+
+**Install:**
 
 Install by saving and unzipping. Then in Matlab, press "Path" button, and "Add
 with subfolders" to mark the unzipped folder.
@@ -62,10 +64,15 @@ Some features of imlook4d:
 
 -   Interactive help, click on the GUI or menu, and a detailed help opens
 
-**Requirements: **Windows, Linux or MacOS, and Matlab with no extra toolboxes
+ 
+
+**Requirements:**  Windows, Linux or MacOS, and Matlab with no extra toolboxes
 
 Integrating with SPM and ImageJ:
 --------------------------------
 
-Experimental Image registration using SPM (additional download) ImageJ
-(additional download: Fiji version or ImageJ version)
+Experimental Image registration using SPM ([SPM home
+page](http://www.fil.ion.ucl.ac.uk/spm/))
+
+ImageJ (additional download: [Fiji version](https://fiji.sc/) or [ImageJ
+version](https://imagej.nih.gov/ij/download.html))
