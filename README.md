@@ -30,8 +30,6 @@ Pre-release version 5 (recommended):
 [imlook4d version
 5.0.0-rc18](https://drive.google.com/uc?export=download&id=12uG7-vkIFHpvWtMohuo3O-oszpjFGL98)
 
- 
-
 **Install:**
 
 Install by saving and unzipping. Then in Matlab, press "Path" button, and "Add
@@ -46,25 +44,19 @@ The program is developed in Matlab
 
 Some features of imlook4d:
 
--   Full 4D VOI analysis, using brush tool (easier than polygons), thresholded
-    brushing.
-
--   Load and Save VOI definitions.
+-   Full 4D VOI analysis, using brush tool (easier than polygons), and
+    thresholded brushing.
 
 -   DICOM, Nifti, Analyze, ECAT (very fast compared to Matlabs routines), and
     reads binary, interfile and some other formats
 
--   Export/Import to Matlab workspace, for full data manipulation for
-    researchers
+-   Export/Import to Matlab, gives full access to data in Matlab workspace
 
--   Drop-in SCRIPTS (Matlab language) that makes it easy to add matlab code to
-    imlook4d menues
+-   Drop-in SCRIPTS  makes it easy to add matlab code to imlook4d menues
 
 -   Some 30 useful scripts for Matrix and ROI manipulations
 
 -   Interactive help, click on the GUI or menu, and a detailed help opens
-
- 
 
 **Requirements:**  Windows, Linux or MacOS, and Matlab with no extra toolboxes
 
