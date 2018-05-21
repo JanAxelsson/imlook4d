@@ -15,14 +15,14 @@ here](mailto:axelsson.jan@gmail.com).
 
 ![](Imlook4d_PET_MRI_screenshot.png)
 
-*imlook4d screen shot Figure: imlook4d PET/MRI with applied temporal Hotelling
-filter*
+*Figure: imlook4d PET/MRI with applied temporal Hotelling filter*
 
 Install
 -------
 
-Register here. Not required, but I would enjoy knowing who used the software. No
-spam.
+[Register
+here](https://docs.google.com/forms/viewform?hl=sv&id=1r-sMEdU94hLp7M_old8AhXE10FLTS6ARFFVNNRJUo8k).
+Not required, but I would enjoy knowing who used the software. No spam.
 
 **Download:**
 
