@@ -66,11 +66,13 @@ Some features of imlook4d:
 
 **Requirements:**  Windows, Linux or MacOS, and Matlab with no extra toolboxes
 
-Integrating with SPM and ImageJ:
---------------------------------
+Advanced user
+-------------
 
-Experimental Image registration using SPM ([SPM home
-page](http://www.fil.ion.ucl.ac.uk/spm/))
+Most users will not miss these features.  Some experimental SPM-based scripts,
+and export/import to ImageJ requires the following downloads:
 
-ImageJ (additional download: [Fiji version](https://fiji.sc/) or [ImageJ
-version](https://imagej.nih.gov/ij/download.html))
+-   [SPM home page](http://www.fil.ion.ucl.ac.uk/spm/)
+
+-   ImageJ: [Fiji version](https://fiji.sc/) or [ImageJ
+    version](https://imagej.nih.gov/ij/download.html)
