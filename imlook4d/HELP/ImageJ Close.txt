@@ -1,0 +1,26 @@
+<h1>ImageJ Close</h1>
+<HR></HR>
+
+<!------------------->
+
+
+<h2>Use</h2>
+
+	<P>
+		Closes ImageJ that was started from imlook4d.
+	</P>
+	<P>
+		This may solve memory errors from previous ImageJ sessions.
+	</P>
+
+
+<!-------------------------------------->
+
+<h2>Acknowledgement</h2>
+
+	<P>
+		<B>MIJ</B> by Daniel Sage, is used for interfacing imlook4d with ImageJ.  
+					See website (<A HREF="http://bigwww.epfl.ch/sage/soft/mij/"> http://bigwww.epfl.ch/sage/soft/mij/ </A>).  The conditions to use this plugin is found on the website.
+					This means that if you use the ImageJ scrips and publish results, you need to include a citation to MIJ
+
+    </P>
