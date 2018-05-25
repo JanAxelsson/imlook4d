@@ -8467,7 +8467,7 @@ end
                             [pathstr,name,ext] = fileparts(helpFilePath);
                             name1=strrep(name,' ','_');
                             name=strrep(name,'_',' ');
-                            helpFilePath=[ pathstr filesep name ext];
+                            %helpFilePath=[ pathstr filesep name ext];
                             text =  fileread(helpFilePath);
                        catch
                            % Read from parent object instead (useful for
