@@ -4479,12 +4479,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                         try
                             disp('DICOM header did not work');
-                            [time, duration]=timeFromDICOMInput(header);
+                            [time, myDuration]=timeFromDICOMInput(header);
                             h=imlook4d(Data, time, duration);
                         catch
                             try 
                                 disp('Try ECAT header');
-                                [time, duration]=timeFromECATInput(subHeader);
+                                [time, myDuration]=timeFromECATInput(subHeader);
                                 h=imlook4d(Data, time, duration);
 
                             catch
