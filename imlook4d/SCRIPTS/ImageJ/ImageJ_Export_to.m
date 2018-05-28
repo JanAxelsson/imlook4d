@@ -7,7 +7,8 @@
 %           1) Copy ij.jar (from ImageJ) and mij.jar (from MIJ) to directory:  imlook4d\external functions\ImageJ
 %           2) Increase java heap memory to 1 GB (Matlab menu > File > Preferences > General >  Java Heap Memory )
 %
-% See https://imagej.net/MATLAB_Scripting
+% See MIJ scripting:  https://imagej.net/MATLAB_Scripting
+%     MIJ API      :  http://bigwww.epfl.ch/sage/soft/mij/doc/index.html
 
 
     % Store variables (so we can clear all variables created in this script)
