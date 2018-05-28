@@ -1,5 +1,5 @@
-[imlook4d](https://sites.google.com/site/imlook4d)
-==================================================
+imlook4d
+========
 
 Introduction
 ------------
@@ -17,8 +17,12 @@ integrated menu in imlook4d)
 Install
 -------
 
-See the imlook4d web site
+Easy method:  Download from the imlook4d web site
 ([https://sites.google.com/site/imlook4d](https://sites.google.com/site/imlook4d))
+
+ 
+
+Advanced user:  Clone this repository
 
  
 
@@ -41,14 +45,8 @@ Some features of imlook4d:
 
 -   Some 30 useful scripts for Matrix and ROI manipulations
 
+-   Support for ImageJ and SPM
+
 -   Interactive help, click on the GUI or menu, and a detailed help opens
 
 **Requirements:** Windows, Linux or MacOS, and Matlab with no extra toolboxes
-
-Advanced user
--------------
-
-Most users will not miss these features. Some experimental SPM-based scripts,
-and export/import to ImageJ requires the following downloads:
-
--   [SPM home page](http://www.fil.ion.ucl.ac.uk/spm/)
