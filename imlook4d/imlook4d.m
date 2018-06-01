@@ -6099,7 +6099,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             % Dialog option
                % [file,path] = uigetfile('*.mat;*.roi','ROI Open file name');
                 [file,path] = uigetfile( ...
-                            {'*.mat;*.roi','imlook4d ROI'; ...
+                            { '*.roi;*.nii;*.nii.gz', 'ROI file' ; ...
+                            '*.mat;*.roi','imlook4d ROI'; ...
                              '*.nii', 'ROI from Nifti';   ...
                             '*.nii.gz','Nifti Files (*.nii.gz)'} ...
                            ,'ROI Open file name');
@@ -6141,7 +6142,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             end         
             
             if strcmp(ext,'.nii')
-                nii = load_nii(fullPath);
+                %nii = load_nii(fullPath);
+                nii = load_untouch_nii(fullPath);
+                
                 rois= nii.img;
                 roiSize = size(rois);
                 
