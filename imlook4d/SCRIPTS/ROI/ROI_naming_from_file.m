@@ -36,6 +36,11 @@ switch file
         OLDCOLUMN = 1;
         NEWCOLUMN = 2;
         
+    case 'Neuromorphometrics.txt'
+        newNames = loadtable( which('Neuromorphometrics.txt') );
+        OLDCOLUMN = 1;
+        NEWCOLUMN = 2;
+        
     otherwise
         error('No valid ROI name lookup-table found');
         return
