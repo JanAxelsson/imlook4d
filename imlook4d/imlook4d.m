@@ -6147,7 +6147,20 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             
             if strcmp(ext,'.nii')
                 %nii = load_nii(fullPath);
-                nii = load_untouch_nii(fullPath);
+                %nii = load_untouch_nii(fullPath);
+                
+                   
+                try
+                        nii = load_nii(fullPath);
+                        openingMode='load_nii';
+                catch
+                        %  Load NIFTI or ANALYZE dataset, but not applying any appropriate affine
+                        %  geometric transform or voxel intensity scaling.
+                        %warndlg({'WARNING - load_nii failed.',  'Trying load_untouch_nii.',  'The data will not go through geometrical transforms'}); 
+                        nii = load_untouch_nii(fullPath)
+                        openingMode='load_untouch_nii';                        
+                end
+                
                 
                 rois= nii.img;
                 roiSize = size(rois);
