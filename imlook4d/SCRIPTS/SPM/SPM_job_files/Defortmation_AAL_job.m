@@ -6,7 +6,7 @@
 %matlabbatch{1}.spm.util.defs.comp{1}.def = {'/Users/tosu01/temp/V12_2017-FEB-13_2017-FEB-13_313854/CT_Skalle_helical_183853_serie9_null_null/iy_sV12-0009-00001-000001.nii'};
 %matlabbatch{1}.spm.util.defs.out{1}.pull.fnames = {which('atlas/AAL2.nii')};
 matlabbatch{1}.spm.util.defs.out{1}.pull.savedir.savepwd = 1;
-matlabbatch{1}.spm.util.defs.out{1}.pull.interp = 0;
+matlabbatch{1}.spm.util.defs.out{1}.pull.interp = 0; % Nearest Neighbor interpolation
 matlabbatch{1}.spm.util.defs.out{1}.pull.mask = 1;
 matlabbatch{1}.spm.util.defs.out{1}.pull.fwhm = [0 0 0];
 matlabbatch{1}.spm.util.defs.out{1}.pull.prefix = 'native_';

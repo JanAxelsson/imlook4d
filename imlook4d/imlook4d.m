@@ -6093,7 +6093,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             % Make axial     
                 handles = resetOrientation(handles);
                 
-            % GUI input
+            % GUI input            
+            if nargin==4
+                file = fullPath;
+            end
+            
             
             if nargin==3
             % Dialog option

@@ -1,37 +1,29 @@
-% YOUR SCRIPT NAME HERE
-% ---------------------
-% This is a template for an imlook4d script that runs your code and puts the results into a new imlook4d window.
-% For documentation:  a) imlook4d menu "/HELP/Help",   or 
-%                     b) type in matlab:   open('Scripting-imlook4d.pdf')  
-%
-% 1) Edit your own code, and save it in the folder USER_SCRIPTS 
-%    (File naming: use "_" instead of space, and only alpha-numeric characters. File name must start with a character)
-%    (Example file name: "My_First_Script.m", which will be visible in menu "/SCRIPTS/USER/My First Script")
-%
-% 2) Open a new imlook4d and the code can be executed on your own data from
-%    the menu /SCRIPTS/USER
+function ROI_naming_from_file( filePath)
+
+% ROI_naming_from_file
+% filePath is the name of the ROI LUT, which is a txt file
+% example: ROI_naming_from_file( 'AAL2.txt')
 
 % Start a script and record variables
 StoreVariables
+imlook4d_current_handle=evalin('base', 'imlook4d_current_handle');
+imlook4d_current_handles=evalin('base', 'imlook4d_current_handles');
 ExportUntouched; 
+imlook4d_ROINames = evalin('base', 'imlook4d_ROINames');
 
-% Data fields that can be modified in your own code:
-% --------------------------------------------------
-% imlook4d_Cdata      - 3D, or 4D data matrix with indeces to (x, y, z, time) coordinates
-% imlook4d_ROI        - 3D ROI matrix (pixels from ROI 1 has value 1, ROI2 value 2, ...)
-% imlook4d_slice      - current slice number
-% imlook4d_frame      - current frame number
-% imlook4d_ROI_number - current ROI number
-% imlook4d_ROINames   - cell with ROI names
 
-% --------------------------------------------------
-% START OWN CODE:
-% --------------------------------------------------
 
 oldFolder = cd();
-folder = fileparts(which('FreeSurferColorLUT.txt') );  % Identify folder by known file
+folder = fileparts(which('FreeSurferColorLUT.txt') );  % Identify folder by file that I know exists
 cd(folder);
-[file,path] = uigetfile('*.txt','Select a lookup file with number in left column and names in second column');
+
+if nargin==1
+    [pathstr,name,ext] = fileparts(filePath);
+    file = [name ext];  
+end
+if nargin==0
+    [file,path] = uigetfile('*.txt','Select a lookup file with number in left column and names in second column');
+end
 
 switch file
     case 'AAL2.txt'
@@ -66,6 +58,7 @@ end
 % --------------------------------------------------
 
 % Import your changes into new instance and clean up your variables
+assignin('base', 'imlook4d_ROINames', imlook4d_ROINames);
 ImportUntouched; 
 %ClearVariables
 cd(oldFolder)
