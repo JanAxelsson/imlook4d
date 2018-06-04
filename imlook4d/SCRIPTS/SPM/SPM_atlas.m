@@ -1,6 +1,7 @@
 StoreVariables
 
 atlasFileName = 'AAL2.nii';
+atlasFileName = 'labels_Neuromorphometrics.nii'
 atlasLUT = 'AAL2.txt';
 
 %% Segment
@@ -33,4 +34,5 @@ LoadROI( outRoiFile );
 ROI_naming_from_file( atlasLUT)
 
 %% Clear 
+clear matlabbatch;
 ClearVariables;
