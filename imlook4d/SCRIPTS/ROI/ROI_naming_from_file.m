@@ -36,8 +36,8 @@ switch file
         OLDCOLUMN = 1;
         NEWCOLUMN = 2;
         
-    case 'Neuromorphometrics.txt'
-        newNames = loadtable( which('Neuromorphometrics.txt') );
+    case 'labels_Neuromorphometrics.txt'
+        newNames = loadtable( which('labels_Neuromorphometrics.txt') );
         OLDCOLUMN = 1;
         NEWCOLUMN = 2;
         

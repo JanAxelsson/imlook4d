@@ -11,6 +11,7 @@
 % NOTE: Realingment must be performed before!
 
 StoreVariables;
+aliveChecker = imlook4d_alive('spm'); % Print '.' while 'spm' in call stack (meaning that it is running). Stop-command: delete(aliveChecker)
 Export;
 
 % From image 
@@ -122,6 +123,8 @@ imlook4d(newPath);
 % END OF OWN CODE
 % --------------------------------------------------
 
-    % Clean up  variables created in this script
-    ClearVariables
+% Clean up  variables created in this script
+clear matlabbatch;
+delete(aliveChecker); 
+ClearVariables
 

@@ -1,11 +1,15 @@
 StoreVariables
+tic
+
+aliveChecker = imlook4d_alive('spm'); % Print '.' while 'spm' in call stack (meaning that it is running). Stop-command: delete(aliveChecker)
 
 atlasFileName = 'AAL2.nii';
 atlasFileName = 'labels_Neuromorphometrics.nii'
 atlasLUT = 'AAL2.txt';
+atlasLUT = 'labels_Neuromorphometrics.txt';
 
 %% Segment
-disp('This will take a couple of minutes!')
+disp('This will take a number of minutes!')
 file = [imlook4d_current_handles.image.folder imlook4d_current_handles.image.file];
 [folder,name,ext] = fileparts(file);
 
@@ -15,7 +19,7 @@ matlabbatch{1}.spm.spatial.preproc.warp.fwhm = 5; % Smoothing FWHM (about 5 for 
 
 spm_jobman('run',matlabbatch);
 
-%% AAL2 atlas to original space
+%% Atlas to original space
 fileInAtlasSpace = [ folder filesep 'iy_' name ext]; 
 atlasFile = which( atlasFileName );
 
@@ -33,6 +37,13 @@ LoadROI( outRoiFile );
 %% Load ROI-names
 ROI_naming_from_file( atlasLUT)
 
+%% Copy LUT to same folder as ROI-file
+prefix = matlabbatch{1}.spm.util.defs.out{1}.pull.prefix; % = 'native_' from Defortmation_AAL_job;
+newFile = [ prefix atlasLUT ];
+copyfile( which(atlasLUT), [ folder filesep newFile ] );
+
 %% Clear 
 clear matlabbatch;
+delete(aliveChecker); 
+toc
 ClearVariables;
