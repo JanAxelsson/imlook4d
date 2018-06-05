@@ -586,17 +586,28 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                          [files2 dirs2]=listDirectory([pathstr1 filesep 'SCRIPTS' filesep dirs{i}]);
                          addpath([pathstr1 filesep 'SCRIPTS' filesep dirs{i}]);      % Add folder to path (in case you made a new one) 
                          
+                         % Sort order from file (defines order in submenu)
+                         sortIndexPath = [pathstr1 filesep 'SCRIPTS' filesep dirs{i} filesep '.sort.txt'];
+                         if exist(sortIndexPath, 'file')
+                             fileID = fopen(sortIndexPath,'r');
+                             formatSpec = '%s';
+                             all = textscan(fileID,formatSpec);
+                             files2 = all{1};
+                         end
+                         
+                         
+                         lineOnOff = 'off';
                          for j=1:length(files2)
-                            
                             [pathstr,name,ext] = fileparts(files2{j});
+                                                        
+                            % Make line
+                            if startsWith( name, '---')
+                                lineOnOff = 'on';
+                            end
+                            
+                            % Make submenu item
                             if strcmp(ext,'.m')
                                 nameWithSpaces= regexprep(name,'_', ' ');  % Replace '_' with ' '
-                                
-                                %handles.scriptsMenuSubItemHandle(j) = uimenu(handles.scriptsMenuSubHandle,'Label',nameWithSpaces, 'Callback', ['eval(''' name ''') ']); 
-                                
-                                % EXAMPLE how to callback two functions
-                                %handles.scriptsMenuSubItemHandle(j) = uimenu(handles.scriptsMenuSubHandle,'Label',nameWithSpaces, 'Callback', ['disp(''HEJ'');' 'eval(''' name ''') ']); 
-                                %disp(['eval(''' name ''') ']);
 
                                 % Advanced callback to allow help files for
                                 % scripts
@@ -605,8 +616,11 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                                     'if imlook4d(''DisplayHelp'',gcbo,[],guidata(gcbo));return;end;' ...
                                     'eval(''' name ''') ' ...
                                     ]); 
-
+                                
+                                handles.scriptsMenuSubItemHandle(j).Separator= lineOnOff;
+                                lineOnOff = 'off';
                             end
+
                          end
 
                     end

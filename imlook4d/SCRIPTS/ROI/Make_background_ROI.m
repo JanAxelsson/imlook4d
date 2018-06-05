@@ -22,6 +22,10 @@ StartScript;
     dy = round( 0.5 * imlook4d_ROI_data.dimension{imlook4d_ROI_number}.y +R);
     dz = round( 0.5 * imlook4d_ROI_data.dimension{imlook4d_ROI_number}.z +R);
     
+    x = round( imlook4d_ROI_data.centroid{imlook4d_ROI_number}.x);
+    y = round( imlook4d_ROI_data.centroid{imlook4d_ROI_number}.y);
+    z = round( imlook4d_ROI_data.centroid{imlook4d_ROI_number}.z);
+    
     R2 = dx*dx + dy*dy + dz*dz; % For sphere equation
     
     % Add new ROI
