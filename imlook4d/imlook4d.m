@@ -3934,6 +3934,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              % Set colorscale
                     imlook4d_set_colorscale_from_modality(gcf, {}, guidata(gcf));
                     imlook4d_set_ROIColor(gcf, {}, guidata(gcf));
+             % Print file path
+             dispOpenWithImlook4d( [path filesep file] );
             function LocalOpenMGH(hObject, eventdata, handles, file,path)  
                 % Test if Freesurfer files exist
                     if strcmp('', which('MRIread'))
