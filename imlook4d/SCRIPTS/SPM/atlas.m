@@ -3,10 +3,17 @@ tic
 
 aliveChecker = imlook4d_alive('spm'); % Print '.' while 'spm' in call stack (meaning that it is running). Stop-command: delete(aliveChecker)
 
-atlasFileName = 'AAL2.nii';
-atlasFileName = 'labels_Neuromorphometrics.nii'
-atlasLUT = 'AAL2.txt';
-atlasLUT = 'labels_Neuromorphometrics.txt';
+if ~exist('atlasFileName')
+    % Defaults
+    atlasFileName = 'labels_Neuromorphometrics.nii'
+    atlasLUT = 'labels_Neuromorphometrics.txt';
+end
+    
+% atlasFileName = 'AAL2.nii';
+% atlasLUT = 'AAL2.txt';
+% 
+% atlasFileName = 'labels_Neuromorphometrics.nii'
+% atlasLUT = 'labels_Neuromorphometrics.txt';
 
 %% Segment
 disp('This will take a number of minutes!')
@@ -44,6 +51,7 @@ copyfile( which(atlasLUT), [ folder filesep newFile ] );
 
 %% Clear 
 clear matlabbatch;
+stop(aliveChecker);
 delete(aliveChecker); 
 toc
 ClearVariables;

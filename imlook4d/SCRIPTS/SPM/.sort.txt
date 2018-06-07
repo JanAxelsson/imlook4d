@@ -1,6 +1,7 @@
 align.m
 coregister_to.m
 ---
+select_atlas.m
 atlas.m
 atlas_GM.m
 ---
