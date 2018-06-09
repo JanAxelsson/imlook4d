@@ -3005,7 +3005,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         %
         % Rotate and flip to selected
         %
-            disp(['2) newNumericOrientation = ' num2str(newNumericOrientation)]);
+            %disp(['2) newNumericOrientation = ' num2str(newNumericOrientation)]);
             [handles, newOrientation] = rotateOrientation( handles, PERMUTE, newNumericOrientation);
 
             % Set new orientation
@@ -3030,7 +3030,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 
                 X=1; Y=2; Z=3;
                 
-                PERMUTE{numericOrientation}
+                PERMUTE{numericOrientation};
 
                 
               % Get current pixel dimensions
@@ -3097,9 +3097,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 handles.image.sliceSpacing = newVoxelSize(Z);
         
             % Test
-            disp(['rotateOrientation       size(ROI)=' num2str(size(handles.image.ROI)) ]);
-            disp(['rotateOrientation       size(UndoROI)=' num2str(size(handles.image.UndoROI.ROI{1}.roiSlices{1})) ]);
-            disp(['rotateOrientation  SliceNumSlider=' num2str(get(handles.SliceNumSlider,'Max')) ]);
+            %disp(['rotateOrientation       size(ROI)=' num2str(size(handles.image.ROI)) ]);
+            %disp(['rotateOrientation       size(UndoROI)=' num2str(size(handles.image.UndoROI.ROI{1}.roiSlices{1})) ]);
+            %disp(['rotateOrientation  SliceNumSlider=' num2str(get(handles.SliceNumSlider,'Max')) ]);
       function handles = resetOrientation(handles)
 %             disp(['resetOrientation  size(ROI)=' num2str(size(handles.image.ROI)) ]);
 %             disp(['resetOrientation  size(Cdata)=' num2str(size(handles.image.Cdata)) ]);
@@ -3111,12 +3111,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              %handles = guidata(handles.figure1);
             
             set(handles.orientationMenu,'Value',1);
-            handles = setOrientation(handles, 1)            
+            handles = setOrientation(handles, 1);            
             %handles = guidata(handles.figure1); % Set modified handles  
         
             % Test
-            disp(['resetOrientation        size(ROI)=' num2str(size(handles.image.ROI)) ]);
-            disp(['resetOrientation   SliceNumSlider=' num2str(get(handles.SliceNumSlider,'Max')) ]);
+            %disp(['resetOrientation        size(ROI)=' num2str(size(handles.image.ROI)) ]);
+            %disp(['resetOrientation   SliceNumSlider=' num2str(get(handles.SliceNumSlider,'Max')) ]);
 
         
     % --------------------------------------------------------------------
@@ -3935,7 +3935,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     imlook4d_set_colorscale_from_modality(gcf, {}, guidata(gcf));
                     imlook4d_set_ROIColor(gcf, {}, guidata(gcf));
              % Print file path
-             dispOpenWithImlook4d( [path filesep file] );
+             dispOpenWithImlook4d( [path file] );
             function LocalOpenMGH(hObject, eventdata, handles, file,path)  
                 % Test if Freesurfer files exist
                     if strcmp('', which('MRIread'))
@@ -6155,7 +6155,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
             
             % Put ROI in rois
-            [pathstr,name,ext] = fileparts(fullPath) 
+            [pathstr,name,ext] = fileparts(fullPath); 
             
             if strcmp(ext,'.roi')|| strcmp(ext,'.mat')
                 load(fullPath,'-mat');
@@ -6173,7 +6173,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         %  Load NIFTI or ANALYZE dataset, but not applying any appropriate affine
                         %  geometric transform or voxel intensity scaling.
                         %warndlg({'WARNING - load_nii failed.',  'Trying load_untouch_nii.',  'The data will not go through geometrical transforms'}); 
-                        nii = load_untouch_nii(fullPath)
+                        nii = load_untouch_nii(fullPath);
                         openingMode='load_untouch_nii';                        
                 end
                 
