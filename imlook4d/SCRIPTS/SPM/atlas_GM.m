@@ -27,7 +27,7 @@ StartScript; % Start a script and open a new instance of imlook4d to play with
 % --------------------------------------------------
 
 % Probability level to use for GM (between 0 and 1)
-THRESHOLD = 0.75;
+THRESHOLD = 0.25;
 
 % Open GM file (name c1FILE.nii); this file is called FILE
 fullPath = [imlook4d_current_handles.image.folder imlook4d_current_handles.image.file];

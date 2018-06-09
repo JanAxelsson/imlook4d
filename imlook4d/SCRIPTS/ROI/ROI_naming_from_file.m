@@ -47,7 +47,7 @@ switch file
 end
 
 
-stop = length(imlook4d_ROINames)-1 % Exclude 'Add ROI'
+stop = length(imlook4d_ROINames)-1; % Exclude 'Add ROI'
 for i=1:stop
     currentName = imlook4d_ROINames{i};
     row = find(strcmp(newNames(:,OLDCOLUMN),currentName ));

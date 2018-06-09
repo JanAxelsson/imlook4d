@@ -39,4 +39,4 @@ matlabbatch{1}.spm.spatial.preproc.warp.reg = [0 0.001 0.5 0.05 0.2];
 matlabbatch{1}.spm.spatial.preproc.warp.affreg = 'mni';
 matlabbatch{1}.spm.spatial.preproc.warp.fwhm = 0;
 matlabbatch{1}.spm.spatial.preproc.warp.samp = 1; 
-matlabbatch{1}.spm.spatial.preproc.warp.write = [1 0]; % Write inverse = [1 0]; Write forward = [0 1]; Write both = [1 1]
+matlabbatch{1}.spm.spatial.preproc.warp.write = [1 1]; % Write inverse = [1 0]; Write forward = [0 1]; Write both = [1 1]
