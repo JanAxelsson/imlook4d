@@ -27,6 +27,8 @@ else
     meanImagePath = [ imlook4d_current_handles.image.folder  'mean' imlook4d_current_handles.image.file(1:end) ]; % make it 'meanSharp.nii' (it does not exist yet)     
 end
 
+% TODO : if 3D image, then there is no need to create a mean image.  Use
+% existing 3D image as meanImage
 
 % If mean image does not exist : Create mean image of dynamic PET (called realingedPath)
 if ~exist(meanImagePath, 'file')

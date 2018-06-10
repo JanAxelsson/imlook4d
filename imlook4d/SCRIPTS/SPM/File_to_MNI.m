@@ -43,10 +43,9 @@ copyfile( which(atlasLUT), newatlasLUT  );
 
 Open( newFileInMNISpace);
 
-% Reslice ROI file from original Matrix to TPM matrix (which defines our
+% TODO:  Reslice ROI file from original Matrix to TPM matrix (which defines our
 % MNI matrix)
 
-% TODO !!!
 
 % Open ROI
 newAtlasFile = [ folder filesep prefix atlasFileName ];
