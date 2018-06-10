@@ -47,6 +47,7 @@ catch
         openingMode='load_untouch_nii';
     catch
         disp(['ERROR loading Gray Matter probability mask.  Does file '  GM_ROI_file 'exist?']);
+        return
     end
 end
 
