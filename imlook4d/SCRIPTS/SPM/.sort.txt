@@ -1,3 +1,5 @@
+DICOM_to_Nifti.m
+---
 align.m
 coregister_to.m
 ---
@@ -6,7 +8,6 @@ use_atlas.m
 atlas_GM.m
 File_to_MNI.m
 ---
-DICOM_to_Nifti.m
----
+
 SPM_open.m
 SPM_write.m
