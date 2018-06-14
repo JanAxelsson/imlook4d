@@ -7,12 +7,15 @@
 % 1) Edit your own code, and save it in the folder USER_SCRIPTS 
 %    (File naming: use "_" instead of space, and only alpha-numeric characters. File name must start with a character)
 %    (Example file name: "My_First_Script.m", which will be visible in menu "/SCRIPTS/USER/My First Script")
-%
+% 
 % 2) Open a new imlook4d and the code can be executed on your own data from
 %    the menu /SCRIPTS/USER
 
-if ~exist('atlasFileName')
-    select_atlas
+
+if ~exist('atlas','var')
+    % Defaults
+    atlas.atlasDefinitionFile = 'labels_Neuromorphometrics';
+    run( atlas.atlasDefinitionFile );
 end
 
 StoreVariables; % Start a script and open a new instance of imlook4d to play with
@@ -23,33 +26,45 @@ file = [imlook4d_current_handles.image.folder imlook4d_current_handles.image.fil
 transformToMNISpace = [ folder filesep 'y_' name ext]; 
 newFileInMNISpace = [folder filesep 'mni_' name ext] ;
 
-dispOpenWithImlook4d( 'Convert with transform  = ', transformToMNISpace  );
-dispOpenWithImlook4d( 'from native-space file  = ', file  );
-dispOpenWithImlook4d( 'to MNI-space file       = ', newFileInMNISpace);
+
+disp( 'Convert native image ->  MNI  :' );
+dispOpenWithImlook4d( 'input : transform          = ', transformToMNISpace  );
+dispOpenWithImlook4d( 'input : native-space file  = ', file  );
+dispOpenWithImlook4d( 'output: MNI-space file     = ', newFileInMNISpace);
 
 %% Deform image Native->MNI
 clear matlabbatch;
 spm('defaults', 'PET');
-Defortmation_AAL_job; % Setup deformation
+run( atlas.deformationScript) ; % Setup deformation
+matlabbatch{1}.spm.util.defs.out{1}.pull.interp = 1; % Trilinear
 matlabbatch{1}.spm.util.defs.comp{1}.def = { transformToMNISpace }; % Deformation file: Nativ -> MNI
 matlabbatch{1}.spm.util.defs.out{1}.pull.fnames = { file }; % file in native
 prefix = 'mni_';
 matlabbatch{1}.spm.util.defs.out{1}.pull.prefix = prefix;
 spm_jobman('run',matlabbatch);
 
-%% Copy LUT file 
-newatlasLUT = [ folder filesep prefix atlasLUT ];
-copyfile( which(atlasLUT), newatlasLUT  );
+Open(newFileInMNISpace);
 
-Open( newFileInMNISpace);
+%% Copy MNI ROI file and LUT to  folder
+prefix = 'mni_';
+% ROI file
+roiFile = [ prefix atlas.atlasFileName ];
+copyfile( which( atlas.atlasFileName), roiFile );
+dispOpenWithImlook4d( 'Write MNI ROI names file    = ', [ folder filesep roiFile ] );
 
-% TODO:  Reslice ROI file from original Matrix to TPM matrix (which defines our
+% LUT file
+newFile = [ prefix atlas.atlasLUT ];
+copyfile( which( atlas.atlasLUT), [ folder filesep newFile ] );
+dispOpenWithImlook4d( 'Write MNI ROI file          = ', [ folder filesep newFile ]  );
+
+
+%% TODO:  Reslice ROI file from original Matrix to TPM matrix (which defines our
 % MNI matrix)
 
 
-% Open ROI
-newAtlasFile = [ folder filesep prefix atlasFileName ];
-LoadROI( newAtlasFile );
+%% Open ROI
+fullRoiFile = [ folder filesep roiFile ];
+LoadROI( fullRoiFile );
 
 
 ClearVariables
