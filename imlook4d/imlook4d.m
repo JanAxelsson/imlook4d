@@ -7176,8 +7176,12 @@ end
          % Redraw
          %axis(handles.axes1, 'auto'); % Needs to set handle to auto to fit strange matrix sizes (i.e. RDF data)
          
-         adjustSliderRanges(handles);
-         updateImage(hObject, eventdata, handles); 
+         
+         try
+            adjustSliderRanges(handles);
+            updateImage(hObject, eventdata, handles); 
+         catch
+         end
          guidata(hObject,handles); 
          a = whos('handles');disp([ 'Size = ' num2str( round( a.bytes/1e6 )) ' MB']);            
     function importFromWorkspace_Callback(hObject, eventdata, handles,varargin)
