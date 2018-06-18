@@ -43,7 +43,7 @@ delete( zipFilePath)
 %% Change name of folder
 [parentFolder,name,ext] = fileparts(unzipFolderPath);
 
-newFolderName = [ parentFolder [ 'imlook4d_' ver ] ];
+newFolderName = [ parentFolder filesep  'imlook4d_' ver  ];
 movefile( unzipFolderPath, newFolderName);
 
 %% Set Matlab path
@@ -52,14 +52,15 @@ b = strsplit(a,':'); % Cell array of paths
 
 % Remove old imlook4d paths
 for i = 1:length(b)
-    if ~isempty(strfind( b{i}, folder))
+    if ~isempty(strfind( b{i}, folder)) % Remove everything containing path to imlook4d installation
         disp (b{i});
         rmpath( b{i} );
     end
 end
 
 % Add new imlook4d to path
-addpath(genpath( unzipFolderPath ));
+addpath(genpath( newFolderName ));
 
 
-% TODO : Save path
+%% TODO : Save path
+disp('<a href="matlab:savepath">Save path (make this downloaded version default) </a>')
