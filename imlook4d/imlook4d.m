@@ -9401,32 +9401,6 @@ end
                       
             guidata(handles.figure1, handles)
         end
-        function version=getImlook4dVersion()
-            % Get version number from About.txt
-%                 [pathstr1,name,ext] = fileparts(which('imlook4d'));
-%                 vs =  fileread([pathstr1 filesep 'HELP' filesep 'About.txt']);
-% 
-%                 startIndex=findstr(vs, 'version');
-%                 characters=findstr(vs(startIndex:end), '<BR>');
-%                 version=vs(startIndex+8:startIndex+characters-2); 
-
-
-                % Formats from pre-commit-hook.bat, available in
-                % version.txt:
-                % 510
-                % 493:510
-                % 510M
-                % 493:510M
-                % These numbers are one digit behind.
-                % I want to extract the last number and add one to it
-                
-                 %str =  fileread('version.txt');
-                 %t=str2double( regexp(str,'\d+', 'match') ); % get all double values
-                 %version = num2str( t(end) );  
-                 version =  fileread('version.txt');
-                 
-                 
- 
         function flag=isMultipleCall()
               flag = false; 
               % Get the stack
