@@ -22,8 +22,12 @@ StoreVariables; % Start a script and open a new instance of imlook4d to play wit
 
 file = [imlook4d_current_handles.image.folder imlook4d_current_handles.image.file];
 [folder,name,ext] = fileparts(file);
+% Transformation native -> MNI
+%transformToMNISpace = [ folder filesep 'y_' name ext]; % TODO : Select deformation file
+[f,p] = uigetfile('y*.nii','Select an atlas file');
+transformToMNISpace = [ p f ];
+
 % Image to MNI space
-transformToMNISpace = [ folder filesep 'y_' name ext]; 
 newFileInMNISpace = [folder filesep 'mni_' name ext] ;
 
 
