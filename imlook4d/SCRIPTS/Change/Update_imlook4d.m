@@ -1,3 +1,5 @@
+disp( [ 'Determining latest available version ']);
+
 
 ID='13mGVhbnZYUyr6BWq4mXTTo12PvM7gykJ';
 latestFileListURL = ['https://drive.google.com/uc?export=download&id=' ID ];
@@ -7,11 +9,13 @@ data = strsplit( text);
 ver = data{1}; % Latest version
 url = data{2}; % URL for latest version
 
+disp( [ 'Latest available version = ' ver ]);
+
 %% Compare if already at latest version
 try
     version=getImlook4dVersion();
     if strcmp( version, ver)
-        disp([ 'You already have the latest version' ver ]);
+        disp([ 'You already have the latest version = ' ver ]);
         return
     end
 catch
@@ -22,25 +26,37 @@ end
 urlToLatestImlook4d = url;
 
 %% Download latest imlook4d
-imlook4dFilePath = which('imlook4d.m');
-[folder,file,ext] = fileparts(imlook4dFilePath);
-zipFilePath = [ folder filesep '..' filesep 'latestImlook4d.zip'];
 
-[zipFileFolder,file,ext] = fileparts(folder); % Same level as imlook4d folder
-zipFilePath = [ zipFileFolder filesep 'latestImlook4d.zip'];
 
-unzipFolderPath = [ zipFileFolder filesep 'latestImlook4d'];
+disp( [ 'Downloading version = ' ver ]);
 
-% TODO : url to latest path
-%urlToLatestImlook4d = 'https://drive.google.com/uc?export=download&id=12uG7-vkIFHpvWtMohuo3O-oszpjFGL98';
-%zipFilePath = '/Users/jan/Downloads/imlook4d.zip';
+% /aaa/bbb/ccc/imlook4d/imlook4d.m
+% /aaa/bbb/ccc/imlook4d/
+% 
+imlook4dFilePath = which('imlook4d.m'); % imlook4dFilePath = /aaa/bbb/ccc/imlook4d/imlook4d.m
+if isempty(imlook4dFilePath)
+    warning('imlook4d is not in path -- cannot install');
+    warning('Please download and install manually from ');
+    warning(urlToLatestImlook4d)
+    return
+end
+
+
+[folder,file,ext] = fileparts(imlook4dFilePath); % folder = /aaa/bbb/ccc/imlook4d
+
+[zipFileFolder,file,ext] = fileparts(folder); % zipFileFolder = /aaa/bbb/ccc
+zipFilePath = [ zipFileFolder filesep 'latestImlook4d.zip']; % zipFilePath = /aaa/bbb/ccc/latestImlook4d.zip
+
+unzipFolderPath = [ zipFileFolder filesep 'latestImlook4d']; % unzipFolderPath = /aaa/bbb/ccc/latestImlook4d
 
 % Get file
 options = weboptions('RequestMethod','get');
 options = weboptions('Timeout',Inf);
-zipFilePath = websave(zipFilePath, urlToLatestImlook4d,options)
+zipFilePath = websave(zipFilePath, urlToLatestImlook4d,options);
 
 %% unzip
+disp( [ 'Unzipping' ]);
+
 folderName = unzip(zipFilePath, unzipFolderPath);
 delete( zipFilePath)
 
@@ -48,23 +64,31 @@ delete( zipFilePath)
 [parentFolder,name,ext] = fileparts(unzipFolderPath);
 
 newFolderName = [ parentFolder filesep  'imlook4d_' ver  ];
+
+disp( [ 'Installing to folder = ' newFolderName ]);
 movefile( unzipFolderPath, newFolderName);
 
 %% Set Matlab path
+disp( [ 'Remove old imlook4d from matlab path = ' folder]);
+
 a = path;
 b = strsplit(a,':'); % Cell array of paths
 
 % Remove old imlook4d paths
 for i = 1:length(b)
     if ~isempty(strfind( b{i}, folder)) % Remove everything containing path to imlook4d installation
-        disp (b{i});
+        %disp (b{i});
         rmpath( b{i} );
     end
 end
 
 % Add new imlook4d to path
+disp( [ 'Set new imlook4d matlab path = ' newFolderName]);
 addpath(genpath( newFolderName ));
 
 
+disp( [ 'Installation DONE!  Old version remains on disk']);
+disp( [ ' ']);
+
 %% TODO : Save path
-disp('<a href="matlab:savepath">Save path (make this downloaded version default) </a>')
+disp('<a href="matlab:savepath">Click to save path (makes new version default) </a>')
