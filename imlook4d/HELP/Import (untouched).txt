@@ -3,7 +3,6 @@
 <!------------------->
 	<P>
 	Imports variables from MATLAB workspace to imlook4d instance.
-    The difference to "Import" is that "Import (untouched)" does not import the image matrix <CODE> imlook4d_Cdata </CODE>. 
     See the "Workspace/Export" menu for more information about what variables will be imported.
 	</P>
 	

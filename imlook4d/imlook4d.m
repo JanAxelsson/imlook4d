@@ -7152,12 +7152,16 @@ end
 
          
 
-         % NOT imported: imlook4d current slice and frame 
+         % NOT imported: imlook4d current frame 
+         
+         try 
+             currentSlice=evalin('base', 'imlook4d_slice');
+         catch
+             disp('failed importing imlook4d_slice');
+         end;        
+         setSlice(handles, currentSlice, handles.figure1);
 
-         
-         
-         %setSliderRanges(handles);
-         %setSliderRanges(handles.figure1);
+
          
          % Resize images
 %          for h = get(handles.axes1, 'Children')
@@ -7171,23 +7175,23 @@ end
          
          % Redraw
          %axis(handles.axes1, 'auto'); % Needs to set handle to auto to fit strange matrix sizes (i.e. RDF data)
-
+         
          adjustSliderRanges(handles);
          updateImage(hObject, eventdata, handles); 
          guidata(hObject,handles); 
          a = whos('handles');disp([ 'Size = ' num2str( round( a.bytes/1e6 )) ' MB']);            
     function importFromWorkspace_Callback(hObject, eventdata, handles,varargin)
         % This function Imports data from workspace INCLUDING Cdata
-        
+
         handles = importUntouched_Callback(hObject, eventdata, handles,varargin);
-                
+
          try  
              handles.image.Cdata=evalin('base', 'imlook4d_Cdata');
          catch
              disp('failed importing imlook4d_Cdata');
          end;
-
-        
+ 
+                  
           % Save modified data
          guidata(hObject,handles);   
          
