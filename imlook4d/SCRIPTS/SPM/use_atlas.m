@@ -34,10 +34,14 @@ dispOpenWithImlook4d( '   output : transform (MNI -> Native) = ', mniToNativeTra
 dispOpenWithImlook4d( '   output : transform (Native -> MNI) = ', nativeToMniTransform  ); % Stored as a convenience, to allow for conversion Native images to MNI
 
 % Run segment job
-if exist( nativeToMniTransform, 'file') == 2
+if exist( mniToNativeTransform, 'file') == 2
     disp(' ')
-    disp('Transform (Native -> MNI) already exists')
-    dispOpenWithImlook4d( 'Use existing transform (Native -> MNI) = ', nativeToMniTransform  ); % Stored as a convenience, to allow for conversion Native images to MNI
+    disp('Transform (MNI -> Native) already exists')
+    dispOpenWithImlook4d( 'Using existing transform  (MNI -> Native) = ', mniToNativeTransform  ); % Stored as a convenience, to allow for conversion Native images to MNI
+    disp(' ')
+    disp('NOTE!  If you want new transforms :  click the two links below,  and run this script again) :')
+    disp(['  1) <a href="matlab:delete(''' mniToNativeTransform ''')">Click here to remove transform (MNI -> Native) </a>'])
+    disp(['  2) <a href="matlab:delete(''' nativeToMniTransform ''')">Click here to remove transform (Native -> MNI) </a>'])
     disp(' ')
 else
     disp(' ')
@@ -60,7 +64,7 @@ prefix = matlabbatch{1}.spm.util.defs.out{1}.pull.prefix; % As defined in matlab
 outRoiFile = [  folder filesep prefix atlas.atlasFileName ];
 
 % List files involved
-disp( 'Atlas to native space :' );
+disp( 'Transforming atlas to native space :' );
 
 dispOpenWithImlook4d( '   input : transform (MNI -> Native) = ', mniToNativeTransform  );
 dispOpenWithImlook4d( '   input : atlas in MNI-space        = ', atlasFile  );
