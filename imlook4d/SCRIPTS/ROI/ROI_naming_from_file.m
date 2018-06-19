@@ -25,26 +25,9 @@ if nargin==0
     [file,path] = uigetfile('*.txt','Select a lookup file with number in left column and names in second column');
 end
 
-switch file
-    case 'AAL2.txt'
-        newNames = loadtable( which('AAL2.txt') );
-        OLDCOLUMN = 1;
-        NEWCOLUMN = 2;
-        
-    case 'FreeSurferColorLUT.txt'
-        newNames = loadtable( which('FreeSurferColorLUT.txt'), ' ', 6);
-        OLDCOLUMN = 1;
-        NEWCOLUMN = 2;
-        
-    case 'labels_Neuromorphometrics.txt'
-        newNames = loadtable( which('labels_Neuromorphometrics.txt') );
-        OLDCOLUMN = 1;
-        NEWCOLUMN = 2;
-        
-    otherwise
-        error('No valid ROI name lookup-table found');
-        return
-end
+newNames = loadtable( which(file) );
+OLDCOLUMN = 1;
+NEWCOLUMN = 2;
 
 
 stop = length(imlook4d_ROINames)-1; % Exclude 'Add ROI'

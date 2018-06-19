@@ -34,10 +34,17 @@ dispOpenWithImlook4d( '   output : transform (MNI -> Native) = ', mniToNativeTra
 dispOpenWithImlook4d( '   output : transform (Native -> MNI) = ', nativeToMniTransform  ); % Stored as a convenience, to allow for conversion Native images to MNI
 
 % Run segment job
-disp(' ')
-disp('This will take a number of minutes!')
-
-spm_jobman('run',matlabbatch);
+if exist( nativeToMniTransform, 'file') == 2
+    disp(' ')
+    disp('Transform (Native -> MNI) already exists')
+    dispOpenWithImlook4d( 'Use existing transform (Native -> MNI) = ', nativeToMniTransform  ); % Stored as a convenience, to allow for conversion Native images to MNI
+    disp(' ')
+else
+    disp(' ')
+    disp('This will take a number of minutes!')
+    
+    spm_jobman('run',matlabbatch);
+end
 
 %% Deform atlas to original space
 clear matlabbatch;
@@ -50,7 +57,7 @@ run( atlas.deformationScript); % Setup deformation
 matlabbatch{1}.spm.util.defs.comp{1}.def = { mniToNativeTransform }; % Deformation file: MNI->Native
 matlabbatch{1}.spm.util.defs.out{1}.pull.fnames = { atlasFile }; % Atlas in MNI
 prefix = matlabbatch{1}.spm.util.defs.out{1}.pull.prefix; % As defined in matlabbatch
-outRoiFile = [  folder filesep prefix atlas.atlasFileName ]
+outRoiFile = [  folder filesep prefix atlas.atlasFileName ];
 
 % List files involved
 disp( 'Atlas to native space :' );
