@@ -6183,6 +6183,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 
                 %roiNames
                 pixelValues = unique(rois);
+                pixelValues = pixelValues( ~isnan( pixelValues)); % Remove NaNs that are treated as unique
                 roiNames={};
                 roiValue = 1; % First ROI should have this value
                 

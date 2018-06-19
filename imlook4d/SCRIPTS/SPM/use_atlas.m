@@ -54,7 +54,7 @@ outRoiFile = [  folder filesep prefix atlas.atlasFileName ]
 
 % List files involved
 disp( 'Atlas to native space :' );
-dispOpenWithImlook4d( '   input : ROI file                  = ', atlasFile  );
+
 dispOpenWithImlook4d( '   input : transform (MNI -> Native) = ', mniToNativeTransform  );
 dispOpenWithImlook4d( '   input : atlas in MNI-space        = ', atlasFile  );
 dispOpenWithImlook4d( '   output: atlas in native-space     = ', outRoiFile);
