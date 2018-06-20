@@ -586,6 +586,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                          [files2 dirs2]=listDirectory([pathstr1 filesep 'SCRIPTS' filesep dirs{i}]);
                          addpath([pathstr1 filesep 'SCRIPTS' filesep dirs{i}]);      % Add folder to path (in case you made a new one) 
                          
+                         org = files2;
                          % Sort order from file (defines order in submenu)
                          sortIndexPath = [pathstr1 filesep 'SCRIPTS' filesep dirs{i} filesep 'sort.txt'];
                          if exist(sortIndexPath, 'file')
@@ -593,8 +594,27 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                              formatSpec = '%s';
                              all = textscan(fileID,formatSpec);
                              files2 = all{1};
+                             
+                             % Look for files missing in sort.txt
+                             missing = setdiff(org,files2);
+                             if ~isempty( missing)
+                                 cleanedMissing = {};
+                                 for k=1:length(missing)
+                                     if strcmp( missing{k}(end-1:end),'.m')
+                                        cleanedMissing = [ cleanedMissing; missing{k}];
+                                     end
+                                 end
+                                 if ~isempty( cleanedMissing)
+                                    dispRed(['Menu "SCRIPTS/' nameWithSpaces '" You forgot this file in "sort.txt" :'])
+                                    disp(cleanedMissing);
+                                 end
+                                 
+                                 files2 = [ files2; '---'; cleanedMissing ];  % Append the missing files
+                             end
+                             
                          end
                          
+                         % Make submenues, honor --- 
                          
                          lineOnOff = 'off';
                          for j=1:length(files2)
@@ -1107,8 +1127,8 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
             % Adjust colorbar position
            % handles.ColorBar = findobj(gcf,'Tag','Colorbar');
 
-           initpos = get(handles.ColorBar,'Position')
-           initpos = [ initpos(1) ,  1.15*initpos(2) ,  initpos(3) , 0.85*initpos(4) ]
+           initpos = get(handles.ColorBar,'Position');
+           initpos = [ initpos(1) ,  1.15*initpos(2) ,  initpos(3) , 0.85*initpos(4) ];
            
            initfontsize = get(handles.ColorBar,'FontSize');
 
@@ -6614,7 +6634,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                      return 
                  end
                  
-                 disp( functionName);
+                 %disp( functionName);
                  
                  Color(handles.figure1, eventdata, handles,functionName)
                  newhandles = guidata(handles.figure1);
