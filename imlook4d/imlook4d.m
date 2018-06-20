@@ -587,7 +587,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                          addpath([pathstr1 filesep 'SCRIPTS' filesep dirs{i}]);      % Add folder to path (in case you made a new one) 
                          
                          % Sort order from file (defines order in submenu)
-                         sortIndexPath = [pathstr1 filesep 'SCRIPTS' filesep dirs{i} filesep '.sort.txt'];
+                         sortIndexPath = [pathstr1 filesep 'SCRIPTS' filesep dirs{i} filesep 'sort.txt'];
                          if exist(sortIndexPath, 'file')
                              fileID = fopen(sortIndexPath,'r');
                              formatSpec = '%s';
