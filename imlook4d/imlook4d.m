@@ -7282,7 +7282,7 @@ end
                 % Mark current window with a checkbox
                 if ( strcmp( get(g(i),'Tag'), 'imlook4d' ) || strcmp( get(g(i),'Tag'), '' ) )
                      h(j,1) = g(i);
-                     get(h(j),'Tag')
+                     get(h(j),'Tag');
                      j = j+1;
                 end
             end   
