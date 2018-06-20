@@ -1,6 +1,6 @@
 function Brain_window_tight(hObject, eventdata, handles)
 
-    window=[-75 150];
+    window=[-10 90];
 
     % Display HELP and get out of callback
      if imlook4d('DisplayHelp', hObject, eventdata, handles) 
