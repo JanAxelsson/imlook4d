@@ -3474,6 +3474,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                     level = str2num( levelInterval(2:end));
                                     nonLockedAboveLevelPixels = find( (ROILock==0) & (handles.image.brush>0) & (subDataMatrix <= level) );
                                 else
+                                    if strcmp( '>', levelInterval(1) ) 
+                                        levelInterval = levelInterval(2:end); % Remove '>'
+                                    end
                                     % draw above level
                                     level = str2num( levelInterval);
                                     nonLockedAboveLevelPixels = find( (ROILock==0) & (handles.image.brush>0) & (subDataMatrix >= level) );
