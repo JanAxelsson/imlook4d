@@ -4,7 +4,7 @@ align.m
 coregister_to.m
 ---
 select_atlas.m
-use_atlas.m
+apply_atlas.m
 atlas_GM.m
 File_to_MNI.m
 ---
