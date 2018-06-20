@@ -2,8 +2,12 @@
 <HR></HR>
 <!------------------->
 	<P>
-	ROI brush only draws pixels above the given ROI level.  Set the level to a value below the lowest pixel value to allow drawing everywhere.
+	ROI brush draws pixels above the given ROI level.  Set the level to a value below the lowest pixel value to allow drawing everywhere.
 	</P>
 
 
+
+	<P>
+	If preceeding the value with "<" the ROI brush draws pixels <i> below </i> the given ROI level. For instance "<10" draws only in pixels below value 10.
+	</P>
 

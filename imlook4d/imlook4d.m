@@ -3460,12 +3460,26 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                 % Draw over any pixels in brush
                                 %subMatrix( nonLockedROIPixels ) = activeROI;  % Draw over any pixels in brush
                                 
-                                % Draw over pixels above level
-                                level = str2num( get(handles.ROILevelEdit,'String') );
-                                subDataMatrix= handles.image.Cdata( ixx:(ixx+rx-1),(iyy):(iyy+ry-1), slice, frame);
-                                
-                                % In brush AND non-locked AND above level
-                                nonLockedAboveLevelPixels = find( (ROILock==0) & (handles.image.brush>0) & (subDataMatrix >= level) ); 
+%                                 % Draw over pixels above level
+%                                 level = str2num( get(handles.ROILevelEdit,'String') );
+                                 subDataMatrix= handles.image.Cdata( ixx:(ixx+rx-1),(iyy):(iyy+ry-1), slice, frame);
+%                                 
+%                                 % In brush AND non-locked AND above level
+%                                 nonLockedAboveLevelPixels = find( (ROILock==0) & (handles.image.brush>0) & (subDataMatrix >= level) );
+
+                                % Above / below level
+                                levelInterval = get(handles.ROILevelEdit,'String');
+                                if strcmp( '<', levelInterval(1) ) 
+                                    % draw below level
+                                    level = str2num( levelInterval(2:end));
+                                    nonLockedAboveLevelPixels = find( (ROILock==0) & (handles.image.brush>0) & (subDataMatrix <= level) );
+                                else
+                                    % draw above level
+                                    level = str2num( levelInterval);
+                                    nonLockedAboveLevelPixels = find( (ROILock==0) & (handles.image.brush>0) & (subDataMatrix >= level) );
+                                end
+
+
                                 
                                 % Set pixels
                                 subMatrix( nonLockedAboveLevelPixels ) = activeROI;  % Draw over any pixels in brush
