@@ -18,6 +18,10 @@
     %disp('SCRIPTS/Threshold.m entered');
     
     
+    if ~exist('Threshold_ROI_defaultanswer')  % If variable defaultanswer is not predefined outside script, set values
+    	Threshold_ROI_defaultanswer = {'100%','40%', '1' , 'end'};
+    end
+    
     % Export to workspace
     StoreVariables
     Export
@@ -34,10 +38,8 @@
                 'Last slice (number or "end")'};
         title='Threshold levels';
         numlines=1;
-    if ~exist('defaultanswer')  % If variable defaultanswer is not predefined outside script, set values
-    	defaultanswer={'100%','40%', '1' , 'end'};
-    end    
-        
+
+    defaultanswer = Threshold_ROI_defaultanswer;
 
     answer=inputdlg(prompt,title,numlines,defaultanswer);
     answer(3:4)=makeAbsoluteSliceNumber(answer(3:4), imlook4d_slice, size(imlook4d_Cdata,3)); % Handle Relative or Absolute positions
@@ -118,13 +120,8 @@
     ImportUntouched
     %Import % Adds ROI to handles in import function
 
-
-
-    
-    % Clear 
-   clear i title  prompt  numlines  defaultanswer  answer  thresholdLevelInPercent  firstSlice  lastSlice  
-   clear activeROI  newROI  temp  currentThreshold
-   clear currentMaxThresholdLevel currentMinThresholdLevel maxLevel maxThresholdLevel minThresholdLevel
+    % Store default until next tim
+    Threshold_ROI_defaultanswer =  answer;
    
    ClearVariables
     %disp('SCRIPTS/Threshold.m DONE');
