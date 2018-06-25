@@ -25,7 +25,11 @@ if nargin==0
     [file,path] = uigetfile('*.txt','Select a lookup file with number in left column and names in second column');
 end
 
-newNames = loadtable( which(file) );
+try
+    newNames = loadtable( [ path file] );
+catch
+    newNames = loadtable( which(file) );
+end
 OLDCOLUMN = 1;
 NEWCOLUMN = 2;
 

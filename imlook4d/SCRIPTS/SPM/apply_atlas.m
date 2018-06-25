@@ -6,7 +6,6 @@ aliveChecker = imlook4d_alive('spm'); % Print '.' while 'spm' in call stack (mea
 if ~exist('atlas','var')
     % Defaults
     atlas.atlasDefinitionFile = 'labels_Neuromorphometrics';
-    run( atlas.atlasDefinitionFile );
 end
     
 % Set variables from atlasDefinitionFile:
