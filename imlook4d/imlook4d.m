@@ -4076,8 +4076,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     catch
                         %  Load NIFTI or ANALYZE dataset, but not applying any appropriate affine
                         %  geometric transform or voxel intensity scaling.
-                        %warndlg({'WARNING - load_nii failed.',  'Trying load_untouch_nii.',  'The data will not go through geometrical transforms'}); 
-                        nii = load_untouch_nii(fullPath)
+                        warndlg({'WARNING - load_nii failed.',  'Trying load_untouch_nii.',  'The data will not go through geometrical transforms'}); 
+                        nii = load_untouch_nii(fullPath);
                         openingMode='load_untouch_nii';                        
                     end
                     
@@ -5169,12 +5169,6 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     %imlook4d_set_colorscale_from_modality( get( findobj(hObject, 'Label', 'Gray') ), eventdata, newhandles);
                     
                     handleToColorMenu=findobj(newhandles.EditMenu, 'Label', 'Color');  % Menu Color
-%                    imlook4d_set_colorscale_from_modality( handleToColorMenu , eventdata, newhandles);     % Sets color according to modality 
-
-%                     newhandles = guidata(h); % Update newhandles
-%                     imlook4d_set_ROIColor(h, {}, newhandles)
-
-%                    updateImage(h, eventdata, newhandles);
                 function displayDicomListOfTags( headers, mode)
 
                     % MACHINE INFO
@@ -6621,7 +6615,6 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         catch
         end
          
-    
     % Color submenu   
         function Color_Callback(hObject, eventdata, handles, functionName)
 %            % General callback for all Colormaps in COLORMAPS folder
@@ -7266,7 +7259,6 @@ end
             text = fileread('UserScript1.m');
             a = com.mathworks.mde.editor.MatlabEditorApplication.getInstance();
             editor = a.newEditor( text );
-            %editor.insertTextAtCaret([text EOL EOL]);  % Insert text at caret
 
     % --------------------------------------------------------------------
     % MODELS 
@@ -9456,10 +9448,7 @@ end
                 % More than 1
                 flag = true; 
               end
-            disp(['isMultipleCall depth=' num2str(numel(s))]);
-
-            
-            
+            disp(['isMultipleCall depth=' num2str(numel(s))]);       
             
 % Dummy function to override duration from timefun toolbox in Matlab 2014b
         function duration ()
