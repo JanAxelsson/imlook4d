@@ -10,8 +10,7 @@
 	</P>
 
 	<P> 
-        Running this script, a file selection dialog is opened, where one DICOM file is selected.
-        All DICOM files in the same folder will be opened, and converted to a 4D Nifti.
+        Running this script, a file selection dialog is opened, where the output Nifti file is created.
        The converted file is opened in imlook4d after conversion.
 	</P>
 
