@@ -3060,11 +3060,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 handles.image.pixelSizeX = newVoxelSize(X);
                 handles.image.pixelSizeY = newVoxelSize(Y);
                 handles.image.sliceSpacing = newVoxelSize(Z);
-        
-            % Test
-            %disp(['rotateOrientation       size(ROI)=' num2str(size(handles.image.ROI)) ]);
-            %disp(['rotateOrientation       size(UndoROI)=' num2str(size(handles.image.UndoROI.ROI{1}.roiSlices{1})) ]);
-            %disp(['rotateOrientation  SliceNumSlider=' num2str(get(handles.SliceNumSlider,'Max')) ]);
+
       function handles = resetOrientation(handles)
 %             disp(['resetOrientation  size(ROI)=' num2str(size(handles.image.ROI)) ]);
 %             disp(['resetOrientation  size(Cdata)=' num2str(size(handles.image.Cdata)) ]);
@@ -3077,13 +3073,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             
             set(handles.orientationMenu,'Value',1);
             handles = setOrientation(handles, 1);            
-            %handles = guidata(handles.figure1); % Set modified handles  
-        
-            % Test
-            %disp(['resetOrientation        size(ROI)=' num2str(size(handles.image.ROI)) ]);
-            %disp(['resetOrientation   SliceNumSlider=' num2str(get(handles.SliceNumSlider,'Max')) ]);
 
-        
+
+     
     % --------------------------------------------------------------------
     % ROI drawing functions
     % --------------------------------------------------------------------
@@ -9355,8 +9347,19 @@ end
         else
             % disp('Multiple frames')
             
+                         
+            % frame number > number of frames ?
+            if ( get(handles.FrameNumSlider,'Value')>frames)
+                
+                set(handles.FrameNumSlider,'visible','on','Min',1,'Max',frames,...
+                    'SliderStep',[1.0/double(frames-1) 1.0/double(frames-1)]);
+                
+                set(handles.FrameNumSlider,'Value', round(frames/2) );
+                set(handles.FrameNumEdit,'String',num2str(round(frames/2)) );
+            end
+            
             set(handles.FrameNumSlider,'visible','on','Min',1,'Max',frames,...
-                'SliderStep',[1.0/double(frames-1) 1.0/double(frames-1)]);
+                 'SliderStep',[1.0/double(frames-1) 1.0/double(frames-1)]);
             set(handles.FrameNumEdit,'visible','on');
             set(handles.FrameText,'visible','on');
             
