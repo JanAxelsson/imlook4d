@@ -36,6 +36,16 @@ outFile = imlook4d_spm_dicom_to_4D_nifti( folder, outFilePath);
 disp(['Saved converted Nifti to file = ' outFile]);
 
 %
+% SIF-file if dynamic
+%
+if (size(imlook4d_Cdata,4)>1) % Dynamic
+    [folder file extension] = fileparts(outFilePath);
+    sifFilePath = [ folder filesep file '.sif'];
+    write_sif( imlook4d_current_handles, sifFilePath); % TODO
+end
+
+
+%
 % Open converted file
 %
 

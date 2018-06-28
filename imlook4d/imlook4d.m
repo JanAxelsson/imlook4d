@@ -7558,7 +7558,7 @@ end
                                 set(handles.axes1,'CLim', CLim);
                            end
                       catch
-                          disp('Error in imlook4d updateImage');
+                          %disp('Error in imlook4d updateImage');
                       end
                     
                 %
