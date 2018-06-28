@@ -5418,7 +5418,15 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                         if strcmp(handles.image.openingMode,'load_untouch_nii')
                             save_untouch_nii(nii, destination);
-                        end                    
+                        end      
+                        
+                        % Save .sif file if time-data exists
+                        try
+                            [folder file extension] = fileparts(destination);
+                            sifFilePath = [ folder filesep file '.sif'];
+                            write_sif( handles, sifFilePath);
+                        catch
+                        end
             function LocalSaveAnalyze(handles, matrix)
 
                     % New file name
