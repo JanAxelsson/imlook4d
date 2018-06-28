@@ -1172,62 +1172,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 % GUI CREATION, this is where a GUI is defined
 % --------------------------------------------------------------------
   
-    % Depreciated (phased out)
-    function initiateSliderRanges(handles)
-       warndlg('initiateSliderRanges is depreciated.  Contact Jan');
-       % This function initiates the slider ranges
-       % when a new imlook4d instance is opened
-       [r,c,z,frames]=size(handles.image.Cdata);
-     
-        % one or multiple slides
-        if z == 1
-            % Make slice slider and edit invisible
-            %disp('Single slice')
-            set(handles.SliceNumSlider,'visible','off','Value', 1);
-            set(handles.SliceNumEdit,'visible','off');
-            set(handles.SliceText,'visible','off');
-        else
-            %disp('Multiple slices')
-            %if ( get(handles.SliceNumSlider,'Value')>z)
-                set(handles.SliceNumSlider,'visible','on','Min',1,'Max',z,...
-                    'Value',round(z/2),...
-                    'SliderStep',[1.0/double(z-1) 1.0/double(z-1)]);
-                
-                set(handles.SliceNumEdit,'String',num2str(round(z/2)) );
-            %end
-            
-            %set(handles.SliceNumEdit,'visible','on');
-            %set(handles.SliceText,'visible','on');
-        end
 
-        % one or multiple frames
-        if frames == 1
-            % Make frame slider and edit invisible
-            %disp('Single frame')
-            set(handles.FrameNumSlider,'visible','off','Value',1);
-            set(handles.FrameNumEdit,'visible','off');
-        else
-            %disp('Multiple frames')
-            set(handles.FrameNumSlider,'visible','on','Min',1,'Max',frames,...
-                'Value',1,...
-                'SliderStep',[1.0/double(frames-1) 1.0/double(frames-1)]);
-            
-            set(handles.PC_low_slider,'Min',1,'Max',frames,...
-                'Value',1,...
-                'SliderStep',[1.0/double(frames-1) 1.0/double(frames-1)]);
-            
-            set(handles.FrameNumEdit,'visible','on');
-            set(handles.FrameText,'visible','on');
-            
-            
-            % Hardcoded initial value for noise cutoff
-            set(handles.PC_high_slider,'Min',1,'Max',frames,'Value',...
-                frames,'SliderStep',[1.0/double(frames-1) 1.0/double(frames-1)]);
-        end
-        
-        set(handles.PC_high_edit,'visible','on','String',num2str(frames));
-        
-        set(handles.PC_high_edit,'visible','on','String',frames);    
     function SliceNumSlider_CreateFcn(hObject, eventdata, handles)
         % hObject    handle to SliceNumSlider (see GCBO)
         % eventdata  reserved - to be defined in a future version of MATLAB
@@ -7427,7 +7372,9 @@ end
                 end
                 
                 if frame>numberOfFrames
-                    frame=numberOfFrames;set(handles.ImgObject3,'Cdata',tempData);
+                    frame=numberOfFrames;
+                    %set(handles.ImgObject3,'Cdata',tempData);
+                    adjustSliderRanges(handles);
                 end
                 if slice>numberOfSlices
                     slice=numberOfSlices;
