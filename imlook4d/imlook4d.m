@@ -6599,39 +6599,42 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                  Color(handles.figure1, eventdata, handles,functionName)
                  newhandles = guidata(handles.figure1);
                  imlook4d_set_ROIColor(newhandles.figure1, eventdata, newhandles)
+                 %newhandles.image.ColormapName = functionName;
+                 handles.image.ColormapName = functionName;
                  guidata(newhandles.figure1,newhandles)
             
             updateImage(hObject, eventdata, handles)
             updateROIs(newhandles)
             function Color(hObject, eventdata, handles, functionName)
-              % General callback for Colormap in COLORMAPS folder, which
-              % has name functionName
-try
-               % Determine correct object (dynamically generated callbacks)
-               temp=findobj('Tag', strrep(functionName,'_', ' '));
-               temp=findobj('Tag', functionName);
-               tempObject=temp(1);
-
-
-               % Checkmarks
-               hColorMenuObjects=get( get(tempObject,'Parent'), 'Children');  % All other
-               for i=1:size(hColorMenuObjects)
-                   set(hColorMenuObjects(i),'Checked','off')
-               end
-               set(tempObject,'Checked','on')
-
-                % Clean out spaces and replace with "_"
-                htable = feval(functionName);
-                set(handles.figure1,'Colormap',htable); 
-                if handles.imSize(3)> 1 
-                %set(handles.SliceNumEdit,'BackgroundColor',[.1 .1 .1],'ForegroundColor','r');
+                % General callback for Colormap in COLORMAPS folder, which
+                % has name functionName
+                try
+                    % Determine correct object (dynamically generated callbacks)
+                    temp=findobj('Tag', strrep(functionName,'_', ' '));
+                    temp=findobj('Tag', functionName);
+                    tempObject=temp(1);
+                    
+                    
+                    % Checkmarks
+                    hColorMenuObjects=get( get(tempObject,'Parent'), 'Children');  % All other
+                    for i=1:size(hColorMenuObjects)
+                        set(hColorMenuObjects(i),'Checked','off')
+                    end
+                    set(tempObject,'Checked','on')
+                    
+                    % Clean out spaces and replace with "_"
+                    htable = feval(functionName);
+                    set(handles.figure1,'Colormap',htable);
+                    if handles.imSize(3)> 1
+                        %set(handles.SliceNumEdit,'BackgroundColor',[.1 .1 .1],'ForegroundColor','r');
+                    end
+                    
+                    handles.image.ColormapName = functionName;
+                    imlook4d_set_ROIColor(handles.figure1, eventdata, handles)
+                    guidata(handles.figure1,handles)
+                catch
+                    dispRed('Problem if you see this: Fix function color');
                 end
-                
-                handles.image.ColormapName = functionName;
-                imlook4d_set_ROIColor(handles.figure1, eventdata, handles)
-catch
-    dispRed('Problem if you see this: Fix function color');
-end
 
     % EDIT/ROI submenu
         function ColorfulROI_Callback(hObject, eventdata, handles)
