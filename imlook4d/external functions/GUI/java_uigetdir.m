@@ -31,8 +31,12 @@ function outputPath=java_uigetdir(guessedDirectory, dialogTitle);
             fc.setCurrentDirectory(java.io.File(guessedDirectory));
 
             out=fc.showSaveDialog( f );
-
-            outputPath=char(fc.getSelectedFile().toString());
+            
+            if out == 0
+                outputPath=char(fc.getSelectedFile().toString());
+            else
+                outputPath = 0;  % Same behaviour as uigetdir
+            end
             
             INPUTS = { outputPath };
             recordInputsText(INPUTS);  % Insert text at caret

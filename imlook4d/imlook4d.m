@@ -5719,6 +5719,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                            %newPath=uigetdir(guessedDirectory,'Select directory to save files to');
                           %newPath=java_uigetdir(guessedDirectory,'Make an empty directory to save all DICOM files within'); % Use java directory open dialog (nicer than windows)
                           newPath=java_uigetdir(previousDirectory,'Select/create directory to save files to'); % Use java directory open dialog (nicer than windows)
+                          if newPath == 0
+                              disp('Cancelled by user');
+                              return
+                          end
+                          
                           
                           % Make directory if not existing
                           fn = fullfile(newPath);
