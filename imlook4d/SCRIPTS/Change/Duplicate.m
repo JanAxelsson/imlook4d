@@ -15,6 +15,14 @@
      % Create imlook4d
      newHandle=imlook4d(imlook4d_current_handles.image.Cdata);  % Create new imlook4d instance with image matrix only
      newHandles=guidata(newHandle);                             % Get handles
+%      
+%      % Move window slightly offset to original
+%      dx = 30;
+%      dy = 30;
+%      oldPos = get( imlook4d_current_handle, 'Position')
+%      newPos = [ oldPos(1) + dx, oldPos(2) - dy, oldPos(3), oldPos(4) ];
+%      set( newHandle, 'Position', newPos);
+%      
      
      % Copy handles.image
      newHandles.image=imlook4d_current_handles.image;           
@@ -53,6 +61,7 @@
         
       % Set y-direction as in original
       set(newHandles.axes1, 'YDir', get( imlook4d_current_handles.axes1,'YDir'));   
+    
 
  %   
  % Set GUI-component same as original
@@ -90,6 +99,8 @@
     for i = 1: length(HmatchOld)
        set( HmatchNew(i), 'String',  get( HmatchOld(i), 'String') );
     end
+
+
  %   
  % FINALIZE
  %     
