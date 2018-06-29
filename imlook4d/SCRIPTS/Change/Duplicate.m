@@ -33,12 +33,15 @@
      % Copy Orientation (Ax,Cor,Sag) to GUI
      set(newHandles.orientationMenu,'Value',get(imlook4d_current_handles.orientationMenu,'Value') );  
      
-     % Copy settings from first GUI
-        set(newHandles.SliceNumSlider,'Value',get(imlook4d_current_handles.SliceNumSlider,'Value') );  
-        set(newHandles.FrameNumSlider,'Value',get(imlook4d_current_handles.FrameNumSlider,'Value') );  
-        set(newHandles.SliceNumEdit,'String',get(imlook4d_current_handles.SliceNumEdit,'String') );  
-        set(newHandles.FrameNumEdit,'String',get(imlook4d_current_handles.FrameNumEdit,'String') ); 
+     % Copy interpolation preferences
+     set(newHandles.interpolate2,'Checked', get( imlook4d_current_handles.interpolate2, 'Checked') );
+     set(newHandles.interpolate4,'Checked', get( imlook4d_current_handles.interpolate4, 'Checked') );
+     
+     % Copy sliders from first GUI
+         set(newHandles.SliceNumSlider,'Value',get(imlook4d_current_handles.SliceNumSlider,'Value') );  
+         set(newHandles.FrameNumSlider,'Value',get(imlook4d_current_handles.FrameNumSlider,'Value') );   
         set(newHandles.ROINumberMenu,'Value',get(imlook4d_current_handles.ROINumberMenu,'Value') );  
+        
      % Copy window title
          set(newHandle, 'Name', ...
              get(imlook4d_current_handle,'Name') ...
@@ -64,10 +67,29 @@
     INPUTS = Parameters( { num2str(limits(1)), num2str(limits(2))} );
     Menu('Edit scale');
     
-    % Copy auto colorscale state
-    set(newHandles.autoColorScaleRadioButton,'Value', get(imlook4d_current_handles.autoColorScaleRadioButton,'Value') );
-     
-
+    % Copy radiobuttons
+    style = 'radiobutton';
+    HmatchOld = findobj(imlook4d_current_handle,'Style',style);
+    HmatchNew = findobj(newHandle,'Style',style);
+    for i = 1: length(HmatchOld)
+       set( HmatchNew(i), 'Value',  get( HmatchOld(i), 'Value') );
+    end
+    
+    % Copy checkboxes
+    style = 'checkbox';
+    HmatchOld = findobj(imlook4d_current_handle,'Style',style);
+    HmatchNew = findobj(newHandle,'Style',style);
+    for i = 1: length(HmatchOld)
+       set( HmatchNew(i), 'Value',  get( HmatchOld(i), 'Value') );
+    end
+    
+    % Copy checkboxes
+    style = 'edit';
+    HmatchOld = findobj(imlook4d_current_handle,'Style',style);
+    HmatchNew = findobj(newHandle,'Style',style);
+    for i = 1: length(HmatchOld)
+       set( HmatchNew(i), 'String',  get( HmatchOld(i), 'String') );
+    end
  %   
  % FINALIZE
  %     
