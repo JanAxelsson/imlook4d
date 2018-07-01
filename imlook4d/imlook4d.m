@@ -571,84 +571,92 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                   % Main menu item
                  handles.scriptsMenuHandle = uimenu(handles.figure1,'Label','SCRIPTS');
                  set(handles.scriptsMenuHandle, 'Callback', 'imlook4d(''ScriptsMenu_Callback'',gcbo,[],guidata(gcbo))');          
-            
-                 [pathstr1,name,ext] = fileparts(which('imlook4d'));
-                 %temp=ls([pathstr1 filesep 'SCRIPTS']);            % Read files in SCRIPTS directory
-                 %temp = cellstr(temp(3:end,:));             % Make cell array of all except '.' and '..' 
                  
-                 [files dirs]=listDirectory([pathstr1 filesep 'SCRIPTS']);
-
-                 % Submenues (Folder names, skip if starting with '.')
+                 [pathstr1,name,ext] = fileparts(which('imlook4d'));
+                 
+                 
+                 [files dirs]=listDirectory([pathstr1 filesep 'SCRIPTS']); 
                  for i=1:length(dirs)
-                    if ~strcmp(dirs{i}(1),'.') % Skip if directory starts with '.'
-                        
-                        nameWithSpaces= regexprep(dirs{i},'_', ' ');  % Replace '_' with ' '
-                        handles.scriptsMenuSubHandle = uimenu(handles.scriptsMenuHandle,'Label',nameWithSpaces);  % Make submenu (don't add callback - let SCRIPT menu do callback)
-                        %set(handles.scriptsMenuHandle, 'Callback', 'imlook4d(''ScriptsMenu_Callback'',gcbo,[],guidata(gcbo))');  % Same callback for all scripts
-                        
-                        % Submenu scripts (Look inside folders, and make submenu items (script names)  )
-                         [files2 dirs2]=listDirectory([pathstr1 filesep 'SCRIPTS' filesep dirs{i}]);
-                         addpath([pathstr1 filesep 'SCRIPTS' filesep dirs{i}]);      % Add folder to path (in case you made a new one) 
-                         
-                         org = files2;
-                         % Sort order from file (defines order in submenu)
-                         sortIndexPath = [pathstr1 filesep 'SCRIPTS' filesep dirs{i} filesep 'sort.txt'];
-                         if exist(sortIndexPath, 'file')
-                             fileID = fopen(sortIndexPath,'r');
-                             formatSpec = '%s';
-                             all = textscan(fileID,formatSpec);
-                             files2 = all{1};
-                             
-                             % Look for files missing in sort.txt
-                             missing = setdiff(org,files2);
-                             if ~isempty( missing)
-                                 cleanedMissing = {};
-                                 for k=1:length(missing)
-                                     if strcmp( missing{k}(end-1:end),'.m')
-                                        cleanedMissing = [ cleanedMissing; missing{k}];
-                                     end
-                                 end
-                                 if ~isempty( cleanedMissing)
-                                    dispRed(['Menu "SCRIPTS/' nameWithSpaces '" You forgot this file in "sort.txt" :'])
-                                    disp(cleanedMissing);
-                                 end
-                                 
-                                 files2 = [ files2; '---'; cleanedMissing ];  % Append the missing files
-                             end
-                             
-                         end
-                         
-                         % Make submenues, honor --- 
-                         
-                         lineOnOff = 'off';
-                         for j=1:length(files2)
-                            [pathstr,name,ext] = fileparts(files2{j});
-                                                        
-                            % Make line
-                            if startsWith( name, '---')
-                                lineOnOff = 'on';
-                            end
-                            
-                            % Make submenu item
-                            if strcmp(ext,'.m')
-                                nameWithSpaces= regexprep(name,'_', ' ');  % Replace '_' with ' '
-
-                                % Advanced callback to allow help files for
-                                % scripts
-                                handles.scriptsMenuSubItemHandle(j) = ...
-                                    uimenu(handles.scriptsMenuSubHandle,'Label',nameWithSpaces, 'Callback', [ ...
-                                    'if imlook4d(''DisplayHelp'',gcbo,[],guidata(gcbo));return;end;' ...
-                                    'eval(''' name ''') ' ...
-                                    ]); 
-                                
-                                handles.scriptsMenuSubItemHandle(j).Separator= lineOnOff;
-                                lineOnOff = 'off';
-                            end
-
-                         end
-
-                    end
+                     nameWithSpaces= regexprep(dirs{i},'_', ' ');  % Replace '_' with ' '
+                     if ~strcmp(dirs{i}(1),'.') % Skip if directory starts with '.'
+                        handles.scriptsMenuSubHandle = uimenu(handles.scriptsMenuHandle,'Label',nameWithSpaces);  % Make submenu to SCRIPTS (don't add callback - let SCRIPT menu do callback)
+                        handles = makeSubMenues( handles, handles.scriptsMenuSubHandle, [pathstr1 filesep 'SCRIPTS' filesep dirs{i} ]);
+                     end
                  end
+
+%                  % Submenues (Folder names, skip if starting with '.')
+%                  for i=1:length(dirs)
+%                     if ~strcmp(dirs{i}(1),'.') % Skip if directory starts with '.'
+%                         
+%                         nameWithSpaces= regexprep(dirs{i},'_', ' ');  % Replace '_' with ' '
+%                         handles.scriptsMenuSubHandle = uimenu(handles.scriptsMenuHandle,'Label',nameWithSpaces);  % Make submenu (don't add callback - let SCRIPT menu do callback)
+%                         
+%                         % Submenu scripts (Look inside folders, and make submenu items (script names)  )
+%                          [files2 dirs2]=listDirectory([pathstr1 filesep 'SCRIPTS' filesep dirs{i}]);
+%                          addpath([pathstr1 filesep 'SCRIPTS' filesep dirs{i}]);      % Add folder to path (in case you made a new one) 
+%                          
+%                          org = files2;
+%                          % Sort order from file (defines order in submenu)
+%                          sortIndexPath = [pathstr1 filesep 'SCRIPTS' filesep dirs{i} filesep 'sort.txt'];
+%                          if exist(sortIndexPath, 'file')
+%                              fileID = fopen(sortIndexPath,'r');
+%                              formatSpec = '%s';
+%                              all = textscan(fileID,formatSpec);
+%                              files2 = all{1};
+%                              
+%                              % Look for files missing in sort.txt
+%                              missing = setdiff(org,files2);
+%                              if ~isempty( missing)
+%                                  cleanedMissing = {};
+%                                  for k=1:length(missing)
+%                                      if strcmp( missing{k}(end-1:end),'.m')
+%                                         cleanedMissing = [ cleanedMissing; missing{k}];
+%                                      end
+%                                  end
+%                                  if ~isempty( cleanedMissing)
+%                                     dispRed(['Menu "SCRIPTS/' nameWithSpaces '" You forgot this file in "sort.txt" :'])
+%                                     disp(cleanedMissing);
+%                                  end
+%                                  
+%                                  files2 = [ files2; '---'; cleanedMissing ];  % Append the missing files
+%                              end
+%                              
+%                          end
+%                          
+%                          % Make submenues, honor --- 
+%                          
+%                          lineOnOff = 'off';
+%                          for j=1:length(files2)
+%                             [pathstr,name,ext] = fileparts(files2{j});
+%                                                         
+%                             % Make line
+%                             if startsWith( name, '---')
+%                                 lineOnOff = 'on';
+%                             end
+%                             
+%                             % Make submenu item
+%                             if strcmp(ext,'.m')
+%                                 nameWithSpaces= regexprep(name,'_', ' ');  % Replace '_' with ' '
+% 
+%                                 % Advanced callback to allow help files for
+%                                 % scripts
+%                                 handles.scriptsMenuSubItemHandle(j) = ...
+%                                     uimenu(handles.scriptsMenuSubHandle,'Label',nameWithSpaces, 'Callback', [ ...
+%                                     'if imlook4d(''DisplayHelp'',gcbo,[],guidata(gcbo));return;end;' ...
+%                                     'eval(''' name ''') ' ...
+%                                     ]); 
+%                                 
+%                                 handles.scriptsMenuSubItemHandle(j).Separator= lineOnOff;
+%                                 lineOnOff = 'off';
+%                             end
+% 
+%                          end
+% 
+%                     end
+%                     
+%                  end
+     
+                 
             %
             % Make USER SCRIPT MENUS (from files in imlook4d/../USER_SCRIPTS directory)
             %      -----------------
@@ -737,6 +745,9 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                  %
                  % Menu SCRIPTS/USER/testscript.m
                  %
+                 
+                 
+
                      % Submenues (Folder names, skip if starting with '.')
                      % Look for folders in (imlook4d/../USER_SCRIPTS)
                      for i=1:length(files)
@@ -1021,27 +1032,6 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 
 
                 set(handles.ColorBar,'Units','normalized');  % Correct above loop (otherwise interactive colorbar does not work)
-
-                                
-
-
-                
-                
-                % Controls (GUILayout2 should not move in y direction)
-    %             handles.GUILayout2.frame1=get(handles.frame1, 'Position');
-    %             handles.GUILayout2.frame3=get(handles.frame3, 'Position');           
-    %             handles.GUILayout2.FrameText=get(handles.FrameText, 'Position');  
-    %             handles.GUILayout2.SliceText=get(handles.SliceText, 'Position');           
-    %             handles.GUILayout2.FrameNumSlider=get(handles.FrameNumSlider, 'Position');   
-    %             handles.GUILayout2.SliceNumSlider=get(handles.SliceNumSlider, 'Position'); 
-    %             handles.GUILayout2.FrameNumEdit=get(handles.FrameNumEdit, 'Position');  
-    %             handles.GUILayout2.SliceNumEdit=get(handles.SliceNumEdit, 'Position');  
-    %             handles.GUILayout2.frameTimeText=get(handles.frameTimeText, 'Position');  
-    %             handles.GUILayout2.frameTimeMinutesText=get(handles.frameTimeMinutesText, 'Position');  
-    %             handles.GUILayout2.text17=get(handles.text17, 'Position');                          
-%                 set(handles.versionText,'Units','normalized');  % Correct above loop (otherwise interactive colorbar does not work)
-%                  handles.GUILayout2.versionText=get(handles.versionText, 'Position'); 
-
     
 
             %
@@ -1125,7 +1115,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 figure1_ResizeFcn(hObject, eventdata, handles)
                 imlook4d_set_defaults(hObject, eventdata, handles);            
                         
-                % Set windows position offset to gcf
+                % Set windows position offset to current imlook4d handle
                 try
                     imlook4d_current_handle = evalin('base', 'imlook4d_current_handle');
                     dx = 24;
@@ -1156,7 +1146,87 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
  
  % Set HitTest (Matlab 2016b is sensitive to this, see my support issue to MathWorks #0235001)
  h=handles.figure1;h.HitTest='on';
-
+    function handles = makeSubMenues( handles, parentMenuHandle, subMenuFolder)
+        if strcmp( subMenuFolder(end), '.') % Ignore '.' and '..'
+            return
+        end
+        
+        % Identify files in folder
+        [filesInDir dirs]=listDirectory(subMenuFolder);
+        
+        % Identify files in sort.txt
+        filesListedInFile = [];
+        sortIndexPath = [ subMenuFolder filesep 'sort.txt'];
+        if exist(sortIndexPath, 'file')
+            fileID = fopen(sortIndexPath,'r');
+            formatSpec = '%s';
+            all = textscan(fileID,formatSpec);
+            filesListedInFile = all{1}';
+        end
+        
+        % Identify acceleratorKeys; for instance '(D)Duplicate' for accelerator D,
+        % in sort.txt
+        acceleratorKeys = {};
+        for i=1:length(filesListedInFile)
+            rowName = filesListedInFile{i};
+            acceleratorKeys{i} = '';
+            if strcmp( rowName(1), '(' )
+                acceleratorKeys{i} = rowName(2);
+                filesListedInFile{i} = rowName(4:end); % Clean out accelerator from name
+            end
+        end
+        
+        % Find which files not listed in sort.txt (or sort.txt is missing)
+        missingFiles = setdiff( filesInDir, filesListedInFile);
+        properMissingFiles = {};
+        properMissingAcceleratorKeys = {};
+        for i=1:length(missingFiles)
+           if strcmp( missingFiles{i}(end-1:end), '.m') 
+               properMissingFiles = [ properMissingFiles missingFiles(i) ];
+               properMissingAcceleratorKeys = [ properMissingAcceleratorKeys {''}]; % Add empty accelerator
+           end
+        end
+        
+        % Add files missing in sort.txt
+        if length(filesListedInFile)>0
+            menuItemNames = [ filesListedInFile  {'---'} properMissingFiles];
+            acceleratorKeys = [ acceleratorKeys {''} properMissingAcceleratorKeys ];
+        else
+            menuItemNames =  properMissingFiles;
+            acceleratorKeys = properMissingAcceleratorKeys;
+        end
+        
+        
+        % Make submenues
+        lineOnOff = 'off';
+        for j=1:length(menuItemNames)
+            [pathstr,name,ext] = fileparts(menuItemNames{j});
+            
+            % Make line
+            if startsWith( name, '---')
+                lineOnOff = 'on';
+            end
+            
+            % Make submenu item
+            if strcmp(ext,'.m')
+                nameWithSpaces= regexprep(name,'_', ' ');  % Replace '_' with ' '
+                
+                % Advanced callback to allow help files for scripts
+                handles.scriptsMenuSubItemHandle(j) = ...
+                    uimenu(parentMenuHandle,'Label',nameWithSpaces, 'Callback', [ ...
+                    'if imlook4d(''DisplayHelp'',gcbo,[],guidata(gcbo));return;end;' ...
+                    'eval(''' name ''') ' ...
+                    ]);
+                
+                % Add Accelerator key
+                set( handles.scriptsMenuSubItemHandle(j), 'Accelerator', acceleratorKeys{j} );
+                
+                handles.scriptsMenuSubItemHandle(j).Separator= lineOnOff;
+                lineOnOff = 'off';
+            end
+            
+        end    
+ 
 % Output to command line                    
 function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         % --- Outputs from this function are returned to the command line.
