@@ -702,6 +702,9 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                  [pathstr1,name,ext] = fileparts(which('imlook4d'));
                  
                  temp=listDirectory([pathstr1 filesep 'COLORMAPS']);
+                 
+                % handles = makeSubMenues( handles, handles.Cmaps, [pathstr1 filesep 'COLORMAPS']);
+
 
                  % Submenu items
                  for i=1:length(temp)
@@ -710,8 +713,8 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 
                     if strcmp(ext,'.m')
                         % Setup submenu callback              
-                       callbackString=['imlook4d(''Color_Callback'',gcbo,[],guidata(gcbo), ''' name ''' )'];
-
+                       callbackString=['imlook4d(''Color_Callback'',gcbo,[],guidata(gcbo), ''' name ''' )'];   
+                       
                        % html text
                        [pathstr2,name2,ext2] = fileparts( which(name));
                        % label = [ '<html> <img width=100 height=15  src="file://' pathstr1 filesep 'COLORMAPS' filesep name2 '.png" ></img><font color="white">--</font>'  nameWithSpaces '</html>'];
@@ -1062,6 +1065,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                     'assignin(''base'', ''imlook4d_current_handle'', gcf );' ...
                     'eval(''' name ''') ' ...
                     ]);
+                
                 
                 % Add Accelerator key
                 set( handles.scriptsMenuSubItemHandle(j), 'Accelerator', acceleratorKeys{j} );
@@ -8407,7 +8411,15 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             % Toolbar buttons don't have 'Label', use 'Tag' instead
                             %helpFilePath=[pathstr1 filesep 'HELP' filesep get(hObject,'Tag') '.txt' ];
                             helpFilePath=[get(hObject,'Tag') '.txt' ];
-
+                       end
+                       
+                       % If html-string in Label
+                       try
+                           labelString = get(hObject,'Label');
+                           if strcmp( labelString(1:6),'<html>')
+                               helpFilePath=[get(hObject,'Tag') '.txt' ];
+                           end
+                       catch
                        end
                        
                        intendedhelpFilePath = helpFilePath;
