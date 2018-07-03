@@ -1738,10 +1738,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         set(handles.orientationMenu,'Enable', 'inactive');
         set(handles.PC_low_slider,'Enable', 'inactive');
         set(handles.FirstFrame,'Enable', 'inactive');
-        set(handles.ColorBar, 'ButtonDownFcn', @(hObject,eventdata)imlook4d('ColorBar_Callback',hObject,eventdata,guidata(hObject)) ); 
-              if DisplayHelp(hObject, eventdata, handles) 
-                 return 
-             end
+        set(handles.ColorBar, 'ButtonDownFcn', @(hObject,eventdata)imlook4d('ColorBar_Callback',hObject,eventdata,guidata(hObject)) );
+        
+        % Display interactive-help first page
+        if DisplayHelp(hObject, eventdata, handles)
+            figure(gcf) % Move to top
+            return
+        end
     function helpToggleTool_OffCallback(hObject, eventdata, handles)
         releasedToggleButton( hObject);
         % Set textboxes etc on, to allow normal work when help button is not pressed
