@@ -700,29 +700,27 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
             % Make COLOR menu (from files in imlook4d COLORMAPS directory)
             %     ------------
                  [pathstr1,name,ext] = fileparts(which('imlook4d'));
-                 
                  temp=listDirectory([pathstr1 filesep 'COLORMAPS']);
-                 
-                % handles = makeSubMenues( handles, handles.Cmaps, [pathstr1 filesep 'COLORMAPS']);
+                 handles = makeSubMenues( handles, handles.Cmaps, [pathstr1 filesep 'COLORMAPS']);
 
-
-                 % Submenu items
-                 for i=1:length(temp)
-                    [pathstr,name,ext] = fileparts(temp{i});
-                    nameWithSpaces= regexprep(name,'_', ' ');  % Replace '_' with ' '
-
-                    if strcmp(ext,'.m')
-                        % Setup submenu callback              
-                       callbackString=['imlook4d(''Color_Callback'',gcbo,[],guidata(gcbo), ''' name ''' )'];   
-                       
-                       % html text
-                       [pathstr2,name2,ext2] = fileparts( which(name));
-                       % label = [ '<html> <img width=100 height=15  src="file://' pathstr1 filesep 'COLORMAPS' filesep name2 '.png" ></img><font color="white">--</font>'  nameWithSpaces '</html>'];
-                       label = [ '<html> <img width=100 height=15  src="file:///' pathstr2 filesep name2 '.png" ></img><font color="white">--</font>'  nameWithSpaces '</html>'];
-
-                       handles.image.colorSubMenuHandle(i) = uimenu(handles.Cmaps, 'Label',label,'Tag',name, 'Callback', callbackString);
-                    end
-                 end  
+% 
+%                  % Submenu items
+%                  for i=1:length(temp)
+%                     [pathstr,name,ext] = fileparts(temp{i});
+%                     nameWithSpaces= regexprep(name,'_', ' ');  % Replace '_' with ' '
+% 
+%                     if strcmp(ext,'.m')
+%                         % Setup submenu callback              
+%                        callbackString=['imlook4d(''Color_Callback'',gcbo,[],guidata(gcbo), ''' name ''' )'];   
+%                        
+%                        % html text
+%                        [pathstr2,name2,ext2] = fileparts( which(name));
+%                        % label = [ '<html> <img width=100 height=15  src="file://' pathstr1 filesep 'COLORMAPS' filesep name2 '.png" ></img><font color="white">--</font>'  nameWithSpaces '</html>'];
+%                        label = [ '<html> <img width=100 height=15  src="file:///' pathstr2 filesep name2 '.png" ></img><font color="white">--</font>'  nameWithSpaces '</html>'];
+% 
+%                        handles.image.colorSubMenuHandle(i) = uimenu(handles.Cmaps, 'Label',label,'Tag',name, 'Callback', callbackString);
+%                     end
+%                  end  
 
             %
             % Make WINDOW LEVEL menu (from files in imlook4d WINDOW_LEVELS directory)
@@ -1055,16 +1053,47 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
             if strcmp(ext,'.m')
                 nameWithSpaces= regexprep(name,'_', ' ');  % Replace '_' with ' '
                 
+                % For SCRIPTS, MODEL,
+                callBack = [ ...
+                    'if imlook4d(''DisplayHelp'',gcbo,[],guidata(gcbo));return;end;' ...
+                    'assignin(''base'', ''imlook4d_current_handle'', gcf );' ...
+                    'eval(''' name ''') ' ];
+                label = nameWithSpaces;
+                tag = nameWithSpaces;
+                                
+                % Special for COLOR menu
+                if strcmp( get(parentMenuHandle, 'Label'), 'Color')
+                    callBack=['imlook4d(''Color_Callback'',gcbo,[],guidata(gcbo), ''' name ''' )']; 
+                    [pathstr2,name2,ext2] = fileparts( which(name));
+                    label = [ '<html> <img width=100 height=15  src="file:///' pathstr2 filesep name2 '.png" ></img><font color="white">--</font>'  nameWithSpaces '</html>'];
+                    tag = nameWithSpaces;
+                end
+                
                 % Advanced callback to allow 
                 % - help files for scripts
                 % - set imlook4d_current_handle
                 % - run script
                 handles.scriptsMenuSubItemHandle(j) = ...
-                    uimenu(parentMenuHandle,'Label',nameWithSpaces, 'Callback', [ ...
-                    'if imlook4d(''DisplayHelp'',gcbo,[],guidata(gcbo));return;end;' ...
-                    'assignin(''base'', ''imlook4d_current_handle'', gcf );' ...
-                    'eval(''' name ''') ' ...
-                    ]);
+                    uimenu(parentMenuHandle,'Label',label, 'Callback', callBack , 'Tag', tag);
+
+
+%                  % Submenu items
+%                  for i=1:length(temp)
+%                     [pathstr,name,ext] = fileparts(temp{i});
+%                     nameWithSpaces= regexprep(name,'_', ' ');  % Replace '_' with ' '
+% 
+%                     if strcmp(ext,'.m')
+%                         % Setup submenu callback              
+%                        callbackString=['imlook4d(''Color_Callback'',gcbo,[],guidata(gcbo), ''' name ''' )'];   
+%                        
+%                        % html text
+%                        [pathstr2,name2,ext2] = fileparts( which(name));
+%                        % label = [ '<html> <img width=100 height=15  src="file://' pathstr1 filesep 'COLORMAPS' filesep name2 '.png" ></img><font color="white">--</font>'  nameWithSpaces '</html>'];
+%                        label = [ '<html> <img width=100 height=15  src="file:///' pathstr2 filesep name2 '.png" ></img><font color="white">--</font>'  nameWithSpaces '</html>'];
+% 
+%                        handles.image.colorSubMenuHandle(i) = uimenu(handles.Cmaps, 'Label',label,'Tag',name, 'Callback', callbackString);
+%                     end
+%                  end  
                 
                 
                 % Add Accelerator key
@@ -6540,7 +6569,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 try
                     % Determine correct object (dynamically generated callbacks)
                     temp=findobj('Tag', strrep(functionName,'_', ' '));
-                    temp=findobj('Tag', functionName);
+                    %temp=findobj('Tag', functionName);
                     tempObject=temp(1);
                     
                     

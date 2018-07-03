@@ -1,5 +1,5 @@
-Gray_inverted.m
 Gray.m
+Gray_inverted.m
 ---
 Hot.m
 Sokolof.m
