@@ -1,4 +1,4 @@
-<h1>SPM Dicom to Nifti</h1>
+<h1>SPM DICOM to Nifti</h1>
 <HR></HR>
 <!------------------->
 	<P>
