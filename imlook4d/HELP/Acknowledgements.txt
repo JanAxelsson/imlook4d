@@ -12,7 +12,7 @@
 			<LI>  <B>MIJ</B> by Daniel Sage, for interfacing imlook4d with ImageJ.  
 					See website (<A HREF=http://bigwww.epfl.ch/sage/soft/mij/"> http://bigwww.epfl.ch/sage/soft/mij/ </A> ), at Biomedical Imaging Group (BIG), Ecole Polytechnique Federale de Lausanne (EPFL), Lausanne, Switzerland<BR><BR>
 			<LI>  <B>numutil </B> by Peter John Acklam.  Used for number conversion.<BR><BR>
-			<LI>  <B>save_cellarray, loadtable </B> by Armin Günter.  Used to save and load text table files.<BR><BR>
+			<LI>  <B>save_cellarray, loadtable </B> by Armin G&uuml;nter.  Used to save and load text table files.<BR><BR>
 			<LI>  <B>Analyze/NIfTI Toolbox</B> by Jimmy Shen for import and export of Analyze/Nifti file formats 
 					(<A HREF=http://www.rotman-baycrest.on.ca/~jimmy/NIfTI"> http://www.rotman-baycrest.on.ca/~jimmy/NIfTI </A> ).<BR><BR>
 

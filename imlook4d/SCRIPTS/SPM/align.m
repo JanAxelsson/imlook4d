@@ -1,4 +1,4 @@
-edit % SPM_realing
+% SPM_realing
 % ---------------------
 % This script uses SPM realingment for Dynamic PET.
 % Input : 4D Nifti
@@ -7,6 +7,8 @@ edit % SPM_realing
 % If .sif file exists with time information, that is copied.
 
 StoreVariables;
+aliveChecker = imlook4d_alive('spm'); % Print '.' while 'spm' in call stack (meaning that it is running). Stop-command: delete(aliveChecker)
+
 Export;
 
 path = [ imlook4d_current_handles.image.folder  imlook4d_current_handles.image.file ];
@@ -69,6 +71,8 @@ imlook4d(newPath);
 % END OF OWN CODE
 % --------------------------------------------------
 
-    % Clean up  variables created in this script
-    ClearVariables
+% Clean up  variables created in this script
+clear matlabbatch;
+delete(aliveChecker); 
+ClearVariables
 

@@ -11,6 +11,7 @@
 % NOTE: Realingment must be performed before!
 
 StoreVariables;
+aliveChecker = imlook4d_alive('spm'); % Print '.' while 'spm' in call stack (meaning that it is running). Stop-command: delete(aliveChecker)
 Export;
 
 % From image 
@@ -26,6 +27,8 @@ else
     meanImagePath = [ imlook4d_current_handles.image.folder  'mean' imlook4d_current_handles.image.file(1:end) ]; % make it 'meanSharp.nii' (it does not exist yet)     
 end
 
+% TODO : if 3D image, then there is no need to create a mean image.  Use
+% existing 3D image as meanImage
 
 % If mean image does not exist : Create mean image of dynamic PET (called realingedPath)
 if ~exist(meanImagePath, 'file')
@@ -97,7 +100,7 @@ matlabbatch{2}.spm.spatial.coreg.estwrite.eoptions.cost_fun = 'nmi';
 matlabbatch{2}.spm.spatial.coreg.estwrite.eoptions.sep = [4 2];
 matlabbatch{2}.spm.spatial.coreg.estwrite.eoptions.tol = [0.02 0.02 0.02 0.001 0.001 0.001 0.01 0.01 0.01 0.001 0.001 0.001];
 matlabbatch{2}.spm.spatial.coreg.estwrite.eoptions.fwhm = [7 7];
-matlabbatch{2}.spm.spatial.coreg.estwrite.roptions.interp = 4;
+matlabbatch{2}.spm.spatial.coreg.estwrite.roptions.interp = 1;
 matlabbatch{2}.spm.spatial.coreg.estwrite.roptions.wrap = [0 0 0];
 matlabbatch{2}.spm.spatial.coreg.estwrite.roptions.mask = 0;
 matlabbatch{2}.spm.spatial.coreg.estwrite.roptions.prefix = newFilePrefix;
@@ -122,6 +125,8 @@ imlook4d(newPath);
 % END OF OWN CODE
 % --------------------------------------------------
 
-    % Clean up  variables created in this script
-    ClearVariables
+% Clean up  variables created in this script
+clear matlabbatch;
+delete(aliveChecker); 
+ClearVariables
 

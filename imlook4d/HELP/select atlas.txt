@@ -1,0 +1,30 @@
+<h1>SPM select atlas</h1>
+<HR></HR>
+<!------------------->
+	<P>
+		Select the atlas to use. The default atlas, if nothing is selected, is the Neuromorphometrics atlas included in SPM. 
+	</P>
+
+	<P>
+		Atlases are defined by an m-file residing in <code>imlook4d/SCRIPTS/SPM/Atlas_initiators</code>.	</P>
+
+	<P>
+		An example of an atlas defining file is labels_Neuromorphometrics.m which defines the parameters for the default SPM-based atlas:
+	</P>
+        <ul>
+                <li>atlas.atlasFileName = 'labels_Neuromorphometrics.nii'; % A Nifti file with integer pixel values defining the ROIs
+                <li>atlas.atlasLUT = 'labels_Neuromorphometrics.txt'; % An index of the ROI names for the .nii ROI file.  Tab delimited file with the pixel value of the ROI in the left column, and the ROI name in the right column
+                <li>atlas.segmentationScript = 'General_segment_job'; % Default segmentation job
+                <li>atlas.deformationScript ='General_Deformation_job';% Default deformation job for mapping from MNI to native space
+        </ul>
+	<P> 
+        This script requires downloaded atlas files to be added to the path.  Select atlas displays the information in the Matlab workspace if the atlas is not found. 
+	</P>
+	<P> 
+        This script requires SPM packages to be added to the path.
+	</P>
+
+	<P> 
+        The SPM package can be found at <a href="http://www.fil.ion.ucl.ac.uk/spm/software/download.html">http://www.fil.ion.ucl.ac.uk/spm/software/download.html </a>
+	</P>
+

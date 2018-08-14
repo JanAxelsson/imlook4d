@@ -12,12 +12,23 @@
 
 
 StartScript
-
+        
+    % Dimensions, assuming you import from same window as exporting
+        dim = size(imlook4d_Cdata);
 
     % Import from ImageJ
-        imlook4d_Cdata=MIJ.getCurrentImage();
+        MIJ.run('Hyperstack to Stack'); % Make 3D
+        M3=MIJ.getCurrentImage();
         
-        % Record history (what this image has been through)
+    % Display as in imlook4d
+        M2 = flipud(M3);
+        %M2=M3;
+        M =imlook4d_fliplr(rot90(M2,3)); % flip and rotate 270 degrees
+        
+        imlook4d_Cdata = reshape( M, dim(1), dim(2), dim(3), []); % Make 4D
+
+        
+    % Record history (what this image has been through)
         historyDescriptor='From ImageJ - ';
         imlook4d_current_handles.image.history=[historyDescriptor '-' imlook4d_current_handles.image.history  ];
         guidata(imlook4d_current_handle, imlook4d_current_handles);

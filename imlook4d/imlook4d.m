@@ -299,6 +299,9 @@ function varargout = imlook4d(varargin)
         % DIALOG       
         %return
     end
+    
+
+    
 
     if nargout
          [varargout{1:nargout}] = gui_mainfcn(gui_State,varargin{:});        
@@ -316,6 +319,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
             % handles    structure with handles and user data (see GUIDATA)
             % varargin   command line arguments to imlook4d (see VARARGIN)
             %
+
             
             % Set recording to off
             handles.record.enabled = false;
@@ -567,50 +571,20 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                   % Main menu item
                  handles.scriptsMenuHandle = uimenu(handles.figure1,'Label','SCRIPTS');
                  set(handles.scriptsMenuHandle, 'Callback', 'imlook4d(''ScriptsMenu_Callback'',gcbo,[],guidata(gcbo))');          
-            
-                 [pathstr1,name,ext] = fileparts(which('imlook4d'));
-                 %temp=ls([pathstr1 filesep 'SCRIPTS']);            % Read files in SCRIPTS directory
-                 %temp = cellstr(temp(3:end,:));             % Make cell array of all except '.' and '..' 
                  
-                 [files dirs]=listDirectory([pathstr1 filesep 'SCRIPTS']);
-
-                 % Submenues (Folder names, skip if starting with '.')
+                 [pathstr1,name,ext] = fileparts(which('imlook4d'));
+                 
+                 
+                 [files dirs]=listDirectory([pathstr1 filesep 'SCRIPTS']); 
                  for i=1:length(dirs)
-                    if ~strcmp(dirs{i}(1),'.') % Skip if directory starts with '.'
-                        
-                        nameWithSpaces= regexprep(dirs{i},'_', ' ');  % Replace '_' with ' '
-                        handles.scriptsMenuSubHandle = uimenu(handles.scriptsMenuHandle,'Label',nameWithSpaces);  % Make submenu (don't add callback - let SCRIPT menu do callback)
-                        %set(handles.scriptsMenuHandle, 'Callback', 'imlook4d(''ScriptsMenu_Callback'',gcbo,[],guidata(gcbo))');  % Same callback for all scripts
-                        
-                        % Submenu scripts (Look inside folders, and make submenu items (script names)  )
-                         [files2 dirs2]=listDirectory([pathstr1 filesep 'SCRIPTS' filesep dirs{i}]);
-                         addpath([pathstr1 filesep 'SCRIPTS' filesep dirs{i}]);      % Add folder to path (in case you made a new one) 
-                         
-                         for j=1:length(files2)
-                            
-                            [pathstr,name,ext] = fileparts(files2{j});
-                            if strcmp(ext,'.m')
-                                nameWithSpaces= regexprep(name,'_', ' ');  % Replace '_' with ' '
-                                
-                                %handles.scriptsMenuSubItemHandle(j) = uimenu(handles.scriptsMenuSubHandle,'Label',nameWithSpaces, 'Callback', ['eval(''' name ''') ']); 
-                                
-                                % EXAMPLE how to callback two functions
-                                %handles.scriptsMenuSubItemHandle(j) = uimenu(handles.scriptsMenuSubHandle,'Label',nameWithSpaces, 'Callback', ['disp(''HEJ'');' 'eval(''' name ''') ']); 
-                                %disp(['eval(''' name ''') ']);
-
-                                % Advanced callback to allow help files for
-                                % scripts
-                                handles.scriptsMenuSubItemHandle(j) = ...
-                                    uimenu(handles.scriptsMenuSubHandle,'Label',nameWithSpaces, 'Callback', [ ...
-                                    'if imlook4d(''DisplayHelp'',gcbo,[],guidata(gcbo));return;end;' ...
-                                    'eval(''' name ''') ' ...
-                                    ]); 
-
-                            end
-                         end
-
-                    end
+                     nameWithSpaces= regexprep(dirs{i},'_', ' ');  % Replace '_' with ' '
+                     if ~strcmp(dirs{i}(1),'.') % Skip if directory starts with '.'
+                        handles.scriptsMenuSubHandle = uimenu(handles.scriptsMenuHandle,'Label',nameWithSpaces);  % Make submenu to SCRIPTS (don't add callback - let SCRIPT menu do callback)
+                        handles = makeSubMenues( handles, handles.scriptsMenuSubHandle, [pathstr1 filesep 'SCRIPTS' filesep dirs{i} ]);
+                     end
                  end
+     
+                 
             %
             % Make USER SCRIPT MENUS (from files in imlook4d/../USER_SCRIPTS directory)
             %      -----------------
@@ -650,73 +624,20 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 
                       % Main menu item
                      handles.scriptsMenuUserHandle = uimenu(handles.scriptsMenuHandle,'Label','USER','Separator','on'); % Under SCRIPTS
-                     %set(handles.scriptsMenuUserHandle, 'Callback', 'imlook4d(''ScriptsMenu_Callback'',gcbo,[],guidata(gcbo))');          
+
+                     % Submenues
+                     [files dirs]=listDirectory( userScriptFolderPath );
+                     for i=1:length(dirs)
+                         nameWithSpaces= regexprep(dirs{i},'_', ' ');  % Replace '_' with ' '
+                         if ~strcmp(dirs{i}(1),'.') % Skip if directory starts with '.'
+                             handles.scriptsMenuSubHandle = uimenu(handles.scriptsMenuUserHandle,'Label',nameWithSpaces);  % Make submenu to SCRIPTS (don't add callback - let SCRIPT menu do callback)
+                             handles = makeSubMenues( handles, handles.scriptsMenuSubHandle, [userScriptFolderPath filesep dirs{i} ]);
+                         end
+                     end
                      
                      % Find files and folders in USER_SCRIPTS
                      [files dirs]=listDirectory(userScriptFolderPath);
-
-
-                 %
-                 % Menu SCRIPTS/USER/JAN
-                 %
-                     % Submenues (Folder names, skip if starting with '.')
-                     % Look for folders in (imlook4d/../USER_SCRIPTS)
-                     for i=1:length(dirs)
-                        if ~strcmp(dirs{i}(1),'.') % Skip if directory starts with '.'
-
-                            nameWithSpaces= regexprep(dirs{i},'_', ' ');  % Replace '_' with ' '
-                            handles.scriptsMenuUserSubHandle = uimenu(handles.scriptsMenuUserHandle,'Label',nameWithSpaces);  % Make submenu (don't add callback - let SCRIPT menu do callback)
-                            %set(handles.userScriptsMenuHandle, 'Callback', 'imlook4d(''ScriptsMenu_Callback'',gcbo,[],guidata(gcbo))');  % Same callback for all scripts
-
-                            %
-                            % Menu SCRIPTS/USER/JAN/testscript.m
-                            %
-                            
-                            % Submenu scripts (Look inside folders, and make submenu items (script names)  )
-                             [files2 dirs2]=listDirectory([userScriptFolderPath filesep dirs{i}]);
-                             addpath([userScriptFolderPath filesep dirs{i}]);      % Add folder to path (in case you made a new one) 
-
-                             for j=1:length(files2)
-
-                                [pathstr,name,ext] = fileparts(files2{j});
-                                if strcmp(ext,'.m')
-                                    nameWithSpaces= regexprep(name,'_', ' ');  % Replace '_' with ' '
-
-                                    % Advanced callback to allow help files for scripts
-                                    handles.userScriptsMenuSubItemHandle(j) = ...
-                                        uimenu(handles.scriptsMenuUserSubHandle,'Label',nameWithSpaces, 'Callback', [ ...
-                                        'if imlook4d(''DisplayHelp'',gcbo,[],guidata(gcbo));return;end;' ...
-                                        'eval(''' name ''') ' ...
-                                        ]); 
-
-                                end
-                             end
-                             
-
-                        end
-                     end    
-                     
-                 %
-                 % Menu SCRIPTS/USER/testscript.m
-                 %
-                     % Submenues (Folder names, skip if starting with '.')
-                     % Look for folders in (imlook4d/../USER_SCRIPTS)
-                     for i=1:length(files)
-                        [pathstr,name,ext] = fileparts(files{i});
-                        if strcmp(ext,'.m') % Only if .m file
-
-                            nameWithSpaces= regexprep(name,'_', ' ');  % Replace '_' with ' '
-                            
-                            % Advanced callback to allow help files for scripts
-                            handles.userScriptsMenuItemHandle(j) = ...
-                                uimenu(handles.scriptsMenuUserHandle,'Label',nameWithSpaces, 'Callback', [ ...
-                                'if imlook4d(''DisplayHelp'',gcbo,[],guidata(gcbo));return;end;' ...
-                                'eval(''' name ''') ' ...
-                                ]); 
-                             
-
-                        end
-                     end                  
+                
  
                      %
                      % Add script menu "SCRIPTS/USER/Create Script"  
@@ -770,77 +691,47 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 
                  %temp=ls([pathstr1 filesep 'MODELS']);
                  
-                 temp=listDirectory([pathstr1 filesep 'MODELS']);
+                 
+                 handles = makeSubMenues( handles, handles.image.modelsMenuHandle, [[pathstr1 filesep 'MODELS']]);
+                 handles.model.functionHandle=[];
 
-                 % Submenu items
-                 for i=1:length(temp)
-                     [pathstr,name,ext] = fileparts(temp{i});
-                    nameWithSpaces= regexprep(name,'_', ' ');  % Replace '_' with ' '
-
-                    if strcmp(ext,'.m')
-                        % Setup submenu callback (for instance test_control)
-                        handles.image.modelsSubMenuHandle(1) = uimenu(handles.image.modelsMenuHandle,'Label',nameWithSpaces, 'Callback', [name '_control(gcbo)']);
-                      
-                        %disp([name '_control(guidata(gcbo))']);% Display paths to scripts
-
-                        % Setup image generation function (for instance @test)
-                        handles.model.functionHandle=[];
-                    end
-                 end
 
             %
             % Make COLOR menu (from files in imlook4d COLORMAPS directory)
             %     ------------
                  [pathstr1,name,ext] = fileparts(which('imlook4d'));
-%                  temp=ls([pathstr1 filesep 'COLORMAPS']);          % Read files in SCRIPTS directory
-%                  temp=([pathstr1 filesep 'COLORMAPS']);
-%                  temp = cellstr(temp(3:end,:));             % Make cell array of all except '.' and '..' 
-                 
                  temp=listDirectory([pathstr1 filesep 'COLORMAPS']);
+                 handles = makeSubMenues( handles, handles.Cmaps, [pathstr1 filesep 'COLORMAPS']);
 
-                 % Submenu items
-                 for i=1:length(temp)
-                    [pathstr,name,ext] = fileparts(temp{i});
-                    nameWithSpaces= regexprep(name,'_', ' ');  % Replace '_' with ' '
-
-                    if strcmp(ext,'.m')
-                        % Setup submenu callback              
-                       callbackString=['imlook4d(''Color_Callback'',gcbo,[],guidata(gcbo), ''' name ''' )'];
-
-                       % html text
-                       [pathstr2,name2,ext2] = fileparts( which(name));
-                       % label = [ '<html> <img width=100 height=15  src="file://' pathstr1 filesep 'COLORMAPS' filesep name2 '.png" ></img><font color="white">--</font>'  nameWithSpaces '</html>'];
-                       label = [ '<html> <img width=100 height=15  src="file:///' pathstr2 filesep name2 '.png" ></img><font color="white">--</font>'  nameWithSpaces '</html>'];
-
-                       handles.image.colorSubMenuHandle(i) = uimenu(handles.Cmaps, 'Label',label,'Tag',name, 'Callback', callbackString);
-                    end
-                 end  
+% 
+%                  % Submenu items
+%                  for i=1:length(temp)
+%                     [pathstr,name,ext] = fileparts(temp{i});
+%                     nameWithSpaces= regexprep(name,'_', ' ');  % Replace '_' with ' '
+% 
+%                     if strcmp(ext,'.m')
+%                         % Setup submenu callback              
+%                        callbackString=['imlook4d(''Color_Callback'',gcbo,[],guidata(gcbo), ''' name ''' )'];   
+%                        
+%                        % html text
+%                        [pathstr2,name2,ext2] = fileparts( which(name));
+%                        % label = [ '<html> <img width=100 height=15  src="file://' pathstr1 filesep 'COLORMAPS' filesep name2 '.png" ></img><font color="white">--</font>'  nameWithSpaces '</html>'];
+%                        label = [ '<html> <img width=100 height=15  src="file:///' pathstr2 filesep name2 '.png" ></img><font color="white">--</font>'  nameWithSpaces '</html>'];
+% 
+%                        handles.image.colorSubMenuHandle(i) = uimenu(handles.Cmaps, 'Label',label,'Tag',name, 'Callback', callbackString);
+%                     end
+%                  end  
 
             %
             % Make WINDOW LEVEL menu (from files in imlook4d WINDOW_LEVELS directory)
             %     ------------------
                  [pathstr1,name,ext] = fileparts(which('imlook4d'));
-%                  temp=ls([pathstr1 filesep 'WINDOW_LEVELS']);      % Read files in WINDOW_LEVELS directory
-%                  temp=([pathstr1 filesep 'WINDOW_LEVELS']);
-%                  temp = cellstr(temp(3:end,:));             % Make cell array of all except '.' and '..' 
  
                  temp=listDirectory([pathstr1 filesep 'WINDOW_LEVELS']);
 
                  % Submenu items
-                 for i=1:length(temp)
-                    [pathstr,name,ext] = fileparts(temp{i});
-                    nameWithSpaces= regexprep(name,'_', ' ');  % Replace '_' with ' '
-
-                    if strcmp(ext,'.m')
-                        % Setup submenu callback 
-                        callbackString=[name '(gcbo,[],guidata(gcbo))'];  % Callback using ui object
-                        callbackString=[callbackString ';' 'imlook4d(''updateImage'',gcf,[],guidata(gcf) )'];
-
-                        
-                        %disp(['name=' name '   WINDOW_LEVELS Callback=' callbackString]);% Display paths
-                        handles.image.WindowLevelsSubMenuHandle(i) = uimenu(handles.WindowLevelsMenu, 'Label',nameWithSpaces, 'Callback', callbackString);     
-                    end
-                 end  
+                 handles = makeSubMenues( handles, handles.WindowLevelsMenu, [pathstr1 filesep 'WINDOW_LEVELS']);
+ 
                  
             %
             % Make NETWORK HOSTS menu (from files in imlook4d PACS directory)
@@ -983,27 +874,6 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 
 
                 set(handles.ColorBar,'Units','normalized');  % Correct above loop (otherwise interactive colorbar does not work)
-
-                                
-
-
-                
-                
-                % Controls (GUILayout2 should not move in y direction)
-    %             handles.GUILayout2.frame1=get(handles.frame1, 'Position');
-    %             handles.GUILayout2.frame3=get(handles.frame3, 'Position');           
-    %             handles.GUILayout2.FrameText=get(handles.FrameText, 'Position');  
-    %             handles.GUILayout2.SliceText=get(handles.SliceText, 'Position');           
-    %             handles.GUILayout2.FrameNumSlider=get(handles.FrameNumSlider, 'Position');   
-    %             handles.GUILayout2.SliceNumSlider=get(handles.SliceNumSlider, 'Position'); 
-    %             handles.GUILayout2.FrameNumEdit=get(handles.FrameNumEdit, 'Position');  
-    %             handles.GUILayout2.SliceNumEdit=get(handles.SliceNumEdit, 'Position');  
-    %             handles.GUILayout2.frameTimeText=get(handles.frameTimeText, 'Position');  
-    %             handles.GUILayout2.frameTimeMinutesText=get(handles.frameTimeMinutesText, 'Position');  
-    %             handles.GUILayout2.text17=get(handles.text17, 'Position');                          
-%                 set(handles.versionText,'Units','normalized');  % Correct above loop (otherwise interactive colorbar does not work)
-%                  handles.GUILayout2.versionText=get(handles.versionText, 'Position'); 
-
     
 
             %
@@ -1058,7 +928,8 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
             %
             % Finalize
             %
-            
+
+         
                 % Set sliders
                 adjustSliderRanges(handles);
 %                 get(handles.PC_high_slider)
@@ -1084,17 +955,22 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 
                 clear varargin;
                 figure1_ResizeFcn(hObject, eventdata, handles)
-                imlook4d_set_defaults(hObject, eventdata, handles);
-            %updateImage(hObject, eventdata, handles);
-            %    guidata(hObject, handles);
-                
-                            
-                            
-            % Adjust colorbar position
-           % handles.ColorBar = findobj(gcf,'Tag','Colorbar');
+                imlook4d_set_defaults(hObject, eventdata, handles);            
+                        
+                % Set windows position offset to current imlook4d handle
+                try
+                    imlook4d_current_handle = evalin('base', 'imlook4d_current_handle');
+                    dx = 24;
+                    dy = 24;
+                    oldPos = get( imlook4d_current_handle, 'Position')
+                    newPos = get( gcf, 'Position') % width and height is OK
+                    newPos = [ oldPos(1) + dx, oldPos(2) - dy, newPos(3), newPos(4) ] % Shift Pos from old window
+                    set( hObject, 'Position', newPos);
+                catch
+                end
 
-           initpos = get(handles.ColorBar,'Position')
-           initpos = [ initpos(1) ,  1.15*initpos(2) ,  initpos(3) , 0.85*initpos(4) ]
+           initpos = get(handles.ColorBar,'Position');
+           initpos = [ initpos(1) ,  1.15*initpos(2) ,  initpos(3) , 0.85*initpos(4) ];
            
            initfontsize = get(handles.ColorBar,'FontSize');
 
@@ -1112,7 +988,123 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
  
  % Set HitTest (Matlab 2016b is sensitive to this, see my support issue to MathWorks #0235001)
  h=handles.figure1;h.HitTest='on';
+    function handles = makeSubMenues( handles, parentMenuHandle, subMenuFolder)
+        if strcmp( subMenuFolder(end), '.') % Ignore '.' and '..'
+            return
+        end
+        
+        % Identify files in folder
+        [filesInDir dirs]=listDirectory(subMenuFolder);
+        
+        % Identify files in sort.txt
+        filesListedInFile = [];
+        sortIndexPath = [ subMenuFolder filesep 'sort.txt'];
+        if exist(sortIndexPath, 'file')
+            fileID = fopen(sortIndexPath,'r');
+            formatSpec = '%s';
+            all = textscan(fileID,formatSpec);
+            filesListedInFile = all{1}';
+        end
+        
+        % Identify acceleratorKeys; for instance '(D)Duplicate' for accelerator D,
+        % in sort.txt
+        acceleratorKeys = {};
+        for i=1:length(filesListedInFile)
+            rowName = filesListedInFile{i};
+            acceleratorKeys{i} = '';
+            if strcmp( rowName(1), '(' )
+                acceleratorKeys{i} = rowName(2);
+                filesListedInFile{i} = rowName(4:end); % Clean out accelerator from name
+            end
+        end
+        
+        % Find which files not listed in sort.txt (or sort.txt is missing)
+        missingFiles = setdiff( filesInDir, filesListedInFile);
+        properMissingFiles = {};
+        properMissingAcceleratorKeys = {};
+        for i=1:length(missingFiles)
+           if strcmp( missingFiles{i}(end-1:end), '.m') 
+               properMissingFiles = [ properMissingFiles missingFiles(i) ];
+               properMissingAcceleratorKeys = [ properMissingAcceleratorKeys {''}]; % Add empty accelerator
+           end
+        end
+        
+        % Add files missing in sort.txt
+        if length(filesListedInFile)>0
+            menuItemNames = [ filesListedInFile  {'---'} properMissingFiles];
+            acceleratorKeys = [ acceleratorKeys {''} properMissingAcceleratorKeys ];
+        else
+            menuItemNames =  properMissingFiles;
+            acceleratorKeys = properMissingAcceleratorKeys;
+        end
+        
+        
+        % Make submenues
+        lineOnOff = 'off';
+        for j=1:length(menuItemNames)
+            [pathstr,name,ext] = fileparts(menuItemNames{j});
+            
+            % Make line
+            if startsWith( name, '---')
+                lineOnOff = 'on';
+            end
+            
+            % Make submenu item
+            if strcmp(ext,'.m')
+                nameWithSpaces= regexprep(name,'_', ' ');  % Replace '_' with ' '
+                
+                % For SCRIPTS, MODEL,
+                callBack = [ ...
+                    'if imlook4d(''DisplayHelp'',gcbo,[],guidata(gcbo));return;end;' ...
+                    'assignin(''base'', ''imlook4d_current_handle'', gcf );' ...
+                    'eval(''' name ''') ' ];
+                label = nameWithSpaces;
+                tag = nameWithSpaces;
+                                
+                % Special for COLOR menu
+                if strcmp( get(parentMenuHandle, 'Label'), 'Color')
+                    callBack=['imlook4d(''Color_Callback'',gcbo,[],guidata(gcbo), ''' name ''' )']; 
+                    [pathstr2,name2,ext2] = fileparts( which(name));
+                    label = [ '<html> <img width=100 height=15  src="file:///' pathstr2 filesep name2 '.png" ></img><font color="white">--</font>'  nameWithSpaces '</html>'];
+                    tag = nameWithSpaces;
+                end
+                
+                % Advanced callback to allow 
+                % - help files for scripts
+                % - set imlook4d_current_handle
+                % - run script
+                handles.scriptsMenuSubItemHandle(j) = ...
+                    uimenu(parentMenuHandle,'Label',label, 'Callback', callBack , 'Tag', tag);
 
+
+%                  % Submenu items
+%                  for i=1:length(temp)
+%                     [pathstr,name,ext] = fileparts(temp{i});
+%                     nameWithSpaces= regexprep(name,'_', ' ');  % Replace '_' with ' '
+% 
+%                     if strcmp(ext,'.m')
+%                         % Setup submenu callback              
+%                        callbackString=['imlook4d(''Color_Callback'',gcbo,[],guidata(gcbo), ''' name ''' )'];   
+%                        
+%                        % html text
+%                        [pathstr2,name2,ext2] = fileparts( which(name));
+%                        % label = [ '<html> <img width=100 height=15  src="file://' pathstr1 filesep 'COLORMAPS' filesep name2 '.png" ></img><font color="white">--</font>'  nameWithSpaces '</html>'];
+%                        label = [ '<html> <img width=100 height=15  src="file:///' pathstr2 filesep name2 '.png" ></img><font color="white">--</font>'  nameWithSpaces '</html>'];
+% 
+%                        handles.image.colorSubMenuHandle(i) = uimenu(handles.Cmaps, 'Label',label,'Tag',name, 'Callback', callbackString);
+%                     end
+%                  end  
+                
+                
+                % Add Accelerator key
+                set( handles.scriptsMenuSubItemHandle(j), 'Accelerator', acceleratorKeys{j} );
+                
+                handles.scriptsMenuSubItemHandle(j).Separator= lineOnOff;
+                lineOnOff = 'off';
+            end
+            
+        end    
+ 
 % Output to command line                    
 function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         % --- Outputs from this function are returned to the command line.
@@ -1138,62 +1130,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 % GUI CREATION, this is where a GUI is defined
 % --------------------------------------------------------------------
   
-    % Depreciated (phased out)
-    function initiateSliderRanges(handles)
-       warndlg('initiateSliderRanges is depreciated.  Contact Jan');
-       % This function initiates the slider ranges
-       % when a new imlook4d instance is opened
-       [r,c,z,frames]=size(handles.image.Cdata);
-     
-        % one or multiple slides
-        if z == 1
-            % Make slice slider and edit invisible
-            %disp('Single slice')
-            set(handles.SliceNumSlider,'visible','off','Value', 1);
-            set(handles.SliceNumEdit,'visible','off');
-            set(handles.SliceText,'visible','off');
-        else
-            %disp('Multiple slices')
-            %if ( get(handles.SliceNumSlider,'Value')>z)
-                set(handles.SliceNumSlider,'visible','on','Min',1,'Max',z,...
-                    'Value',round(z/2),...
-                    'SliderStep',[1.0/double(z-1) 1.0/double(z-1)]);
-                
-                set(handles.SliceNumEdit,'String',num2str(round(z/2)) );
-            %end
-            
-            %set(handles.SliceNumEdit,'visible','on');
-            %set(handles.SliceText,'visible','on');
-        end
 
-        % one or multiple frames
-        if frames == 1
-            % Make frame slider and edit invisible
-            %disp('Single frame')
-            set(handles.FrameNumSlider,'visible','off','Value',1);
-            set(handles.FrameNumEdit,'visible','off');
-        else
-            %disp('Multiple frames')
-            set(handles.FrameNumSlider,'visible','on','Min',1,'Max',frames,...
-                'Value',1,...
-                'SliderStep',[1.0/double(frames-1) 1.0/double(frames-1)]);
-            
-            set(handles.PC_low_slider,'Min',1,'Max',frames,...
-                'Value',1,...
-                'SliderStep',[1.0/double(frames-1) 1.0/double(frames-1)]);
-            
-            set(handles.FrameNumEdit,'visible','on');
-            set(handles.FrameText,'visible','on');
-            
-            
-            % Hardcoded initial value for noise cutoff
-            set(handles.PC_high_slider,'Min',1,'Max',frames,'Value',...
-                frames,'SliderStep',[1.0/double(frames-1) 1.0/double(frames-1)]);
-        end
-        
-        set(handles.PC_high_edit,'visible','on','String',num2str(frames));
-        
-        set(handles.PC_high_edit,'visible','on','String',frames);    
     function SliceNumSlider_CreateFcn(hObject, eventdata, handles)
         % hObject    handle to SliceNumSlider (see GCBO)
         % eventdata  reserved - to be defined in a future version of MATLAB
@@ -1801,10 +1738,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         set(handles.orientationMenu,'Enable', 'inactive');
         set(handles.PC_low_slider,'Enable', 'inactive');
         set(handles.FirstFrame,'Enable', 'inactive');
-        set(handles.ColorBar, 'ButtonDownFcn', @(hObject,eventdata)imlook4d('ColorBar_Callback',hObject,eventdata,guidata(hObject)) ); 
-              if DisplayHelp(hObject, eventdata, handles) 
-                 return 
-             end
+        set(handles.ColorBar, 'ButtonDownFcn', @(hObject,eventdata)imlook4d('ColorBar_Callback',hObject,eventdata,guidata(hObject)) );
+        
+        % Display interactive-help first page
+        if DisplayHelp(hObject, eventdata, handles)
+            figure(gcf) % Move to top
+            return
+        end
     function helpToggleTool_OffCallback(hObject, eventdata, handles)
         releasedToggleButton( hObject);
         % Set textboxes etc on, to allow normal work when help button is not pressed
@@ -2125,7 +2065,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 disp( msg);
                 displayMessageRow(msg)
                 
-                line( x,y,'ButtonDownFcn','delete(gcbo)');
+                line( x,y,'ButtonDownFcn','delete(gcbo)','LineWidth',3);
                 
                 releasedToggleButton( hObject);
                 
@@ -2991,7 +2931,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         %
         % Rotate and flip to selected
         %
-            disp(['2) newNumericOrientation = ' num2str(newNumericOrientation)]);
+            %disp(['2) newNumericOrientation = ' num2str(newNumericOrientation)]);
             [handles, newOrientation] = rotateOrientation( handles, PERMUTE, newNumericOrientation);
 
             % Set new orientation
@@ -3016,7 +2956,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 
                 X=1; Y=2; Z=3;
                 
-                PERMUTE{numericOrientation}
+                PERMUTE{numericOrientation};
 
                 
               % Get current pixel dimensions
@@ -3081,11 +3021,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 handles.image.pixelSizeX = newVoxelSize(X);
                 handles.image.pixelSizeY = newVoxelSize(Y);
                 handles.image.sliceSpacing = newVoxelSize(Z);
-        
-            % Test
-            disp(['rotateOrientation       size(ROI)=' num2str(size(handles.image.ROI)) ]);
-            disp(['rotateOrientation       size(UndoROI)=' num2str(size(handles.image.UndoROI.ROI{1}.roiSlices{1})) ]);
-            disp(['rotateOrientation  SliceNumSlider=' num2str(get(handles.SliceNumSlider,'Max')) ]);
+
       function handles = resetOrientation(handles)
 %             disp(['resetOrientation  size(ROI)=' num2str(size(handles.image.ROI)) ]);
 %             disp(['resetOrientation  size(Cdata)=' num2str(size(handles.image.Cdata)) ]);
@@ -3097,14 +3033,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              %handles = guidata(handles.figure1);
             
             set(handles.orientationMenu,'Value',1);
-            handles = setOrientation(handles, 1)            
-            %handles = guidata(handles.figure1); % Set modified handles  
-        
-            % Test
-            disp(['resetOrientation        size(ROI)=' num2str(size(handles.image.ROI)) ]);
-            disp(['resetOrientation   SliceNumSlider=' num2str(get(handles.SliceNumSlider,'Max')) ]);
+            handles = setOrientation(handles, 1);            
 
-        
+
+     
     % --------------------------------------------------------------------
     % ROI drawing functions
     % --------------------------------------------------------------------
@@ -3426,12 +3358,29 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                 % Draw over any pixels in brush
                                 %subMatrix( nonLockedROIPixels ) = activeROI;  % Draw over any pixels in brush
                                 
-                                % Draw over pixels above level
-                                level = str2num( get(handles.ROILevelEdit,'String') );
-                                subDataMatrix= handles.image.Cdata( ixx:(ixx+rx-1),(iyy):(iyy+ry-1), slice, frame);
-                                
-                                % In brush AND non-locked AND above level
-                                nonLockedAboveLevelPixels = find( (ROILock==0) & (handles.image.brush>0) & (subDataMatrix >= level) ); 
+%                                 % Draw over pixels above level
+%                                 level = str2num( get(handles.ROILevelEdit,'String') );
+                                 subDataMatrix= handles.image.Cdata( ixx:(ixx+rx-1),(iyy):(iyy+ry-1), slice, frame);
+%                                 
+%                                 % In brush AND non-locked AND above level
+%                                 nonLockedAboveLevelPixels = find( (ROILock==0) & (handles.image.brush>0) & (subDataMatrix >= level) );
+
+                                % Above / below level
+                                levelInterval = get(handles.ROILevelEdit,'String');
+                                if strcmp( '<', levelInterval(1) ) 
+                                    % draw below level
+                                    level = str2num( levelInterval(2:end));
+                                    nonLockedAboveLevelPixels = find( (ROILock==0) & (handles.image.brush>0) & (subDataMatrix <= level) );
+                                else
+                                    if strcmp( '>', levelInterval(1) ) 
+                                        levelInterval = levelInterval(2:end); % Remove '>'
+                                    end
+                                    % draw above level
+                                    level = str2num( levelInterval);
+                                    nonLockedAboveLevelPixels = find( (ROILock==0) & (handles.image.brush>0) & (subDataMatrix >= level) );
+                                end
+
+
                                 
                                 % Set pixels
                                 subMatrix( nonLockedAboveLevelPixels ) = activeROI;  % Draw over any pixels in brush
@@ -3920,6 +3869,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              % Set colorscale
                     imlook4d_set_colorscale_from_modality(gcf, {}, guidata(gcf));
                     imlook4d_set_ROIColor(gcf, {}, guidata(gcf));
+             % Print file path
+             dispOpenWithImlook4d( [path file] );
             function LocalOpenMGH(hObject, eventdata, handles, file,path)  
                 % Test if Freesurfer files exist
                     if strcmp('', which('MRIread'))
@@ -4023,8 +3974,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     catch
                         %  Load NIFTI or ANALYZE dataset, but not applying any appropriate affine
                         %  geometric transform or voxel intensity scaling.
-                        %warndlg({'WARNING - load_nii failed.',  'Trying load_untouch_nii.',  'The data will not go through geometrical transforms'}); 
-                        nii = load_untouch_nii(fullPath)
+                        warndlg({'WARNING - load_nii failed.',  'Trying load_untouch_nii.',  'The data will not go through geometrical transforms'}); 
+                        nii = load_untouch_nii(fullPath);
                         openingMode='load_untouch_nii';                        
                     end
                     
@@ -4479,12 +4430,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                         try
                             disp('DICOM header did not work');
-                            [time, duration]=timeFromDICOMInput(header);
+                            [time, myDuration]=timeFromDICOMInput(header);
                             h=imlook4d(Data, time, duration);
                         catch
                             try 
                                 disp('Try ECAT header');
-                                [time, duration]=timeFromECATInput(subHeader);
+                                [time, myDuration]=timeFromECATInput(subHeader);
                                 h=imlook4d(Data, time, duration);
 
                             catch
@@ -5116,12 +5067,6 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     %imlook4d_set_colorscale_from_modality( get( findobj(hObject, 'Label', 'Gray') ), eventdata, newhandles);
                     
                     handleToColorMenu=findobj(newhandles.EditMenu, 'Label', 'Color');  % Menu Color
-%                    imlook4d_set_colorscale_from_modality( handleToColorMenu , eventdata, newhandles);     % Sets color according to modality 
-
-%                     newhandles = guidata(h); % Update newhandles
-%                     imlook4d_set_ROIColor(h, {}, newhandles)
-
-%                    updateImage(h, eventdata, newhandles);
                 function displayDicomListOfTags( headers, mode)
 
                     % MACHINE INFO
@@ -5371,7 +5316,15 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                         if strcmp(handles.image.openingMode,'load_untouch_nii')
                             save_untouch_nii(nii, destination);
-                        end                    
+                        end      
+                        
+                        % Save .sif file if time-data exists
+                        try
+                            [folder file extension] = fileparts(destination);
+                            sifFilePath = [ folder filesep file '.sif'];
+                            write_sif( handles, sifFilePath);
+                        catch
+                        end
             function LocalSaveAnalyze(handles, matrix)
 
                     % New file name
@@ -5727,6 +5680,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                            %newPath=uigetdir(guessedDirectory,'Select directory to save files to');
                           %newPath=java_uigetdir(guessedDirectory,'Make an empty directory to save all DICOM files within'); % Use java directory open dialog (nicer than windows)
                           newPath=java_uigetdir(previousDirectory,'Select/create directory to save files to'); % Use java directory open dialog (nicer than windows)
+                          if newPath == 0
+                              disp('Cancelled by user');
+                              return
+                          end
+                          
                           
                           % Make directory if not existing
                           fn = fullfile(newPath);
@@ -6093,13 +6051,18 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             % Make axial     
                 handles = resetOrientation(handles);
                 
-            % GUI input
+            % GUI input            
+            if nargin==4
+                file = fullPath;
+            end
+            
             
             if nargin==3
             % Dialog option
                % [file,path] = uigetfile('*.mat;*.roi','ROI Open file name');
                 [file,path] = uigetfile( ...
-                            {'*.mat;*.roi','imlook4d ROI'; ...
+                            { '*.roi;*.nii;*.nii.gz', 'ROI file' ; ...
+                            '*.mat;*.roi','imlook4d ROI'; ...
                              '*.nii', 'ROI from Nifti';   ...
                             '*.nii.gz','Nifti Files (*.nii.gz)'} ...
                            ,'ROI Open file name');
@@ -6134,19 +6097,35 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
             
             % Put ROI in rois
-            [pathstr,name,ext] = fileparts(fullPath) 
+            [pathstr,name,ext] = fileparts(fullPath); 
             
             if strcmp(ext,'.roi')|| strcmp(ext,'.mat')
                 load(fullPath,'-mat');
             end         
             
             if strcmp(ext,'.nii')
-                nii = load_nii(fullPath);
+                %nii = load_nii(fullPath);
+                %nii = load_untouch_nii(fullPath);
+                
+                   
+                try
+                        nii = load_nii(fullPath);
+                        openingMode='load_nii';
+                catch
+                        %  Load NIFTI or ANALYZE dataset, but not applying any appropriate affine
+                        %  geometric transform or voxel intensity scaling.
+                        %warndlg({'WARNING - load_nii failed.',  'Trying load_untouch_nii.',  'The data will not go through geometrical transforms'}); 
+                        nii = load_untouch_nii(fullPath);
+                        openingMode='load_untouch_nii';                        
+                end
+                
+                
                 rois= nii.img;
                 roiSize = size(rois);
                 
                 %roiNames
                 pixelValues = unique(rois);
+                pixelValues = pixelValues( ~isnan( pixelValues)); % Remove NaNs that are treated as unique
                 roiNames={};
                 roiValue = 1; % First ROI should have this value
                 
@@ -6547,7 +6526,6 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         catch
         end
          
-    
     % Color submenu   
         function Color_Callback(hObject, eventdata, handles, functionName)
 %            % General callback for all Colormaps in COLORMAPS folder
@@ -6577,44 +6555,47 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                      return 
                  end
                  
-                 disp( functionName);
+                 %disp( functionName);
                  
                  Color(handles.figure1, eventdata, handles,functionName)
                  newhandles = guidata(handles.figure1);
                  imlook4d_set_ROIColor(newhandles.figure1, eventdata, newhandles)
+                 %newhandles.image.ColormapName = functionName;
+                 handles.image.ColormapName = functionName;
                  guidata(newhandles.figure1,newhandles)
             
             updateImage(hObject, eventdata, handles)
             updateROIs(newhandles)
             function Color(hObject, eventdata, handles, functionName)
-              % General callback for Colormap in COLORMAPS folder, which
-              % has name functionName
-try
-               % Determine correct object (dynamically generated callbacks)
-               temp=findobj('Tag', strrep(functionName,'_', ' '));
-               temp=findobj('Tag', functionName);
-               tempObject=temp(1);
-
-
-               % Checkmarks
-               hColorMenuObjects=get( get(tempObject,'Parent'), 'Children');  % All other
-               for i=1:size(hColorMenuObjects)
-                   set(hColorMenuObjects(i),'Checked','off')
-               end
-               set(tempObject,'Checked','on')
-
-                % Clean out spaces and replace with "_"
-                htable = feval(functionName);
-                set(handles.figure1,'Colormap',htable); 
-                if handles.imSize(3)> 1 
-                %set(handles.SliceNumEdit,'BackgroundColor',[.1 .1 .1],'ForegroundColor','r');
+                % General callback for Colormap in COLORMAPS folder, which
+                % has name functionName
+                try
+                    % Determine correct object (dynamically generated callbacks)
+                    temp=findobj('Tag', strrep(functionName,'_', ' '));
+                    %temp=findobj('Tag', functionName);
+                    tempObject=temp(1);
+                    
+                    
+                    % Checkmarks
+                    hColorMenuObjects=get( get(tempObject,'Parent'), 'Children');  % All other
+                    for i=1:size(hColorMenuObjects)
+                        set(hColorMenuObjects(i),'Checked','off')
+                    end
+                    set(tempObject,'Checked','on')
+                    
+                    % Clean out spaces and replace with "_"
+                    htable = feval(functionName);
+                    set(handles.figure1,'Colormap',htable);
+                    if handles.imSize(3)> 1
+                        %set(handles.SliceNumEdit,'BackgroundColor',[.1 .1 .1],'ForegroundColor','r');
+                    end
+                    
+                    handles.image.ColormapName = functionName;
+                    imlook4d_set_ROIColor(handles.figure1, eventdata, handles)
+                    guidata(handles.figure1,handles)
+                catch
+                    dispRed('Problem if you see this: Fix function color');
                 end
-                
-                handles.image.ColormapName = functionName;
-                imlook4d_set_ROIColor(handles.figure1, eventdata, handles)
-catch
-    dispRed('Problem if you see this: Fix function color');
-end
 
     % EDIT/ROI submenu
         function ColorfulROI_Callback(hObject, eventdata, handles)
@@ -7116,12 +7097,16 @@ end
 
          
 
-         % NOT imported: imlook4d current slice and frame 
+         % NOT imported: imlook4d current frame 
+         
+         try 
+             currentSlice=evalin('base', 'imlook4d_slice');
+         catch
+             disp('failed importing imlook4d_slice');
+         end;        
+         setSlice(handles, currentSlice, handles.figure1);
 
-         
-         
-         %setSliderRanges(handles);
-         %setSliderRanges(handles.figure1);
+
          
          % Resize images
 %          for h = get(handles.axes1, 'Children')
@@ -7135,23 +7120,27 @@ end
          
          % Redraw
          %axis(handles.axes1, 'auto'); % Needs to set handle to auto to fit strange matrix sizes (i.e. RDF data)
-
-         adjustSliderRanges(handles);
-         updateImage(hObject, eventdata, handles); 
+         
+         
+         try
+            adjustSliderRanges(handles);
+            updateImage(hObject, eventdata, handles); 
+         catch
+         end
          guidata(hObject,handles); 
          a = whos('handles');disp([ 'Size = ' num2str( round( a.bytes/1e6 )) ' MB']);            
     function importFromWorkspace_Callback(hObject, eventdata, handles,varargin)
         % This function Imports data from workspace INCLUDING Cdata
-        
+
         handles = importUntouched_Callback(hObject, eventdata, handles,varargin);
-                
+
          try  
              handles.image.Cdata=evalin('base', 'imlook4d_Cdata');
          catch
              disp('failed importing imlook4d_Cdata');
          end;
-
-        
+ 
+                  
           % Save modified data
          guidata(hObject,handles);   
          
@@ -7184,7 +7173,6 @@ end
             text = fileread('UserScript1.m');
             a = com.mathworks.mde.editor.MatlabEditorApplication.getInstance();
             editor = a.newEditor( text );
-            %editor.insertTextAtCaret([text EOL EOL]);  % Insert text at caret
 
     % --------------------------------------------------------------------
     % MODELS 
@@ -7217,7 +7205,7 @@ end
                 % Mark current window with a checkbox
                 if ( strcmp( get(g(i),'Tag'), 'imlook4d' ) || strcmp( get(g(i),'Tag'), '' ) )
                      h(j,1) = g(i);
-                     get(h(j),'Tag')
+                     get(h(j),'Tag');
                      j = j+1;
                 end
             end   
@@ -7345,7 +7333,9 @@ end
                 end
                 
                 if frame>numberOfFrames
-                    frame=numberOfFrames;set(handles.ImgObject3,'Cdata',tempData);
+                    frame=numberOfFrames;
+                    %set(handles.ImgObject3,'Cdata',tempData);
+                    adjustSliderRanges(handles);
                 end
                 if slice>numberOfSlices
                     slice=numberOfSlices;
@@ -7484,7 +7474,7 @@ end
                                 set(handles.axes1,'CLim', CLim);
                            end
                       catch
-                          disp('Error in imlook4d updateImage');
+                          %disp('Error in imlook4d updateImage');
                       end
                     
                 %
@@ -7577,7 +7567,7 @@ end
                 %
 
                     imAlphaData1 = 1;   % bottom-layer
-                    imAlphaData2 = 0.5; % overlay-layer
+                    imAlphaData2 = 0.8; % overlay-layer (background image in imlook4d vocabulary)
                     imAlphaDataROI =0.5;% roi-layer
 
                     % First image
@@ -8453,7 +8443,15 @@ end
                             % Toolbar buttons don't have 'Label', use 'Tag' instead
                             %helpFilePath=[pathstr1 filesep 'HELP' filesep get(hObject,'Tag') '.txt' ];
                             helpFilePath=[get(hObject,'Tag') '.txt' ];
-
+                       end
+                       
+                       % If html-string in Label
+                       try
+                           labelString = get(hObject,'Label');
+                           if strcmp( labelString(1:6),'<html>')
+                               helpFilePath=[get(hObject,'Tag') '.txt' ];
+                           end
+                       catch
                        end
                        
                        intendedhelpFilePath = helpFilePath;
@@ -8467,7 +8465,7 @@ end
                             [pathstr,name,ext] = fileparts(helpFilePath);
                             name1=strrep(name,' ','_');
                             name=strrep(name,'_',' ');
-                            helpFilePath=[ pathstr filesep name ext];
+                            %helpFilePath=[ pathstr filesep name ext];
                             text =  fileread(helpFilePath);
                        catch
                            % Read from parent object instead (useful for
@@ -9326,8 +9324,19 @@ end
         else
             % disp('Multiple frames')
             
+                         
+            % frame number > number of frames ?
+            if ( get(handles.FrameNumSlider,'Value')>frames)
+                
+                set(handles.FrameNumSlider,'visible','on','Min',1,'Max',frames,...
+                    'SliderStep',[1.0/double(frames-1) 1.0/double(frames-1)]);
+                
+                set(handles.FrameNumSlider,'Value', round(frames/2) );
+                set(handles.FrameNumEdit,'String',num2str(round(frames/2)) );
+            end
+            
             set(handles.FrameNumSlider,'visible','on','Min',1,'Max',frames,...
-                'SliderStep',[1.0/double(frames-1) 1.0/double(frames-1)]);
+                 'SliderStep',[1.0/double(frames-1) 1.0/double(frames-1)]);
             set(handles.FrameNumEdit,'visible','on');
             set(handles.FrameText,'visible','on');
             
@@ -9357,32 +9366,6 @@ end
                       
             guidata(handles.figure1, handles)
         end
-        function version=getImlook4dVersion()
-            % Get version number from About.txt
-%                 [pathstr1,name,ext] = fileparts(which('imlook4d'));
-%                 vs =  fileread([pathstr1 filesep 'HELP' filesep 'About.txt']);
-% 
-%                 startIndex=findstr(vs, 'version');
-%                 characters=findstr(vs(startIndex:end), '<BR>');
-%                 version=vs(startIndex+8:startIndex+characters-2); 
-
-
-                % Formats from pre-commit-hook.bat, available in
-                % version.txt:
-                % 510
-                % 493:510
-                % 510M
-                % 493:510M
-                % These numbers are one digit behind.
-                % I want to extract the last number and add one to it
-                
-                 %str =  fileread('version.txt');
-                 %t=str2double( regexp(str,'\d+', 'match') ); % get all double values
-                 %version = num2str( t(end) );  
-                 version =  fileread('version.txt');
-                 
-                 
- 
         function flag=isMultipleCall()
               flag = false; 
               % Get the stack
@@ -9400,10 +9383,7 @@ end
                 % More than 1
                 flag = true; 
               end
-            disp(['isMultipleCall depth=' num2str(numel(s))]);
-
-            
-            
+            disp(['isMultipleCall depth=' num2str(numel(s))]);       
             
 % Dummy function to override duration from timefun toolbox in Matlab 2014b
         function duration ()

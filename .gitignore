@@ -7,3 +7,6 @@
 # Ignore soft-linked USER_SCRIPT
 USER_SCRIPTS
 /USER_SCRIPTS
+
+# Ignore imlook4d releases
+imlook4d_*/

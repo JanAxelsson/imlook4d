@@ -12,8 +12,11 @@
    end
    
    if nargin()==1
+       try
          dummy=getINPUTS();
-         h=imlook4d(arg1);
+       catch
+       end
+       h=imlook4d(arg1);
    end
    
    handles = guidata(h);
