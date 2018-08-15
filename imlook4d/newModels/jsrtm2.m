@@ -67,7 +67,7 @@ function data =  jsrtm2( data, k2p)
     data.srtm2.par = [ R1_, k2_, k2a_ ,BP_ ];
     data.srtm2.name = { 'R1_', 'k2_', 'k2a_','BP_'};
     data.srtm2.fitted_curve = modfit_srtm2;
-    disp(data.srtm2.name );
-    disp(data.srtm2.par );
+%     disp(data.srtm2.name );
+%     disp(data.srtm2.par );
     
 end

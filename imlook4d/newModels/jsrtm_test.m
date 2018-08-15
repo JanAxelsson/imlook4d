@@ -10,12 +10,19 @@ disp(a.srtm)
 disp(a.srtm2)
 
 %%
+tic
+R1=zeros(1,256*256);
+for i = 1:256*256
 data.midtime = imlook4d_ROI_data.midtime;
 data.tact = imlook4d_ROI_data.mean(:,2);
+
 data.reftact = imlook4d_ROI_data.mean(:,1);
 
-a = jsrtm( data)
-%a = jsrtm2( a, a.srtm.k2p )
+a = jsrtm( data);
+R1(i) = a.srtm.par(1);
+%a = jsrtm2( a, a.srtm.k2p );
 
-disp(a.srtm)
-disp(a.srtm2)
+%disp(a.srtm)
+%disp(a.srtm2)
+end
+toc
