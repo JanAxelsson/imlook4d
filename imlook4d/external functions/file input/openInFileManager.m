@@ -14,7 +14,7 @@ elseif isunix
     % Linux
     else
         fMs = {...
-            'xdg-open'   % most generic one
+            'LD_LIBRARY_PATH= xdg-open'   % most generic one, LD_LIBRARY= uses system CLib instead of Matlab's
             'gvfs-open'  % successor of gnome-open
             'gnome-open' % older gnome-based systems               
             'kde-open'   % older KDE systems
