@@ -75,6 +75,8 @@ function data =  jsrtm( data)
 
     %LSQ-estimation using, solving for X = lscov(A,C)
     [parest se mse]   = lscov(ASRTM,roitac); 
+    %parest = ASRTM\roitac;  % Faster!
+    
     modfit_srtm = ASRTM * parest;
     R1  = parest(1); %K1/K1p
     k2  = parest(2); % k2 of target region
