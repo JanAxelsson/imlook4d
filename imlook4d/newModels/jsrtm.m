@@ -11,11 +11,23 @@ function data =  jsrtm( data)
     %   data.srtm.par  = values for [ R1, k2, k2p, k2a, BP ]; 
     %   data.srtm.name = { 'R1', 'k2', 'k2p','k2a','BP'};
     %   data.srtm.fitted_curve = fitted time-activity curve
-    %   data.srtm.k2p  = value of k2p (which can be used in SRTM2); 
-    %
-    % Example:
-    %   a = jsrtm( data) 
     
+    % If multiple TACTs (call itself)
+    if size(data.tact,2)>1
+        one_data = data;
+        for i=1:size(data.tact,2)
+            one_data.tact = data.tact(:,i);
+            a = jsrtm( one_data);
+            data.srtm{i} = a.srtm;
+        end
+        return
+    end
+    
+    %
+    % If one TACT
+    %
+    
+
     % time
     tmid = data.midtime;
     dt = [tmid(1); tmid(2:length(tmid))-tmid(1:length(tmid)-1)];
@@ -29,7 +41,7 @@ function data =  jsrtm( data)
 
   
     % Integrate to mid times
-    function value_vector = integrate( C, dt)
+    function value_vector = integral( C, dt)
         value_vector = cumsum( C.*dt);% - 0.5 * C .* dt; % exclude activity from second half (after midtime)
     end        
 
@@ -58,11 +70,13 @@ function data =  jsrtm( data)
     ASRTM = zeros(t_points ,3); % Design matrix is [t_points x 3 parameters] matrix
    
     ASRTM(:,1) = reftac;  % CR(t0)
-    ASRTM(:,2) = integrate( reftac, dt);  % int(CR(0:t))
-    ASRTM(:,3) = -integrate( roitac, dt); % -int(C(t))
+    ASRTM(:,2) = integral( reftac, dt);  % int(CR(0:t))
+    ASRTM(:,3) = -integral( roitac, dt); % -int(C(t))
 
     %LSQ-estimation using, solving for X = lscov(A,C)
     [parest se mse]   = lscov(ASRTM,roitac); 
+    %parest = ASRTM\roitac;  % Faster!
+    
     modfit_srtm = ASRTM * parest;
     R1  = parest(1); %K1/K1p
     k2  = parest(2); % k2 of target region
@@ -79,8 +93,8 @@ function data =  jsrtm( data)
     data.srtm.fitted_curve = modfit_srtm;
     data.srtm.k2p = k2p;
     
-    disp(data.srtm.name );
-    disp(data.srtm.par );
+%     disp(data.srtm.name );
+%     disp(data.srtm.par );
 
     
 end
