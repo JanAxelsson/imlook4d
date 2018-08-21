@@ -1,4 +1,4 @@
-function out =  jjsrtm( matrix, t, dt, Cr, k2p)
+function out =  jjsrtm2( matrix, t, dt, Cr, k2p)
 
     % SRTM2 (Simplified Reference Tissue Model 2)
     %
@@ -96,10 +96,10 @@ function out =  jjsrtm( matrix, t, dt, Cr, k2p)
 
     
     A = zeros(t_points ,2);% Design matrix is [t_points x 2 parameters] matrix
-    A(:,1)  = Cr +  k2p * integrate( Cr, dt);  % CR(t0)
+    A(:,1)  = Cr +  k2p * integrate( Cr, dt);  % CR(t) + k2p*int(CR(t))
     
     for i = 1:n
-        A(:,2) = -integrate( Ct, dt);  % int(CR(0:t))
+        A(:,2) = -integrate(  Ct(i,:), dt);  % -int(Ct(0:t))
 
         %LSQ-estimation using, solving for X = lscov(A,C)
         [X se mse]   = lscov(A,Ct(i,:)'); 
