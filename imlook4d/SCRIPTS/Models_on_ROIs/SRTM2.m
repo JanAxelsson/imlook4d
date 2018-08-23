@@ -17,8 +17,9 @@ disp('Calculating SRTM ...');
 a = jjsrtm( tact, imlook4d_time/60, imlook4d_duration/60, ref);
 
 % store for SRTM2
-k2p = median(a.pars{3});
-disp(['Median k2p = ' num2str(k2p) ]);
+k2p_values = a.pars{3};
+k2p = median( k2p_values(k2p_values>0) );  % Positive k2p 
+disp(['Median positive k2p = ' num2str(k2p) ]);
 
 
 % % Display
@@ -36,7 +37,7 @@ b = jjsrtm2( tact, imlook4d_time/60, imlook4d_duration/60, ref,k2p);
 % Display
 S = roi_table_gui( ...
     [imlook4d_ROINames(1:end-1) num2cell( cell2mat(b.pars) ) ], ...
-    [model_name ' (Ref=' ref_name ')'], ...
+    [model_name ' (Ref=' ref_name '  k2p = ' num2str(k2p) ')'], ...
     b.names ...
     );
 

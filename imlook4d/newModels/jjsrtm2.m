@@ -4,14 +4,15 @@ function out =  jjsrtm2( matrix, t, dt, Cr, k2p)
     %
     % Inputs:
     %   matrix = data with last dimension being frames (could be image matrix, or ROI values)
-    %   t = frame start times in seconds
-    %   dt = frame duration in seconds
+    %   t = frame start times in minutes
+    %   dt = frame duration in minutes
     %   Cr = reference time-activity curve [ 1 N ] 
     %   k2p = from SRTM
     %
     % Outputs:
-    %   out.pars  = cell array with matrices { R1, k2, k2p, k2a, BP }; 
-    %   out.names = { 'R1', 'k2', 'k2p','k2a','BP'};
+    %   out.pars  = cell array with matrices { R1, k2, k2a, BP }; 
+    %   out.names = { 'R1', 'k2', 'k2a','BP'};
+    %   out.units = { '1', 'min-1','min-1','1'};
     
     warning('off','MATLAB:lscov:RankDefDesignMat')
     warning('off','MATLAB:nearlySingularMatrix')
