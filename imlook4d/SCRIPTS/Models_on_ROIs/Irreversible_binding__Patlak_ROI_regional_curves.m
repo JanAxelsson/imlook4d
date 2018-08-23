@@ -23,6 +23,10 @@
 
     numberOfROIs=size(contents,1)-1;
 
+
+
+    TAB=sprintf('\t');
+    EOL=sprintf('\n');
 %
 % TACT  [ROI nr, frames]
 %
