@@ -1,4 +1,4 @@
-function out =  jjwater_doubleintegralmethod( matrix, t, dt, Ct1, range)
+function out =  jjwater_doubleintegralmethod( matrix, t, dt, Ct1)
 
     % PET Water - double integral method
     %
@@ -7,7 +7,6 @@ function out =  jjwater_doubleintegralmethod( matrix, t, dt, Ct1, range)
     %   t = frame start times in minutes
     %   dt = frame duration in minutes
     %   Ct1 = reference time-activity curve [ 1 N ], should be over whole brain
-    %   range = [ startFrame endFrame].  If endFrame is missing, then  endFrame = last frame number
     %
     % Outputs:
     %   out.pars  = cell array with matrices { BPND, DVR, intercept}; 
@@ -20,6 +19,14 @@ function out =  jjwater_doubleintegralmethod( matrix, t, dt, Ct1, range)
     %     out.Xmodel = Logan X-axis for fitted range
     %     out.Ymodel = Logan Y-axis for fitted range
     %     out.residual = Y - Ymodel, diff for fitted range
+    %
+    % Example: 
+    %   % Export from imlook4d, where a whole-brain ROI is the current ROI. Then run: 
+    %   tacts = generateTACT(imlook4d_current_handles,imlook4d_ROI);  % ROIs
+    %   ref = tacts(imlook4d_ROI_number,:); % Current ROI
+    %   a = jjwater_doubleintegralmethod( imlook4d_Cdata, imlook4d_time/60, imlook4d_duration/60, ref); % Fit to end frame
+    %   flow = a.pars{1};
+    %   imlook4d(flow);
     
     
     
