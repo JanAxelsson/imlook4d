@@ -1062,7 +1062,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 tag = nameWithSpaces;
                 
                 % Special for MODEL menu
-                if strcmp( get(parentMenuHandle, 'Label'), 'Color')
+                if strcmp( get(parentMenuHandle, 'Label'), 'MODELS')
                     callBack = [name '_control(gcbo)']; % For Models
                 end
                                 
