@@ -120,7 +120,7 @@ function out =  jjlogan( matrix, t, dt, Cr, range, k2ref)
     out.units = { '1','1','min'};
     
     out.xlabel = '\int_{0}^{t} C_{ref} dt /C_t';
-    out.ylabel = '\int_{0}^{t} C_{ref} dt /C_t';
+    out.ylabel = '\int_{0}^{t} C_t dt /C_t';
     
     % --------
     % Clean up
