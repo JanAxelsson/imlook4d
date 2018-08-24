@@ -33,15 +33,19 @@ function out =  jjzhou( matrix, t, dt, Cr, range)
     s = size(matrix);
     switch length(s)
         case 2
+            IS_ROI = true; 
             n = s(1);
             outsize = [ s(1) 1 ]; % reshape needs 2D input
         case 3
+            IS_ROI = false;  
             n= s(1)*s(2);
             outsize = [ s(1) s(2)];
         case 4
+            IS_ROI = false; 
             n = s(1)*s(2)*s(3);
             outsize = [ s(1) s(2) s(3)];
     end
+        
         
     
     Ct = reshape( matrix, n, [] ) ;  % [  pixels frames ]
@@ -58,22 +62,30 @@ function out =  jjzhou( matrix, t, dt, Cr, range)
   
     for i = 1:n
         
-        newX=integrate(Cr,dt)./Cr(i,:); % integeral{REF}/ROI(t)
-        newY=integrate(Ct(i,:),dt)./Cr(i,:);    % integeral{ROI}/ROI(t)
+        newX=integrate(Cr,dt)./Cr; % integeral{REF}/ROI(t)
+        newY=integrate(Ct(i,:),dt)./Cr;    % integeral{ROI}/ROI(t)
         
         % Limit range
-        newX =  newX(regressionRange)';  % X-values in range
+        tempX =  newX(regressionRange)';  % X-values in range
         tempY = newY(regressionRange)';  % Y-values in range
         
         % Two alternatives:
         %p = linortfit2(double(newX), double(tempY)); % Orthogonal regression
-        p = [newX ones(length(newX),1) ] \ tempY;    % Normal regression
+        p = [tempX ones(length(tempX),1) ] \ tempY;    % Normal regression
       
         DVR(i) = p(1);
         BP(i) = DVR(i) - 1;
         intercept(i) = p(2);
         
-
+        % For modelWindow compatibility: Store X,Y
+        if IS_ROI 
+            out.X{i} = newX;
+            out.Y{i} = newY;
+            
+            out.Xmodel{i} = out.X{i}(regressionRange);
+            out.Ymodel{i} = DVR(i) * out.Xmodel{i} + intercept(i); % Calculate model answer
+            out.residual{i} = out.Y{i}(regressionRange) - out.Ymodel{i};
+        end
 
     end
           
@@ -87,6 +99,9 @@ function out =  jjzhou( matrix, t, dt, Cr, range)
     out.pars = {BP, DVR, intercept};
     out.names = { 'BPND', 'DVR', 'intercept'};
     out.units = { '1','1','min'};
+        
+    out.xlabel = '\int_{0}^{t} C_{ref} dt / C_{ref}';
+    out.ylabel = '\int_{0}^{t} C_t dt / C_{ref}';
 
     
     % --------
