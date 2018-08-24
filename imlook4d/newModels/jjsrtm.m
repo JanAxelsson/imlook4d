@@ -12,6 +12,13 @@ function out =  jjsrtm( matrix, t, dt, Cr)
     %   out.pars  = cell array with matrices { R1, k2, k2p, k2a, BP }; 
     %   out.names = { 'R1', 'k2', 'k2p','k2a','BP'};
     %   out.units = { '1', 'min-1', 'min-1','min-1','1'};
+    %  
+    %   Cell array with cells for each ROI:
+    %     out.X = X-axis 
+    %     out.Y = Y-axis 
+    %     out.Xmodel = model X-axis
+    %     out.Ymodel = model Y-axis 
+    %     out.residual = Y - Ymodel
     
     warning('off','MATLAB:lscov:RankDefDesignMat')
     warning('off','MATLAB:nearlySingularMatrix')
@@ -24,12 +31,15 @@ function out =  jjsrtm( matrix, t, dt, Cr)
     s = size(matrix);
     switch length(s)
         case 2
+            IS_ROI = true; 
             n = s(1);
             outsize = [ s(1) 1 ]; % reshape needs 2D input
         case 3
+            IS_ROI = false;  
             n= s(1)*s(2);
             outsize = [ s(1) s(2)];
         case 4
+            IS_ROI = false; 
             n = s(1)*s(2)*s(3);
             outsize = [ s(1) s(2) s(3)];
     end
@@ -93,6 +103,17 @@ function out =  jjsrtm( matrix, t, dt, Cr)
         k2a(i) = X(3); % k2a=k2/(1+BP)
         BP(i)  = k2(i)/k2a(i) - 1;
 
+        
+        % For modelWindow compatibility: 
+        if IS_ROI 
+            out.X{i} = tmid;
+            out.Y{i} = Ct(i,:);
+            
+            out.Xmodel{i} = out.X{i};
+            out.Ymodel{i} = ( A * X )'; % X is the parameters found in model
+            out.residual{i} = out.Y{i} - out.Ymodel{i};
+        end
+
     end
           
     % --------
@@ -106,7 +127,10 @@ function out =  jjsrtm( matrix, t, dt, Cr)
     
     out.pars = {R1, k2, k2p, k2a, BP};
     out.names = { 'R1', 'k2', 'k2p','k2a','BP'};
-    out.units = { '1', 'min-1', 'min-1','min-1','1'};
+    out.units = { '1', 'min-1', 'min-1','min-1','1'};   
+ 
+    out.xlabel = 'time';
+    out.ylabel = 'C_t';
 
     
     % --------

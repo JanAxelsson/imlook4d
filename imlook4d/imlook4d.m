@@ -6290,7 +6290,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             j=1;
             for i=1:size(g)
                 % Mark current window with a checkbox
-                if ( strcmp( get(g(i),'Tag'), 'imlook4d' ) || strcmp( get(g(i),'Tag'), '' ) )
+                if ( strcmp( get(g(i),'Tag'), 'imlook4d' ) || strcmp( get(g(i),'Tag'), '' )  || strcmp( get(g(i),'Tag'), 'modelWindow' ))
                      h(j,1) = g(i);
                      get(h(j),'Tag')
                      j = j+1;

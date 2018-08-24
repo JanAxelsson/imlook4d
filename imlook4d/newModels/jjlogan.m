@@ -4,8 +4,8 @@ function out =  jjlogan( matrix, t, dt, Cr, range, k2ref)
     %
     % Inputs:
     %   matrix = data with last dimension being frames (could be image matrix, or ROI values)
-    %   t = frame start times in seconds
-    %   dt = frame duration in seconds
+    %   t = frame start times in minutes
+    %   dt = frame duration in minutes
     %   Cr = reference time-activity curve [ 1 N ] 
     %   range = [ startFrame endFrame].  If endFrame is missing, then  endFrame = last frame number
     %   k2ref = optional, k2 for reference region (For raclopride this is often omitted)
@@ -14,6 +14,13 @@ function out =  jjlogan( matrix, t, dt, Cr, range, k2ref)
     %   out.pars  = cell array with matrices { BPND, DVR, intercept}; 
     %   out.names = { 'BPND', 'DVR', 'intercept'};
     %   out.units = { '1','1','min'};
+    %  
+    %   Cell array with cells for each ROI:
+    %     out.X = Logan X-axis 
+    %     out.Y = Logan Y-axis 
+    %     out.Xmodel = Logan X-axis for fitted range
+    %     out.Ymodel = Logan Y-axis for fitted range
+    %     out.residual = Y - Ymodel, diff for fitted range
     
     
     
@@ -38,12 +45,15 @@ function out =  jjlogan( matrix, t, dt, Cr, range, k2ref)
     s = size(matrix);
     switch length(s)
         case 2
+            IS_ROI = true; 
             n = s(1);
             outsize = [ s(1) 1 ]; % reshape needs 2D input
         case 3
+            IS_ROI = false;  
             n= s(1)*s(2);
             outsize = [ s(1) s(2)];
         case 4
+            IS_ROI = false; 
             n = s(1)*s(2)*s(3);
             outsize = [ s(1) s(2) s(3)];
     end
@@ -62,25 +72,37 @@ function out =  jjlogan( matrix, t, dt, Cr, range, k2ref)
     % ----------------   
   
     for i = 1:n
+        % Handle two different models (with or without known k2 for reference area)
         if HAS_K2_REF
             newX = ( integrate(Cr,dt) + Cr/k2ref ) ./ Ct(i,:); % integeral{REF}/ROI(t) + REF/k2ref
         else
             newX = integrate(Cr,dt)./Ct(i,:); % integeral{REF}/ROI(t)
         end
         
-        newY=integrate(Ct(i,:),dt)./Ct(i,:);    % integeral{ROI}/ROI(t)
-        
+        newY = integrate(Ct(i,:),dt)./Ct(i,:);    % integeral{ROI}/ROI(t)
+    
         % Limit range
-        newX =  newX(regressionRange)';  % X-values in range
+        tempX =  newX(regressionRange)';  % X-values in range
         tempY = newY(regressionRange)';  % Y-values in range
         
         % Two alternatives:
         %p = linortfit2(double(newX), double(tempY)); % Orthogonal regression
-        p = [newX ones(length(newX),1) ] \ tempY;    % Normal regression
+        p = [tempX ones(length(tempX),1) ] \ tempY;    % Normal regression
       
         DVR(i) = p(1);
         BP(i) = DVR(i) - 1;
         intercept(i) = p(2);
+        
+                
+        % For modelWindow compatibility: Store X,Y
+        if IS_ROI 
+            out.X{i} = newX;
+            out.Y{i} = newY;
+            
+            out.Xmodel{i} = out.X{i}(regressionRange);
+            out.Ymodel{i} = DVR(i) * out.Xmodel{i} + intercept(i); % Calculate model answer
+            out.residual{i} = out.Y{i}(regressionRange) - out.Ymodel{i};
+        end
 
     end
           
@@ -94,7 +116,9 @@ function out =  jjlogan( matrix, t, dt, Cr, range, k2ref)
     out.pars = {BP, DVR, intercept};
     out.names = { 'BPND', 'DVR', 'intercept'};
     out.units = { '1','1','min'};
-
+    
+    out.xlabel = '\int_{0}^{t} C_{ref} dt /C_t';
+    out.ylabel = '\int_{0}^{t} C_{ref} dt /C_t';
     
     % --------
     % Clean up
