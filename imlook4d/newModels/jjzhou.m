@@ -46,15 +46,7 @@ function out =  jjzhou( matrix, t, dt, Cr, range)
             outsize = [ s(1) s(2) s(3)];
     end
         
-        
-    
-    Ct = reshape( matrix, n, [] ) ;  % [  pixels frames ]
-  
-  
-    % Integrate to mid times
-    function value_vector = integrate( C, dt)
-        value_vector = cumsum( C.*dt);% -0.5 * C .* dt; % exclude activity from second half (after midtime)
-    end        
+    Ct = reshape( matrix, n, [] ) ;  % [  pixels frames ]     
 
     % ----------------
     %  Logan model
@@ -62,8 +54,8 @@ function out =  jjzhou( matrix, t, dt, Cr, range)
   
     for i = 1:n
         
-        newX=integrate(Cr,dt)./Cr; % integeral{REF}/ROI(t)
-        newY=integrate(Ct(i,:),dt)./Cr;    % integeral{ROI}/ROI(t)
+        newX=cumsum(Cr.*dt)./Cr; % integeral{REF}/ROI(t)
+        newY=cumsum(Ct(i,:).*dt)./Cr;    % integeral{ROI}/ROI(t)
         
         % Limit range
         tempX =  newX(regressionRange)';  % X-values in range

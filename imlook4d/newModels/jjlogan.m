@@ -57,15 +57,9 @@ function out =  jjlogan( matrix, t, dt, Cr, range, k2ref)
             n = s(1)*s(2)*s(3);
             outsize = [ s(1) s(2) s(3)];
     end
-        
-    
+            
     Ct = reshape( matrix, n, [] ) ;  % [  pixels frames ]
-  
-  
-    % Integrate to mid times
-    function value_vector = integrate( C, dt)
-        value_vector = cumsum( C.*dt);% -0.5 * C .* dt; % exclude activity from second half (after midtime)
-    end        
+   
 
     % ----------------
     %  Logan model
@@ -77,13 +71,13 @@ function out =  jjlogan( matrix, t, dt, Cr, range, k2ref)
     for i = 1:n
         % Handle two different models (with or without known k2 for reference area)
         if HAS_K2_REF
-            newX = ( integrate(Cr,dt) + Cr/k2ref ) ./ Ct(i,:); % integeral{REF}/ROI(t) + REF/k2ref
+            newX = ( cumsum(Cr.*dt) + Cr/k2ref ) ./ Ct(i,:); % integeral{REF}/ROI(t) + REF/k2ref
         else
-            newX = integrate(Cr,dt)./Ct(i,:); % integeral{REF}/ROI(t)
+            newX = cumsum(Cr.*dt)./Ct(i,:); % integeral{REF}/ROI(t)
         end
         
-        newY = integrate(Ct(i,:),dt)./Ct(i,:);    % integeral{ROI}/ROI(t)
-    
+        newY = cumsum(Ct(i,:).*dt)./Ct(i,:);    % integeral{ROI}/ROI(t)
+
         % Limit range
         tempX =  newX(regressionRange)';  % X-values in range
         tempY = newY(regressionRange)';  % Y-values in range
