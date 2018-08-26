@@ -36,17 +36,6 @@ function out =  jjwater_doubleintegralmethod( matrix, t, dt, Ct1)
     % time
     tmid = t + 0.5 * dt;
     dt      = [tmid(1), tmid(2:length(tmid))-tmid(1:length(tmid)-1)];
-        
-    if length(range) == 1
-        startFrame = range(1);
-        endFrame = length(t);
-    end
-    if length(range) == 2
-        startFrame = range(1);
-        endFrame = range(2);
-    end
-    
-    regressionRange = startFrame:endFrame; % integrate from startFrame to end
 
     
     % activity
@@ -83,6 +72,9 @@ function out =  jjwater_doubleintegralmethod( matrix, t, dt, Ct1)
     VT=0.86;
     VT1=0.86;
     f1=0.5;
+    
+    % Setup variables
+    f = zeros(1,n);
 
     for i = 1:n
         % Elin Wallsten created the model from 

@@ -12,8 +12,7 @@ tact = tacts;  % all ROIs
 
 
 disp('Calculating model ...');
-a = jjwater_doubleintegralmethod( tact, imlook4d_time/60, imlook4d_duration/60, ref, imlook4d_frame); % Fit to end frame
-
+a = jjwater_doubleintegralmethod( tact, imlook4d_time/60, imlook4d_duration/60, ref);
 
 modelWindow( ...
     a , ...
