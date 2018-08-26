@@ -55,7 +55,7 @@ function varargout = modelWindow_OutputFcn(hObject, eventdata, handles)
     varargout{1} = handles.output;
 
 % On Open    
-function modelWindow_OpeningFcn(hObject, eventdata, handles, datastruct, roinames, title)
+function modelWindow_OpeningFcn(hObject, eventdata, handles, datastruct, roinames, title, varargin)
 % --- Executes just before modelWindow is made visible.
     % This function has no output args, see OutputFcn.
     % hObject    handle to figure
@@ -106,16 +106,6 @@ function modelWindow_OpeningFcn(hObject, eventdata, handles, datastruct, roiname
 
     % Update handles structure
     guidata(hObject, handles);
-
-%
-% Callbacks
-%
-function uitable_CellSelectionCallback(hObject, eventdata, handles)
-    roinumber = eventdata.Indices(1);
-    drawPlots( handles,roinumber);
-    handles.mainAxesRoiName.String = handles.roinames{roinumber};
-    handles.selectedRow = roinumber;
-    guidata(handles.modelWindow, handles);
     
 %
 % Utility functions
@@ -179,9 +169,16 @@ function drawPlots( handles,roinumber)
         ylabel(handles.residualAxes,residualLabel);
     catch
     end
-
-
-% --- Executes on button press in AbsoluteResidualRadioButton.
+    
+%
+% Callbacks
+%
+function uitable_CellSelectionCallback(hObject, eventdata, handles)
+    roinumber = eventdata.Indices(1);
+    drawPlots( handles,roinumber);
+    handles.mainAxesRoiName.String = handles.roinames{roinumber};
+    handles.selectedRow = roinumber;
+    guidata(handles.modelWindow, handles);
 function AbsoluteResidualRadioButton_Callback(hObject, eventdata, handles)
     roinumber = handles.selectedRow;
     drawPlots( handles,roinumber)

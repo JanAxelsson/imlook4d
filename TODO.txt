@@ -1,4 +1,5 @@
 Add things to do:
 
 DEVELOP
-- imageJ, flip and rotate 
+- modelWindow: show parameters
+- modelWindow: allow update of model
