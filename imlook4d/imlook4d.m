@@ -2109,7 +2109,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              end
         NewVal= round(get(hObject,'Value'));
         set(handles.FrameNumEdit,'String',num2str(NewVal));
-        updateImage(hObject, eventdata, handles);
+        %updateImage(hObject, eventdata, handles);
     function SliceNumSlider_Callback(hObject, eventdata, handles) 
              % Display HELP and get out of callback
              if DisplayHelp(hObject, eventdata, handles) 
