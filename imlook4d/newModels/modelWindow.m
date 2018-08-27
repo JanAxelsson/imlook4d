@@ -82,7 +82,7 @@ function modelWindow_OpeningFcn(hObject, eventdata, handles, datastruct, roiname
     
     % Populate table
     handles.uitable.Data = [roinames, num2cell( cell2mat(datastruct.pars) )];
-    handles.uitable.ColumnWidth = {200, 'auto'}
+    handles.uitable.ColumnWidth = {200, 'auto'};
     
     for i = 1:length(datastruct.names)
         datastruct.names{i} = [datastruct.names{i} '|' datastruct.units{i} ];

@@ -46,7 +46,10 @@ function [activity, NPixels, stdev, maxActivity]=generateTACT(handles,ROI3D)
              else
                  % Multiple slices with ROI, correct dimensions of tempData
                  % matrix
-                 [tempData, explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, indecesWithRoi, 1:numberOfFrames);
+                %[tempData, explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, indecesWithRoi, 1:numberOfFrames);
+                
+                % Above was slow in imlook4d/generateImage -- this is faster for many ROIs
+                tempData = handles.image.Cdata;
              end
              numberOfFrames=size(tempData,4);
 
@@ -81,3 +84,5 @@ function [activity, NPixels, stdev, maxActivity]=generateTACT(handles,ROI3D)
                     end
 
             end %for
+            
+            
