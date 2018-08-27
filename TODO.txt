@@ -3,3 +3,5 @@ Add things to do:
 DEVELOP
 - modelWindow: show parameters
 - modelWindow: allow update of model
+
+- JPEG DICOM

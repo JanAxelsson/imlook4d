@@ -329,7 +329,7 @@ function donePushbutton_Callback(hObject, eventdata, handles)
             delete(handles.figure1);
             
         % Update imlook4d image
-        %imlook4d('updateImage',handles.imlook4d_handle, [], imlook4d_handles);
+        imlook4d('updateImage',handles.imlook4d_handle, [], imlook4d_handles);
 
 
 
