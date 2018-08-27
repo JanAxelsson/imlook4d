@@ -15,17 +15,11 @@
 
     %  imlook4d_current_handles is updated whenever SCRIPTS menu in imlook4d is
     %  selected
-    %disp('SCRIPTS/Threshold.m entered');
-    
-    
-    if ~exist('Threshold_ROI_defaultanswer')  % If variable defaultanswer is not predefined outside script, set values
-    	Threshold_ROI_defaultanswer = {'100%','40%', '1' , 'end'};
-    end
-    
+        
     % Export to workspace
     StoreVariables
     Export
-    
+
     % Calculate max level in current frame (if not defined outside the script)
     if ( ~exist('maxLevel') )
         maxLevel=max(reshape(imlook4d_Cdata(:,:,:,imlook4d_frame), 1,size(imlook4d_Cdata,1)*size(imlook4d_Cdata,2)*size(imlook4d_Cdata,3)  ) );
@@ -39,9 +33,11 @@
         title='Threshold levels';
         numlines=1;
 
-    defaultanswer = Threshold_ROI_defaultanswer;
-
+    defaultanswer = RetriveEarlierValues('Threshold', {'100%','40%', '1' , 'end'} ); % Read default if exists, or apply these as default
     answer=inputdlg(prompt,title,numlines,defaultanswer);
+    StoreValues('Threshold', answer ); % Store answer as new dialog default
+
+    
     answer(3:4)=makeAbsoluteSliceNumber(answer(3:4), imlook4d_slice, size(imlook4d_Cdata,3)); % Handle Relative or Absolute positions
         
     maxThresholdLevel=answer{1} ;
@@ -121,7 +117,7 @@
     %Import % Adds ROI to handles in import function
 
     % Store default until next tim
-    Threshold_ROI_defaultanswer =  answer;
+    imlook4d_store.Threshold.inputs =  answer;
    
    ClearVariables
     %disp('SCRIPTS/Threshold.m DONE');
