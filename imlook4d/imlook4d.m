@@ -1044,9 +1044,24 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
         for j=1:length(menuItemNames)
             [pathstr,name,ext] = fileparts(menuItemNames{j});
             
-            % Make line
+            % Make line separator above next item
             if startsWith( name, '---')
-                lineOnOff = 'on';
+                lineOnOff = 'on';  % Store this flag until next row is processed. Set lineOnOff = 'off'; after line set to 'on' on next item 
+            end
+
+                        
+            % Comment row
+            if startsWith( name, '#')
+                nameWithSpaces= regexprep(name(2:end),'_', ' ');  % Replace '_' with ' '
+                callBack='';
+                label = nameWithSpaces;
+                tag = name;
+                handles.scriptsMenuSubItemHandle(j) = ...
+                    uimenu(parentMenuHandle,'Label',label, 'Callback', callBack , 'Tag', tag);
+                
+                handles.scriptsMenuSubItemHandle(j).Separator= lineOnOff;
+                handles.scriptsMenuSubItemHandle(j).ForegroundColor = [0    0.4510    0.7412];
+                lineOnOff = 'off';
             end
             
             % Make submenu item
@@ -1073,6 +1088,8 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                     label = [ '<html> <img width=100 height=15  src="file:///' pathstr2 filesep name2 '.png" ></img><font color="white">--</font>'  nameWithSpaces '</html>'];
                     tag = nameWithSpaces;
                 end
+                
+
                 
                 % Advanced callback to allow 
                 % - help files for scripts
@@ -1107,6 +1124,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 handles.scriptsMenuSubItemHandle(j).Separator= lineOnOff;
                 lineOnOff = 'off';
             end
+
             
         end    
  
