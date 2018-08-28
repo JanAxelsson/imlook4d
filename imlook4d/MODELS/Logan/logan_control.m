@@ -242,7 +242,7 @@ function copyFromROIPushbutton_Callback(hObject, eventdata, handles)
             imlook4d_handles.model.functionHandle = [];  % Stops model to be used in TACT calculations
             guidata(handles.imlook4d_handle,  imlook4d_handles); 
             %[activity, NPixels] = generateTACT(imlook4d_handles, imlook4d_handles.image.Cdata, imlook4d_handles.image.ROI);
-            [activity, NPixels] = generateTACT(imlook4d_handles, imlook4d_handles.image.ROI);
+            [activity, NPixels] = generateTACT(imlook4d_handles, imlook4d_handles.image.ROI, activeROI);
   
         %
         % UPDATE LIST-BOX 
@@ -329,7 +329,7 @@ function donePushbutton_Callback(hObject, eventdata, handles)
             delete(handles.figure1);
             
         % Update imlook4d image
-        %imlook4d('updateImage',handles.imlook4d_handle, [], imlook4d_handles);
+        imlook4d('updateImage',handles.imlook4d_handle, [], imlook4d_handles);
 
 
 

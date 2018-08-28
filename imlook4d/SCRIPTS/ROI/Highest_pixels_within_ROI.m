@@ -12,7 +12,7 @@
 % INITIALIZE
 
 StoreVariables
-temp_variable_list=imlook4d_variables_before_script;
+
 EOL = sprintf('\n');
 
     Export
@@ -32,6 +32,7 @@ EOL = sprintf('\n');
         1, ...
         {num2str( N0 )} );
     
+    
     N=str2num( answer{1} );
     
     % Get threshold level for the lowest of the N pixels
@@ -48,6 +49,5 @@ EOL = sprintf('\n');
         
 
     
-imlook4d_variables_before_script=temp_variable_list;    
 ClearVariables    
 

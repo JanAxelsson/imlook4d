@@ -1044,9 +1044,24 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
         for j=1:length(menuItemNames)
             [pathstr,name,ext] = fileparts(menuItemNames{j});
             
-            % Make line
+            % Make line separator above next item
             if startsWith( name, '---')
-                lineOnOff = 'on';
+                lineOnOff = 'on';  % Store this flag until next row is processed. Set lineOnOff = 'off'; after line set to 'on' on next item 
+            end
+
+                        
+            % Comment-row
+            if startsWith( name, '#')
+                nameWithSpaces= regexprep(name(2:end),'_', ' ');  % Replace '_' with ' '
+                callBack='';
+                label = nameWithSpaces;
+                tag = name;
+                handles.scriptsMenuSubItemHandle(j) = ...
+                    uimenu(parentMenuHandle,'Label',label, 'Callback', callBack , 'Tag', tag);
+                
+                handles.scriptsMenuSubItemHandle(j).Separator= lineOnOff;
+                handles.scriptsMenuSubItemHandle(j).ForegroundColor = [0    0.4510    0.7412];
+                lineOnOff = 'off';
             end
             
             % Make submenu item
@@ -1060,6 +1075,11 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                     'eval(''' name ''') ' ];
                 label = nameWithSpaces;
                 tag = nameWithSpaces;
+                
+                % Special for MODEL menu
+                if strcmp( get(parentMenuHandle, 'Label'), 'MODELS')
+                    callBack = [name '_control(gcbo)']; % For Models
+                end
                                 
                 % Special for COLOR menu
                 if strcmp( get(parentMenuHandle, 'Label'), 'Color')
@@ -1068,6 +1088,20 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                     label = [ '<html> <img width=100 height=15  src="file:///' pathstr2 filesep name2 '.png" ></img><font color="white">--</font>'  nameWithSpaces '</html>'];
                     tag = nameWithSpaces;
                 end
+                
+                % Special for Window Levels menu
+                if strcmp( get(parentMenuHandle, 'Tag'), 'WindowLevelsMenu')
+                    % Setup submenu callback
+                    %callBack=['imlook4d(''Color_Callback'',gcbo,[],guidata(gcbo), ''' name ''' )']; 
+                    callBack=[name '( gcbo, [], guidata(gcbo) )'];  % Callback using ui object
+                    callBack=[callBack '; ' 'imlook4d(''updateImage'',gcbo,[],guidata(gcbo) ) '];
+
+                    %disp(['name=' name '   WINDOW_LEVELS Callback=' callbackString]);% Display paths
+                    %handles.image.WindowLevelsSubMenuHandle(i) = uimenu(handles.WindowLevelsMenu, 'Label',nameWithSpaces, 'Callback', callbackString);
+                    tag = nameWithSpaces;
+                end
+
+
                 
                 % Advanced callback to allow 
                 % - help files for scripts
@@ -1102,6 +1136,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 handles.scriptsMenuSubItemHandle(j).Separator= lineOnOff;
                 lineOnOff = 'off';
             end
+
             
         end    
  
@@ -2104,7 +2139,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              end
         NewVal= round(get(hObject,'Value'));
         set(handles.FrameNumEdit,'String',num2str(NewVal));
-        updateImage(hObject, eventdata, handles);
+        %updateImage(hObject, eventdata, handles);
     function SliceNumSlider_Callback(hObject, eventdata, handles) 
              % Display HELP and get out of callback
              if DisplayHelp(hObject, eventdata, handles) 
@@ -6290,7 +6325,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             j=1;
             for i=1:size(g)
                 % Mark current window with a checkbox
-                if ( strcmp( get(g(i),'Tag'), 'imlook4d' ) || strcmp( get(g(i),'Tag'), '' ) )
+                if ( strcmp( get(g(i),'Tag'), 'imlook4d' ) || strcmp( get(g(i),'Tag'), '' )  || strcmp( get(g(i),'Tag'), 'modelWindow' ))
                      h(j,1) = g(i);
                      get(h(j),'Tag')
                      j = j+1;
@@ -8472,6 +8507,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                            % submenues that do not have any help
                            % file.
                            disp([ 'Missing help file - could not find file=' helpFilePath]);
+                           helpFilePath=[pathstr1 filesep 'HELP' filesep get(hObject,'Label') '.txt' ];
+                           
+                           matlabCommand = ['copyfile(''' [ pathstr1 filesep 'HELP' filesep 'helpTemplate.txt'] ''' ,''' [ pathstr1 filesep 'HELP' filesep get(hObject,'Label') '.txt'] ''');' ];
+                           matlabCommand = [ matlabCommand 'edit(''' [ pathstr1 filesep 'HELP' filesep get(hObject,'Label') '.txt'] ''');']
+                               
+                           disp( [ 'Help file did not exist. Create file here: <a href="matlab:' matlabCommand '">' helpFilePath '</a>' ]);
+
                            
                            try
                                 parentObject=get(hObject,'Parent');
@@ -8483,9 +8525,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                 try
                                     helpFilePath=[ get(parentObject,'Label') '.txt' ];
                                     text =  fileread(helpFilePath);
-                                catch                                     
-                                    helpFilePath=[ get(parentObject,'Tag') '.txt' ];
-                                    text =  fileread(helpFilePath);   
+                                catch  
+                                    try
+                                        helpFilePath=[ get(parentObject,'Tag') '.txt' ];
+                                        text =  fileread(helpFilePath);   
+                                    catch
+                                        return;
+                                    end
                                 end
                            end
                        end
@@ -8556,25 +8602,25 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                     )...
                                     ];  
                                 
-                            % Handle to object
-                                try
-                                    hObjectHandle = num2str(hObject);
-                                    figureHandle = num2str(handles.figure1);
-                                catch
-                                    % Newer Matlabs from cirka 2014
-                                    hObjectHandle = 'only in earlier versions of Matlab';
-                                    figureHandle = 'only in earlier versions of Matlab';
-                                end
-                                
-                                developersText=[ developersText  parseHTMLTableRow(  ...
-                                    '<B>Handle to object=</B>', ...
-                                    [ hObjectHandle '  (' get(hObject,'Type') ')']) ...
-                                    ];  
-                            % Imlook4d-instance handle
-                                developersText=[ developersText  parseHTMLTableRow(  ...
-                                    '<B>Handle to imlook4d instance (handles.figure1)=</B>',...
-                                    figureHandle )...
-                                    ]; 
+%                             % Handle to object
+%                                 try
+%                                     hObjectHandle = num2str(hObject);
+%                                     figureHandle = num2str(handles.figure1);
+%                                 catch
+%                                     % Newer Matlabs from cirka 2014
+%                                     hObjectHandle = 'only in earlier versions of Matlab';
+%                                     figureHandle = 'only in earlier versions of Matlab';
+%                                 end
+%                                 
+%                                 developersText=[ developersText  parseHTMLTableRow(  ...
+%                                     '<B>Handle to object=</B>', ...
+%                                     [ hObjectHandle '  (' get(hObject,'Type') ')']) ...
+%                                     ];  
+%                             % Imlook4d-instance handle
+%                                 developersText=[ developersText  parseHTMLTableRow(  ...
+%                                     '<B>Handle to imlook4d instance (handles.figure1)=</B>',...
+%                                     figureHandle )...
+%                                     ]; 
                             % Link to Matlab code
                             try
                                 developersText=[ developersText  parseHTMLTableRow(  ...

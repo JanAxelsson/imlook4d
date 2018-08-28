@@ -94,12 +94,14 @@ function outputImage=water( handles, matrix,outputFrameRange)
     range=1:last;
     range_for_mean=last-4:last+4;
     %disp(t(range_for_mean)');
+
     
     % Rebecca
     range_for_mean=last-3:last+3;% Rebecca
     range_for_mean=19:25;
     range=1:19;
     
+
     
     SloppyFlow=mean(Ct(:,:,:,range_for_mean),4) /sum( Cinp(range).*dt(range) );
     

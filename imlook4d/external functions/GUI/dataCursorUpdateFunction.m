@@ -47,22 +47,30 @@
         try 
             value = handles.image.Cdata(x,y,z,t);
             
-            % If background image exists
-            h2 = handles.image.backgroundImageHandle;
-            handles2 = guidata(h2);
-            frame2 = round(get(handles2.FrameNumSlider,'Value'));
-            value_bck = handles2.image.Cdata(x,y,z,frame2);
+            % Fast Calculate pixel value (use generateImage, thus gettting models, PCA-filter etc)
+            handles.image.Cdata = handles.image.Cdata(x,y,z,:);  % Call using [1,1,1,:] matrix for this pixel only
+            [tempData, explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, 1, t);
+            value = tempData;
             
-%             output_txt = { output_txt{:}, ...
-%                 ['Foreground: ',num2str( value,4) ], ...
-%                 ['Background: ',num2str( value_bck,4) ], ...
-%                 };
-            
-             
             output_txt = { output_txt{:}, ...
-                ['Foreground: ',num2str( value,'%10.5g\n') ], ...
-                ['Background: ',num2str( value_bck,'%10.5g\n') ], ...
-                };
+                ['Value: ',num2str( value,'%10.5g\n') ], ...
+                };     
+            
+            % If background image exists
+            try
+                h2 = handles.image.backgroundImageHandle;
+                handles2 = guidata(h2);
+                frame2 = round(get(handles2.FrameNumSlider,'Value'));
+                value_bck = handles2.image.Cdata(x,y,z,frame2);
+                
+                output_txt = { output_txt{:}, ...
+                    ['Foreground: ',num2str( value,'%10.5g\n') ], ...
+                    ['Background: ',num2str( value_bck,'%10.5g\n') ], ...
+                    };
+            catch
+            end
+            
+
 
             
         catch

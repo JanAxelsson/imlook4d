@@ -1,4 +1,20 @@
 Add things to do:
 
 DEVELOP
-- imageJ, flip and rotate 
+- models On Rois - show dialog for paramteters
+- RetrieveEarlierValues + StoreValues - implementera i modeller (ovan)
+
+- MODELS, add dialog (as in models on ROIs) and use new jjlogan and other jj:s
+
+
+WISHLIST
+- reference area can be combination of multiple ROIs
+
+- modelWindow: show parameters
+- modelWindow: allow update of model
+
+- JPEG DICOM
+
+
+PEARL-PD
+- loop script to get TACTs and calculate parameters

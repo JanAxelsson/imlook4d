@@ -2,7 +2,7 @@
 <HR></HR>
 <!------------------->
 	<P>
-		Loads medical images from PACS:
+		Loads medical images from PACS.  Currently working on Windows computers
 
 	</P>
 

@@ -1,4 +1,4 @@
-function [activity, NPixels, stdev, maxActivity]=generateTACT(handles,ROI3D)
+function [activity, NPixels, stdev, maxActivity]=generateTACT(handles,ROI3D, roisToCalculate)
 %function [activity, NPixels]=generateTACT(handles,image4D,ROI3D)
     %
     % This function generates a TACT curve.
@@ -10,6 +10,7 @@ function [activity, NPixels, stdev, maxActivity]=generateTACT(handles,ROI3D)
     %     handles       - used to read model (to generate image correctly if a model exists)
     %     image4D       - matrix  [x,y,slice,frame]
     %     ROI3D         - ROI matrix [x,y,slice]
+    %     roisToCalculate - OPTIONAL; A ROI number or range.  If left out, all ROIs are calculated.  Examples: 2, 1:10
     %
     % outputs:
     %    activity       - activity conc in ROI [roi, frame]
@@ -29,7 +30,12 @@ function [activity, NPixels, stdev, maxActivity]=generateTACT(handles,ROI3D)
             slicesWithRoi=sum(sum(ROI3D));      % zero if no roi in slice => no values for TACT
             slicesWithRoi=slicesWithRoi(:);     % row index is slice number.
             indecesWithRoi=find(slicesWithRoi>0);
+
             
+            if nargin < 3
+                roisToCalculate = 1:numberOfROIs;
+            end
+                        
             % Generate 4D image ONLY for slices with ROIs (zero for other slices)
             % This is to speed up calculations!
 
@@ -46,14 +52,17 @@ function [activity, NPixels, stdev, maxActivity]=generateTACT(handles,ROI3D)
              else
                  % Multiple slices with ROI, correct dimensions of tempData
                  % matrix
-                 [tempData, explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, indecesWithRoi, 1:numberOfFrames);
+                %[tempData, explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, indecesWithRoi, 1:numberOfFrames);
+                
+                % Above was slow in imlook4d/generateImage -- this is faster for many ROIs
+                tempData = handles.image.Cdata;
              end
              numberOfFrames=size(tempData,4);
 
 
 
             % Calculate TACT for each ROI
-             for i=1:numberOfROIs
+             for i=roisToCalculate
                  %disp(i)
                     % Determine indeces to Cdata matrix for this ROI 
                     indecesToROI=find(ROI3D==i);        % from ROI definition
@@ -81,3 +90,5 @@ function [activity, NPixels, stdev, maxActivity]=generateTACT(handles,ROI3D)
                     end
 
             end %for
+            
+            

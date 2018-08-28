@@ -1,35 +1,46 @@
-function out =  jjsrtm( matrix, t, dt, Cr, k2p)
+function out =  jjsrtm2( matrix, t, dt, Cr, k2p)
 
     % SRTM2 (Simplified Reference Tissue Model 2)
     %
     % Inputs:
     %   matrix = data with last dimension being frames (could be image matrix, or ROI values)
-    %   t = frame start times in seconds
-    %   dt = frame duration in seconds
+    %   t = frame start times in minutes
+    %   dt = frame duration in minutes
     %   Cr = reference time-activity curve [ 1 N ] 
     %   k2p = from SRTM
     %
     % Outputs:
-    %   out.pars  = cell array with matrices { R1, k2, k2p, k2a, BP }; 
-    %   out.names = { 'R1', 'k2', 'k2p','k2a','BP'};
+    %   out.pars  = cell array with matrices { R1, k2, k2a, BP }; 
+    %   out.names = { 'R1', 'k2', 'k2a','BP'};
+    %   out.units = { '1', 'min-1','min-1','1'};
+    %  
+    %   Cell array with cells for each ROI:
+    %     out.X = X-axis 
+    %     out.Y = Y-axis 
+    %     out.Xmodel = model X-axis
+    %     out.Ymodel = model Y-axis 
+    %     out.residual = Y - Ymodel
     
     warning('off','MATLAB:lscov:RankDefDesignMat')
     warning('off','MATLAB:nearlySingularMatrix')
 
     % time
     tmid = t + 0.5 * dt;
-    
+    dt      = [tmid(1), tmid(2:length(tmid))-tmid(1:length(tmid)-1)];
     
     % activity
     s = size(matrix);
     switch length(s)
         case 2
+            IS_ROI = true; 
             n = s(1);
             outsize = [ s(1) 1 ]; % reshape needs 2D input
         case 3
+            IS_ROI = false;  
             n= s(1)*s(2);
             outsize = [ s(1) s(2)];
         case 4
+            IS_ROI = false; 
             n = s(1)*s(2)*s(3);
             outsize = [ s(1) s(2) s(3)];
     end
@@ -96,10 +107,10 @@ function out =  jjsrtm( matrix, t, dt, Cr, k2p)
 
     
     A = zeros(t_points ,2);% Design matrix is [t_points x 2 parameters] matrix
-    A(:,1)  = Cr +  k2p * integrate( Cr, dt);  % CR(t0)
+    A(:,1)  = Cr +  k2p * integrate( Cr, dt);  % CR(t) + k2p*int(CR(t))
     
     for i = 1:n
-        A(:,2) = -integrate( Ct, dt);  % int(CR(0:t))
+        A(:,2) = -integrate(  Ct(i,:), dt);  % -int(Ct(0:t))
 
         %LSQ-estimation using, solving for X = lscov(A,C)
         [X se mse]   = lscov(A,Ct(i,:)'); 
@@ -111,6 +122,16 @@ function out =  jjsrtm( matrix, t, dt, Cr, k2p)
         k2a_(i)= X(2); % k2a=k2/(1+BP)
         BP_(i) = k2_(i)/k2a_(i) - 1;  
 
+        
+        % For modelWindow compatibility: 
+        if IS_ROI 
+            out.X{i} = tmid;
+            out.Y{i} = Ct(i,:);
+            
+            out.Xmodel{i} = out.X{i};
+            out.Ymodel{i} = ( A * X )'; % X is the parameters found in model
+            out.residual{i} = out.Y{i} - out.Ymodel{i};
+        end
     end
           
     % --------
@@ -124,6 +145,9 @@ function out =  jjsrtm( matrix, t, dt, Cr, k2p)
     out.pars = {R1_, k2_,  k2a_, BP_};
     out.names = { 'R1_', 'k2_','k2a_','BP_'};
     out.units = { '1', 'min-1','min-1','1'};
+ 
+    out.xlabel = 'time';
+    out.ylabel = 'C_t';
 
     
     % --------

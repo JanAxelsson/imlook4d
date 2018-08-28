@@ -1,0 +1,8 @@
+<h1> Guess ROI color </h1>
+<HR></HR>
+<!------------------->
+	<P>
+	Selects ROI mode which may be best for the color scale.  The result will be one of the ROI modes that can be selected manually.
+	</P>
+
+

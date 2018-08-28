@@ -1,5 +1,6 @@
 %% Jarkkos format from simulation data
 load('NtSimul_RACBI_May2018.mat');
+%%
 midtime = mean( NtSimul.ROITime,2);
 tact =  NtSimul.ROIdata_Baseline.Tissue';
 reftact =  NtSimul.REFdata_simul';
@@ -19,31 +20,14 @@ BP = a.pars{5}
 k2p = a.pars{3};
 
 % SRTM2
-a = jjsrtm2( tact, T, dT, reftact,k2p);
-R1_ = a.pars{1}
-BP_ = a.pars{4}
+b = jjsrtm2( tact, T, dT, reftact,k2p);
+R1_ = b.pars{1}
+BP_ = b.pars{4}
 
 %a = jsrtm( data1)
 %a = jsrtm2( a, a.srtm.k2p )
 
 
-%%
-tic
-R1=zeros(1,256*256);
-for i = 1:256*256
-data.midtime = imlook4d_ROI_data.midtime;
-data.tact = imlook4d_ROI_data.mean(:,2);
-
-data.reftact = imlook4d_ROI_data.mean(:,1);
-
-a = jsrtm( data);
-R1(i) = a.par(1);
-%a = jsrtm2( a, a.srtm.k2p );
-
-%disp(a.srtm)
-%disp(a.srtm2)
-end
-toc
 
 %%
 
@@ -51,17 +35,34 @@ toc
 % Other ROIs being roi 2,3, ...
 tic
 
-ref = imlook4d_ROI_data.mean(:,1)'; 
-matrix = imlook4d_ROI_data.mean(:,2:end)';
+ref = imlook4d_ROI_data.mean(:,imlook4d_ROI_number)'; 
+tact = imlook4d_ROI_data.mean()';
 
-a = jjsrtm( matrix, imlook4d_time, imlook4d_duration, ref);
+a = jjsrtm( tact, imlook4d_time/60, imlook4d_duration/60, ref);
 R1 = a.pars{1}
+
+
+% SRTM2
+k2p = median(a.pars{3});
+b = jjsrtm2( tact, imlook4d_time/60, imlook4d_duration/60, ref,k2p);
+R1_ = b.pars{1}
+BP_ = b.pars{4}
+
+toc
+%%
+
+S = roi_table_gui( ...
+    [imlook4d_ROINames(1:end-1) num2cell( cell2mat(b.pars) ) ], ...
+    'test window', ...
+    b.names ...
+    )
+
 
 %%  
 
 % ROI-data to workspace, first ROI being ref roi
 tic
-ref = imlook4d_ROI_data.mean(:,1)';  % ROI-data to workspace, first ROI being ref roi
+ref = imlook4d_ROI_data.mean(:,imlook4d_ROI_number)';  % ROI-data to workspace, first ROI being ref roi
 
 % One pixel
 a = jjsrtm( imlook4d_Cdata(1,1,20,:), imlook4d_time, imlook4d_duration, ref);
@@ -74,7 +75,7 @@ size(a.pars{1})
 toc;tic;
 
 % One slice
-a = jjsrtm( imlook4d_Cdata(:,:,20,:), imlook4d_time, imlook4d_duration, ref);
+a = jjsrtm( imlook4d_Cdat a(:,:,20,:), imlook4d_time, imlook4d_duration, ref);
 size(a.pars{1})
 toc;tic;
 

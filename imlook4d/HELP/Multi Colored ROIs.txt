@@ -1,0 +1,8 @@
+<h1> Multi Colored ROIs </h1>
+<HR></HR>
+<!------------------->
+	<P>
+	ROIs are drawn in different colors.  
+	</P>
+
+
