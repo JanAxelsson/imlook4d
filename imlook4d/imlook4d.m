@@ -6559,7 +6559,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             setColorBar( thisHandles, CLim)
  
         catch
-        end
+         end
+        updateImage(hObject, eventdata, thisHandles)
          
     % Color submenu   
         function Color_Callback(hObject, eventdata, handles, functionName)
