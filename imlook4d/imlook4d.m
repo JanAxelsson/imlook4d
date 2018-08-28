@@ -8507,6 +8507,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                            % submenues that do not have any help
                            % file.
                            disp([ 'Missing help file - could not find file=' helpFilePath]);
+                           helpFilePath=[pathstr1 filesep 'HELP' filesep get(hObject,'Label') '.txt' ];
+                           
+                           matlabCommand = ['copyfile(''' [ pathstr1 filesep 'HELP' filesep 'helpTemplate.txt'] ''' ,''' [ pathstr1 filesep 'HELP' filesep get(hObject,'Label') '.txt'] ''');' ];
+                           matlabCommand = [ matlabCommand 'edit(''' [ pathstr1 filesep 'HELP' filesep get(hObject,'Label') '.txt'] ''');']
+                               
+                           disp( [ 'Help file did not exist. Create file here: <a href="matlab:' matlabCommand '">' helpFilePath '</a>' ]);
+
                            
                            try
                                 parentObject=get(hObject,'Parent');
@@ -8518,9 +8525,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                 try
                                     helpFilePath=[ get(parentObject,'Label') '.txt' ];
                                     text =  fileread(helpFilePath);
-                                catch                                     
-                                    helpFilePath=[ get(parentObject,'Tag') '.txt' ];
-                                    text =  fileread(helpFilePath);   
+                                catch  
+                                    try
+                                        helpFilePath=[ get(parentObject,'Tag') '.txt' ];
+                                        text =  fileread(helpFilePath);   
+                                    catch
+                                        return;
+                                    end
                                 end
                            end
                        end
