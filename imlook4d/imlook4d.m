@@ -1050,7 +1050,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
             end
 
                         
-            % Comment row
+            % Comment-row
             if startsWith( name, '#')
                 nameWithSpaces= regexprep(name(2:end),'_', ' ');  % Replace '_' with ' '
                 callBack='';
@@ -1089,6 +1089,18 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                     tag = nameWithSpaces;
                 end
                 
+                % Special for Window Levels menu
+                if strcmp( get(parentMenuHandle, 'Tag'), 'WindowLevelsMenu')
+                    % Setup submenu callback
+                    %callBack=['imlook4d(''Color_Callback'',gcbo,[],guidata(gcbo), ''' name ''' )']; 
+                    callBack=[name '( gcbo, [], guidata(gcbo) )'];  % Callback using ui object
+                    callBack=[callBack '; ' 'imlook4d(''updateImage'',gcbo,[],guidata(gcbo) ) '];
+
+                    %disp(['name=' name '   WINDOW_LEVELS Callback=' callbackString]);% Display paths
+                    %handles.image.WindowLevelsSubMenuHandle(i) = uimenu(handles.WindowLevelsMenu, 'Label',nameWithSpaces, 'Callback', callbackString);
+                    tag = nameWithSpaces;
+                end
+
 
                 
                 % Advanced callback to allow 
