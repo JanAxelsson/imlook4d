@@ -23,7 +23,7 @@ function varargout = modelWindow(varargin)
 
     % Edit the above text to modify the response to help modelWindow
 
-    % Last Modified by GUIDE v2.5 24-Aug-2018 17:08:22
+    % Last Modified by GUIDE v2.5 28-Aug-2018 16:46:30
 
     % Begin initialization code - DO NOT EDIT
 gui_Singleton = 0;
@@ -44,7 +44,7 @@ gui_Singleton = 0;
     end
     % End initialization code - DO NOT EDIT
     dummy=1; % Dummy to hide when code folding
-function varargout = modelWindow_OutputFcn(hObject, eventdata, handles) 
+function varargout = modelWindow_OutputFcn(~, ~, handles) 
     % --- Outputs from this function are returned to the command line.
     % varargout  cell array for returning output args (see VARARGOUT);
     % hObject    handle to figure
@@ -55,7 +55,7 @@ function varargout = modelWindow_OutputFcn(hObject, eventdata, handles)
     varargout{1} = handles.output;
 
 % On Open    
-function modelWindow_OpeningFcn(hObject, eventdata, handles, datastruct, roinames, title, varargin)
+function modelWindow_OpeningFcn(hObject, ~, handles, datastruct, roinames, title, varargin)
 % --- Executes just before modelWindow is made visible.
     % This function has no output args, see OutputFcn.
     % hObject    handle to figure
@@ -91,7 +91,6 @@ function modelWindow_OpeningFcn(hObject, eventdata, handles, datastruct, roiname
 
     % Draw initial graphs
     handles.selectedRow = 1;    
-    handles.mainAxesRoiName.String = handles.roinames{handles.selectedRow};
     drawPlots( handles,handles.selectedRow);
 
     % % Make uitable sortable
@@ -112,6 +111,12 @@ function modelWindow_OpeningFcn(hObject, eventdata, handles, datastruct, roiname
 %
 function drawPlots( handles,roinumber)
     datastruct = handles.datastruct;
+    previousMainYLim = handles.mainAxes.YLim;
+    
+    %
+    % Write info
+    %
+    handles.mainAxesRoiName.String = [ 'ROI = ' handles.roinames{roinumber} ];
     
     %
     % Draw data and model
@@ -139,6 +144,14 @@ function drawPlots( handles,roinumber)
 
     catch
         hold(handles.mainAxes,'off');
+    end
+    
+    m = max( abs(handles.datastruct.Y{roinumber}) ); % Find max absolute value
+    m = m * 1.2; % Get some space
+    handles.mainAxes.YLim = [0 +m];
+    
+    if get(handles.lockedYradiobutton,'Value')
+        handles.mainAxes.YLim = previousMainYLim; 
     end
 
     %
@@ -173,15 +186,17 @@ function drawPlots( handles,roinumber)
 %
 % Callbacks
 %
-function uitable_CellSelectionCallback(hObject, eventdata, handles)
+function uitable_CellSelectionCallback(~, eventdata, handles)
     roinumber = eventdata.Indices(1);
     drawPlots( handles,roinumber);
-    handles.mainAxesRoiName.String = handles.roinames{roinumber};
     handles.selectedRow = roinumber;
     guidata(handles.modelWindow, handles);
-function AbsoluteResidualRadioButton_Callback(hObject, eventdata, handles)
+function AbsoluteResidualRadioButton_Callback(~, ~, handles)
     roinumber = handles.selectedRow;
     drawPlots( handles,roinumber)
-function PercentResidualRadioButton_Callback(hObject, eventdata, handles)
+function PercentResidualRadioButton_Callback(~, ~, handles)
+    roinumber = handles.selectedRow;
+    drawPlots( handles,roinumber)  
+function LockYradiobutton_Callback(~, ~, handles)
     roinumber = handles.selectedRow;
     drawPlots( handles,roinumber)
