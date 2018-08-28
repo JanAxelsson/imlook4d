@@ -2233,7 +2233,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         
 
         set(handles.PC_high_edit,'String',num2str(NewVal));
-        updateImage(hObject, eventdata, handles)                   
+        %updateImage(hObject, eventdata, handles)                   
         
         
     % --------------------------------------------------------------------
@@ -2289,7 +2289,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         strg = get(hObject,'String');
         if str2num(strg)>=1 && str2num(strg)<=frames
             set(handles.PC_high_slider,'Value',str2num(strg));
-            updateImage(hObject, eventdata, handles)
+            %updateImage(hObject, eventdata, handles)
         end
     function FirstFrameInPCAFilter_Callback(hObject, eventdata, handles)
         
@@ -6559,7 +6559,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             setColorBar( thisHandles, CLim)
  
         catch
-        end
+         end
+        updateImage(hObject, eventdata, thisHandles)
          
     % Color submenu   
         function Color_Callback(hObject, eventdata, handles, functionName)
