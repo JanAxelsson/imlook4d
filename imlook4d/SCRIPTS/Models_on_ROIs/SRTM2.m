@@ -2,7 +2,6 @@ StoreVariables;
 Export;
 
 model_name = 'SRTM2';
-ref_name = imlook4d_ROINames{imlook4d_ROI_number};
 
 % First run SRTM (same code as SRTM script copied here)
 

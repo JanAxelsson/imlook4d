@@ -2,7 +2,6 @@ StoreVariables;
 Export;
 
 model_name = 'Logan';
-ref_name = imlook4d_ROINames{imlook4d_ROI_number};
 
 %
 % Dialog
@@ -39,13 +38,19 @@ else
     a = jjlogan( tact, imlook4d_time/60, imlook4d_duration/60, ref, [ startFrame endFrame]); % Model ignoring term with k2ref
 end
 
+% Get Logan axes for reference tissue
+r = jjlogan( ref, imlook4d_time/60, imlook4d_duration/60, ref, [ startFrame endFrame]);
+
+a.Yref = r.Y{1};
+a.Xref = r.X{1};
+
 %
 % Display
 %
 modelWindow( ...
     a , ...
     imlook4d_ROINames(1:end-1), ...
-    [model_name ' (First frame = '  num2str(imlook4d_frame) ')'], ...
+    [model_name ' (First frame = '  num2str(startFrame) ')'], ...
     @jjlogan, ...
     { 'Regression from'} ...
     );

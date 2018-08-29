@@ -134,7 +134,7 @@ function out =  jjsrtm( matrix, t, dt, Cr)
     out.xlabel = 'time';
     out.ylabel = 'C_t';
     
-    out.Xref = out.X{i};
+    out.Xref = out.X{1};
     out.Yref = Cr;
 
     

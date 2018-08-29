@@ -2,7 +2,6 @@ StoreVariables;
 Export;
 
 model_name = 'SRTM';
-ref_name = imlook4d_ROINames{imlook4d_ROI_number};
 
 %
 % Model

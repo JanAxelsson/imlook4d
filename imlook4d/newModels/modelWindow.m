@@ -112,19 +112,11 @@ function modelWindow_OpeningFcn(hObject, ~, handles, datastruct, roinames, title
 function drawPlots( handles,roinumber)
     datastruct = handles.datastruct;
     previousMainYLim = handles.mainAxes.YLim;
-    
-    %
-    % Write info
-    %
-    handles.mainAxesRoiName.String = [ 'ROI = ' handles.roinames{roinumber} ];
-    xlabel(handles.mainAxes,datastruct.xlabel);
-    ylabel(handles.mainAxes,datastruct.ylabel);
-    title(handles.mainAxes,'Model');    
-    
-    myLegends = {};
-        
+
+    %    
     % Draw data and model
     %
+    myLegends = {};
     try % Data
         plot (handles.datastruct.X{roinumber},handles.datastruct.Y{roinumber},...
             'Marker','o', ...
@@ -148,7 +140,7 @@ function drawPlots( handles,roinumber)
     end
     
     try % Reference
-        hold(handles.mainAxes,'on');
+        %hold(handles.mainAxes,'on');
         plot (handles.datastruct.Xref,handles.datastruct.Yref,...
             'Marker','o', ...
             'LineStyle','none',...
@@ -158,6 +150,14 @@ function drawPlots( handles,roinumber)
     catch
     end
     hold(handles.mainAxes,'off');
+    
+    %
+    % Write info
+    %
+    handles.mainAxesRoiName.String = [ 'ROI = ' handles.roinames{roinumber} ];
+    xlabel(handles.mainAxes,datastruct.xlabel);
+    ylabel(handles.mainAxes,datastruct.ylabel);
+    title(handles.mainAxes,'Model');    
     
     legend(handles.mainAxes,myLegends);
     
@@ -172,6 +172,7 @@ function drawPlots( handles,roinumber)
     %
     % Draw residuals
     %
+    myLegends = {};
     try
         if handles.PercentResidualRadioButton.Value
             residual = 100 * handles.datastruct.residual{roinumber} ./ handles.datastruct.Ymodel{roinumber};
@@ -186,8 +187,11 @@ function drawPlots( handles,roinumber)
             'LineStyle','none',...
             'Color','blue',...
             'Parent',handles.residualAxes)
+        myLegends = [ myLegends 'Model - ROI'];
         
         title(handles.residualAxes,'Residual');
+        legend(handles.residualAxes, myLegends);
+    
         handles.residualAxes.XAxisLocation = 'origin';
         handles.residualAxes.XLim = handles.mainAxes.XLim;
         m = max( abs(residual) ); % Find max absolute value
