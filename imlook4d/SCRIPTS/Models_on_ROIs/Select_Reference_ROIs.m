@@ -24,7 +24,23 @@ else
     return
 end
 
+% Add 'ref' to ROIName
+REFLABEL = '* ';
+temp = imlook4d_ROINames;
+for i = 1 : ( length(temp)-1 )
+    if startsWith(temp{i},REFLABEL)
+        temp{i} = temp{i}( length(REFLABEL)+1 : end);
+        disp( ['Clear ' temp{i} ]);
+    end
+end
+for i = s
+    temp{i} = [ REFLABEL temp{i}];
+    disp( ['Set ' temp{i} ]);
+end
+
 imlook4d_current_handles.model.common.ReferenceROINumbers = s;
+
+imlook4d_ROINames = temp;
 
 Import;
 ClearVariables;
