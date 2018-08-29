@@ -59,7 +59,7 @@ function outputImage=zhou( handles, matrix,outputFrameRange)
     
    tic
 
-        a = jjzhou( matrix, handles.image.time/60, handles.image.duration/60, handles.model.Logan.referenceData', handles.model.Logan.startFrame);
+        a = jjzhou( matrix, handles.image.time/60, handles.image.duration/60, handles.model.Zhou.referenceData', handles.model.Zhou.startFrame);
         
         if strcmp(handles.model.Zhou.type, 'BP')
             outputImage(:,:,1,1) = a.pars{1}; % DVR
