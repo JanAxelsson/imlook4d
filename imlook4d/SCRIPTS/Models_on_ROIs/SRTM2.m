@@ -9,7 +9,7 @@ ref_name = imlook4d_ROINames{imlook4d_ROI_number};
 disp('Calculating time-activity curves ...');
 tacts = generateTACT(imlook4d_current_handles,imlook4d_ROI);  % ROIs
 
-ref = tacts(imlook4d_ROI_number,:); % Current ROI
+ref = generateReferenceTACT( imlook4d_current_handles)
 tact = tacts;  % all ROIs
 
 
@@ -36,9 +36,9 @@ b = jjsrtm2( tact, imlook4d_time/60, imlook4d_duration/60, ref,k2p);
 
 % Display
 modelWindow( ...
-    a , ...
+    b , ...
     imlook4d_ROINames(1:end-1), ...
-    [model_name ' (Ref=' ref_name ',  First frame = '  num2str(imlook4d_frame) ')  k2p = ' num2str(k2p)] ...
+    [model_name ' (k2p = ' num2str(k2p) ')'] ...
     );
 
 disp('Done!');

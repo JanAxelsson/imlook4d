@@ -117,34 +117,49 @@ function drawPlots( handles,roinumber)
     % Write info
     %
     handles.mainAxesRoiName.String = [ 'ROI = ' handles.roinames{roinumber} ];
+    xlabel(handles.mainAxes,datastruct.xlabel);
+    ylabel(handles.mainAxes,datastruct.ylabel);
+    title(handles.mainAxes,'Model');    
     
-    %
+    myLegends = {};
+        
     % Draw data and model
     %
-    try
+    try % Data
         plot (handles.datastruct.X{roinumber},handles.datastruct.Y{roinumber},...
             'Marker','o', ...
             'LineStyle','none',...
             'Color','blue',...
             'Parent',handles.mainAxes)
-        
-        xlabel(handles.mainAxes,datastruct.xlabel);
-        ylabel(handles.mainAxes,datastruct.ylabel);
-        title(handles.mainAxes,'Model');
+        myLegends = [ myLegends 'ROI'];
     catch
     end
     
-    try
+    try % Model
         hold(handles.mainAxes,'on');
         plot (handles.datastruct.Xmodel{roinumber},handles.datastruct.Ymodel{roinumber},...
             'LineStyle','-', ...
             'Color','blue',...
             'Parent',handles.mainAxes)
-        hold(handles.mainAxes,'off');
+        myLegends = [ myLegends 'Model'];
 
     catch
-        hold(handles.mainAxes,'off');
+        %hold(handles.mainAxes,'off');
     end
+    
+    try % Reference
+        hold(handles.mainAxes,'on');
+        plot (handles.datastruct.Xref,handles.datastruct.Yref,...
+            'Marker','o', ...
+            'LineStyle','none',...
+            'Color','red',...
+            'Parent',handles.mainAxes)
+        myLegends = [ myLegends 'Reference'];
+    catch
+    end
+    hold(handles.mainAxes,'off');
+    
+    legend(handles.mainAxes,myLegends);
     
     m = max( abs(handles.datastruct.Y{roinumber}) ); % Find max absolute value
     m = m * 1.2; % Get some space

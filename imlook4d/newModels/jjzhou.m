@@ -13,6 +13,15 @@ function out =  jjzhou( matrix, t, dt, Cr, range)
     %   out.pars  = cell array with matrices { BPND, DVR, intercept}; 
     %   out.names = { 'BPND', 'DVR', 'intercept'};
     %   out.units = { '1','1','min'};
+    %  
+    %   Cell array with cells for each ROI:
+    %     out.X = Zhou X-axis 
+    %     out.Y = Zhou Y-axis 
+    %     out.Xref = Cr x-axis (same times, most often)
+    %     out.Yref = Cr
+    %     out.Xmodel = Zhou X-axis for fitted range
+    %     out.Ymodel = Zhou Y-axis for fitted range
+    %     out.residual = Y - Ymodel, diff for fitted range
     
     warning('off','MATLAB:lscov:RankDefDesignMat')
     warning('off','MATLAB:nearlySingularMatrix')
@@ -94,6 +103,9 @@ function out =  jjzhou( matrix, t, dt, Cr, range)
         
     out.xlabel = '\int_{0}^{t} C_{ref} dt / C_{ref}';
     out.ylabel = '\int_{0}^{t} C_t dt / C_{ref}';
+    
+    out.Xref = out.X{i};
+    out.Yref = Cr;
 
     
     % --------

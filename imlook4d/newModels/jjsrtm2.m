@@ -17,6 +17,8 @@ function out =  jjsrtm2( matrix, t, dt, Cr, k2p)
     %   Cell array with cells for each ROI:
     %     out.X = X-axis 
     %     out.Y = Y-axis 
+    %     out.Xref = Cr x-axis (same times, most often)
+    %     out.Yref = Cr
     %     out.Xmodel = model X-axis
     %     out.Ymodel = model Y-axis 
     %     out.residual = Y - Ymodel
@@ -148,6 +150,9 @@ function out =  jjsrtm2( matrix, t, dt, Cr, k2p)
  
     out.xlabel = 'time';
     out.ylabel = 'C_t';
+    
+    out.Xref = out.X{i};
+    out.Yref = Cr;
 
     
     % --------

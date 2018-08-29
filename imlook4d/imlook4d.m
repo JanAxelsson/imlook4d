@@ -2860,12 +2860,30 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             
             % Shift down ROI names
             contents = {contents{1:ROINumber-1} , contents{ROINumber+1:end}};
+            set(handles.ROINumberMenu,'String', contents)   
             
             % Shift down Visible and Locks
             handles.image.VisibleROIs = [ handles.image.VisibleROIs(1:ROINumber-1) handles.image.VisibleROIs(ROINumber+1:end)   ];
             handles.image.LockedROIs = [ handles.image.LockedROIs(1:ROINumber-1) handles.image.LockedROIs(ROINumber+1:end)   ];
-            
-            set(handles.ROINumberMenu,'String', contents)          
+
+            %
+            % Handle Reference ROIs (stored ROI numbers)
+            %
+                % Find position in Reference ROIs list
+                indexToRemove = find( handles.model.common.ReferenceROINumbers== ROINumber); % index in list
+                
+                % Subtract 1 from ROIs larger than current ROINumber
+                handles.model.common.ReferenceROINumbers( handles.model.common.ReferenceROINumbers > ROINumber ) = ...
+                     handles.model.common.ReferenceROINumbers( handles.model.common.ReferenceROINumbers > ROINumber ) - 1;
+                 
+                % Remove from Reference ROIs, if in list
+                if ~isempty(indexToRemove)
+                    handles.model.common.ReferenceROINumbers = [ ...
+                        handles.model.common.ReferenceROINumbers( 1:(indexToRemove-1) ), ...
+                        handles.model.common.ReferenceROINumbers( (indexToRemove+1):end ) ...
+                        ];
+                end               
+       
             
             % Selected ROI
             if ( ROINumber >= length( contents ) ) % Selected ROI pointing to Add ROI, or outside
@@ -2886,7 +2904,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         
         % Remove if not locked
         if ( sum( handles.image.LockedROIs) > 0 )
-            disp('ONE OR MORE LOCKED ROIs - not allowed to remove');
+            disp('ONE OR MORE LOCKED ROIs - not allowed to remove.  Unlock ROIs first.');
         else
             
             contents = {contents{end}}; % Remove all but 'Add ROI'
@@ -2896,6 +2914,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             
             handles.image.VisibleROIs = [];
             handles.image.LockedROIs = [];
+            
+            handles.model.common.ReferenceROINumbers = []; % Reference ROI list
             
             %disp([ 'Visible = ' num2str(handles.image.VisibleROIs) ]);
             %disp([ 'Locked  = ' num2str(handles.image.LockedROIs) ]);
@@ -6305,7 +6325,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             close(gcf);
             
    % Close window(s)             
-         function Close_one_Callback(hObject, eventdata, handles)
+        function Close_one_Callback(hObject, eventdata, handles)
          % Display HELP and get out of callback
              if DisplayHelp(hObject, eventdata, handles) 
                  return 

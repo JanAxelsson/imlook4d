@@ -18,6 +18,8 @@ function out =  jjlogan( matrix, t, dt, Cr, range, k2ref)
     %   Cell array with cells for each ROI:
     %     out.X = Logan X-axis 
     %     out.Y = Logan Y-axis 
+    %     out.Xref = Cr x-axis (same times, most often)
+    %     out.Yref = Cr
     %     out.Xmodel = Logan X-axis for fitted range
     %     out.Ymodel = Logan Y-axis for fitted range
     %     out.residual = Y - Ymodel, diff for fitted range
@@ -115,6 +117,9 @@ function out =  jjlogan( matrix, t, dt, Cr, range, k2ref)
     
     out.xlabel = '\int_{0}^{t} C_{ref} dt /C_t';
     out.ylabel = '\int_{0}^{t} C_t dt /C_t';
+    
+    out.Xref = out.X{i};
+    out.Yref = Cr;
     
     % --------
     % Clean up

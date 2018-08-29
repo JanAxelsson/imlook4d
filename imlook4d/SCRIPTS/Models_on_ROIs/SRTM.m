@@ -11,7 +11,7 @@ ref_name = imlook4d_ROINames{imlook4d_ROI_number};
 disp('Calculating time-activity curves ...');
 tacts = generateTACT(imlook4d_current_handles,imlook4d_ROI);  % ROIs
 
-ref = tacts(imlook4d_ROI_number,:); % Current ROI
+ref = generateReferenceTACT( imlook4d_current_handles)
 tact = tacts;  % all ROIs
 
 
@@ -29,7 +29,7 @@ disp(['Median k2p = ' num2str(k2p) ]);
 modelWindow( ...
     a , ...
     imlook4d_ROINames(1:end-1), ...
-    [model_name ' (Ref=' ref_name ',  First frame = '  num2str(imlook4d_frame) ')'] ...
+    [model_name ] ...
     );
 
 disp('Done!');

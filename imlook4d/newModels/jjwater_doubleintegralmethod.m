@@ -14,11 +14,10 @@ function out =  jjwater_doubleintegralmethod( matrix, t, dt, Ct1)
     %   out.units = { '1','1','min'};
     %  
     %   Cell array with cells for each ROI:
-    %     out.X = Logan X-axis 
-    %     out.Y = Logan Y-axis 
-    %     out.Xmodel = Logan X-axis for fitted range
-    %     out.Ymodel = Logan Y-axis for fitted range
-    %     out.residual = Y - Ymodel, diff for fitted range
+    %     out.X = X-axis 
+    %     out.Y = Y-axis 
+    %     out.Xref = Ct1 x-axis (same times, most often)
+    %     out.Yref = Ct1
     %
     % Example: 
     %   % Export from imlook4d, where a whole-brain ROI is the current ROI. Then run: 
@@ -126,6 +125,9 @@ function out =  jjwater_doubleintegralmethod( matrix, t, dt, Ct1)
     
     out.xlabel = 'time';
     out.ylabel = 'C_t';
+    
+    out.Xref = out.X{i};
+    out.Yref = Ct1;
     
     % --------
     % Clean up
