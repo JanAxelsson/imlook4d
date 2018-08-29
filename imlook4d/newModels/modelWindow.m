@@ -189,6 +189,7 @@ function drawPlots( handles,roinumber)
             'LineStyle','none',...
             'Color','blue',...
             'Parent',handles.residualAxes)
+        myLegends = [ myLegends 'Model - ROI'];
         
         title(handles.residualAxes,'Residual');
         legend(handles.residualAxes, myLegends);
