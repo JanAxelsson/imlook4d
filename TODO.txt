@@ -1,22 +1,24 @@
-Add things to do:
+TODO
+=====
 
 DEVELOP
-- models On Rois - show dialog for paramteters
-- RetrieveEarlierValues + StoreValues - implementera i modeller (ovan)
-
-- MODELS, add dialog (as in models on ROIs) and use new jjlogan and other jj:s
+[  ]   MODELS, add dialog (as in models on ROIs) and use new jjlogan and other jj:s
+[  ]   Display Reference ROIs (only show Ref-ROIs with dropdown menu from ROI-selection?)
 
 
 WISHLIST
-- reference area can be combination of multiple ROIs
+[  ]   modelWindow: show parameters
+[  ]   modelWindow: allow update of model
 
-- modelWindow: show parameters
-- modelWindow: allow update of model
-
-- JPEG DICOM
-
-- Update menu, should it save the new downloaded path by default?
+[  ]   jpeg dicoms
+[  ]   Update menu, should it save the new downloaded path by default?
 
 
 PEARL-PD
-- loop script to get TACTs and calculate parameters
+[  ]   loop script to get TACTs and calculate parameters
+
+
+
+ISSUES
+======
+[  ]   ROI/ScreePlot fails

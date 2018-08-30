@@ -2926,6 +2926,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
     function ResetROILevel_Callback(hObject, eventdata, handles, name)
         lowestValue = min( handles.image.Cdata(:));
         set(handles.ROILevelEdit,'String', num2str(lowestValue));
+    function Only_Ref_ROIs_Callback(hObject, eventdata, handles, name)
+        if strcmp( handles.OnlyRefROIs.Checked, 'on');
+            handles.OnlyRefROIs.Checked = 'off';
+        else
+            handles.OnlyRefROIs.Checked = 'on';
+        end
+        
+        updateROIs(handles);
 
     function orientationMenu_Callback(hObject, eventdata, handles, name)
         
@@ -8306,11 +8314,22 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
   
                        
                        % Remove non-visible ROIs from pixels
-                       for i=1:length(handles.image.VisibleROIs)
+                       numberOfROIs = length(handles.image.VisibleROIs);
+                       for i=1:numberOfROIs
                            if (handles.image.VisibleROIs(i)==0)
                                rois(rois==i)=0;       % All ROIs
                            end
                        end
+                       
+                       % Keep only reference ROIs, if checked in GUI
+                       if strcmp( handles.OnlyRefROIs.Checked, 'on')
+                           roisToCalculate = handles.model.common.ReferenceROINumbers;
+                           roisToHide = setdiff( 1:numberOfROIs , roisToCalculate);
+                           for i = roisToHide
+                               rois(rois==i)=0; 
+                           end
+                       end
+                       
 
                        % Set pixels in active ROI                              set(handles.ImgObject3,'AlphaData', 0.5);  
 

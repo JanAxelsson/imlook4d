@@ -1,5 +1,11 @@
 function [activity, NPixels, stdev, maxActivity]=generateReferenceTACT(handles)
-    roisToCalculate = handles.model.common.ReferenceROINumbers;
+    try
+        roisToCalculate = handles.model.common.ReferenceROINumbers;
+    catch
+        handles.model.common.ReferenceROINumbers = []; % Was not defined, lets make an empty one
+        roisToCalculate = [];
+    end
+    
     ROI = handles.image.ROI;
     
     tempROI = zeros( size(ROI));
@@ -8,8 +14,11 @@ function [activity, NPixels, stdev, maxActivity]=generateReferenceTACT(handles)
     end
     
     if isempty(roisToCalculate)
-       errordlg('No reference region defined'); 
-       error('No reference region defined');
+       errordlg({'No reference region defined.', ...
+           'Please Select Reference Region from ', ...
+           ' SCRIPTS/Models on ROIs/Select Reference ROIs'} );
+       
+       error('No reference region defined'); 
     end
     
     ROI(ROI>0) = 1;
