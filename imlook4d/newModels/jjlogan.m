@@ -118,8 +118,10 @@ function out =  jjlogan( matrix, t, dt, Cr, range, k2ref)
     out.xlabel = '\int_{0}^{t} C_{ref} dt /C_t';
     out.ylabel = '\int_{0}^{t} C_t dt /C_t';
     
-    out.Xref = out.X{i};
-    out.Yref = Cr;
+    if IS_ROI
+        out.Xref = out.X{i};
+        out.Yref = Cr;
+    end
     
     % --------
     % Clean up
