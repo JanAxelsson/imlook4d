@@ -2714,52 +2714,57 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
        catch
            disp('Exception in ROINumberMenu_Callback');
        end
-    function ROI_Show_Callback(hObject, eventdata, handles, name)
-        if DisplayHelp(hObject, eventdata, handles)
-            return
-        end
-        ROINumberMenu=get(handles.ROINumberMenu);
-        contents = ROINumberMenu.String; % Cell array 
-        
-        ROINumber=ROINumberMenu.Value;
-        contents{ROINumber} = regexprep(contents{ROINumber}, '\(hidden\) ', ''); % Remove (hidden) prefix
-        set(handles.ROINumberMenu,'String', contents);
-        
-        handles.image.VisibleROIs(ROINumber)=ROINumber;
-        %disp([ 'Visible = ' num2str(handles.image.VisibleROIs) ]);
-        %disp([ 'Locked  = ' num2str(handles.image.LockedROIs) ]);
-        guidata(hObject,handles);% Save handles
-        updateROIs(handles);
     function ROI_ShowAll_Callback(hObject, eventdata, handles, name) 
         if DisplayHelp(hObject, eventdata, handles)
             return
         end
+        
+        % Show all hidden
         ROINumberMenu=get(handles.ROINumberMenu);
         contents = ROINumberMenu.String; % Cell array 
-        %handles.image.VisibleROIs=[1:size(ROINumberMenu.String,1)-1];  % Set all ROIs to visible
         handles.image.VisibleROIs(1:size(ROINumberMenu.String,1)-1)=1;       
         ROINumber=ROINumberMenu.Value;
         contents = regexprep(contents, '\(hidden\) ', ''); % Remove (hidden) prefix
         set(handles.ROINumberMenu,'String', contents);
         
-        %disp([ 'Visible = ' num2str(handles.image.VisibleROIs) ]);
-        %disp([ 'Locked  = ' num2str(handles.image.LockedROIs) ]);
+        % Show ref ROIs
+        handles.OnlyRefROIs.Checked = 'off'; % Set hide to off
+        
+        % Set Hide Checkmark to off
+        handles.HideROI.Checked = 'off'; % Set hide to off
+        
         guidata(hObject,handles);% Save handles
         updateROIs(handles);
     function ROI_Hide_Callback(hObject, eventdata, handles, name)
         if DisplayHelp(hObject, eventdata, handles)
             return
         end
-        ROINumberMenu=get(handles.ROINumberMenu);
-        contents = ROINumberMenu.String; % Cell array 
-        ROINumber=ROINumberMenu.Value;
         
-        handles.image.VisibleROIs(ROINumber)=0;
-        contents{ROINumber}=['(hidden) ' contents{ROINumber}];   % Set (hidden) prefix
-        set(handles.ROINumberMenu,'String', contents)
-        
-        %disp([ 'Visible = ' num2str(handles.image.VisibleROIs) ]);
-        %disp([ 'Locked  = ' num2str(handles.image.LockedROIs) ]);
+        if strcmp( handles.HideROI.Checked, 'on');
+            % Show
+            handles.HideROI.Checked = 'off'; % Set hide to off
+            
+            ROINumberMenu=get(handles.ROINumberMenu);
+            contents = ROINumberMenu.String; % Cell array
+            
+            ROINumber=ROINumberMenu.Value;
+            contents{ROINumber} = regexprep(contents{ROINumber}, '\(hidden\) ', ''); % Remove (hidden) prefix
+            set(handles.ROINumberMenu,'String', contents);
+            
+            handles.image.VisibleROIs(ROINumber)=ROINumber;
+        else
+            % Hide
+            handles.HideROI.Checked = 'on'; % Set hide to on
+            
+            ROINumberMenu=get(handles.ROINumberMenu);
+            contents = ROINumberMenu.String; % Cell array
+            ROINumber=ROINumberMenu.Value;
+            
+            handles.image.VisibleROIs(ROINumber)=0;
+            contents{ROINumber}=['(hidden) ' contents{ROINumber}];   % Set (hidden) prefix
+            set(handles.ROINumberMenu,'String', contents)
+        end
+
         guidata(hObject,handles);% Save handles
         updateROIs(handles);   
     function ROI_Hide_All_Callback(hObject, eventdata, handles, name) 
@@ -2812,34 +2817,32 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         if DisplayHelp(hObject, eventdata, handles)
             return
         end
-        ROINumberMenu=get(handles.ROINumberMenu);
-        contents = ROINumberMenu.String; % Cell array 
-        ROINumber=ROINumberMenu.Value;
         
-        handles.image.LockedROIs(ROINumber)=1;
-        contents{ROINumber}=['(locked) ' contents{ROINumber}];   % Set (locked) prefix
-        set(handles.ROINumberMenu,'String', contents)
-        
-        %disp([ 'Visible = ' num2str(handles.image.VisibleROIs) ]);
-        %disp([ 'Locked  = ' num2str(handles.image.LockedROIs) ]);
+        if strcmp( handles.Lock_ROI.Checked, 'on');
+            handles.Lock_ROI.Checked = 'off'; % Unlock
+            
+            ROINumberMenu=get(handles.ROINumberMenu);
+            contents = ROINumberMenu.String; % Cell array
+            ROINumber=ROINumberMenu.Value;
+            
+            handles.image.LockedROIs(ROINumber)=0;
+            contents = regexprep(contents, '\(locked\) ', ''); % Remove (hidden) prefix
+            set(handles.ROINumberMenu,'String', contents)
+        else
+            handles.Lock_ROI.Checked = 'on'; % Lock
+            
+            
+            ROINumberMenu=get(handles.ROINumberMenu);
+            contents = ROINumberMenu.String; % Cell array
+            ROINumber=ROINumberMenu.Value;
+            
+            handles.image.LockedROIs(ROINumber)=1;
+            contents{ROINumber}=['(locked) ' contents{ROINumber}];   % Set (locked) prefix
+            set(handles.ROINumberMenu,'String', contents)
+        end
+
         guidata(hObject,handles);% Save handles
         updateROIs(handles);   
-    function ROI_UnLock_Callback(hObject, eventdata, handles, name)
-        if DisplayHelp(hObject, eventdata, handles)
-            return
-        end
-        ROINumberMenu=get(handles.ROINumberMenu);
-        contents = ROINumberMenu.String; % Cell array
-        ROINumber=ROINumberMenu.Value;
-        
-        handles.image.LockedROIs(ROINumber)=0;
-        contents = regexprep(contents, '\(locked\) ', ''); % Remove (hidden) prefix
-        set(handles.ROINumberMenu,'String', contents)
-        
-        %disp([ 'Visible = ' num2str(handles.image.VisibleROIs) ]);
-        %disp([ 'Locked  = ' num2str(handles.image.LockedROIs) ]);
-        guidata(hObject,handles);% Save handles
-        updateROIs(handles);
     function ROI_Remove_Callback(hObject, eventdata, handles, name)
         if DisplayHelp(hObject, eventdata, handles)
             return
@@ -2927,6 +2930,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         lowestValue = min( handles.image.Cdata(:));
         set(handles.ROILevelEdit,'String', num2str(lowestValue));
     function Only_Ref_ROIs_Callback(hObject, eventdata, handles, name)
+        if DisplayHelp(hObject, eventdata, handles)
+            return
+        end
+        
         if strcmp( handles.OnlyRefROIs.Checked, 'on');
             handles.OnlyRefROIs.Checked = 'off';
         else
