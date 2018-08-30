@@ -2708,7 +2708,6 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             name = names(ROINumber);
             set(hObject,'TooltipString', name{1});
 
-
             guidata(handles.figure1,handles);% Save handles 
             updateROIs(handles);
        catch
@@ -2784,8 +2783,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
     
         set(handles.ROINumberMenu,'String', contents)
         
-        %disp([ 'Visible = ' num2str(handles.image.VisibleROIs) ]);
-        %disp([ 'Locked  = ' num2str(handles.image.LockedROIs) ]);
+        handles.HideROI.Checked = 'on'; % Set hide checkbox  on
+        
         guidata(hObject,handles);% Save handles
         updateROIs(handles);   
     function ROI_Rename_Callback(hObject, eventdata, handles, name)
@@ -6681,7 +6680,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
            for i=1:size(hROIObjects)
                set(hROIObjects(i),'Checked','off')
            end
-           set(hObject,'Checked','on')
+           %set(hObject,'Checked','on')
            
            imlook4d_set_ROIColor(handles.figure1, eventdata, handles)
            
