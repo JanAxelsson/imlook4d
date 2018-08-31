@@ -1,8 +1,8 @@
-function outputImage=zhou( handles, matrix,outputFrameRange)
+function outputImage = water_doubleintegral( handles, matrix,outputFrameRange)
 %
-% function zhou
+% function water_doubleintegral
 %
-% (based on Patlak m-files)
+% 
 %
 % input:
 %
@@ -38,40 +38,18 @@ function outputImage=zhou( handles, matrix,outputFrameRange)
 % /MODELS/test/test_control.fig     GUI for test_control
 %
 % Author: Jan Axelsson
-% 2008-SEP-23
-
-  
-    %disp('logan called');
-
-    % Perform calculations
-
-    % This model takes a time series [:,:,slice,:] and generates a single image.
+% 2018-AUG-31
 
 
-%       outputImage(:,:,1,1)=imlook4d_zhou(...
-%             matrix, ...
-%             handles.image.time, ...
-%             handles.image.duration, ...
-%             handles.model.Zhou.startFrame, ...
-%             handles.model.Zhou.endFrame, ...
-%             handles.model.Zhou.referenceData, ...
-%             handles.model.Zhou.type );
-    
-   tic
-
-        a = jjzhou( matrix, ...
+tic
+        a = jjwater_doubleintegralmethod( matrix, ...
             handles.image.time/60, ...
             handles.image.duration/60, ...
-            handles.model.Zhou.referenceData', ...
-            [ handles.model.Zhou.startFrame handles.model.Zhou.endFrame ] ...
+            handles.model.Water_DoubleIntegral.referenceData ...
             );
+
+
+        outputImage(:,:,1,1) = a.pars{1}; % Flow;
         
-        if strcmp(handles.model.Zhou.type, 'BP')
-            outputImage(:,:,1,1) = a.pars{1}; % BP
-        end
-         
-        if strcmp(handles.model.Zhou.type, 'slope')
-            outputImage(:,:,1,1) = a.pars{2}; % DVR
-        end       
-toc 
+toc
 

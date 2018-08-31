@@ -125,9 +125,11 @@ function out =  jjwater_doubleintegralmethod( matrix, t, dt, Ct1)
     
     out.xlabel = 'time';
     out.ylabel = 'C_t';
-    
-    out.Xref = out.X{i};
-    out.Yref = Ct1;
+      
+    if IS_ROI 
+        out.Xref = out.X{i};
+        out.Yref = Ct1;
+    end
     
     % --------
     % Clean up

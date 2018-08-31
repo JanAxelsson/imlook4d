@@ -105,8 +105,8 @@ function out =  jjzhou( matrix, t, dt, Cr, range)
     out.ylabel = '\int_{0}^{t} C_t dt / C_{ref}';
   
     if IS_ROI 
-    out.Xref = out.X{i};
-    out.Yref = Cr;
+        out.Xref = out.X{i};
+        out.Yref = Cr;
     end
 
     

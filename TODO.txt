@@ -3,7 +3,8 @@ TODO
 
 DEVELOP
 [  ]   MODELS, add dialog (as in models on ROIs) and use new jjlogan and other jj:s
-[  ]   Display Reference ROIs (only show Ref-ROIs with dropdown menu from ROI-selection?)
+		Can I use a common dialog for inputs to ROI and Parametric image?
+		Store common reference curve in imlook4d_current_handles, when Selecting Reference ROI?
 
 
 WISHLIST

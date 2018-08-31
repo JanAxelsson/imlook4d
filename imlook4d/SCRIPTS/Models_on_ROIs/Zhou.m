@@ -6,20 +6,15 @@ model_name = 'Zhou';
 %
 % Dialog
 %
-prompt={'Start Frame ',...
-    'Last Frame ',...
-    'k2'};
-title=[ model_name ' inputs'];
-numlines=1;
-
-defaultanswer = RetriveEarlierValues('Zhou', { num2str(imlook4d_frame), num2str( size(imlook4d_Cdata,4) ), ''}  );  % Read default if exists, or apply these as default
-answer=inputdlg(prompt,title,numlines,defaultanswer);
+prompt={'Start Frame ', 'Last Frame '};
+[answer, imlook4d_current_handles] = ModelDialog( imlook4d_current_handles, ...
+    model_name, ...
+    prompt, ...
+    { num2str(imlook4d_frame), num2str( size(imlook4d_Cdata,4) ) } ...
+    );
 
 startFrame = str2num( answer{1});
 endFrame = str2num( answer{2});
-[k2ref, k2ref_existing] = str2num(answer{3} );
-
-StoreValues('Zhou', answer); % Store answer as new dialog default
 
 
 %
@@ -28,7 +23,7 @@ StoreValues('Zhou', answer); % Store answer as new dialog default
 disp('Calculating time-activity curves ...');
 tacts = generateTACT(imlook4d_current_handles,imlook4d_ROI);  % ROIs
 
-ref = generateReferenceTACT( imlook4d_current_handles)
+ref = generateReferenceTACT( imlook4d_current_handles);
 tact = tacts;  % all ROIs
 
 
@@ -40,7 +35,10 @@ r = jjlogan( ref, imlook4d_time/60, imlook4d_duration/60, ref, [ startFrame endF
 a.Yref = r.Y{1};
 a.Xref = r.X{1};
 
+
+%
 % Display
+%
 modelWindow( ...
     a , ...
     imlook4d_ROINames(1:end-1), ...
@@ -49,4 +47,5 @@ modelWindow( ...
 
 disp('Done!');
 
+Import; % Because ModelDialog adds to imlook4d_current_handles.model.Zhou.inputs
 ClearVariables;
