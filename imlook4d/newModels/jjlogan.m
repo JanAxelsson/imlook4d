@@ -1,3 +1,4 @@
+
 function out =  jjlogan( matrix, t, dt, Cr, range, k2ref)
 
     % Reference Logan

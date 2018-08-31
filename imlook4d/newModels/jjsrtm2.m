@@ -118,6 +118,7 @@ function out =  jjsrtm2( matrix, t, dt, Cr, k2p)
         k2_(i) = k2p * R1_(i); 
         k2a_(i)= X(2); % k2a=k2/(1+BP)
         BP_(i) = k2_(i)/k2a_(i) - 1;  
+        BP_(i) = R1_(i)*k2p/k2a_(i) - 1;
 
         
         % For modelWindow compatibility: 
@@ -146,8 +147,10 @@ function out =  jjsrtm2( matrix, t, dt, Cr, k2p)
     out.xlabel = 'time';
     out.ylabel = 'C_t';
     
-    out.Xref = out.X{i};
-    out.Yref = Cr;
+    if IS_ROI
+        out.Xref = out.X{i};
+        out.Yref = Cr;
+    end
 
     
     % --------

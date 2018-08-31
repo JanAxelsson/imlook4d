@@ -128,9 +128,11 @@ function out =  jjsrtm( matrix, t, dt, Cr)
  
     out.xlabel = 'time';
     out.ylabel = 'C_t';
-    
-    out.Xref = out.X{1};
-    out.Yref = Cr;
+
+    if IS_ROI
+        out.Xref = out.X{i};
+        out.Yref = Cr;
+    end
 
     
     % --------

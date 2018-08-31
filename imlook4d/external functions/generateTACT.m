@@ -24,7 +24,7 @@ function [activity, NPixels, stdev, maxActivity]=generateTACT(handles,ROI3D, roi
             numberOfFrames=size(handles.image.Cdata,4);
             %numberOfROIs=max(ROI3D(:));
             numberOfROIs=length( get(handles.ROINumberMenu,'String'))-1;
-            tempData=zeros(size(handles.image.Cdata),'single');
+            %tempData=zeros(size(handles.image.Cdata),'single');
             
             % Determine what slices contain a ROI
             slicesWithRoi=sum(sum(ROI3D));      % zero if no roi in slice => no values for TACT

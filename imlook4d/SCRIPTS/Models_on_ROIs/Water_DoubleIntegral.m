@@ -1,5 +1,12 @@
 StoreVariables;
+
+% Inhibit function handle for image update
+keepFunctionHandle = imlook4d_current_handles.model.functionHandle;
+imlook4d_current_handles.model.functionHandle = [];
+guidata( imlook4d_current_handle, imlook4d_current_handles);
+
 Export;
+
 
 model_name = 'Water Double Integral Method';
 
@@ -30,7 +37,10 @@ model_name = 'Water Double Integral Method';
         imlook4d_ROINames(1:end-1), ...
         [model_name ] ...
         );
+    
+    % Restore functionHandle
+    imlook4d_current_handles.model.functionHandle = keepFunctionHandle;
 
     disp('Done!');
-
+    Import;
     ClearVariables;

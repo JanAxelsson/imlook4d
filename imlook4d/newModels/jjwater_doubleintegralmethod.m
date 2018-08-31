@@ -95,7 +95,7 @@ function out =  jjwater_doubleintegralmethod( matrix, t, dt, Ct1)
         %kappa=(1/VT)*sum(cumsum(Ct.*dt, 2).*dt, 2);
         kappa = (1/VT1) * sum( integrate( Ct(i,:), dt).*dt);
 
-        f(i) = alpha ./ (beta + gamma - kappa);
+        f(:,i) = alpha ./ (beta + gamma - kappa);
 
         
         
