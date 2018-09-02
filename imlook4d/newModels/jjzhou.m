@@ -9,6 +9,10 @@ function out =  jjzhou( matrix, t, dt, Cr, range)
     %   Cr = reference time-activity curve [ 1 N ] 
     %   range = [ startFrame endFrame].  If endFrame is missing, then  endFrame = last frame number
     %
+    %   If zero inputs arguments, then out.names and out.units are
+    %   returned.  This may be used for dialog boxes previous to running
+    %   this function
+    %
     % Outputs:
     %   out.pars  = cell array with matrices { BPND, DVR, intercept}; 
     %   out.names = { 'BPND', 'DVR', 'intercept'};
@@ -25,6 +29,14 @@ function out =  jjzhou( matrix, t, dt, Cr, range)
     
     warning('off','MATLAB:lscov:RankDefDesignMat')
     warning('off','MATLAB:nearlySingularMatrix')
+        
+    out.names = { 'BPND', 'DVR', 'intercept'};
+    out.units = { '1','1','min'};
+        
+    if nargin == 0    
+        return
+    end
+    
     
     if length(range) == 1
         startFrame = range(1);
@@ -98,8 +110,6 @@ function out =  jjzhou( matrix, t, dt, Cr, range)
     intercept = reshape(intercept, outsize);
     
     out.pars = {BP, DVR, intercept};
-    out.names = { 'BPND', 'DVR', 'intercept'};
-    out.units = { '1','1','min'};
         
     out.xlabel = '\int_{0}^{t} C_{ref} dt / C_{ref}';
     out.ylabel = '\int_{0}^{t} C_t dt / C_{ref}';

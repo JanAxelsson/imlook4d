@@ -50,7 +50,7 @@ tic
             );
 
 
-        outputImage(:,:,1,1) = a.pars{1}; % BP;
+        outputImage(:,:,1,1) = a.pars{ handles.model.SRTM2.imagetype}; % BP;
         
 toc
 

@@ -2,9 +2,11 @@ TODO
 =====
 
 DEVELOP
-[  ]   MODELS, add dialog (as in models on ROIs) and use new jjlogan and other jj:s
-		Can I use a common dialog for inputs to ROI and Parametric image?
-		Store common reference curve in imlook4d_current_handles, when Selecting Reference ROI?
+[  ]   Way to mask image (except for ROI).  SRTM fails badly if not masked
+       1) Auto-mask  max(imlook4d_Cdata,[],4)
+[  ]   Logan 
+[  ]   Vectorize Zhou SRTM, SRTM2
+[  ]   HELP files for models 
 
 
 WISHLIST
@@ -15,6 +17,10 @@ WISHLIST
 [  ]   Update menu, should it save the new downloaded path by default?
 
 
+IDEAS
+[   ]	Can I make robuster SRTM-like fixing BPs from Logan ?
+
+
 PEARL-PD
 [  ]   loop script to get TACTs and calculate parameters
 
@@ -22,4 +28,3 @@ PEARL-PD
 
 ISSUES
 ======
-[  ]   ROI/ScreePlot fails

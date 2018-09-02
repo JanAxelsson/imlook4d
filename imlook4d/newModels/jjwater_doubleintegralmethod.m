@@ -8,6 +8,10 @@ function out =  jjwater_doubleintegralmethod( matrix, t, dt, Ct1)
     %   dt = frame duration in minutes
     %   Ct1 = reference time-activity curve [ 1 N ], should be over whole brain
     %
+    %   If zero inputs arguments, then out.names and out.units are
+    %   returned.  This may be used for dialog boxes previous to running
+    %   this function
+    %
     % Outputs:
     %   out.pars  = cell array with matrices { BPND, DVR, intercept}; 
     %   out.names = { 'BPND', 'DVR', 'intercept'};
@@ -31,6 +35,13 @@ function out =  jjwater_doubleintegralmethod( matrix, t, dt, Ct1)
     
     warning('off','MATLAB:lscov:RankDefDesignMat')
     warning('off','MATLAB:nearlySingularMatrix')
+        
+    out.names = { 'f'};
+    out.units = { 'mL/cm3/min'};
+        
+    if nargin == 0    
+        return
+    end
     
     % time
     tmid = t + 0.5 * dt;
@@ -118,10 +129,7 @@ function out =  jjwater_doubleintegralmethod( matrix, t, dt, Ct1)
      % --------  
     f = reshape(f, outsize);
 
-    
     out.pars = {f};
-    out.names = { 'f'};
-    out.units = { 'mL/cm3/min'};
     
     out.xlabel = 'time';
     out.ylabel = 'C_t';

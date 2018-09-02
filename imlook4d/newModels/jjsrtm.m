@@ -8,6 +8,10 @@ function out =  jjsrtm( matrix, t, dt, Cr)
     %   dt = frame duration in minutes
     %   Cr = reference time-activity curve [ 1 N ] 
     %
+    %   If zero inputs arguments, then out.names and out.units are
+    %   returned.  This may be used for dialog boxes previous to running
+    %   this function
+    %
     % Outputs:
     %   out.pars  = cell array with matrices { BP, R1, k2, k2p, k2a }; 
     %   out.names = { 'BP', 'R1', 'k2', 'k2p','k2a'};
@@ -24,7 +28,14 @@ function out =  jjsrtm( matrix, t, dt, Cr)
     
     warning('off','MATLAB:lscov:RankDefDesignMat')
     warning('off','MATLAB:nearlySingularMatrix')
-
+    
+    out.names = { 'BP', 'R1', 'k2', 'k2p','k2a'};
+    out.units = { '1','1', 'min-1', 'min-1','min-1'};   
+        
+    if nargin == 0
+        return
+    end
+    
     % time
     tmid = t + 0.5 * dt;
     dt      = [tmid(1), tmid(2:length(tmid))-tmid(1:length(tmid)-1)];
@@ -123,8 +134,6 @@ function out =  jjsrtm( matrix, t, dt, Cr)
     BP = reshape(BP, outsize);
     
     out.pars = {BP, R1, k2, k2p, k2a};
-    out.names = { 'BP', 'R1', 'k2', 'k2p','k2a'};
-    out.units = { '1','1', 'min-1', 'min-1','min-1'};   
  
     out.xlabel = 'time';
     out.ylabel = 'C_t';

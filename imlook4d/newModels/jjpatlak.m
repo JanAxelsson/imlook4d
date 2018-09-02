@@ -9,6 +9,10 @@ function out =  jjpatlak( matrix, t, dt, Cinp, range)
     %   Cinp = input function [ 1 N ] 
     %   range = [ startFrame endFrame].  If endFrame is missing, then  endFrame = last frame number
     %
+    %   If zero inputs arguments, then out.names and out.units are
+    %   returned.  This may be used for dialog boxes previous to running
+    %   this function
+    %
     % Outputs:
     %   out.pars  = cell array with matrices { Ki, intercept}; 
     %   out.names = { 'Ki', 'intercept'};
@@ -23,6 +27,13 @@ function out =  jjpatlak( matrix, t, dt, Cinp, range)
     
     warning('off','MATLAB:lscov:RankDefDesignMat')
     warning('off','MATLAB:nearlySingularMatrix')
+    
+    out.names = { 'Ki', 'intercept'};
+    out.units = { 'min-1','1'};
+        
+    if nargin == 0    
+        return
+    end
     
     
     if length(range) == 1
@@ -106,8 +117,6 @@ function out =  jjpatlak( matrix, t, dt, Cinp, range)
     intercept = reshape(intercept, outsize);
     
     out.pars = {Ki, intercept};
-    out.names = { 'Ki', 'intercept'};
-    out.units = { 'min-1','1'};
     
     out.xlabel = '\int_{0}^{t} C_a dt / C_a';
     out.ylabel = 'C_t / C_a';

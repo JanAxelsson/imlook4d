@@ -49,7 +49,7 @@ tic
             );
 
 
-        outputImage(:,:,1,1) = a.pars{1}; % BP;
+        outputImage(:,:,1,1) = a.pars{imlook4d_current_handles.model.SRTM2.imagetype}; % BP;
         
 toc
 

@@ -25,5 +25,6 @@ imlook4d_current_handles.model.Logan.startFrame = startFrame;
 imlook4d_current_handles.model.Logan.endFrame = endFrame;
 imlook4d_current_handles.model.Logan.referenceData = generateReferenceTACT( imlook4d_current_handles);
 imlook4d_current_handles.model.Logan.k2 = k2ref;
+imlook4d_current_handles.model.SRTM2.imagetype = 1; % BP
 
 Import

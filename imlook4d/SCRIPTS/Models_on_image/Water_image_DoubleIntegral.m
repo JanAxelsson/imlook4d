@@ -13,6 +13,7 @@ model_name = 'Water_DoubleIntegral';
 % Set model parameters
 imlook4d_current_handles.model.functionHandle = @water_doubleintegral;
 imlook4d_current_handles.model.Water_DoubleIntegral.referenceData = generateReferenceTACT( imlook4d_current_handles);
+imlook4d_current_handles.model.SRTM2.imagetype = 1; % Flow
 
 Import
 ClearVariables

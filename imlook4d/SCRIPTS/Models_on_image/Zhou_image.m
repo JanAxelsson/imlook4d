@@ -28,7 +28,9 @@ imlook4d_current_handles.model.functionHandle = @zhou;
 imlook4d_current_handles.model.Zhou.startFrame = startFrame;
 imlook4d_current_handles.model.Zhou.endFrame = endFrame;
 imlook4d_current_handles.model.Zhou.type = 'BP';
-imlook4d_current_handles.model.Zhou.referenceData = generateReferenceTACT( imlook4d_current_handles)';
+guidata(imlook4d_current_handle, imlook4d_current_handles)
+imlook4d_current_handles.model.Zhou.referenceData = generateReferenceTACT( imlook4d_current_handles);
+imlook4d_current_handles.model.SRTM2.imagetype = 1; % BP
 
 Import
 ClearVariables

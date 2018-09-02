@@ -15,6 +15,10 @@ function out =  jjlogan( matrix, t, dt, Cr, range, k2ref)
     %   out.pars  = cell array with matrices { BPND, DVR, intercept}; 
     %   out.names = { 'BPND', 'DVR', 'intercept'};
     %   out.units = { '1','1','min'};
+    %
+    %   If zero inputs arguments, then out.names and out.units are
+    %   returned.  This may be used for dialog boxes previous to running
+    %   this function
     %  
     %   Cell array with cells for each ROI:
     %     out.X = Logan X-axis 
@@ -29,6 +33,14 @@ function out =  jjlogan( matrix, t, dt, Cr, range, k2ref)
     
     warning('off','MATLAB:lscov:RankDefDesignMat')
     warning('off','MATLAB:nearlySingularMatrix')
+    
+    out.names = { 'BPND', 'DVR', 'intercept'};
+    out.units = { '1','1','min'}; 
+        
+    if nargin == 0
+        return
+    end
+    
     
     HAS_K2_REF = (nargin == 6);
     
@@ -113,8 +125,6 @@ function out =  jjlogan( matrix, t, dt, Cr, range, k2ref)
     intercept = reshape(intercept, outsize);
     
     out.pars = {BP, DVR, intercept};
-    out.names = { 'BPND', 'DVR', 'intercept'};
-    out.units = { '1','1','min'};
     
     out.xlabel = '\int_{0}^{t} C_{ref} dt /C_t';
     out.ylabel = '\int_{0}^{t} C_t dt /C_t';
