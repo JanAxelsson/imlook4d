@@ -47,26 +47,54 @@ function outputImage=ratio( handles, matrix,outputFrameRange)
 
 
     
-    % Perform calculations
-    for i=outputFrameRange  % Generate one image per frame in outputFrameRange
-        %disp(i);
-        modelImage(:,:,1,i)=matrix(:,:,1,i)/handles.model.ratio.TACT(i);
-        max(max(max(abs(matrix(:,:,1,i)))));
-    end
+%     % Perform calculations
+%     for i=outputFrameRange  % Generate one image per frame in outputFrameRange
+%         %disp(i);
+%         modelImage(:,:,1,i)=matrix(:,:,1,i)/handles.model.ratio.TACT(i);
+%         max(max(max(abs(matrix(:,:,1,i)))));
+%     end
+% 
+%     % Fix matrix dimensions depending if output is single image or
+%     % time-series.
+%     %
+%     % This may not be necessary if output can only be a single image 
+%     % (for instance PATLAK and other models)
+%     
+%     if (size(outputFrameRange(:))==1)
+%         % (If outputFrameRange is not a range, a single image should be returned)
+%         % Create 2D image
+%         outputImage=modelImage(:,:,1,outputFrameRange);
+%     else
+%         % (If outputFrameRange is a range)
+%         % Keep 4D image
+%         outputImage=modelImage;
+%     end
+%     
+    tic
 
-    % Fix matrix dimensions depending if output is single image or
-    % time-series.
-    %
-    % This may not be necessary if output can only be a single image 
-    % (for instance PATLAK and other models)
     
     if (size(outputFrameRange(:))==1)
         % (If outputFrameRange is not a range, a single image should be returned)
         % Create 2D image
-        outputImage=modelImage(:,:,1,outputFrameRange);
+        a = jjratio( matrix, handles.image.time/60, ...
+            handles.image.duration/60, ...
+            handles.model.Ratio.referenceData',...
+            outputFrameRange ...
+            );
+        outputImage(:,:,1,1) = a.pars{1}; % Ratio
     else
         % (If outputFrameRange is a range)
-        % Keep 4D image
-        outputImage=modelImage;
+        %  4D image
+        for i=outputFrameRange  % Generate one image per frame in outputFrameRange
+            a = jjratio( matrix, handles.image.time/60, ...
+                handles.image.duration/60, ...
+                handles.model.Ratio.referenceData',...
+                i ...
+                );
+            outputImage(:,:,1,i) = a.pars{1}; % Ratio
+        end
     end
+    
+        
+toc
 

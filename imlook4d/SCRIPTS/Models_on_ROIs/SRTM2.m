@@ -1,4 +1,11 @@
 StoreVariables;
+
+% Inhibit model image (which is triggered by existence of functionHandle)
+keepFunctionHandle = imlook4d_current_handles.model.functionHandle;
+imlook4d_current_handles.model.functionHandle = [];
+guidata( imlook4d_current_handle, imlook4d_current_handles);
+
+
 Export;
 
 model_name = 'SRTM2';

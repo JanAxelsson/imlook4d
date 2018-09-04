@@ -70,7 +70,7 @@ function out =  jjzhou( matrix, t, dt, Cr, range)
     Ct = reshape( matrix, n, [] ) ;  % [  pixels frames ]     
 
     % ----------------
-    %  Logan model
+    %  Logan model, Zhou method
     % ----------------   
   
     for i = 1:n
