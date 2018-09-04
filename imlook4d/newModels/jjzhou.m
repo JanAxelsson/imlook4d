@@ -71,20 +71,31 @@ function out =  jjzhou( matrix, t, dt, Cr, range)
 
     % ----------------
     %  Logan model, Zhou method
-    % ----------------   
-  
+    % ----------------
+    
+    newX=cumsum(Cr.*dt)./Cr; % integeral{REF}/ROI(t)
+    tempX =  newX(regressionRange)';  % X-values in range
+    A = [tempX ones(length(tempX),1) ] ;
+    
+    nY = cumsum(Ct.*dt,2)./Cr;    % integeral{ROI}/ROI(t)
+    
     for i = 1:n
         
-        newX=cumsum(Cr.*dt)./Cr; % integeral{REF}/ROI(t)
-        newY=cumsum(Ct(i,:).*dt)./Cr;    % integeral{ROI}/ROI(t)
+        %newY=cumsum(Ct(i,:).*dt)./Cr;    % integeral{ROI}/ROI(t)
+        %tempY = newY(regressionRange)';  % Y-values in range
         
-        % Limit range
-        tempX =  newX(regressionRange)';  % X-values in range
-        tempY = newY(regressionRange)';  % Y-values in range
+        
+        tempY = nY( i, regressionRange)';
+        
+        
         
         % Two alternatives:
         %p = linortfit2(double(newX), double(tempY)); % Orthogonal regression
-        p = [tempX ones(length(tempX),1) ] \ tempY;    % Normal regression
+        p = A \ tempY;    % Normal regression
+        
+        % Fast sloppy alternative
+       % p(1) = ( tempY(end) - tempY(1) ) / ( tempX(end) - tempX(1) ); % slope k
+       % p(2) = - p(1) * tempX(end) + tempY(end); % intercept m
       
         DVR(i) = p(1);
         BP(i) = DVR(i) - 1;
@@ -92,6 +103,7 @@ function out =  jjzhou( matrix, t, dt, Cr, range)
         
         % For modelWindow compatibility: Store X,Y
         if IS_ROI 
+            newY = nY(i, :);
             out.X{i} = newX;
             out.Y{i} = newY;
             
