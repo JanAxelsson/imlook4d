@@ -2,6 +2,7 @@ TODO
 =====
 
 DEVELOP
+[  ]   Add Models for ratio, clearance
 [  ]   Way to mask image (except for ROI).  SRTM fails badly if not masked
        1) Auto-mask  max(imlook4d_Cdata,[],4)
 [  ]   Logan 

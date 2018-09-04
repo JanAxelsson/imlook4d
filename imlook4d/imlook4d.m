@@ -2632,7 +2632,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             ROINumber=get(hObject,'Value');
 
             %IF Add ROI
-            if strcmp( contents{get(hObject,'Value')},'Add ROI' )
+            if strcmp( contents{ROINumber},'Add ROI' )
                 n=size(contents,1);
 
                 % Default ROI names only
@@ -2658,8 +2658,22 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 handles.image.VisibleROIs=[ handles.image.VisibleROIs 1];
                 handles.image.LockedROIs=[ handles.image.LockedROIs 0];
 
-            else
-            % ELSE an existing ROI - we will now display the slice of that ROI   
+            end
+            
+
+            % If an existing ROI - we will now:
+            %   - display the slice of that ROI 
+            %   - set context menu hidden flag, so it will be displayed if right-clicked in future          
+            if ~strcmp( contents{ROINumber},'Add ROI' )
+
+                % Set context menu hidden flag
+                if startsWith( contents{ROINumber}, '(hidden)' ) 
+                    disp('hidden')
+                    handles.HideROI.Checked = 'on';
+                else
+                    disp('visible')
+                    handles.HideROI.Checked = 'off';
+                end
 
                 % Find first slice of ROI
                 numberOfSlices=size(handles.image.Cdata,3);
@@ -2699,7 +2713,6 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         % loop
                         %disp(['imlook4d/ROINumberMenu_Callback ERROR: No ROI with number ' num2str(ROINumber) 'found in any slice']);
                     end
-
                 %end
             end
             
