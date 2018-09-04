@@ -79,7 +79,7 @@ function out =  jjlogan( matrix, t, dt, Cr, range, k2ref)
     % ----------------
     %  Logan model
     % ----------------   
-    Ct = Ct + 1;  % Set tolerance to avoid Ct = zero . 
+    Ct = Ct +0;  % Set tolerance to avoid Ct = zero . 
 
     % TODO : Think about copying imlook4d_logan, instead of tolerance -- is that necessary?
   
@@ -98,8 +98,9 @@ function out =  jjlogan( matrix, t, dt, Cr, range, k2ref)
         tempY = newY(regressionRange)';  % Y-values in range
         
         % Two alternatives:
-        %p = linortfit2(double(tempX), double(tempY)); % Orthogonal regression
-        p = [tempX ones(length(tempX),1) ] \ tempY;    % Normal regression
+        p = linortfit2(double(tempX), double(tempY)); % Orthogonal regression
+        %p = [tempX ones(length(tempX),1) ] \ tempY;    % Normal regression
+        
       
         DVR(i) = p(1);
         BP(i) = DVR(i) - 1;

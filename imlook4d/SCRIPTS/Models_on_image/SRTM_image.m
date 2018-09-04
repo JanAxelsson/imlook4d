@@ -23,7 +23,7 @@ model_name = 'SRTM';
     % Set model parameters
     imlook4d_current_handles.model.functionHandle = @srtm;
     imlook4d_current_handles.model.SRTM.referenceData = generateReferenceTACT( imlook4d_current_handles);
-    imlook4d_current_handles.model.SRTM2.imagetype = selection;
+    imlook4d_current_handles.model.SRTM.imagetype = selection;
 
 
 Import
