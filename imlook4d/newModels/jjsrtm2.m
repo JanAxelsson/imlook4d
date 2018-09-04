@@ -122,10 +122,9 @@ function out =  jjsrtm2( matrix, t, dt, Cr, k2p)
         A(:,2) = -cumsum(  Ct(i,:) .* dt);  % -int(Ct(0:t))
 
         %LSQ-estimation using, solving for X = lscov(A,C)
-        [X se mse]   = lscov(A,Ct(i,:)'); 
+        X  = lscov(A,Ct(i,:)'); 
         %X = A\Ct(i,:)';  % Faster!
 
-        % modfit_srtm = A * X;
         R1_(i)= X(1); %K1/K1p
         k2_(i) = k2p * R1_(i); 
         k2a_(i)= X(2); % k2a=k2/(1+BP)
