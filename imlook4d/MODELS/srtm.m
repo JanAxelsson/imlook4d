@@ -1,8 +1,8 @@
-function outputImage=logan( handles, matrix,outputFrameRange)
+function outputImage = srtm( handles, matrix,outputFrameRange)
 %
-% function Logan
+% SRTM
 %
-% (based on Patlak m-files)
+% 
 %
 % input:
 %
@@ -38,34 +38,18 @@ function outputImage=logan( handles, matrix,outputFrameRange)
 % /MODELS/test/test_control.fig     GUI for test_control
 %
 % Author: Jan Axelsson
-% 2008-SEP-23
+% 2018-AUG-31
 
-  
-    %disp('logan called');
 
-    % Perform calculations
-
-    % This model takes a time series [:,:,slice,:] and generates a single image.
-
-% tic
-%       outputImage(:,:,1,1)=imlook4d_logan(...
-%             matrix, ...
-%             handles.image.time, ...
-%             handles.image.duration, ...
-%             handles.model.Logan.startFrame, ...
-%             handles.model.Logan.endFrame, ...
-%             handles.model.Logan.referenceData, ...
-%             handles.model.Logan.type );
-%         toc
 tic
-
-        Cr = reshape( handles.model.Logan.referenceData, 1, []); % Allow old logan to use this function.
-        a = jjlogan( matrix, handles.image.time/60, ...
+        a = jjsrtm( matrix, ...
+            handles.image.time/60, ...
             handles.image.duration/60, ...
-            Cr,...
-            [ handles.model.Logan.startFrame handles.model.Logan.endFrame] ...
+            handles.model.SRTM.referenceData ...
             );
-        outputImage(:,:,1,1) = a.pars{2}; % DVR
+
+
+        outputImage(:,:,1,1) = a.pars{handles.model.SRTM.imagetype}; % BP etc
         
 toc
 

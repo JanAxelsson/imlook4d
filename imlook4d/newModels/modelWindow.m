@@ -112,39 +112,54 @@ function modelWindow_OpeningFcn(hObject, ~, handles, datastruct, roinames, title
 function drawPlots( handles,roinumber)
     datastruct = handles.datastruct;
     previousMainYLim = handles.mainAxes.YLim;
-    
-    %
-    % Write info
-    %
-    handles.mainAxesRoiName.String = [ 'ROI = ' handles.roinames{roinumber} ];
-    
-    %
+
+    %    
     % Draw data and model
     %
-    try
+    myLegends = {};
+    try % Data
         plot (handles.datastruct.X{roinumber},handles.datastruct.Y{roinumber},...
             'Marker','o', ...
             'LineStyle','none',...
             'Color','blue',...
             'Parent',handles.mainAxes)
-        
-        xlabel(handles.mainAxes,datastruct.xlabel);
-        ylabel(handles.mainAxes,datastruct.ylabel);
-        title(handles.mainAxes,'Model');
+        myLegends = [ myLegends 'ROI'];
     catch
     end
     
-    try
+    try % Model
         hold(handles.mainAxes,'on');
         plot (handles.datastruct.Xmodel{roinumber},handles.datastruct.Ymodel{roinumber},...
             'LineStyle','-', ...
             'Color','blue',...
             'Parent',handles.mainAxes)
-        hold(handles.mainAxes,'off');
+        myLegends = [ myLegends 'Model'];
 
     catch
-        hold(handles.mainAxes,'off');
+        %hold(handles.mainAxes,'off');
     end
+    
+    try % Reference
+        %hold(handles.mainAxes,'on');
+        plot (handles.datastruct.Xref,handles.datastruct.Yref,...
+            'Marker','o', ...
+            'LineStyle','none',...
+            'Color','red',...
+            'Parent',handles.mainAxes)
+        myLegends = [ myLegends 'Reference'];
+    catch
+    end
+    hold(handles.mainAxes,'off');
+    
+    %
+    % Write info
+    %
+    handles.mainAxesRoiName.String = [ 'ROI = ' handles.roinames{roinumber} ];
+    xlabel(handles.mainAxes,datastruct.xlabel);
+    ylabel(handles.mainAxes,datastruct.ylabel);
+    title(handles.mainAxes,'Model');    
+    
+    legend(handles.mainAxes,myLegends);
     
     m = max( abs(handles.datastruct.Y{roinumber}) ); % Find max absolute value
     m = m * 1.2; % Get some space
@@ -157,14 +172,17 @@ function drawPlots( handles,roinumber)
     %
     % Draw residuals
     %
+    myLegends = {};
     try
         if handles.PercentResidualRadioButton.Value
             residual = 100 * handles.datastruct.residual{roinumber} ./ handles.datastruct.Ymodel{roinumber};
             residualLabel = '% Diff';
+            myLegends = [ myLegends '100 * (ROI - Model) / Model'];
         end
         if handles.AbsoluteResidualRadioButton.Value
             residual = handles.datastruct.residual{roinumber};
             residualLabel = 'Diff';
+            myLegends = [ myLegends 'ROI - Model'];
         end
         plot (handles.datastruct.Xmodel{roinumber},residual,...
             'Marker','o', ...
@@ -173,6 +191,8 @@ function drawPlots( handles,roinumber)
             'Parent',handles.residualAxes)
         
         title(handles.residualAxes,'Residual');
+        legend(handles.residualAxes, myLegends);
+    
         handles.residualAxes.XAxisLocation = 'origin';
         handles.residualAxes.XLim = handles.mainAxes.XLim;
         m = max( abs(residual) ); % Find max absolute value

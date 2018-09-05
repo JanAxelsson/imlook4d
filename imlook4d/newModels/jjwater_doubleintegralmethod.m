@@ -8,17 +8,20 @@ function out =  jjwater_doubleintegralmethod( matrix, t, dt, Ct1)
     %   dt = frame duration in minutes
     %   Ct1 = reference time-activity curve [ 1 N ], should be over whole brain
     %
+    %   If zero inputs arguments, then out.names and out.units are
+    %   returned.  This may be used for dialog boxes previous to running
+    %   this function
+    %
     % Outputs:
     %   out.pars  = cell array with matrices { BPND, DVR, intercept}; 
     %   out.names = { 'BPND', 'DVR', 'intercept'};
     %   out.units = { '1','1','min'};
     %  
     %   Cell array with cells for each ROI:
-    %     out.X = Logan X-axis 
-    %     out.Y = Logan Y-axis 
-    %     out.Xmodel = Logan X-axis for fitted range
-    %     out.Ymodel = Logan Y-axis for fitted range
-    %     out.residual = Y - Ymodel, diff for fitted range
+    %     out.X = X-axis 
+    %     out.Y = Y-axis 
+    %     out.Xref = Ct1 x-axis (same times, most often)
+    %     out.Yref = Ct1
     %
     % Example: 
     %   % Export from imlook4d, where a whole-brain ROI is the current ROI. Then run: 
@@ -32,6 +35,13 @@ function out =  jjwater_doubleintegralmethod( matrix, t, dt, Ct1)
     
     warning('off','MATLAB:lscov:RankDefDesignMat')
     warning('off','MATLAB:nearlySingularMatrix')
+        
+    out.names = { 'f'};
+    out.units = { 'mL/cm3/min'};
+        
+    if nargin == 0    
+        return
+    end
     
     % time
     tmid = t + 0.5 * dt;
@@ -96,7 +106,7 @@ function out =  jjwater_doubleintegralmethod( matrix, t, dt, Ct1)
         %kappa=(1/VT)*sum(cumsum(Ct.*dt, 2).*dt, 2);
         kappa = (1/VT1) * sum( integrate( Ct(i,:), dt).*dt);
 
-        f(i) = alpha ./ (beta + gamma - kappa);
+        f(:,i) = alpha ./ (beta + gamma - kappa);
 
         
         
@@ -119,13 +129,15 @@ function out =  jjwater_doubleintegralmethod( matrix, t, dt, Ct1)
      % --------  
     f = reshape(f, outsize);
 
-    
     out.pars = {f};
-    out.names = { 'f'};
-    out.units = { 'mL/cm3/min'};
     
     out.xlabel = 'time';
     out.ylabel = 'C_t';
+      
+    if IS_ROI 
+        out.Xref = out.X{i};
+        out.Yref = Ct1;
+    end
     
     % --------
     % Clean up

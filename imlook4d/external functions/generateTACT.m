@@ -46,17 +46,17 @@ function [activity, NPixels, stdev, maxActivity]=generateTACT(handles,ROI3D, roi
              
              % Fix that generateImage puts a single slice into a matrix of dimensions [:,:,1,:]
              % by putting generated image back into correct slice
-             if (size(indecesWithRoi(:))==1)
-                 % Single slice, put into slice 1 by generateImage
-                 [tempData(:,:,indecesWithRoi,:), explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, indecesWithRoi, 1:numberOfFrames);
-             else
-                 % Multiple slices with ROI, correct dimensions of tempData
-                 % matrix
-                %[tempData, explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, indecesWithRoi, 1:numberOfFrames);
-                
-                % Above was slow in imlook4d/generateImage -- this is faster for many ROIs
+%              if (size(indecesWithRoi(:))==1)
+%                  % Single slice, put into slice 1 by generateImage
+%                  [tempData(:,:,indecesWithRoi,:), explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, indecesWithRoi, 1:numberOfFrames);
+%              else
+%                  % Multiple slices with ROI, correct dimensions of tempData
+%                  % matrix
+%                 %[tempData, explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, indecesWithRoi, 1:numberOfFrames);
+%                 
+%                 % Above was slow in imlook4d/generateImage -- this is faster for many ROIs
                 tempData = handles.image.Cdata;
-             end
+%              end
              numberOfFrames=size(tempData,4);
 
 

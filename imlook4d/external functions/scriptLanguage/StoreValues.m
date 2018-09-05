@@ -11,5 +11,7 @@ function StoreValues( name, valuesToStore)
     % Set cell values one by one
     for i=1:length(valuesToStore)
         % Skapa: imlook4d_store.Logan.inputs{4}=defaultValues{i}
-        evalin('base',['imlook4d_store.' name '.inputs{' num2str(i) '}=''' valuesToStore{i} ''''] );
+        evalin('base',['imlook4d_store.' name '.inputs{' num2str(i) '}=''' valuesToStore{i} ''';'] );
     end
+    
+    

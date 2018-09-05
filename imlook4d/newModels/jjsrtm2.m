@@ -9,20 +9,34 @@ function out =  jjsrtm2( matrix, t, dt, Cr, k2p)
     %   Cr = reference time-activity curve [ 1 N ] 
     %   k2p = from SRTM
     %
+    %   If zero inputs arguments, then out.names and out.units are
+    %   returned.  This may be used for dialog boxes previous to running
+    %   this function
+    %
     % Outputs:
-    %   out.pars  = cell array with matrices { R1, k2, k2a, BP }; 
-    %   out.names = { 'R1', 'k2', 'k2a','BP'};
-    %   out.units = { '1', 'min-1','min-1','1'};
+    %   out.pars  = cell array with matrices {  BP, R1, k2, k2a}; 
+    %   out.names = { 'BP', 'R1', 'k2', 'k2a'};
+    %   out.units = { '1', '1', 'min-1','min-1'};
     %  
     %   Cell array with cells for each ROI:
     %     out.X = X-axis 
     %     out.Y = Y-axis 
+    %     out.Xref = Cr x-axis (same times, most often)
+    %     out.Yref = Cr
     %     out.Xmodel = model X-axis
     %     out.Ymodel = model Y-axis 
     %     out.residual = Y - Ymodel
     
     warning('off','MATLAB:lscov:RankDefDesignMat')
     warning('off','MATLAB:nearlySingularMatrix')
+    
+    out.names = { 'BP_', 'R1_', 'k2_','k2a_'};
+    out.units = { '1', '1', 'min-1','min-1'};
+        
+    if nargin == 0
+        return
+    end
+    
 
     % time
     tmid = t + 0.5 * dt;
@@ -54,12 +68,7 @@ function out =  jjsrtm2( matrix, t, dt, Cr, k2p)
 
     % Derived variables
     t_points = length(tmid);
-
-  
-    % Integrate to mid times
-    function value_vector = integrate( C, dt)
-        value_vector = cumsum( C.*dt);% - 0.5 * C .* dt; % exclude activity from second half (after midtime)
-    end        
+    
 
     % ----------------
     %  SRTM model
@@ -107,20 +116,20 @@ function out =  jjsrtm2( matrix, t, dt, Cr, k2p)
 
     
     A = zeros(t_points ,2);% Design matrix is [t_points x 2 parameters] matrix
-    A(:,1)  = Cr +  k2p * integrate( Cr, dt);  % CR(t) + k2p*int(CR(t))
+    A(:,1)  = Cr +  k2p * cumsum( Cr .* dt);  % CR(t) + k2p*int(CR(t))
     
     for i = 1:n
-        A(:,2) = -integrate(  Ct(i,:), dt);  % -int(Ct(0:t))
+        A(:,2) = -cumsum(  Ct(i,:) .* dt);  % -int(Ct(0:t))
 
         %LSQ-estimation using, solving for X = lscov(A,C)
-        [X se mse]   = lscov(A,Ct(i,:)'); 
+        X  = lscov(A,Ct(i,:)'); 
         %X = A\Ct(i,:)';  % Faster!
 
-        % modfit_srtm = A * X;
         R1_(i)= X(1); %K1/K1p
         k2_(i) = k2p * R1_(i); 
         k2a_(i)= X(2); % k2a=k2/(1+BP)
         BP_(i) = k2_(i)/k2a_(i) - 1;  
+        BP_(i) = R1_(i)*k2p/k2a_(i) - 1;
 
         
         % For modelWindow compatibility: 
@@ -142,12 +151,15 @@ function out =  jjsrtm2( matrix, t, dt, Cr, k2p)
     k2a_ = reshape(k2a_, outsize);
     BP_ = reshape(BP_, outsize);
     
-    out.pars = {R1_, k2_,  k2a_, BP_};
-    out.names = { 'R1_', 'k2_','k2a_','BP_'};
-    out.units = { '1', 'min-1','min-1','1'};
+    out.pars = {BP_, R1_, k2_,  k2a_};
  
     out.xlabel = 'time';
     out.ylabel = 'C_t';
+    
+    if IS_ROI
+        out.Xref = out.X{i};
+        out.Yref = Cr;
+    end
 
     
     % --------

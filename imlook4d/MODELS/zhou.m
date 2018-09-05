@@ -59,10 +59,15 @@ function outputImage=zhou( handles, matrix,outputFrameRange)
     
    tic
 
-        a = jjzhou( matrix, handles.image.time/60, handles.image.duration/60, handles.model.Logan.referenceData', handles.model.Logan.startFrame);
+        a = jjzhou( matrix, ...
+            handles.image.time/60, ...
+            handles.image.duration/60, ...
+            handles.model.Zhou.referenceData, ...
+            [ handles.model.Zhou.startFrame handles.model.Zhou.endFrame ] ...
+            );
         
         if strcmp(handles.model.Zhou.type, 'BP')
-            outputImage(:,:,1,1) = a.pars{1}; % DVR
+            outputImage(:,:,1,1) = a.pars{1}; % BP
         end
          
         if strcmp(handles.model.Zhou.type, 'slope')

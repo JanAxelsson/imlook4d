@@ -9,13 +9,34 @@ function out =  jjzhou( matrix, t, dt, Cr, range)
     %   Cr = reference time-activity curve [ 1 N ] 
     %   range = [ startFrame endFrame].  If endFrame is missing, then  endFrame = last frame number
     %
+    %   If zero inputs arguments, then out.names and out.units are
+    %   returned.  This may be used for dialog boxes previous to running
+    %   this function
+    %
     % Outputs:
     %   out.pars  = cell array with matrices { BPND, DVR, intercept}; 
     %   out.names = { 'BPND', 'DVR', 'intercept'};
     %   out.units = { '1','1','min'};
+    %  
+    %   Cell array with cells for each ROI:
+    %     out.X = Zhou X-axis 
+    %     out.Y = Zhou Y-axis 
+    %     out.Xref = Cr x-axis (same times, most often)
+    %     out.Yref = Cr
+    %     out.Xmodel = Zhou X-axis for fitted range
+    %     out.Ymodel = Zhou Y-axis for fitted range
+    %     out.residual = Y - Ymodel, diff for fitted range
     
     warning('off','MATLAB:lscov:RankDefDesignMat')
     warning('off','MATLAB:nearlySingularMatrix')
+        
+    out.names = { 'BPND', 'DVR', 'intercept'};
+    out.units = { '1','1','min'};
+        
+    if nargin == 0    
+        return
+    end
+    
     
     if length(range) == 1
         startFrame = range(1);
@@ -49,21 +70,36 @@ function out =  jjzhou( matrix, t, dt, Cr, range)
     Ct = reshape( matrix, n, [] ) ;  % [  pixels frames ]     
 
     % ----------------
-    %  Logan model
-    % ----------------   
-  
+    %  Logan model, Zhou method
+    % ----------------
+    
+    newX=cumsum(Cr.*dt)./Cr; % integeral{REF}/ROI(t)
+    tempX =  newX(regressionRange)';  % X-values in range
+    A = [tempX ones(length(tempX),1) ] ;
+    
+    nY = cumsum(Ct.*dt,2)./Cr;    % integeral{ROI}/ROI(t)
+    
     for i = 1:n
         
-        newX=cumsum(Cr.*dt)./Cr; % integeral{REF}/ROI(t)
-        newY=cumsum(Ct(i,:).*dt)./Cr;    % integeral{ROI}/ROI(t)
+        %newY=cumsum(Ct(i,:).*dt)./Cr;    % integeral{ROI}/ROI(t)
+        %tempY = newY(regressionRange)';  % Y-values in range
         
-        % Limit range
-        tempX =  newX(regressionRange)';  % X-values in range
-        tempY = newY(regressionRange)';  % Y-values in range
         
-        % Two alternatives:
-        %p = linortfit2(double(newX), double(tempY)); % Orthogonal regression
-        p = [tempX ones(length(tempX),1) ] \ tempY;    % Normal regression
+        tempY = nY( i, regressionRange)';
+        
+        
+        
+        % Three alternatives:
+        
+        % A) Slow but no bias in pixels
+        %p = linortfit2(double(tempX), double(tempY)); % Orthogonal regression
+        
+        % B) Fair speed, Normal regression
+        p = A \ tempY;    % Normal regression
+        
+        % C) Fast sloppy alternative
+       % p(1) = ( tempY(end) - tempY(1) ) / ( tempX(end) - tempX(1) ); % slope k
+       % p(2) = - p(1) * tempX(end) + tempY(end); % intercept m
       
         DVR(i) = p(1);
         BP(i) = DVR(i) - 1;
@@ -71,6 +107,7 @@ function out =  jjzhou( matrix, t, dt, Cr, range)
         
         % For modelWindow compatibility: Store X,Y
         if IS_ROI 
+            newY = nY(i, :);
             out.X{i} = newX;
             out.Y{i} = newY;
             
@@ -89,11 +126,14 @@ function out =  jjzhou( matrix, t, dt, Cr, range)
     intercept = reshape(intercept, outsize);
     
     out.pars = {BP, DVR, intercept};
-    out.names = { 'BPND', 'DVR', 'intercept'};
-    out.units = { '1','1','min'};
         
     out.xlabel = '\int_{0}^{t} C_{ref} dt / C_{ref}';
     out.ylabel = '\int_{0}^{t} C_t dt / C_{ref}';
+  
+    if IS_ROI 
+        out.Xref = out.X{i};
+        out.Yref = Cr;
+    end
 
     
     % --------
