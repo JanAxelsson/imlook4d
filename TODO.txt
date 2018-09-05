@@ -11,6 +11,9 @@ DEVELOP
 
 
 WISHLIST
+[  ]   ROI Table with histogram for marked ROI
+[  ]   TACT window as Model Window, but with histogram for marked ROI and Frame
+
 [  ]   modelWindow: show parameters
 [  ]   modelWindow: allow update of model
 

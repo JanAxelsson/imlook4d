@@ -8740,8 +8740,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                    % should not be scriptable
                                    
                                    % Guess that not SCRIPTS menu
-                                   
-                                   cmd = [ 'Menu(''' get(hObject,'Label') ''')' ];
+                                   label = get(hObject,'Label');
+                                   % Clean if html in label (the 
+                                   if contains(label,'<html>')
+                                       label = get(hObject,'Tag');
+                                   end
+                                       
+                                       
+                                   cmd = [ 'Menu(''' label ''')' ];
                                    
                                    % Open menu
                                    try
