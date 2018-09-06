@@ -2,17 +2,20 @@ TODO
 =====
 
 DEVELOP
-[  ]   Add Models for ratio, clearance
-[  ]   Way to mask image (except for ROI).  SRTM fails badly if not masked
-       1) Auto-mask  max(imlook4d_Cdata,[],4)
-[  ]   Logan 
-[  ]   Vectorize Zhou SRTM, SRTM2
 [  ]   HELP files for models 
 
+[  ]   Add Models for  clearance
+[  ]   Vectorize SRTM, SRTM2 (possible?)
 
 WISHLIST
-[  ]   ROI Table with histogram for marked ROI
-[  ]   TACT window as Model Window, but with histogram for marked ROI and Frame
+[  ]   TACT window as Model Window, but 
+		- with histogram for marked ROI and Frame
+		- must be on one frame (how to select frame in dynamic ?)
+		- Hide time-activity plot if static scan
+		- Include SAVE tact to file, as in TACT-button
+		- When everything included from old TACT-window, link this to TACT button
+
+[  ]   make column widths optimal to fit more.
 
 [  ]   modelWindow: show parameters
 [  ]   modelWindow: allow update of model
@@ -22,7 +25,7 @@ WISHLIST
 
 
 IDEAS
-[   ]	Can I make robuster SRTM-like fixing BPs from Logan ?
+[   ]	Can I make robuster SRTM-like model by fixing BPs calculated from Logan ?
 
 
 PEARL-PD

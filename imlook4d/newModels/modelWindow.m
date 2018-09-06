@@ -81,13 +81,17 @@ function modelWindow_OpeningFcn(hObject, ~, handles, datastruct, roinames, title
     set(handles.modelWindow, 'Name', title);
     
     % Populate table
-    handles.uitable.Data = [roinames, num2cell( cell2mat(datastruct.pars) )];
+    handles.uitable.Data = [num2cell( cell2mat(datastruct.pars) )];
     handles.uitable.ColumnWidth = {200, 'auto'};
+    
+    handles.uitable.RowStriping = 'on';
     
     for i = 1:length(datastruct.names)
         datastruct.names{i} = [datastruct.names{i} '|' datastruct.units{i} ];
     end;
-    handles.uitable.ColumnName = [ 'name' datastruct.names];
+    handles.uitable.RowName = roinames ;
+    handles.uitable.ColumnName =  datastruct.names;
+    handles.uitable.RearrangeableColumns = 'on';
 
     % Draw initial graphs
     handles.selectedRow = 1;    
