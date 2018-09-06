@@ -161,7 +161,10 @@ function drawPlots( handles,roinumber)
     
     legend(handles.mainAxes,myLegends);
     
-    m = max( abs(handles.datastruct.Y{roinumber}) ); % Find max absolute value
+    % Find max absolute value (exclude non-numbers)
+    v = [ abs(handles.datastruct.Y{roinumber})  abs(handles.datastruct.Yref) ] ;
+    V = v( find( isfinite(v)))
+    m = max(V ); 
     m = m * 1.2; % Get some space
     handles.mainAxes.YLim = [0 +m];
     
