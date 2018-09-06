@@ -194,7 +194,7 @@ function drawPlots( handles,roinumber)
         legend(handles.residualAxes, myLegends);
     
         handles.residualAxes.XAxisLocation = 'origin';
-        handles.residualAxes.XLim = handles.mainAxes.XLim;
+        handles.residualAxes.XLim = handles.mainAxes.XLim; % Same x-axis on graphs
         m = max( abs(residual) ); % Find max absolute value
         m = m * 1.25 + 0.1; % Get some space
         handles.residualAxes.YLim = [ -m +m]; % Symmetric Y-residual axis around zero

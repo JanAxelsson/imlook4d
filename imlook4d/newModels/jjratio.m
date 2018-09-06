@@ -68,15 +68,17 @@ function out =  jjratio( matrix, t, dt, Cr, frame)
 
     for i = 1:n
         
-        newY = Ct(i,frame)./Cr(frame);  % ratio 
+        newY = Ct(i,:)./Cr(:)';  % ratio 
                 
         % For modelWindow compatibility: Store X,Y
         if IS_ROI 
-            out.X{i} = tmid;
-            out.Y{i} = newY;
+            indecesToNumbers = find(isfinite(newY)) ; % Not NaN or Inf
+            
+            out.X{i} = tmid(indecesToNumbers);
+            out.Y{i} = newY(indecesToNumbers);
         end
         
-        ratio(i) = newY;
+        ratio(i) = newY(frame);
 
     end
           
