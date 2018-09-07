@@ -80,18 +80,29 @@ function modelWindow_OpeningFcn(hObject, ~, handles, datastruct, roinames, title
     % Set figure name
     set(handles.modelWindow, 'Name', title);
     
+    %
     % Populate table
-    handles.uitable.Data = [num2cell( cell2mat(datastruct.pars) )];
-    %handles.uitable.ColumnWidth = {200, 'auto'};
-    
-    handles.uitable.RowStriping = 'on';
-    
-    for i = 1:length(datastruct.names)
-        datastruct.names{i} = [datastruct.names{i} '|' datastruct.units{i} ];
-    end;
-    handles.uitable.RowName = roinames ;
-    handles.uitable.ColumnName =  datastruct.names;
-    handles.uitable.RearrangeableColumns = 'on';
+    %
+        handles.uitable.RowStriping = 'on';
+        handles.uitable.RearrangeableColumns = 'on';
+
+        % If parameters exists, make row names into table side
+        % If no parameters, write row names in table cells
+        if length(datastruct.names) > 0
+            handles.uitable.Data = [num2cell( cell2mat(datastruct.pars) )];
+            for i = 1:length(datastruct.names)
+                datastruct.names{i} = [datastruct.names{i} '|' datastruct.units{i} ];
+            end;
+            handles.uitable.ColumnName =  datastruct.names;
+            handles.uitable.RowName = roinames ;
+        else
+            handles.uitable.Data = roinames;
+            datastruct.names = datastruct.names;
+            handles.uitable.ColumnName =  {'ROI'};
+            handles.uitable.ColumnWidth = {200, 'auto'};
+        end
+
+        
 
     % Draw initial graphs
     handles.selectedRow = 1;    
@@ -114,7 +125,9 @@ function modelWindow_OpeningFcn(hObject, ~, handles, datastruct, roinames, title
 % Utility functions
 %
 function drawPlots( handles,roinumber)
+
     datastruct = handles.datastruct;
+    
     try % May not be set first time
         previousMainYLim = handles.mainAxes.YLim;
         previousMainAxisLegendPosition = handles.mainAxes.Legend.Position;
@@ -160,7 +173,38 @@ function drawPlots( handles,roinumber)
         catch
         end
         hold(handles.mainAxes,'off');
+        
+    %
+    % Set axes
+    %
 
+        % Find max absolute value (exclude non-numbers)
+        v = [0 100]; % Default value, one lowest and one highest
+        try v = [ handles.datastruct.Y{roinumber} ]; catch; end
+        try v = [ handles.datastruct.Y{roinumber} handles.datastruct.Yref ] ; catch; end
+
+        V = v( find( isfinite(v))); % Remove Inf and NaN
+        Vmax = max(V);
+        Vmin = min(V);
+        
+        % Get some space above
+        Vmax = Vmax * 1.2; 
+        
+        % Get some space below (or start at zero)
+        if Vmin >=0 % Y-axis starts at 0
+            Vmin = 0;
+        else 
+            Vmin = Vmin * 1.2; % Get some space
+        end
+        
+        % Set axis 
+        handles.mainAxes.YLim = [Vmin +Vmax];
+
+        if get(handles.lockedYradiobutton,'Value')
+            handles.mainAxes.YLim = previousMainYLim;
+        end
+    
+    
     %
     % Write info
     %
@@ -172,22 +216,6 @@ function drawPlots( handles,roinumber)
         legend(handles.mainAxes,myLegends);    
 
 
-        % Find max absolute value (exclude non-numbers)
-        try
-            v = [ handles.datastruct.Y{roinumber} handles.datastruct.Yref ] ;
-        catch
-            v = [ handles.datastruct.Y{roinumber} ]; % Yref does not exist (Time-activity curve could be like that)
-        end
-        V = v( find( isfinite(v)));
-        Vmax = max(V);
-        Vmin = min(V);
-        m = Vmax * 1.2; % Get some space
-        handles.mainAxes.YLim = [Vmin +Vmax];
-
-        if get(handles.lockedYradiobutton,'Value')
-            handles.mainAxes.YLim = previousMainYLim;
-        end
-    
  
     %
     % Draw residuals

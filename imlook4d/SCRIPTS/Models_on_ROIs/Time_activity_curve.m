@@ -8,7 +8,8 @@ guidata( imlook4d_current_handle, imlook4d_current_handles);
 
 Export;
 
-ExportROIs
+IS_DYNAMIC = size(imlook4d_Cdata,4) > 1 % One frame if more than one column
+
 
 model_name = 'Time-activity curve';
 
@@ -30,7 +31,6 @@ end
 % Model
 %
 disp('Calculating time-activity curves ...');
-tacts = generateTACT(imlook4d_current_handles,imlook4d_ROI);  % ROIs
 
 try
     REF_EXISTS = imlook4d_current_handles.model.common.ReferenceROINumbers;
@@ -40,29 +40,37 @@ try
 catch
     REF_EXISTS = false;
 end
-tact = tacts;  % all ROIs
-
-n = size(tacts,1);
-for i = 1:n
-    a.X{i} = tmid;
-    a.Y{i} = tact(i,:);
-end
 
 
 a.ylabel = 'C_t';
 
 
-IS_DYNAMIC = size(a.X{1},2) > 1 % One frame if more than one column
+%
+% Alternative analysis DYNAMIC / STATIC
+%
+
 if IS_DYNAMIC
+    tact = generateTACT(imlook4d_current_handles,imlook4d_ROI);  % ROIs
     a.names = {'Click in cell'};
     a.units = {''};
     a.pars = {''};
+    
+    a.names = {};
+    a.units = {};
+    a.pars = {};    
+    n = size(tact,1);
+    for i = 1:n
+        a.X{i} = tmid;
+        a.Y{i} = tact(i,:);
+    end
+    
     modelWindow( ...
         a , ...
         imlook4d_ROINames(1:end-1), ...
         [model_name ] ...
         );
 else
+    ExportROIs
     a.names = {'mean', 'volume', 'pixels','max', 'min', 'std'};
     a.units = {'', '', '', '', '', ''};
     a.pars = { imlook4d_ROI_data.mean', ...
