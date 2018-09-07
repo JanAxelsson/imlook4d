@@ -113,120 +113,128 @@ function modelWindow_OpeningFcn(hObject, ~, handles, datastruct, roinames, title
 %
 % Utility functions
 %
-    function drawPlots( handles,roinumber)
+function drawPlots( handles,roinumber)
     datastruct = handles.datastruct;
     try % May not be set first time
         previousMainYLim = handles.mainAxes.YLim;
         previousMainAxisLegendPosition = handles.mainAxes.Legend.Position;
+        previousResidualAxisLegendPosition = handles.residualAxes.Legend.Position;
     catch
     end
 
     %
     % Draw data and model
     %
-    myLegends = {};
-    try % Data
-        plot (handles.datastruct.X{roinumber},handles.datastruct.Y{roinumber},...
-            'Marker','o', ...
-            'MarkerSize',6, ...
-            'LineStyle','none',...
-            'Color','blue',...
-            'MarkerFaceColor','blue',...
-            'Parent',handles.mainAxes)
-        myLegends = [ myLegends 'ROI'];
-    catch
-    end
+        myLegends = {};
+        try % Data
+            plot (handles.datastruct.X{roinumber},handles.datastruct.Y{roinumber},...
+                'Marker','o', ...
+                'MarkerSize',6, ...
+                'LineStyle','none',...
+                'Color','blue',...
+                'MarkerFaceColor','blue',...
+                'Parent',handles.mainAxes)
+            myLegends = [ myLegends 'ROI'];
+        catch
+        end
 
-    try % Model
-        hold(handles.mainAxes,'on');
-        plot (handles.datastruct.Xmodel{roinumber},handles.datastruct.Ymodel{roinumber},...
-            'LineStyle','-', ...
-            'Color','blue',...
-            'Parent',handles.mainAxes)
-        myLegends = [ myLegends 'Model'];
+        try % Model
+            hold(handles.mainAxes,'on');
+            plot (handles.datastruct.Xmodel{roinumber},handles.datastruct.Ymodel{roinumber},...
+                'LineStyle','-', ...
+                'Color','blue',...
+                'Parent',handles.mainAxes)
+            myLegends = [ myLegends 'Model'];
 
-    catch
-        %hold(handles.mainAxes,'off');
-    end
+        catch
+        end
 
-    try % Reference
-        %hold(handles.mainAxes,'on');
-        plot (handles.datastruct.Xref,handles.datastruct.Yref,...
-            'Marker','o', ...
-            'MarkerSize',7, ...
-            'LineStyle','none',...
-            'Color','red',...
-            'Parent',handles.mainAxes)
-        myLegends = [ myLegends 'Reference'];
-    catch
-    end
-    hold(handles.mainAxes,'off');
+        try % Reference
+            plot (handles.datastruct.Xref,handles.datastruct.Yref,...
+                'Marker','o', ...
+                'MarkerSize',7, ...
+                'LineStyle','none',...
+                'Color','red',...
+                'Parent',handles.mainAxes)
+            myLegends = [ myLegends 'Reference'];
+        catch
+        end
+        hold(handles.mainAxes,'off');
 
     %
     % Write info
     %
-    handles.mainAxesRoiName.String = [ 'ROI = ' handles.roinames{roinumber} ];
-    xlabel(handles.mainAxes,datastruct.xlabel);
-    ylabel(handles.mainAxes,datastruct.ylabel);
-    title(handles.mainAxes,'Model');
+        handles.mainAxesRoiName.String = [ 'ROI = ' handles.roinames{roinumber} ];
+        xlabel(handles.mainAxes,datastruct.xlabel);
+        ylabel(handles.mainAxes,datastruct.ylabel);
+        title(handles.mainAxes,'Model');
 
-    legend(handles.mainAxes,myLegends);    
-    try % May not be set first time
-        handles.mainAxes.Legend.Position = previousMainAxisLegendPosition;
-    catch
-    end
+        legend(handles.mainAxes,myLegends);    
 
 
-    % Find max absolute value (exclude non-numbers)
-    v = [ handles.datastruct.Y{roinumber} handles.datastruct.Yref ] ;
-    V = v( find( isfinite(v)));
-    Vmax = max(V);
-    Vmin = min(V);
-    m = Vmax * 1.2; % Get some space
-    handles.mainAxes.YLim = [Vmin +Vmax];
+        % Find max absolute value (exclude non-numbers)
+        try
+            v = [ handles.datastruct.Y{roinumber} handles.datastruct.Yref ] ;
+        catch
+            v = [ handles.datastruct.Y{roinumber} ]; % Yref does not exist (Time-activity curve could be like that)
+        end
+        V = v( find( isfinite(v)));
+        Vmax = max(V);
+        Vmin = min(V);
+        m = Vmax * 1.2; % Get some space
+        handles.mainAxes.YLim = [Vmin +Vmax];
 
-    if get(handles.lockedYradiobutton,'Value')
-        handles.mainAxes.YLim = previousMainYLim;
-    end
+        if get(handles.lockedYradiobutton,'Value')
+            handles.mainAxes.YLim = previousMainYLim;
+        end
     
  
     %
     % Draw residuals
     %
-    myLegends = {};
-    try
-        if handles.PercentResidualRadioButton.Value
-            residual = 100 * handles.datastruct.residual{roinumber} ./ handles.datastruct.Ymodel{roinumber};
-            residualLabel = '% Diff';
-            myLegends = [ myLegends '100 * (ROI - Model) / Model'];
+        myLegends = {};
+        try
+            if handles.PercentResidualRadioButton.Value
+                residual = 100 * handles.datastruct.residual{roinumber} ./ handles.datastruct.Ymodel{roinumber};
+                residualLabel = '% Diff';
+                myLegends = [ myLegends '100 * (ROI - Model) / Model'];
+            end
+            if handles.AbsoluteResidualRadioButton.Value
+                residual = handles.datastruct.residual{roinumber};
+                residualLabel = 'Diff';
+                myLegends = [ myLegends 'ROI - Model'];
+            end
+            plot (handles.datastruct.Xmodel{roinumber},residual,...
+                'Marker','o', ...
+                'MarkerSize',6, ...
+                'LineStyle','none',...
+                'Color','blue',...
+                'MarkerFaceColor','blue',...
+                'Parent', ...
+                handles.residualAxes)
+
+
+            title(handles.residualAxes,'Residual');
+            legend(handles.residualAxes, myLegends);
+
+            handles.residualAxes.XAxisLocation = 'origin';
+            handles.residualAxes.XLim = handles.mainAxes.XLim; % Same x-axis on graphs
+            m = max( abs(residual) ); % Find max absolute value
+            m = m * 1.25 + 0.1; % Get some space
+            handles.residualAxes.YLim = [ -m +m]; % Symmetric Y-residual axis around zero
+
+            ylabel(handles.residualAxes,residualLabel);
+        catch
         end
-        if handles.AbsoluteResidualRadioButton.Value
-            residual = handles.datastruct.residual{roinumber};
-            residualLabel = 'Diff';
-            myLegends = [ myLegends 'ROI - Model'];
+   %
+   % Restore positions
+   %
+        try % May not be set first time
+            handles.mainAxes.Legend.Position = previousMainAxisLegendPosition;
+            handles.residualAxes.Legend.Position = previousResidualAxisLegendPosition;
+        catch
         end
-        plot (handles.datastruct.Xmodel{roinumber},residual,...
-            'Marker','o', ...
-            'MarkerSize',6, ...
-            'LineStyle','none',...
-            'Color','blue',...
-            'MarkerFaceColor','blue',...
-            'Parent', ...
-            handles.residualAxes)
-
-
-        title(handles.residualAxes,'Residual');
-        legend(handles.residualAxes, myLegends);
-
-        handles.residualAxes.XAxisLocation = 'origin';
-        handles.residualAxes.XLim = handles.mainAxes.XLim; % Same x-axis on graphs
-        m = max( abs(residual) ); % Find max absolute value
-        m = m * 1.25 + 0.1; % Get some space
-        handles.residualAxes.YLim = [ -m +m]; % Symmetric Y-residual axis around zero
-
-        ylabel(handles.residualAxes,residualLabel);
-    catch
-    end
+        
     
 %
 % Callbacks

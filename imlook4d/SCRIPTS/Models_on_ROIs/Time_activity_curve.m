@@ -32,7 +32,14 @@ end
 disp('Calculating time-activity curves ...');
 tacts = generateTACT(imlook4d_current_handles,imlook4d_ROI);  % ROIs
 
-ref = generateReferenceTACT( imlook4d_current_handles);
+try
+    REF_EXISTS = imlook4d_current_handles.model.common.ReferenceROINumbers;
+    ref = generateReferenceTACT( imlook4d_current_handles);
+    a.Xref = a.X{1};
+    a.Yref = ref;
+catch
+    REF_EXISTS = false;
+end
 tact = tacts;  % all ROIs
 
 n = size(tacts,1);
@@ -41,8 +48,7 @@ for i = 1:n
     a.Y{i} = tact(i,:);
 end
 
-a.Xref = a.X{1};
-a.Yref = ref;
+
 a.ylabel = 'C_t';
 
 
