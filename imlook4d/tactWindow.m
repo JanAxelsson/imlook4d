@@ -147,9 +147,9 @@ function drawPlots( handles,roinumber)
     try % May not be set first time
         previousRoiNumbernumber = getappdata(handles.tactWindow, 'previousRoiNumbernumber');
         previousMainXLim = getappdata(handles.tactWindow, 'previousMainXLim');
-        previousMainYLim = getappdata(handles.tactWindow, 'previousMainYLim');
-        previousSecondXLim = getappdata(handles.tactWindow, 'previousSecondXLim');
-        previousSecondYLim = getappdata(handles.tactWindow, 'previousSecondYLim');
+        %previousMainYLim = getappdata(handles.tactWindow, 'previousMainYLim');
+        %previousSecondXLim = getappdata(handles.tactWindow, 'previousSecondXLim');
+        %previousSecondYLim = getappdata(handles.tactWindow, 'previousSecondYLim');
         
     catch
         previousRoiNumbernumber = 1;
@@ -176,7 +176,7 @@ function drawPlots( handles,roinumber)
     %
     % Set axes
     %
-        % Set to previous 
+        % Set to previous or optimum
         try
             optimumXLim = [ min( handles.ROI_data_struct.min )  max( handles.ROI_data_struct.max ) ];
             handles.mainAxes.XLim = optimumXLim;
@@ -184,7 +184,7 @@ function drawPlots( handles,roinumber)
             
             if get(handles.lockedXradiobutton,'Value')
                 handles.mainAxes.XLim = previousMainXLim;
-                handles.secondAxes.XLim = previousSecondXLim;
+                %handles.secondAxes.XLim = previousSecondXLim;
             end
 
             if get(handles.lockedYradiobutton,'Value')
@@ -194,8 +194,15 @@ function drawPlots( handles,roinumber)
         catch
         end
         
+        % Same x-axis on both histograms
+        handles.secondAxes.XLim = handles.mainAxes.XLim;
 
-
+%         % Set same y-axis on both histograms
+%         yLim1 = handles.mainAxes.YLim;
+%         yLim2 = handles.secondAxes.YLim;
+%         ymax = max( [ yLim1(2) yLim2(2)]);
+%         handles.mainAxes.YLim = [ yLim1(1) ymax];
+%         handles.secondAxes.YLim = [ yLim2(1) ymax];
     
     
     %
@@ -206,7 +213,7 @@ function drawPlots( handles,roinumber)
         %xlabel(handles.mainAxes,datastruct.xlabel);
         %ylabel(handles.mainAxes,datastruct.ylabel);
         title(handles.mainAxes,'ROI pixel values');
-        title(handles.secondAxes,'Last ROI pixel values');
+        title(handles.secondAxes,'Previous ROI');
 
         %legend(handles.mainAxes,myLegends);    
 
@@ -223,9 +230,9 @@ function drawPlots( handles,roinumber)
         if (previousRoiNumbernumber ~= roinumber)
             setappdata(handles.tactWindow, 'previousRoiNumbernumber', roinumber);
             setappdata(handles.tactWindow, 'previousMainXLim',handles.mainAxes.XLim);
-            setappdata(handles.tactWindow, 'previousMainYLim',handles.mainAxes.YLim);
-            setappdata(handles.tactWindow, 'previousSecondXLim',handles.secondAxes.XLim);
-            setappdata(handles.tactWindow, 'previousSecondYLim',handles.secondAxes.YLim);
+            %setappdata(handles.tactWindow, 'previousMainYLim',handles.mainAxes.YLim);
+            %setappdata(handles.tactWindow, 'previousSecondXLim',handles.secondAxes.XLim);
+            %setappdata(handles.tactWindow, 'previousSecondYLim',handles.secondAxes.YLim);
         end
         
 %
@@ -239,7 +246,6 @@ function uitable_CellSelectionCallback(~, eventdata, handles)
 function lockedXradiobutton_Callback(~, ~, handles)
     roinumber = handles.selectedRow;
     setappdata(handles.tactWindow, 'previousMainXLim',handles.mainAxes.XLim);
-    setappdata(handles.tactWindow, 'previousSecondXLim',handles.secondAxes.XLim);
     drawPlots( handles,roinumber)
 function lockedYradiobutton_Callback(hObject, eventdata, handles)
     roinumber = handles.selectedRow;
