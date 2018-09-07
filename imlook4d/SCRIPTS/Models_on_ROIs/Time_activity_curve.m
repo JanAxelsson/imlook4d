@@ -13,13 +13,17 @@ ExportROIs
 model_name = 'Time-activity curve';
 
 try
-t = imlook4d_time/60;
-dt = imlook4d_duration/60;
-
-tmid = t + 0.5 * dt;
-dt = [tmid(1), tmid(2:length(tmid))-tmid(1:length(tmid)-1)];
-catch
+    t = imlook4d_time/60;
+    dt = imlook4d_duration/60;
     
+    tmid = t + 0.5 * dt;
+    dt = [tmid(1), tmid(2:length(tmid))-tmid(1:length(tmid)-1)];
+    
+    
+    a.xlabel = 'time';
+catch
+    tmid = 1 : size( imlook4d_Cdata,4);
+    a.xlabel = 'frame';
 end
 
 %
@@ -39,15 +43,14 @@ end
 
 a.Xref = a.X{1};
 a.Yref = ref;
-a.xlabel = 'time';
 a.ylabel = 'C_t';
 
 
 IS_DYNAMIC = size(a.X{1},2) > 1 % One frame if more than one column
 if IS_DYNAMIC
-    a.names = {};
-    a.units = {};
-    a.pars = {};
+    a.names = {'Click in cell'};
+    a.units = {''};
+    a.pars = {''};
     modelWindow( ...
         a , ...
         imlook4d_ROINames(1:end-1), ...
@@ -78,5 +81,5 @@ else
 end
 
 
-Import; % Because ModelDialog adds to imlook4d_current_handles.model.Zhou.inputs
+Import; 
 ClearVariables;

@@ -82,7 +82,7 @@ function modelWindow_OpeningFcn(hObject, ~, handles, datastruct, roinames, title
     
     % Populate table
     handles.uitable.Data = [num2cell( cell2mat(datastruct.pars) )];
-    handles.uitable.ColumnWidth = {200, 'auto'};
+    %handles.uitable.ColumnWidth = {200, 'auto'};
     
     handles.uitable.RowStriping = 'on';
     
@@ -113,11 +113,15 @@ function modelWindow_OpeningFcn(hObject, ~, handles, datastruct, roinames, title
 %
 % Utility functions
 %
-function drawPlots( handles,roinumber)
+    function drawPlots( handles,roinumber)
     datastruct = handles.datastruct;
-    previousMainYLim = handles.mainAxes.YLim;
+    try % May not be set first time
+        previousMainYLim = handles.mainAxes.YLim;
+        previousMainAxisLegendPosition = handles.mainAxes.Legend.Position;
+    catch
+    end
 
-    %    
+    %
     % Draw data and model
     %
     myLegends = {};
@@ -132,7 +136,7 @@ function drawPlots( handles,roinumber)
         myLegends = [ myLegends 'ROI'];
     catch
     end
-    
+
     try % Model
         hold(handles.mainAxes,'on');
         plot (handles.datastruct.Xmodel{roinumber},handles.datastruct.Ymodel{roinumber},...
@@ -144,7 +148,7 @@ function drawPlots( handles,roinumber)
     catch
         %hold(handles.mainAxes,'off');
     end
-    
+
     try % Reference
         %hold(handles.mainAxes,'on');
         plot (handles.datastruct.Xref,handles.datastruct.Yref,...
@@ -157,28 +161,35 @@ function drawPlots( handles,roinumber)
     catch
     end
     hold(handles.mainAxes,'off');
-    
+
     %
     % Write info
     %
     handles.mainAxesRoiName.String = [ 'ROI = ' handles.roinames{roinumber} ];
     xlabel(handles.mainAxes,datastruct.xlabel);
     ylabel(handles.mainAxes,datastruct.ylabel);
-    title(handles.mainAxes,'Model');    
-    
-    legend(handles.mainAxes,myLegends);
-    
-    % Find max absolute value (exclude non-numbers)
-    v = [ abs(handles.datastruct.Y{roinumber})  abs(handles.datastruct.Yref) ] ;
-    V = v( find( isfinite(v)))
-    m = max(V ); 
-    m = m * 1.2; % Get some space
-    handles.mainAxes.YLim = [0 +m];
-    
-    if get(handles.lockedYradiobutton,'Value')
-        handles.mainAxes.YLim = previousMainYLim; 
+    title(handles.mainAxes,'Model');
+
+    legend(handles.mainAxes,myLegends);    
+    try % May not be set first time
+        handles.mainAxes.Legend.Position = previousMainAxisLegendPosition;
+    catch
     end
 
+
+    % Find max absolute value (exclude non-numbers)
+    v = [ handles.datastruct.Y{roinumber} handles.datastruct.Yref ] ;
+    V = v( find( isfinite(v)));
+    Vmax = max(V);
+    Vmin = min(V);
+    m = Vmax * 1.2; % Get some space
+    handles.mainAxes.YLim = [Vmin +Vmax];
+
+    if get(handles.lockedYradiobutton,'Value')
+        handles.mainAxes.YLim = previousMainYLim;
+    end
+    
+ 
     %
     % Draw residuals
     %
@@ -203,16 +214,16 @@ function drawPlots( handles,roinumber)
             'Parent', ...
             handles.residualAxes)
 
-        
+
         title(handles.residualAxes,'Residual');
         legend(handles.residualAxes, myLegends);
-    
+
         handles.residualAxes.XAxisLocation = 'origin';
         handles.residualAxes.XLim = handles.mainAxes.XLim; % Same x-axis on graphs
         m = max( abs(residual) ); % Find max absolute value
         m = m * 1.25 + 0.1; % Get some space
         handles.residualAxes.YLim = [ -m +m]; % Symmetric Y-residual axis around zero
-        
+
         ylabel(handles.residualAxes,residualLabel);
     catch
     end
