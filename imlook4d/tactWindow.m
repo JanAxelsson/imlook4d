@@ -215,7 +215,7 @@ function drawPlots( handles,roinumber)
         title(handles.mainAxes,'ROI pixel values');
         title(handles.secondAxes,'Previous ROI');
 
-        %legend(handles.mainAxes,myLegends);    
+        %legend(handles.mainAxes,myLegends, 'Interpreter', 'none');    
 
   
    %

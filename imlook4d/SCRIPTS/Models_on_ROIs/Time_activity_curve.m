@@ -32,14 +32,6 @@ end
 %
 disp('Calculating time-activity curves ...');
 
-try
-    REF_EXISTS = imlook4d_current_handles.model.common.ReferenceROINumbers;
-    ref = generateReferenceTACT( imlook4d_current_handles);
-    a.Xref = a.X{1};
-    a.Yref = ref;
-catch
-    REF_EXISTS = false;
-end
 
 
 a.ylabel = 'C_t';
@@ -64,6 +56,17 @@ if IS_DYNAMIC
         a.Y{i} = tact(i,:);
     end
     
+    % Ref
+    try
+        REF_EXISTS = length(imlook4d_current_handles.model.common.ReferenceROINumbers) > 0;
+        ref = generateReferenceTACT( imlook4d_current_handles);
+        a.Xref = a.X{1};
+        a.Yref = ref;
+    catch
+        REF_EXISTS = false;
+    end
+    
+    % Plot
     modelWindow( ...
         a , ...
         imlook4d_ROINames(1:end-1), ...

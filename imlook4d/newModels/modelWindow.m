@@ -124,7 +124,7 @@ function modelWindow_OpeningFcn(hObject, ~, handles, datastruct, roinames, title
 %
 % Utility functions
 %
-function drawPlots( handles,roinumber)
+function drawPlots( handles,roinumbers)
 
     datastruct = handles.datastruct;
     
@@ -139,18 +139,23 @@ function drawPlots( handles,roinumber)
     % Draw data and model
     %
         myLegends = {};
-        try % Data
-            plot (handles.datastruct.X{roinumber},handles.datastruct.Y{roinumber},...
-                'Marker','o', ...
-                'MarkerSize',6, ...
-                'LineStyle','none',...
-                'Color','blue',...
-                'MarkerFaceColor','blue',...
-                'Parent',handles.mainAxes)
-            myLegends = [ myLegends 'ROI'];
-        catch
-        end
 
+        for i = 1:length(roinumbers)
+            roinumber = roinumbers(i);
+            try % Data
+                h = plot (handles.datastruct.X{roinumber},handles.datastruct.Y{roinumber},...
+                    'Marker','o', ...
+                    'MarkerSize',6, ...                
+                    'LineStyle','none',...
+                    'Parent',handles.mainAxes)
+                myLegends = [ myLegends [ 'ROI = ' handles.roinames{roinumber} ] ];
+                set(h, 'MarkerFaceColor', get(h, 'Color') );
+                hold(handles.mainAxes,'on');
+            catch
+                disp('data plot error');
+            end
+        end
+    
         try % Model
             hold(handles.mainAxes,'on');
             plot (handles.datastruct.Xmodel{roinumber},handles.datastruct.Ymodel{roinumber},...
@@ -160,6 +165,7 @@ function drawPlots( handles,roinumber)
             myLegends = [ myLegends 'Model'];
 
         catch
+                disp('model plot error');
         end
 
         try % Reference
@@ -171,6 +177,7 @@ function drawPlots( handles,roinumber)
                 'Parent',handles.mainAxes)
             myLegends = [ myLegends 'Reference'];
         catch
+                disp('model plot error');
         end
         hold(handles.mainAxes,'off');
         
@@ -180,8 +187,8 @@ function drawPlots( handles,roinumber)
 
         % Find max absolute value (exclude non-numbers)
         v = [0 100]; % Default value, one lowest and one highest
-        try v = [ handles.datastruct.Y{roinumber} ]; catch; end
-        try v = [ handles.datastruct.Y{roinumber} handles.datastruct.Yref ] ; catch; end
+        try v = [ handles.datastruct.Y{roinumbers} ]; catch; end
+        try v = [ handles.datastruct.Y{roinumbers} handles.datastruct.Yref ] ; catch; end
 
         V = v( find( isfinite(v))); % Remove Inf and NaN
         Vmax = max(V);
@@ -213,8 +220,7 @@ function drawPlots( handles,roinumber)
         ylabel(handles.mainAxes,datastruct.ylabel);
         title(handles.mainAxes,'Model');
 
-        legend(handles.mainAxes,myLegends);    
-
+        legend(handles.mainAxes,myLegends, 'Interpreter', 'none','Location','east');    
 
  
     %
@@ -225,25 +231,35 @@ function drawPlots( handles,roinumber)
             if handles.PercentResidualRadioButton.Value
                 residual = 100 * handles.datastruct.residual{roinumber} ./ handles.datastruct.Ymodel{roinumber};
                 residualLabel = '% Diff';
-                myLegends = [ myLegends '100 * (ROI - Model) / Model'];
+                %myLegends = [ myLegends '100 * (ROI - Model) / Model'];
             end
             if handles.AbsoluteResidualRadioButton.Value
                 residual = handles.datastruct.residual{roinumber};
                 residualLabel = 'Diff';
-                myLegends = [ myLegends 'ROI - Model'];
+                %myLegends = [ myLegends 'ROI - Model'];
             end
-            plot (handles.datastruct.Xmodel{roinumber},residual,...
-                'Marker','o', ...
-                'MarkerSize',6, ...
-                'LineStyle','none',...
-                'Color','blue',...
-                'MarkerFaceColor','blue',...
-                'Parent', ...
-                handles.residualAxes)
+            
+            myLegends = {};
 
+            for i = 1:length(roinumbers)
+                roinumber = roinumbers(i);
+                try % Data
+                    h =  plot (handles.datastruct.Xmodel{roinumber},residual,...
+                        'Marker','o', ...
+                        'MarkerSize',6, ...
+                        'LineStyle','none',...
+                        'Parent', ...
+                        handles.residualAxes);
+                    myLegends = [ myLegends [ 'ROI = ' handles.roinames{roinumber} ] ];
+                    set(h, 'MarkerFaceColor', get(h, 'Color') );
+                    hold(handles.residualAxes,'on');
+                catch
+                    disp('residual plot error');
+                end
+            end
+            hold(handles.residualAxes,'off');
 
             title(handles.residualAxes,'Residual');
-            legend(handles.residualAxes, myLegends);
 
             handles.residualAxes.XAxisLocation = 'origin';
             handles.residualAxes.XLim = handles.mainAxes.XLim; % Same x-axis on graphs
@@ -258,26 +274,36 @@ function drawPlots( handles,roinumber)
    % Restore positions
    %
         try % May not be set first time
-            handles.mainAxes.Legend.Position = previousMainAxisLegendPosition;
-            handles.residualAxes.Legend.Position = previousResidualAxisLegendPosition;
+            handles.mainAxes.Legend.Position = [
+                previousMainAxisLegendPosition(1), ... 
+                previousMainAxisLegendPosition(2) + previousMainAxisLegendPosition(4) - handles.mainAxes.Legend.Position(4), ... 
+                handles.mainAxes.Legend.Position(3), ... 
+                handles.mainAxes.Legend.Position(4), ... 
+                ];
+            handles.residualAxes.Legend.Position = [
+                previousResidualAxisLegendPosition(1), ... 
+                previousResidualAxisLegendPosition(2) + previousResidualAxisLegendPosition(4) - handles.residualAxes.Legend.Position(4), ... 
+                handles.residualAxes.Legend.Position(3), ... 
+                handles.residualAxes.Legend.Position(4), ... 
+                ];
         catch
         end
-        
-    
+
 %
 % Callbacks
 %
 function uitable_CellSelectionCallback(~, eventdata, handles)
-    roinumber = eventdata.Indices(1);
-    drawPlots( handles,roinumber);
-    handles.selectedRow = roinumber;
+    roinumbers = eventdata.Indices(:,1);
+    drawPlots( handles,roinumbers);
+    handles.selectedRow = roinumbers;
     guidata(handles.modelWindow, handles);
 function AbsoluteResidualRadioButton_Callback(~, ~, handles)
-    roinumber = handles.selectedRow;
-    drawPlots( handles,roinumber)
+    %roinumber = handles.selectedRow;
+    roinumbers = eventdata.Indices(:,1);
+    drawPlots( handles,roinumbers);
 function PercentResidualRadioButton_Callback(~, ~, handles)
-    roinumber = handles.selectedRow;
-    drawPlots( handles,roinumber)  
+    roinumbers = eventdata.Indices(:,1);
+    drawPlots( handles,roinumbers); 
 function LockYradiobutton_Callback(~, ~, handles)
-    roinumber = handles.selectedRow;
-    drawPlots( handles,roinumber)
+    roinumbers = eventdata.Indices(:,1);
+    drawPlots( handles,roinumbers);
