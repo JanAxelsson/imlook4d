@@ -127,6 +127,7 @@ function modelWindow_OpeningFcn(hObject, ~, handles, datastruct, roinames, title
 function drawPlots( handles,roinumbers)
 
     datastruct = handles.datastruct;
+    myLegends = {};
     
     try % May not be set first time
         previousMainYLim = handles.mainAxes.YLim;
@@ -134,50 +135,65 @@ function drawPlots( handles,roinumbers)
         previousResidualAxisLegendPosition = handles.residualAxes.Legend.Position;
     catch
     end
-
+     
     %
-    % Draw data and model
-    %
-        myLegends = {};
+    % Draw reference, data, model 
+    %   
+    
+        % Reference
+        try 
+            plot (handles.datastruct.Xref,handles.datastruct.Yref,...
+                'Marker','o', ...
+                'MarkerSize',7, ...
+                'LineStyle','none',...
+                'Color','black',...
+                'Parent',handles.mainAxes ...
+                );
+            myLegends = [ myLegends 'Reference'];
 
+            hold(handles.mainAxes,'on');
+        catch
+            disp('reference plot error');
+        end
+
+        
+        % Data
         for i = 1:length(roinumbers)
             roinumber = roinumbers(i);
-            try % Data
+            try 
                 h = plot (handles.datastruct.X{roinumber},handles.datastruct.Y{roinumber},...
                     'Marker','o', ...
                     'MarkerSize',6, ...                
                     'LineStyle','none',...
-                    'Parent',handles.mainAxes)
-                myLegends = [ myLegends [ 'ROI = ' handles.roinames{roinumber} ] ];
-                set(h, 'MarkerFaceColor', get(h, 'Color') );
+                    'Parent',handles.mainAxes ...
+                    );
+                
+                c{i} = get(h, 'Color'); % Store colors for each ROI
+                
+                set(h, 'MarkerFaceColor', c{i} );
+                myLegends = [ myLegends handles.roinames{roinumber}  ];
+                
                 hold(handles.mainAxes,'on');
             catch
                 disp('data plot error');
             end
         end
-    
-        try % Model
-            hold(handles.mainAxes,'on');
-            plot (handles.datastruct.Xmodel{roinumber},handles.datastruct.Ymodel{roinumber},...
+
+        
+        % Model
+        for i = 1:length(roinumbers)
+            roinumber = roinumbers(i);
+            try 
+                h = plot (handles.datastruct.Xmodel{roinumber},handles.datastruct.Ymodel{roinumber},...
                 'LineStyle','-', ...
-                'Color','blue',...
-                'Parent',handles.mainAxes)
-            myLegends = [ myLegends 'Model'];
-
-        catch
+                'Parent',handles.mainAxes ...
+                );
+            
+                set(h, 'Color', c{i} ); % Stored when plotting Data, above
+                hold(handles.mainAxes,'on');
+            catch
                 disp('model plot error');
-        end
-
-        try % Reference
-            plot (handles.datastruct.Xref,handles.datastruct.Yref,...
-                'Marker','o', ...
-                'MarkerSize',7, ...
-                'LineStyle','none',...
-                'Color','red',...
-                'Parent',handles.mainAxes)
-            myLegends = [ myLegends 'Reference'];
-        catch
-                disp('model plot error');
+            end
         end
         hold(handles.mainAxes,'off');
         
@@ -215,10 +231,9 @@ function drawPlots( handles,roinumbers)
     %
     % Write info
     %
-        handles.mainAxesRoiName.String = [ 'ROI = ' handles.roinames{roinumber} ];
         xlabel(handles.mainAxes,datastruct.xlabel);
         ylabel(handles.mainAxes,datastruct.ylabel);
-        title(handles.mainAxes,'Model');
+        title(handles.mainAxes,'Data');
 
         legend(handles.mainAxes,myLegends, 'Interpreter', 'none','Location','east');    
 
@@ -229,29 +244,30 @@ function drawPlots( handles,roinumbers)
         myLegends = {};
         try
             if handles.PercentResidualRadioButton.Value
-                residual = 100 * handles.datastruct.residual{roinumber} ./ handles.datastruct.Ymodel{roinumber};
+                residual = handles.datastruct.residual;
+                for i = 1:length(roinumbers)
+                    roinumber = roinumbers(i);
+                    residual{roinumber} = 100 * handles.datastruct.residual{roinumber} ./ handles.datastruct.Ymodel{roinumber};
+                end
                 residualLabel = '% Diff';
-                %myLegends = [ myLegends '100 * (ROI - Model) / Model'];
             end
             if handles.AbsoluteResidualRadioButton.Value
-                residual = handles.datastruct.residual{roinumber};
+                residual = handles.datastruct.residual;
                 residualLabel = 'Diff';
-                %myLegends = [ myLegends 'ROI - Model'];
             end
             
             myLegends = {};
 
             for i = 1:length(roinumbers)
                 roinumber = roinumbers(i);
-                try % Data
-                    h =  plot (handles.datastruct.Xmodel{roinumber},residual,...
+                try 
+                    h =  plot (handles.datastruct.Xmodel{roinumber},residual{roinumber},...
                         'Marker','o', ...
                         'MarkerSize',6, ...
                         'LineStyle','none',...
-                        'Parent', ...
-                        handles.residualAxes);
-                    myLegends = [ myLegends [ 'ROI = ' handles.roinames{roinumber} ] ];
-                    set(h, 'MarkerFaceColor', get(h, 'Color') );
+                        'Parent', handles.residualAxes ...
+                        );
+                    set(h, 'MarkerFaceColor', c{i} );% Stored when plotting Data, above
                     hold(handles.residualAxes,'on');
                 catch
                     disp('residual plot error');
@@ -262,8 +278,8 @@ function drawPlots( handles,roinumbers)
             title(handles.residualAxes,'Residual');
 
             handles.residualAxes.XAxisLocation = 'origin';
-            handles.residualAxes.XLim = handles.mainAxes.XLim; % Same x-axis on graphs
-            m = max( abs(residual) ); % Find max absolute value
+            handles.residualAxes.XLim = handles.mainAxes.XLim; % Same x-axis on both graphs
+            m = max( abs(residual{roinumbers} )); % Find max absolute value
             m = m * 1.25 + 0.1; % Get some space
             handles.residualAxes.YLim = [ -m +m]; % Symmetric Y-residual axis around zero
 
@@ -297,13 +313,9 @@ function uitable_CellSelectionCallback(~, eventdata, handles)
     drawPlots( handles,roinumbers);
     handles.selectedRow = roinumbers;
     guidata(handles.modelWindow, handles);
-function AbsoluteResidualRadioButton_Callback(~, ~, handles)
-    %roinumber = handles.selectedRow;
-    roinumbers = eventdata.Indices(:,1);
-    drawPlots( handles,roinumbers);
-function PercentResidualRadioButton_Callback(~, ~, handles)
-    roinumbers = eventdata.Indices(:,1);
-    drawPlots( handles,roinumbers); 
-function LockYradiobutton_Callback(~, ~, handles)
-    roinumbers = eventdata.Indices(:,1);
-    drawPlots( handles,roinumbers);
+function AbsoluteResidualRadioButton_Callback(~, eventdata, handles)
+     drawPlots( handles, handles.selectedRow);
+function PercentResidualRadioButton_Callback(~, eventdata, handles)
+     drawPlots( handles,handles.selectedRow); 
+function LockYradiobutton_Callback(~, eventdata, handles)
+     drawPlots( handles,handles.selectedRow); 

@@ -43,7 +43,7 @@ a.ylabel = 'C_t';
 
 if IS_DYNAMIC
     tact = generateTACT(imlook4d_current_handles,imlook4d_ROI);  % ROIs
-    a.names = {'Click in cell'};
+    a.names = {''};
     a.units = {''};
     a.pars = {''};
     
@@ -55,6 +55,10 @@ if IS_DYNAMIC
         a.X{i} = tmid;
         a.Y{i} = tact(i,:);
     end
+    
+    % Store same data points in model (will be drawn as a line)
+    a.Xmodel = a.X;
+    a.Ymodel = a.Y;
     
     % Ref
     try
