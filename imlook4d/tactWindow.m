@@ -23,7 +23,7 @@ function varargout = modelWindow(varargin)
 
     % Edit the above text to modify the response to help tactWindow
 
-    % Last Modified by GUIDE v2.5 07-Sep-2018 16:59:05
+    % Last Modified by GUIDE v2.5 10-Sep-2018 16:09:07
 
     % Begin initialization code - DO NOT EDIT
 gui_Singleton = 0;
@@ -147,6 +147,7 @@ function drawPlots( handles,roinumber)
     try % May not be set first time
         previousRoiNumbernumber = getappdata(handles.tactWindow, 'previousRoiNumbernumber');
         previousMainXLim = getappdata(handles.tactWindow, 'previousMainXLim');
+        previousMainXTickLabel = getappdata(handles.tactWindow, 'previousMainXTickLabel');
         %previousMainYLim = getappdata(handles.tactWindow, 'previousMainYLim');
         %previousSecondXLim = getappdata(handles.tactWindow, 'previousSecondXLim');
         %previousSecondYLim = getappdata(handles.tactWindow, 'previousSecondYLim');
@@ -162,13 +163,13 @@ function drawPlots( handles,roinumber)
 
 
         try % Histogram
-            hist( handles.ROI_data_struct.pixels{roinumber}, ...
+            histogram( handles.ROI_data_struct.pixels{roinumber}, ...
                 'Parent', handles.mainAxes)
         catch
         end
 
         try % Histogram previous
-            hist( handles.ROI_data_struct.pixels{previousRoiNumbernumber}, ...
+            histogram( handles.ROI_data_struct.pixels{previousRoiNumbernumber}, ...
                 'Parent', handles.secondAxes)
         catch
         end
@@ -184,13 +185,11 @@ function drawPlots( handles,roinumber)
             
             if get(handles.lockedXradiobutton,'Value')
                 handles.mainAxes.XLim = previousMainXLim;
-                %handles.secondAxes.XLim = previousSecondXLim;
+                handles.secondAxes.XLim = previousSecondXLim;
+                
+                handles.mainAxes.XTickLabel = previousMainXLim;
             end
 
-            if get(handles.lockedYradiobutton,'Value')
-                handles.mainAxes.YLim = previousMainYLim;
-                handles.secondAxes.YLim = previousSecondYLim;
-            end
         catch
         end
         
@@ -210,8 +209,6 @@ function drawPlots( handles,roinumber)
     %
         handles.mainAxesRoiName.String = [ 'ROI = ' handles.roinames{roinumber} ];
         handles.secondAxesRoiName.String = [ 'ROI = ' handles.roinames{previousRoiNumbernumber} ];
-        %xlabel(handles.mainAxes,datastruct.xlabel);
-        %ylabel(handles.mainAxes,datastruct.ylabel);
         title(handles.mainAxes,'ROI pixel values');
         title(handles.secondAxes,'Previous ROI');
 
@@ -230,11 +227,29 @@ function drawPlots( handles,roinumber)
         if (previousRoiNumbernumber ~= roinumber)
             setappdata(handles.tactWindow, 'previousRoiNumbernumber', roinumber);
             setappdata(handles.tactWindow, 'previousMainXLim',handles.mainAxes.XLim);
-            %setappdata(handles.tactWindow, 'previousMainYLim',handles.mainAxes.YLim);
-            %setappdata(handles.tactWindow, 'previousSecondXLim',handles.secondAxes.XLim);
-            %setappdata(handles.tactWindow, 'previousSecondYLim',handles.secondAxes.YLim);
+            %setappdata(handles.tactWindow, 'previousMainXTickLabel',handles.mainAxes.XTickLabel);
         end
-        
+% Shading of Pressed Toolbar Buttons
+function pressedToggleButton( hObject)
+   if ismac
+       icon = hObject.CData;
+       hObject.UserData = icon; % Remember original icon
+
+       % Determine background from NaN in first dimension (which is
+       % what Matlab seems to use for built in togglebuttons)
+       background(:,:,3) = isnan( icon(:,:,1) );
+       background(:,:,2) = isnan( icon(:,:,1) );
+       background(:,:,1) = isnan( icon(:,:,1) );
+
+       newIcon = icon;
+       newIcon( background) = 0.8;
+
+       hObject.CData = newIcon;
+   end  
+function releasedToggleButton( hObject)
+    if ismac
+        hObject.CData = hObject.UserData;  % Restore
+    end
 %
 % Callbacks
 %
@@ -247,6 +262,17 @@ function lockedXradiobutton_Callback(~, ~, handles)
     roinumber = handles.selectedRow;
     setappdata(handles.tactWindow, 'previousMainXLim',handles.mainAxes.XLim);
     drawPlots( handles,roinumber)
-function lockedYradiobutton_Callback(hObject, eventdata, handles)
-    roinumber = handles.selectedRow;
-    drawPlots( handles,roinumber)
+
+
+% --------------------------------------------------------------------
+function uitoggletool1_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to uitoggletool1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function uitoggletool1_OnCallback(hObject, eventdata, handles)
+% hObject    handle to uitoggletool1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
