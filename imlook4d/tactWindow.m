@@ -29,8 +29,8 @@ function varargout = tactWindow(varargin)
 gui_Singleton = 0;
     gui_State = struct('gui_Name',       mfilename, ...
                        'gui_Singleton',  gui_Singleton, ...
-                       'gui_OpeningFcn', @modelWindow_OpeningFcn, ...
-                       'gui_OutputFcn',  @modelWindow_OutputFcn, ...
+                       'gui_OpeningFcn', @tactWindow_OpeningFcn, ...
+                       'gui_OutputFcn',  @tactWindow_OutputFcn, ...
                        'gui_LayoutFcn',  [] , ...
                        'gui_Callback',   []);
     if nargin && ischar(varargin{1})
@@ -44,7 +44,7 @@ gui_Singleton = 0;
     end
     % End initialization code - DO NOT EDIT
     dummy=1; % Dummy to hide when code folding
-function varargout = modelWindow_OutputFcn(~, ~, handles) 
+function varargout = tactWindow_OutputFcn(~, ~, handles) 
     % --- Outputs from this function are returned to the command line.
     % varargout  cell array for returning output args (see VARARGOUT);
     % hObject    handle to figure
@@ -55,7 +55,7 @@ function varargout = modelWindow_OutputFcn(~, ~, handles)
     varargout{1} = handles.output;
 
 % On Open    
-function modelWindow_OpeningFcn(hObject, ~, handles, ROI_data_struct, title, varargin)
+function tactWindow_OpeningFcn(hObject, ~, handles, ROI_data_struct, title, varargin)
 % --- Executes just before tactWindow is made visible.
     % This function has no output args, see OutputFcn.
     % hObject    handle to figure
@@ -101,19 +101,19 @@ function modelWindow_OpeningFcn(hObject, ~, handles, ROI_data_struct, title, var
 
         % If parameters exists, make row names into table side
         % If no parameters, write row names in table cells
-        if length(datastruct.names) > 0
-            handles.uitable.Data = [num2cell( cell2mat(datastruct.pars) )];
-            for i = 1:length(datastruct.names)
-                datastruct.names{i} = [datastruct.names{i} '|' datastruct.units{i} ];
-            end;
-            handles.uitable.ColumnName =  datastruct.names;
-            handles.uitable.RowName = roinames ;
-        else
+%         if length(datastruct.names) > 0
+%             handles.uitable.Data = [num2cell( cell2mat(datastruct.pars) )];
+%             for i = 1:length(datastruct.names)
+%                 datastruct.names{i} = [datastruct.names{i} '|' datastruct.units{i} ];
+%             end;
+%             handles.uitable.ColumnName =  datastruct.names;
+%             handles.uitable.RowName = roinames ;
+%         else
             handles.uitable.Data = roinames;
             datastruct.names = datastruct.names;
             handles.uitable.ColumnName =  {'ROI'};
             handles.uitable.ColumnWidth = {200, 'auto'};
-        end
+%         end
         
      % Set defaults
      setappdata(handles.tactWindow, 'previousRoiNumbernumber',1);

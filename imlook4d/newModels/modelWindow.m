@@ -88,19 +88,19 @@ function modelWindow_OpeningFcn(hObject, ~, handles, datastruct, roinames, title
 
         % If parameters exists, make row names into table side
         % If no parameters, write row names in table cells
-        if length(datastruct.names) > 0
-            handles.uitable.Data = [num2cell( cell2mat(datastruct.pars) )];
-            for i = 1:length(datastruct.names)
-                datastruct.names{i} = [datastruct.names{i} '|' datastruct.units{i} ];
-            end;
-            handles.uitable.ColumnName =  datastruct.names;
-            handles.uitable.RowName = roinames ;
-        else
+%         if length(datastruct.names) > 0
+%             handles.uitable.Data = [num2cell( cell2mat(datastruct.pars) )];
+%             for i = 1:length(datastruct.names)
+%                 datastruct.names{i} = [datastruct.names{i} '|' datastruct.units{i} ];
+%             end;
+%             handles.uitable.ColumnName =  datastruct.names;
+%             handles.uitable.RowName = roinames ;
+%         else
             handles.uitable.Data = roinames;
             datastruct.names = datastruct.names;
             handles.uitable.ColumnName =  {'ROI'};
             handles.uitable.ColumnWidth = {200, 'auto'};
-        end
+%         end
 
         
 
