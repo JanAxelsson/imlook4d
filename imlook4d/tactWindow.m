@@ -1,5 +1,5 @@
 % Standard GUIDE code
-function varargout = modelWindow(varargin)
+function varargout = tactWindow(varargin)
     % TACTWINDOW MATLAB code for tactWindow.fig
     %      TACTWINDOW, by itself, creates a new TACTWINDOW or raises the existing
     %      singleton*.
