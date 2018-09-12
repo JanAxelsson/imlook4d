@@ -1,7 +1,7 @@
 function out =  jjsrtm2( matrix, t, dt, Cr, k2p)
 
     % SRTM2 (Simplified Reference Tissue Model 2)
-    %
+    % (https://doi.org/10.1097/01.WCB.0000033967.83623.34)
     % Inputs:
     %   matrix = data with last dimension being frames (could be image matrix, or ROI values)
     %   t = frame start times in minutes

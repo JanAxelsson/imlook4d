@@ -1,6 +1,7 @@
 function out =  jjsrtm( matrix, t, dt, Cr)
 
     % SRTM (Simplified Reference Tissue Model)
+    % (https://doi.org/10.1006/nimg.1996.0066)
     %
     % Inputs:
     %   matrix = data with last dimension being frames (could be image matrix, or ROI values)

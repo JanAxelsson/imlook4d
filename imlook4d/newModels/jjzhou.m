@@ -1,6 +1,7 @@
 function out =  jjzhou( matrix, t, dt, Cr, range)
 
     % Reference Logan, Zhou method
+    % (https://doi.org/10.1016/j.neuroimage.2008.09.021)
     %
     % Inputs:
     %   matrix = data with last dimension being frames (could be image matrix, or ROI values)
