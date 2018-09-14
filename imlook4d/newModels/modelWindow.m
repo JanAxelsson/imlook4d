@@ -363,6 +363,14 @@ function export_curve_menu_Callback(hObject, eventdata, handles)
     catch
         disp('newTACT error -- time information missing?');
     end
+    
+    % If startTime and duration stored in extras
+    try
+        TACThandles.TACT.startTime = 60 * datastruct.extras.frameStartTime';
+        TACThandles.TACT.duration = 60 * datastruct.extras.frameDuration';
+    catch
+        
+    end
 
     % Statistics
     TACThandles.TACT.tact = cell2mat(datastruct.Y')'; % ROI value for each frame

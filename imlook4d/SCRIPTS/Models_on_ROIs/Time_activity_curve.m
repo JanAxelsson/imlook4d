@@ -51,6 +51,8 @@ if IS_DYNAMIC
     a.extras.N = NPixels;
     a.extras.stdev = stdev;
     a.extras.unit = imlook4d_current_handles.image.unit;
+    a.extras.frameStartTime = imlook4d_time / 60;
+    a.extras.frameDuration = imlook4d_duration / 60;
       
     n = size(tact,1);
     for i = 1:n
