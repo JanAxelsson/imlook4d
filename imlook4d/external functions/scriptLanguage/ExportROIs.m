@@ -95,7 +95,7 @@
             allIndecesToROI(:,j)=indecesToROI+(j-1)*offset;
         end
         
-        roiPixels = imlook4d_Cdata(allIndecesToROI);
+        roiPixels = double( imlook4d_Cdata(allIndecesToROI) );
 
 % Same as before:        
         
