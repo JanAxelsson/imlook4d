@@ -2081,20 +2081,20 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 [x,y]= ginput(2);
                 
                 
-                % side in mm
+                % side in pixels
                 dx = x(2) - x(1);
                 dy = y(2) - y(1);
-                length  = sqrt( dx^2 + dy^2 ); % length in mm
+                pixels  = sqrt( dx^2 + dy^2 ); % length in pixels
                 
-                % side in pixels
+                % side in mm
                 try
-                    px = dx * handles.image.pixelSizeX;
-                    py = dy * handles.image.pixelSizeY;
+                    dx_mm = dx * handles.image.pixelSizeX;
+                    dy_mm = dy * handles.image.pixelSizeY;
                 catch
-                    px = dx;
-                    py = dy;
+                    dx_mm = dx;
+                    dy_mm = dy;
                 end
-                pixels = sqrt( px^2 + py^2 ); % length in pixels
+                length = sqrt( dx_mm^2 + dy_mm^2 ); % length in pixels
                 
                 msg = [ 'Length = ' num2str( length) ' mm    (' num2str( pixels) ' pixels long)'];
                 disp( msg);
