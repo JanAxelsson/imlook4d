@@ -1,4 +1,4 @@
-function [activity, NPixels, stdev, maxActivity]=generateTACT(handles,ROI3D, roisToCalculate)
+function [activity, NPixels, stdev, maxActivity, roisToCalculate ]=generateTACT(handles,ROI3D, roisToCalculate)
 %function [activity, NPixels]=generateTACT(handles,image4D,ROI3D)
     %
     % This function generates a TACT curve.
@@ -17,13 +17,31 @@ function [activity, NPixels, stdev, maxActivity]=generateTACT(handles,ROI3D, roi
     %    NPixels        - number of pixels in roi [roi]
     %    stdev            - standard deviation of pixels in ROI [roi, frame]
     %    maxActivity    - max activity in ROI
+    %    roisToCalculate - report back one of: 
+    %       a) input argument roisToCalculate from the input argument
+    %       b) roi values that existed in ROI matrix
     %
     %disp('Entered generateTACT');
             % image4D = handles.image.Cdata
             numberOfSlices=size(handles.image.Cdata,3);
             numberOfFrames=size(handles.image.Cdata,4);
-            %numberOfROIs=max(ROI3D(:));
-            numberOfROIs=length( get(handles.ROINumberMenu,'String'))-1;
+            
+            try
+                numberOfROIs=length( get(handles.ROINumberMenu,'String'))-1;
+            catch
+                roinumbers =  unique(ROI3D(:));
+                roinumbers =  roinumbers( roinumbers ~= 0 ); % Exclude 0
+                numberOfROIs = length(roinumbers);
+            end
+            
+                        
+            if nargin < 3
+                roinumbers =  unique(ROI3D(:));
+                roinumbers =  roinumbers( roinumbers ~= 0 ); % Exclude 0
+                roisToCalculate = roinumbers;
+            end
+            
+            
             tempData=zeros(size(handles.image.Cdata),'single');
             
             % Determine what slices contain a ROI
@@ -31,10 +49,7 @@ function [activity, NPixels, stdev, maxActivity]=generateTACT(handles,ROI3D, roi
             slicesWithRoi=slicesWithRoi(:);     % row index is slice number.
             indecesWithRoi=find(slicesWithRoi>0);
 
-            
-            if nargin < 3
-                roisToCalculate = 1:numberOfROIs;
-            end
+
                         
             % Generate 4D image ONLY for slices with ROIs (zero for other slices)
             % This is to speed up calculations!
@@ -62,10 +77,11 @@ function [activity, NPixels, stdev, maxActivity]=generateTACT(handles,ROI3D, roi
 
 
             % Calculate TACT for each ROI
-             for i=roisToCalculate
+             for i= 1:length(roisToCalculate)
+                 roiValue = roisToCalculate(i);
                  %disp(i)
                     % Determine indeces to Cdata matrix for this ROI 
-                    indecesToROI=find(ROI3D==i);        % from ROI definition
+                    indecesToROI=find(ROI3D==roiValue);        % from ROI definition
                     NPixels(i)=size(indecesToROI,1);    % Number of pixels in ROI i
                     offset=size(ROI3D(:),1 );           % offset to next frame (number of pixels in volume)
                     allIndecesToROI=zeros(size(indecesToROI,1),numberOfFrames); % place for indeces in all frames
