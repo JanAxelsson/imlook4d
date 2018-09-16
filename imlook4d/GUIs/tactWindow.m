@@ -23,7 +23,7 @@
 
         % Edit the above text to modify the response to help tactWindow
 
-        % Last Modified by GUIDE v2.5 10-Sep-2018 16:09:07
+        % Last Modified by GUIDE v2.5 16-Sep-2018 22:39:33
 
         % Begin initialization code - DO NOT EDIT
     gui_Singleton = 0;
@@ -255,4 +255,3 @@ function lockedXradiobutton_Callback(~, ~, handles)
     roinumber = handles.selectedRow;
     setappdata(handles.tactWindow, 'previousMainXLim',handles.mainAxes.XLim);
     drawPlots( handles,roinumber)
-

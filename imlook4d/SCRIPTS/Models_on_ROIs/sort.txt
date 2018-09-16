@@ -1,7 +1,6 @@
 Select_Reference_ROIs_.m
 ---
 #Simple
-Time_activity_curve.m
 Ratio.m
 ---
 #Receptor_studies_(Reference_tissue)_:
@@ -15,9 +14,4 @@ Patlak.m
 ---
 #Flow_(Reference_tissue)_:
 Water_DoubleIntegral.m
----
-#Old_:
-Irreversible_binding__Patlak_ROI_regional_curves.m
-Reversible_binding__Logan_ROI_regional_curves.m
-Reversible_binding__Zhou_ROI_regional_curves.m
 

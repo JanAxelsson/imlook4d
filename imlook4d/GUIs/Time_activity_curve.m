@@ -43,9 +43,9 @@ a.ylabel = 'C_t';
 
 if IS_DYNAMIC
     [tact, NPixels, stdev, maxActivity, roisToCalculate ] = generateTACT(imlook4d_current_handles,imlook4d_ROI);  % ROIs
-    a.names = {''};
-    a.units = {''};
-    a.pars = {''};
+    a.names = {};
+    a.units = {};
+    a.pars = {};
     
     % Store for use in SaveTact, when called from modelWindow
     a.extras.N = NPixels;
