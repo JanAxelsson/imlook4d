@@ -778,7 +778,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
             %
             % Make HELP menu (let it display at far right)
             %
-                 set(handles.HelpMenu,'Position',8);
+                 set(handles.HelpMenu,'Position',7);
                  %disp('HELP menu')
 
                  
@@ -6863,132 +6863,6 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         % zoom(ratio)    
             zoom out                                           % Zoom to initial state
             zoom(eval(handles.image.zoomFactorFormula) );      % Zoom factor
-
-    % --------------------------------------------------------------------
-    % IMTOOLS 
-    % -------------------------------------------------------------------- 
-    function imHistogram_Callback(hObject, eventdata, handles)
-       % Display HELP and get out of callback
-             if DisplayHelp(hObject, eventdata, handles) 
-                 return 
-             end
-           
-        myhistogram(handles,1)
-    function imProfile_Callback(hObject, eventdata, handles)
-       % Display HELP and get out of callback
-             if DisplayHelp(hObject, eventdata, handles) 
-                 return 
-             end
-           
-        improfile;
-    function MontageFrames_Callback(hObject, eventdata, handles)
-       % Display HELP and get out of callback
-             if DisplayHelp(hObject, eventdata, handles) 
-                 return 
-             end
-           
-    % Graph images
-
-        % Initialize
-            slice=round(get(handles.SliceNumSlider,'Value'));
-            frame=round(get(handles.FrameNumSlider,'Value')); 
-            numberOfFrames=size(handles.image.Cdata,4);
-
-        % Figure
-            scrsz = get(0,'ScreenSize');    %screen coordinates, [left bottom width height]
-            figure('Name', ['Montage (slice=' num2str(slice) ')'],...
-                'Position',[150 40 scrsz(3)-180 scrsz(4)-100]);
-
-            NCols=5;NRows=ceil(numberOfFrames/NCols);
-            GI=1;
-                            
-                
-            for i=1:numberOfFrames  
-                subplot(NRows,NCols,GI), imagesc (handles.image.Cdata(:,:,slice,i)); title(['Frame ' num2str(i)],'fontsize',6);GI=GI+1;  
-                
-                pos = get(gca,'position');set(gca,'position',[pos(1) pos(2) pos(3)*1.2  pos(4)*1.2]); % Make width and height larger
-                
-                axis('off');
-                colormap(jet);
-            end
-    function MontageSlices_Callback(hObject, eventdata, handles)
-       % Display HELP and get out of callback
-             if DisplayHelp(hObject, eventdata, handles) 
-                 return 
-             end
-
-
-        % Initialize
-            slice=round(get(handles.SliceNumSlider,'Value'));
-            frame=round(get(handles.FrameNumSlider,'Value')); 
-            numberOfSlices=size(handles.image.Cdata,3);
-
-        % Figure
-            scrsz = get(0,'ScreenSize');    %screen coordinates, [left bottom width height]
-            figure('Name', ['Montage (frame=' num2str(frame) ')'],...
-                'Position',[150 40 scrsz(3)-180 scrsz(4)-100]);
-
-
-
-            NCols=8;NRows=ceil(numberOfSlices/NCols);
-            GI=1;     
-                
-            for i=1:numberOfSlices  
-                subplot(NRows,NCols,GI), imagesc (handles.image.Cdata(:,:,i,frame)); title(['Slice ' num2str(i)],'fontsize',6);GI=GI+1;  
-                
-                pos = get(gca,'position');set(gca,'position',[pos(1) pos(2) pos(3)*1.1  pos(4)*1.1]); % Make width and height larger
-                
-                axis('off');
-                colormap(jet);
-                
-            end
-            
-           
-            
-            
-            %
-            %TRIAL
-            %
-                rememberSlice=round(get(handles.SliceNumSlider,'Value'));
-
-%                 for i=1:numberOfSlices  % Flip through slices
-%                             set(handles.SliceNumSlider,'Value',i);
-%                             updateImage(hObject, eventdata, handles);
-%                 end
-%
-%                 set(handles.SliceNumSlider,'Value',rememberSlice);          % Restore
-
-
-                % Figure
-                scrsz = get(0,'ScreenSize');    %screen coordinates, [left bottom width height]
-                figure('Name', ['TEST Montage (frame=' num2str(frame) ')'],...
-                    'Position',[150 40 scrsz(3)-180 scrsz(4)-100]);
-
-
-
-                NCols=7;NRows=ceil(numberOfSlices/NCols);
-                GI=1;     
-
-                for i=1:numberOfSlices  
-                    set(handles.SliceNumSlider,'Value',i);
-                    updateImage(hObject, eventdata, handles);
-                    colorbar('fontsize',6);
-
-                    tempData=get(handles.ImgObject,'Cdata');
-
-                    subplot(NRows,NCols,GI), imagesc(tempData); title(['Slice ' num2str(i)],'fontsize',6);GI=GI+1;  
-
-                    pos = get(gca,'position');set(gca,'position',[pos(1) pos(2) pos(3)*1.1  pos(4)*1.1]); % Make width and height larger
-
-                    axis('off');
-                    %colormap(jet);
-                    
-                end
-                
-                colorbar('fontsize',6); %Needed to update last colorbar
-                drawnow;
-                
-                set(handles.SliceNumSlider,'Value',rememberSlice);          % Restore   
                 
     % --------------------------------------------------------------------
     % WORKSPACE 
