@@ -2,17 +2,30 @@ TODO
 =====
 
 DEVELOP
+[ok]   Move new MODELS to MODELS menu
+[ok]   Save time-activity to different formats from tactWindow window (especially sif and pmod)
+[  ]   Move Time-activity from "Models on ROIs" to TACT button (after above)
+
+[ok]   PROBLEM -- short frames (GE water scans) have T and dT that does not add up.  How to solve?
+	   Maybe save Tstart and dT as well as midtimes for models?
+	   
+[  ]   Keep old models.  Idea, keep logan.m etc, and make new files jlogan.m for the new models.	   
+
+
 [  ]   HELP files for models 
 
 [  ]   Add Models for  clearance
+[  ]   Add Patlak for images
 [  ]   Vectorize SRTM, SRTM2 (possible?)
+
+[  ]   Make mask, allowing models on images to work better
 
 WISHLIST
 [  ]   TACT window as Model Window, but 
-		- with histogram for marked ROI and Frame
+ok		- with histogram for marked ROI and Frame
 		- must be on one frame (how to select frame in dynamic ?)
-		- Hide time-activity plot if static scan
-		- Include SAVE tact to file, as in TACT-button
+ok		- Hide time-activity plot if static scan
+ok		- Include SAVE tact to file, as in TACT-button
 		- When everything included from old TACT-window, link this to TACT button
 
 [  ]   make column widths optimal to fit more.

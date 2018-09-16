@@ -1,4 +1,4 @@
-function out =  jjwater_doubleintegralmethod( matrix, t, dt, Ct1)
+function out =  jjwater_doubleintegralmethod( matrix, t, dt_in, Ct1)
 
     % PET Water - double integral method
     %
@@ -44,7 +44,7 @@ function out =  jjwater_doubleintegralmethod( matrix, t, dt, Ct1)
     end
     
     % time
-    tmid = t + 0.5 * dt;
+    tmid = t + 0.5 * dt_in;
     dt      = [tmid(1), tmid(2:length(tmid))-tmid(1:length(tmid)-1)];
 
     
@@ -138,6 +138,12 @@ function out =  jjwater_doubleintegralmethod( matrix, t, dt, Ct1)
         out.Xref = out.X{i};
         out.Yref = Ct1;
     end
+    
+    % NOTE: There is not enough information for short water scans on GE
+    % scanner, where the T and dT:s don't add up.
+    % Store for use in SaveTact, when called from modelWindow
+    out.extras.frameStartTime = t;
+    out.extras.frameDuration = dt_in;
     
     % --------
     % Clean up

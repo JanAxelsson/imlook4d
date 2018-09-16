@@ -1076,10 +1076,10 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 label = nameWithSpaces;
                 tag = nameWithSpaces;
                 
-                % Special for MODEL menu
-                if strcmp( get(parentMenuHandle, 'Label'), 'MODELS')
-                    callBack = [name '_control(gcbo)']; % For Models
-                end
+%                % Special for OLD MODEL menu
+%                 if strcmp( get(parentMenuHandle, 'Label'), 'MODELS')
+%                     callBack = [name '_control(gcbo)']; % For Models
+%                 end
                                 
                 % Special for COLOR menu
                 if strcmp( get(parentMenuHandle, 'Label'), 'Color')
@@ -1164,7 +1164,6 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 % --------------------------------------------------------------------
 % GUI CREATION, this is where a GUI is defined
 % --------------------------------------------------------------------
-  
 
     function SliceNumSlider_CreateFcn(hObject, eventdata, handles)
         % hObject    handle to SliceNumSlider (see GCBO)
@@ -2233,7 +2232,6 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         
 
         set(handles.PC_high_edit,'String',num2str(NewVal));
-        %updateImage(hObject, eventdata, handles)                   
         
         
     % --------------------------------------------------------------------
@@ -2581,14 +2579,6 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
     % --------------------------------------------------------------------
     % BUTTONS
     % --------------------------------------------------------------------
-    function TACT_Callback(hObject, eventdata, handles)
-       % Display HELP and get out of callback
-             if DisplayHelp(hObject, eventdata, handles) 
-                 return 
-             end
-             
-        %TACT(hObject, eventdata, handles);
-        newTACT(hObject, eventdata, handles); 
     function clearROI_Callback2(hObject, eventdata, handles)
        % Display HELP and get out of callback
              if DisplayHelp(hObject, eventdata, handles) 
@@ -2606,7 +2596,6 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
          updateImage(hObject, eventdata, handles); 
          updateROIs(handles);
-   
          
     % --------------------------------------------------------------------
     % SELECTIONS
@@ -3117,8 +3106,6 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             set(handles.orientationMenu,'Value',1);
             handles = setOrientation(handles, 1);            
 
-
-     
     % --------------------------------------------------------------------
     % ROI drawing functions
     % --------------------------------------------------------------------
@@ -9012,183 +8999,6 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
            colors = get(0,'DefaultAxesColorOrder'); % Matrix with colors in rows 1-7
            colorIndex = mod(index, size(colors,1))+1;
            color = colors(colorIndex,:);
-        function activity=newTACT(hObject, eventdata, handles)
-            %
-            % Initialize
-            %
-                contents = get(handles.ROINumberMenu,'String'); % Cell array  
-                numberOfROIs=size(contents,1)-1;
-                numberOfFrames=size(handles.image.Cdata,4);
-                numberOfSlices=size(handles.image.Cdata,3);
-                
-                IsPCImage=get(handles.PCImageRadioButton,'Value');      % PC images radio button selected
-                IsResidualImage=get(handles.ResidualRadiobutton,'Value'); % Redisual image radio button selected
-
-            %
-            % Plot TACT curve
-            %  
-                try
-                    [activity, NPixels, stdev]=generateTACT(handles, handles.image.ROI);
-                catch
-                    % NEW version 
-                    [activity, NPixels, stdev]=generateTACT_new(handles, handles.image.ROI);
-                end
-                
-%                 % Use ExportROI script internally
-%                 imlook4d_current_handle=hObject;
-%                 imlook4d_current_handles=handles;
-%                 imlook4d_Cdata=handles.image.Cdata;
-%                 imlook4d_ROI=handles.image.ROI;
-%                 imlook4d_frame=round(get(handles.FrameNumSlider,'Value')); 
-%                 ExportROIs
-%                 % Data now in imlook4d_ROI_data
-
-%                 tic
-%                     [activity2, NPixels2, stdev2]=generateTACT(handles, handles.image.ROI);
-%                 toc;tic
-%                     % NEW version 
-%                     [activity, NPixels, stdev]=generateTACT_new(handles, handles.image.ROI);
-%                 toc  
-% 
-%                 disp([activity2', activity',stdev', stdev2' ]);
-%                 disp([NPixels2', NPixels']);
-
-
-                windowTitle=['TACT: ' get(handles.figure1, 'Name')];
-                h=figure('Name', windowTitle,'NumberTitle' ,'off');
-  
-
-                %%for i=1:numberOfROIs
-                for i=find(handles.image.VisibleROIs)   
-                    disp([num2str(i) '   ' contents{i}])
-
-                        if not(IsPCImage)
-                            try
-                                timeScale=handles.image.time;
-
-                                timeScale=timeScale(1,1:size(activity,2));  % Make as many x-axis items as there are activity items
-                                
-                                duration=handles.image.duration;
-
-                            catch
-                                timeScale=1:numberOfFrames;
-                                duration=zeros(size(timeScale));  % Set duration to zero if not known
-                            end
-                        end
-
-                    % Plot current ROI
-                       try
-                            plot( timeScale/60, activity(i,:) , '-o', 'MarkerSize',3);
-                            %plot( timeScale, stdev(i,:) , '-o', 'MarkerSize',3);
-                            hold all
-                            xlabel('Time [min]');
-                            ylabel('Intensity');
-                       catch
-                           plot( activity(i,:) , '-o', 'MarkerSize',3);
-                           hold all
-                           xlabel('Frame number');
-                           ylabel('Intensity');
-                       end
-
-                end
-
-            %
-            % Adjust labels
-            %
-                if IsPCImage
-                    xlabel('Principal component number');
-                end
-                                            
-            %
-            % Adjust axis
-            %
-            try
-                haxis=get(h,'CurrentAxes');
-                temp=get(haxis,'YLim');
-                
-                YLow=temp(1);
-                YHigh=temp(2);
-            catch
-            end
-                
-%                 if ~IsResidualImage      % NOT residual radio button selected
-%                     set(haxis,'YLim', [0 YHigh])
-%                 end
-                
-                if min(activity(:))<0      % If negative values, display whole range
-                    set(haxis,'YLim', [YLow YHigh])
-                end
-            %
-            % Add legend to TACT curve
-            %
-
-                % Number of pixels
-                %for i=1:numberOfROIs 
-                j=1;
-                for i=find(handles.image.VisibleROIs)  
-                    newContents{j}=[contents{i} ' (' num2str(NPixels(i)) ' pixels)' ]; % Add pixel count to legend
-                    j=j+1;
-                end
-
-                %Legend  (TeX formatting off)
-                legend(newContents(1:end),'Interpreter','none');  
-
-           %
-           % Output for different file formats
-           %
-                % Cover case where for instance a parametric image is
-                % displayed and the durations are kept for future reference
-                frameNumbers=1:size(activity,2);
-                if size( frameNumbers,2)==1
-                    duration=duration(1,1);
-                end
-
-                
-                %
-                % Make struct to export to button
-                % 
-                
-                contents = get(handles.ROINumberMenu,'String')'; % Cell array
-                contents={ contents{1:(end-1)}}; % Put "Add ROI" last
-               TACThandles = [];
-               
-               TACThandles.record = handles.record;
-               
-               TACThandles.TACT.roiNames = contents;
-               
-               
-               TACThandles.image = handles.image;
-                
-               TACThandles.TACT.frameNumber = frameNumbers';
-                try
-               TACThandles.TACT.startTime = timeScale';
-               TACThandles.TACT.midTime = (timeScale + duration / 2 )';
-               TACThandles.TACT.duration = duration';
-                catch
-                    disp('newTACT error -- time information missing?');
-                end
-               TACThandles.TACT.tact = activity';
-               TACThandles.TACT.std = stdev';
-               TACThandles.TACT.pixels = NPixels'; 
-                                
-                % Add save button to figure
-%                 btn = uicontrol('Style', 'pushbutton', 'String', 'TACT to file',...
-%                     'Position', [20 20 80 20],...
-%                     'Callback', {@SaveTactToFile,TACThandles}); 
-
-                guidata(h,TACThandles);  % Store struct in figure window (equivalent ot how handles is stored in imlook4d)
-                
-                btn = uicontrol('Style', 'pushbutton', 'String', 'TACT to file',...
-                    'Units', 'normalized', ...
-                    'Position', [0.80 0.01 0.15 0.05],...
-                    'BackgroundColor', 'yellow', ...
-                    'Callback', 'SaveTactToFile(gcf, {},guidata(gcf))' ); 
-                    %'Callback', {@SaveTactToFile,TACThandles} ); 
- 
-            %
-            % Move TACT plot to top
-            %
-                set(h,'Visible','on');   
         function save_cellarray(cellarr, filename, header, latex)
             % function save_cellarray(cellarr, filename, header, latex)
             %
