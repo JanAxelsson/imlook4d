@@ -1043,6 +1043,9 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
         lineOnOff = 'off';
         for j=1:length(menuItemNames)
             [pathstr,name,ext] = fileparts(menuItemNames{j});
+            if isempty(name)
+               name = pathstr(1:end-1);  % Fix for older Matlab 
+            end
             
             % Make line separator above next item
             if startsWith( name, '---')
@@ -2095,7 +2098,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 end
                 length = sqrt( dx_mm^2 + dy_mm^2 ); % length in pixels
                 
-                msg = [ 'Length = ' num2str( length) ' mm    (' num2str( pixels) ' pixels long)'];
+                % angle in degrees
+                angle_degrees = atan2d( dy,dx   );
+                
+                msg = [ 'Length = ' num2str( length) ' mm (' num2str( pixels) ' pixels long).  Angle = ' num2str(angle_degrees) ' degrees'];
                 disp( msg);
                 displayMessageRow(msg)
                 
@@ -2914,7 +2920,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             contents = {contents{end}}; % Remove all but 'Add ROI'
             set(handles.ROINumberMenu,'String', contents)
             set(handles.ROINumberMenu,'Value', 1)
-            handles.image.ROI(:) = 0;
+            handles.image.ROI = zeros( size( handles.image.Cdata(:,:,:,1))) ;
             
             handles.image.VisibleROIs = [];
             handles.image.LockedROIs = [];
@@ -9183,6 +9189,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 flag = true; 
               end
             disp(['isMultipleCall depth=' num2str(numel(s))]);       
+        function ok = startsWith( s1, s2)
+            % Replaces default startsWidh (allowing imlook4d prior to 2016b
+            % to work)
+            n = min( length(s1), length(s2));
+            ok = strncmpi(s1,s2,n);
             
 % Dummy function to override duration from timefun toolbox in Matlab 2014b
         function duration ()
