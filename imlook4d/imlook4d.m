@@ -2108,7 +2108,39 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 line( x,y,'ButtonDownFcn','delete(gcbo)','LineWidth',3);
                 
                 releasedToggleButton( hObject);
-                
+
+    function rotateToggleButtonOn_ClickedCallback(hObject, eventdata, handles)
+       % Display HELP and get out of callback
+       if DisplayHelp(hObject, eventdata, handles)
+           set(hObject,'State', 'on')
+           return
+       end
+       
+       pressedToggleButton( hObject);
+       
+       h = rotate3d( handles.axes1);
+       h.Enable = 'on';
+       
+       h.ActionPostCallback = '[az,el] = view; view(az,90) '; % Reset elevation (rotate only in plane)
+       camzoom(1)
+
+    function rotateToggleButtonOff_ClickedCallback(hObject, eventdata, handles)
+       % Display HELP and get out of callback
+       if DisplayHelp(hObject, eventdata, handles)
+           set(hObject,'State', 'off')
+           return
+       end
+       
+       releasedToggleButton( hObject);
+       
+       [az,el] = view;
+       handles.image.Cdata = imrotate( handles.image.Cdata, - az, 'bilinear','crop');
+       view(0,90)
+       rotate3d off
+       guidata( handles.figure1,handles);
+       
+       updateImage(handles.figure1, [], handles);
+            
    % Shading of Pressed Toolbar Buttons
        function pressedToggleButton( hObject)
            if ismac

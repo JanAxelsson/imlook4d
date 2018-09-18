@@ -1,0 +1,18 @@
+<h1>Rotate Tool </h1>
+<HR></HR>
+<!------------------->
+	<P>
+		This tools starts an interactive rotation in the plane.  It is activated by pressing the rotate button.  You need to apply the rotation for the image rotation to be implemented.
+	</P>
+
+	<P>
+		Right-click on the image gives an option to reset the view.  Do this if you wish to keep the image as it was.
+	</P>
+	<P>
+		The rotation is applied to the image first when the button is toggled off.  This cannot be un-done.
+	</P>
+	
+	<P>
+		NOTE: each applied rotation will degrade the image.  It is therefore advisable to perform maximum one rotation in each Axial, Coronal and Sagital plane.
+	</P>
+	
