@@ -2,6 +2,10 @@ TODO
 =====
 
 DEVELOP
+[  ]  Saved ROI with locks does not display locks when opened
+[  ]  View / Background image add -- fails on NM-CT.  CT is lost, or takes forever
+
+
 [ok]   Move new MODELS to MODELS menu
 [ok]   Save time-activity to different formats from tactWindow window (especially sif and pmod)
 [ok]   Move Time-activity from "Models on ROIs" to TACT button (after above)
@@ -20,12 +24,8 @@ DEVELOP
 [  ]   Make mask, allowing models on images to work better
 
 WISHLIST
-[  ]   TACT window as Model Window, but 
-ok		- with histogram for marked ROI and Frame
-		- must be on one frame (how to select frame in dynamic ?)
-ok		- Hide time-activity plot if static scan
-ok		- Include SAVE tact to file, as in TACT-button
-		- When everything included from old TACT-window, link this to TACT button
+[  ]   interactive min and max level settings
+[  ]   measure tool, make handles on line to adjust
 
 [  ]   make column widths optimal to fit more.
 

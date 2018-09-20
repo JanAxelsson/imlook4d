@@ -499,13 +499,18 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
           end
           
      % Slice spacing
-           try
-            out2=dirtyDICOMHeaderData(header, i, '0018', '0050',mode);
-            sliceSpacing=str2num(out2.string);  %
-          catch   
-             %sliceSpacing=-1
-             sliceSpacing=1
-           end    
+             try
+                 out2=dirtyDICOMHeaderData(header, i, '0018', '0088',mode); % Spacing Between Slices
+                 sliceSpacing=str2num(out2.string);  %
+             catch
+                 try
+                     out2=dirtyDICOMHeaderData(header, i, '0018', '0050',mode); % Slice Thickness
+                     sliceSpacing=str2num(out2.string);  %
+                 catch
+                     %sliceSpacing=-1
+                     sliceSpacing=1
+                 end
+             end
           
            
            % ImagePosition
@@ -522,6 +527,35 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                    imagePosition{i}=[0; 0; 0];
                end
            end
+           
+           %
+           % NM special
+           %
+           if strcmp( 'NM', modality)
+               out=dirtyDICOMHeaderData(headers, 1, '0028', '0009',guessedMode); % Frame increment pointer
+               tag = [ uint8_to_hex( out.bytes(2)) uint8_to_hex( out.bytes(1)) uint8_to_hex( out.bytes(4)) uint8_to_hex( out.bytes(3))];
+               
+               if strcmp('00540080', tag) % Slice Vector
+                   
+                   % Create slice positions
+                       for i=1:lastIndex;
+                           try
+                               pos = imagePosition{i};
+                               x = pos(1);
+                               y = pos(2);
+                               z = pos(3) + (i-1) * sliceSpacing;
+                               imagePosition{i}=[x; y; z];
+                           catch
+                           end
+                       end
+
+               end
+           end
+               
+               
+               
+           
+           
            
 %            % PatientOrientation
 %             %(0020,0037) DS #14 [-1\0\0\0\-1\0] Image Orientation (Patient)
@@ -567,7 +601,7 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
             outputStruct.modality=modality;
             outputStruct.pixelSizeX=pixelSizeX;
             outputStruct.pixelSizeY=pixelSizeY;
-            outputStruct.sliceSpacing=sliceSpacing;
+            outputStruct.sliceSpacing=abs(sliceSpacing);
             outputStruct.imagePosition=imagePosition;
             outputStruct.orientation=outputStruct;
             try

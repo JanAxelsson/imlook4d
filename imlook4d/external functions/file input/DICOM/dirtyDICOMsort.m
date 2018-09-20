@@ -106,10 +106,13 @@
                   %  indexlist(i,3)=str2num(out.string);
                  % catch
                       try
-                        out=dirtyDICOMHeaderData(sortedHeaders, i, '0020', '0032',mode);  % Position
-                        str=out.string;
-                        temp=strfind(str,'\'); 
-                        indexlist(i,3)=str2num( str(temp(2)+1:end));  %
+%                         out=dirtyDICOMHeaderData(sortedHeaders, i, '0020', '0032',mode);  % Position
+%                         str=out.string;
+%                         temp=strfind(str,'\'); 
+%                         indexlist(i,3)=str2num( str(temp(2)+1:end));  %
+
+                          pos = DICOMStruct.imagePosition{i};
+                          indexlist(i,3) = pos(3); 
                         
                       catch
                         indexlist(i,3)=0;   
