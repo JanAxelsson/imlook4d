@@ -2105,9 +2105,38 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 disp( msg);
                 displayMessageRow(msg)
                 
-                line( x,y,'ButtonDownFcn','delete(gcbo)','LineWidth',3);
+                %line( x,y,'ButtonDownFcn','delete(gcbo)','LineWidth',3);
+                h = imline( gca,x,y);
+                callback = [ 'msg = [ ''Length = '' num2str( length) '' mm ('' num2str( pixels) '' pixels long).  Angle = '' num2str(angle_degrees) '' degrees''];' ...
+                    'imlook4d( ''displayMessageRow'', msg)' ];
+
+                %addNewPositionCallback(h, @(p) disp(mat2str(p,3)));
+                addNewPositionCallback(h, @(p) displayLineCoordinates( p) );
                 
                 releasedToggleButton( hObject);
+        function displayLineCoordinates( pos)
+            disp(mat2str(pos,3))
+            dx = pos(1,1) - pos(1,2);
+            dy = pos(2,1) - pos(2,2);
+            
+                            pixels  = sqrt( dx^2 + dy^2 ); % length in pixels
+                
+                % side in mm
+                try
+                    dx_mm = dx * handles.image.pixelSizeX;
+                    dy_mm = dy * handles.image.pixelSizeY;
+                catch
+                    dx_mm = dx;
+                    dy_mm = dy;
+                end
+                length = sqrt( dx_mm^2 + dy_mm^2 ); % length in pixels
+                
+                % angle in degrees
+                angle_degrees = atan2d( dy,dx   );
+                
+                msg = [ 'Length = ' num2str( length) ' mm (' num2str( pixels) ' pixels long).  Angle = ' num2str(angle_degrees) ' degrees'];
+                disp( msg);
+                displayMessageRow(msg)
 
     function rotateToggleButtonOn_ClickedCallback(hObject, eventdata, handles)
        % Display HELP and get out of callback
