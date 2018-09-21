@@ -6028,24 +6028,39 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             
                             
                         % If multiple images in one dicom file, reshape
-                            %if size(fileNames,2)~=size( unique(fileNames),2 )   % Multiple images in the same file is characterized by having the same file name for each slice
                             if size( unique(fileNames),2 )==1   % Multiple images in the same file is characterized by having the same file name for each slice
-                              %matrix=matrix(:);
                               
-                              % If Detectors column was opene into slice
-                              % column, then exchange back
-                              
-                                 % NM (0054,0021) US #2 [2] Number of Detectors
-                                 try 
-                                     numberOfDetectorsInScan=dirtyDICOMHeaderData(handles.image.dirtyDICOMHeader, 1,'0054', '0021',mode); 
-                                     numberOfDetectors=numberOfDetectorsInScan.bytes(1)+256*numberOfDetectorsInScan.bytes(2);
-                                 catch
-                                     numberOfDetectors=1; 
-                                 end   
-                                 if (numberOfDetectors == numberOfSlices) % Assume detectors in 3d column
-                                    matrix = reshape( matrix, rows, cols, [], numberOfFrames); 
-                                    matrix = permute( matrix, [1 2 5 4 3]);  % swap back to what is whas in original Dicom file
-                                 end
+%                               % If Detectors column was opene into slice
+%                               % column, then exchange back
+%                               
+%                                  % NM (0054,0021) US #2 [2] Number of Detectors
+%                                  try 
+%                                      numberOfDetectorsInScan=dirtyDICOMHeaderData(handles.image.dirtyDICOMHeader, 1,'0054', '0021',mode); 
+%                                      numberOfDetectors=numberOfDetectorsInScan.bytes(1)+256*numberOfDetectorsInScan.bytes(2);
+%                                  catch
+%                                      numberOfDetectors=1; 
+%                                  end   
+%                                  if (numberOfDetectors == numberOfSlices) % Assume detectors in 3d column
+%                                     matrix = reshape( matrix, rows, cols, [], numberOfFrames); 
+%                                     matrix = permute( matrix, [1 2 5 4 3]);  % swap back to what is whas in original Dicom file
+%                                  end
+
+                                % Assume same order as displayed
+                                % Allow only changing number of slices
+                                
+                                % Change Slices vector if exist
+                                numberOfSlices = size(matrix,3);
+                                try
+                                    out0=dirtyDICOMHeaderData(headers, 1, '0054', '0080',mode,2); % Slice vector
+                                    newString = out0.string( 1 : 2*numberOfSlices);
+                                    headers{1} = dirtyDICOMModifyHeaderString( headers{1}, '0054', '0080',mode, newString, 2); % Occurs first in '00280009' Frame increment pointer
+
+                                    headers{1} = dirtyDICOMModifyHeaderUS(headers{1}, '0054', '0081',mode, numberOfSlices)
+                                catch
+                                    disp('Error modifying slice vector');
+                                end
+                                
+                                
                                  
                                  matrix=matrix(:);
 
