@@ -2,10 +2,8 @@ TODO
 =====
 
 DEVELOP
-[  ]  Saved ROI with locks does not display locks when opened
-[  ]  View / Background image add -- fails on NM-CT.  CT is lost, or takes forever
-
-
+[  ]  Saved ROI with locks does not display locks when opened.  COULD NOT REPRODUCE
+[ok]  View / Background image add -- fails on NM-CT.  CT is lost, or takes forever
 [ok]   Move new MODELS to MODELS menu
 [ok]   Save time-activity to different formats from tactWindow window (especially sif and pmod)
 [ok]   Move Time-activity from "Models on ROIs" to TACT button (after above)

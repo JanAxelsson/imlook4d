@@ -6,7 +6,7 @@
 	</P>
 
 	<P>
-		Right-click on the image gives an option to reset the view.  Do this if you wish to keep the image as it was.
+		Right-click on the image gives an option to reset the view, or delete the line.  Do this if you wish to keep the image as it was.
 	</P>
 	<P>
 		The rotation is applied to the image first when the button is toggled off.  This cannot be un-done.
