@@ -2116,10 +2116,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 releasedToggleButton( hObject);
         function displayLineCoordinates( pos)
             disp(mat2str(pos,3))
-            dx = pos(1,1) - pos(1,2);
-            dy = pos(2,1) - pos(2,2);
             
-                            pixels  = sqrt( dx^2 + dy^2 ); % length in pixels
+            dx = pos(2,1) - pos(1,1) ;
+            dy = pos(2,2) - pos(1,2) ;
+            
+                pixels  = sqrt( dx^2 + dy^2 ); % length in pixels
                 
                 % side in mm
                 try
