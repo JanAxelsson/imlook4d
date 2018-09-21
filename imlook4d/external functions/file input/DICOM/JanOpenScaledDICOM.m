@@ -516,7 +516,7 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
            % ImagePosition
            for i=1:lastIndex;
                try
-                   out2=dirtyDICOMHeaderData(headers, 1, '0020', '0032',guessedMode);
+                   out2=dirtyDICOMHeaderData(header, i, '0020', '0032',guessedMode);
                    str=out2.string;
                    temp=strfind(str,'\');
                    x=str2num( str(1:temp(1)-1 ));      % X-pos (mm)
@@ -548,7 +548,6 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                            catch
                            end
                        end
-
                end
            end
                

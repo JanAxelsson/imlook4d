@@ -5060,58 +5060,98 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 
                     % if a single DICOM file had multiple images, then above method does not work.  
                     % Use that the filename is the same for all images, to determine that this is the case.
-                    % Correct above and put images in slices.
+                    % Correct above and follow the Frame increment pointer order
                     if sum(strcmp(outputStruct.dirtyDICOMFileNames(:),outputStruct.dirtyDICOMFileNames(1)))>1
                         numberOfImages=size(outputStruct.dirtyDICOMFileNames(:),1);
-                        numberOfSlices=numberOfImages;
-                        numberOfFrames=1;
-  
-                        % NM (0054,0028) Number of frames
-                         try 
-                             numberOfFramesInFile=dirtyDICOMHeaderData(outputStruct.dirtyDICOMHeader, 1,'0028', '0008',mode); 
-                             numberOfFrames=str2num( numberOfFramesInFile.string);
-                             numberOfSlices=numberOfImages/numberOfFrames;
-                         catch
-                             numberOfFrames=1; 
-                         end
-                         
-                         
-                         % NM (0054,0021) US #2 [2] Number of Detectors
-                         try 
-                             numberOfDetectorsInScan=dirtyDICOMHeaderData(outputStruct.dirtyDICOMHeader, 1,'0054', '0021',mode); 
-                             numberOfDetectors=numberOfDetectorsInScan.bytes(1)+256*numberOfDetectorsInScan.bytes(2);
-                             numberOfFrames=numberOfFrames/numberOfDetectors;
-                         catch
-                             numberOfDetectors=1; 
-                         end
+                        numberOfSlices = length( outputStruct.imagePosition )
                         
-                         % Make 5D matrix: x,y,slice,frame,detector
-                         outputMatrix = reshape(outputMatrix,size(outputMatrix,1),size(outputMatrix,2),numberOfSlices,numberOfFrames, numberOfDetectors); 
+                        % Find all Frame Increment Pointers
+                        out0=dirtyDICOMHeaderData(headers, 1, '0028', '0009',mode); % Frame increment pointer
+                        counter = 0;
+                        dim = [];
+                        for k = 1 : (out0.valueLength / 4)
+                            start = (k-1)*4 + 1;
+                            tagString = out0.bytes( start : (start+3) );
+                            tag = [ uint8_to_hex( tagString(2)) uint8_to_hex( tagString(1)) uint8_to_hex( tagString(4)) uint8_to_hex( tagString(3))];
+
+                            % Leave slices, and handle separately outside loop                            
+                            if ~strcmp(tag, '00540080')
+                                counter = counter + 1;
+                                frameIncrementPointers{counter} = tag;
+                                vectorTag = dirtyDICOMHeaderData(headers, 1, tag(1:4), tag(5:8),mode,2); % Second instance (since found in 00280009)
+                                vector = 256 * vectorTag.bytes(2:2:end) + vectorTag.bytes(1:2:end);
+                                dim(counter) = max(vector); % vector with number of elements in each dimension
+                            end
+                        end
+                        
+                        
+                        % Remove slices from dim, and handle separately (so
+                        % slices always in 3:d dimension
+                        numberOfSlices = 1;
+                        try
+                            out0=dirtyDICOMHeaderData(headers, 1, '0054', '0081',mode); % Number of slices
+                            numberOfSlices = 256 * out0.bytes(2) + out0.bytes(1);
+                        catch
+                            
+                        end
+                        
+                        
+                        % Reshape matrix
+                        nx = size(outputMatrix,1);
+                        ny = size(outputMatrix,2);
+                        dims = [ nx ny numberOfSlices dim];
+                        outputMatrix = reshape( outputMatrix, dims);
+                        
+                        
+                        
+%                         numberOfFrames=1;
+%   
+%                         % NM (0054,0028) Number of frames
+%                          try 
+%                              numberOfFramesInFile=dirtyDICOMHeaderData(outputStruct.dirtyDICOMHeader, 1,'0028', '0008',mode); 
+%                              numberOfFrames=str2num( numberOfFramesInFile.string);
+%                              numberOfSlices=numberOfImages/numberOfFrames;
+%                          catch
+%                              numberOfFrames=1; 
+%                          end
                          
-                         % If one slice, allow detectors to go into slice
-                         % position
-                         if (numberOfSlices == 1)
-                             % Exchange Detectors and Slices columns (so
-                             % that detectors will be in slice slider in
-                             % imlook4d)
-                             outputMatrix = permute( outputMatrix, [1 2 5 4 3]);
-                             numberOfSlices = numberOfDetectors;  % Treat detectors as slices in opening new imlook4d, below
-                         end
+                         
+%                          % NM (0054,0021) US #2 [2] Number of Detectors
+%                          try 
+%                              numberOfDetectorsInScan=dirtyDICOMHeaderData(outputStruct.dirtyDICOMHeader, 1,'0054', '0021',mode); 
+%                              numberOfDetectors=numberOfDetectorsInScan.bytes(1)+256*numberOfDetectorsInScan.bytes(2);
+%                              numberOfFrames=numberOfFrames/numberOfSlices/numberOfDetectors;
+%                          catch
+%                              numberOfDetectors=1; 
+%                          end
+%                         
+%                          % Make 5D matrix: x,y,slice,frame,detector
+%                          outputMatrix = reshape(outputMatrix,size(outputMatrix,1),size(outputMatrix,2),numberOfSlices,numberOfFrames, numberOfDetectors); 
+%                          
+%                          % If one slice, allow detectors to go into slice
+%                          % position
+%                          if (numberOfSlices == 1)
+%                              % Exchange Detectors and Slices columns (so
+%                              % that detectors will be in slice slider in
+%                              % imlook4d)
+%                              outputMatrix = permute( outputMatrix, [1 2 5 4 3]);
+%                              numberOfSlices = numberOfDetectors;  % Treat detectors as slices in opening new imlook4d, below
+%                          end
                          
                          
-                         % assume NM, calculate slice locations
-                         
-                         startLocation=sliceLocations(1);
-                         try
-                            out=dirtyDICOMHeaderData(outputStruct.dirtyDICOMHeader, 1, '0018', '0088',mode);  %Spacing Between Slices (can be negative number)
-                            sliceStep=str2num(out.string);
-                         catch
-                            sliceStep=outputStruct.sliceSpacing;  % This is not a negative number
-                         end
-                         
-                         for i=1:numberOfSlices
-                             sliceLocations(i)=startLocation+(i-1)*sliceStep;
-                         end
+%                          % assume NM, calculate slice locations
+%                          
+%                          startLocation=sliceLocations(1);
+%                          try
+%                             out=dirtyDICOMHeaderData(outputStruct.dirtyDICOMHeader, 1, '0018', '0088',mode);  %Spacing Between Slices (can be negative number)
+%                             sliceStep=str2num(out.string);
+%                          catch
+%                             sliceStep=outputStruct.sliceSpacing;  % This is not a negative number
+%                          end
+%                          
+%                          for i=1:numberOfSlices
+%                              sliceLocations(i)=startLocation+(i-1)*sliceStep;
+%                          end
                          
                          % Set time
                          
