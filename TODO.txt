@@ -2,15 +2,7 @@ TODO
 =====
 
 DEVELOP
-[  ]  Saved ROI with locks does not display locks when opened.  COULD NOT REPRODUCE
-[ok]  View / Background image add -- fails on NM-CT.  CT is lost, or takes forever
-[ok]   Move new MODELS to MODELS menu
-[ok]   Save time-activity to different formats from tactWindow window (especially sif and pmod)
-[ok]   Move Time-activity from "Models on ROIs" to TACT button (after above)
-
-[ok]   PROBLEM -- short frames (GE water scans) have T and dT that does not add up.  How to solve?
-	   Maybe save Tstart and dT as well as midtimes for models?
-	   
+[  ]   interactive min and max level settings
 
 
 [  ]   HELP files for models 
@@ -22,17 +14,19 @@ DEVELOP
 [  ]   Make mask, allowing models on images to work better
 
 WISHLIST
-[  ]   interactive min and max level settings
-[  ]   measure tool, make handles on line to adjust
 
-[  ]   make column widths optimal to fit more.
+[  ]   ask if wish to rotate linked images with same size, or background image when toggling rotating button off
+[  ]   rotate lines in current axes, when toggling rotating button off
 
+[  ]   modelWindow and tactWindow:  make column widths optimal to fit more.
 [  ]   modelWindow: show parameters
 [  ]   modelWindow: allow update of model
 
 [  ]   jpeg dicoms
-[  ]   Update menu, should it save the new downloaded path by default?
+[  ]   Update menu, should it save the new downloaded path by default?  Dialog window asking to save?
 
+
+[ok]   measure tool, make handles on line to adjust
 
 IDEAS
 [   ]	Can I make robuster SRTM-like model by fixing BPs calculated from Logan ?
@@ -45,3 +39,21 @@ PEARL-PD
 
 ISSUES
 ======
+
+
+
+
+
+DONE
+====
+
+
+[  ]  Saved ROI with locks does not display locks when opened.  COULD NOT REPRODUCE
+[ok]  View / Background image add -- fails on NM-CT.  CT is lost, or takes forever
+[ok]   Move new MODELS to MODELS menu
+[ok]   Save time-activity to different formats from tactWindow window (especially sif and pmod)
+[ok]   Move Time-activity from "Models on ROIs" to TACT button (after above)
+
+[ok]   PROBLEM -- short frames (GE water scans) have T and dT that does not add up.  How to solve?
+	   Maybe save Tstart and dT as well as midtimes for models?
+	   
