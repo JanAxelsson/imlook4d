@@ -24,7 +24,7 @@ function varargout = adjustLevel(varargin)
 
 % Edit the above text to modify the response to help adjustLevel
 
-% Last Modified by GUIDE v2.5 21-Sep-2018 23:08:41
+% Last Modified by GUIDE v2.5 22-Sep-2018 20:06:53
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -102,18 +102,21 @@ function adjustLevel_OpeningFcn(hObject, eventdata, handles, varargin)
     tempData = handles.imlook4d_handles.image.CachedImage;      % Read cached image, Image data (not flipped or rotated)
     
     %
-    % NOT WORKING: Set continous auto-update on sliders (when moving slider with mouse)
+    % Continous update on sliders
     %
-        hs = handles.minSlider;
-        hListener = addlistener(hs,'Value','PostSet',...
-                    @(hObject,eventdata)imlook4d('updateImage',imlook4d_handle,eventdata,guidata(imlook4d_handle)) ...
+    
+        % Tip from http://www.alecjacobson.com/weblog/?p=4098
+        hs1 = handles.minSlider;
+        hs1.addlistener('Value','PostSet',...
+            @(src,data) data.AffectedObject.Callback(data.AffectedObject,struct('Source',data.AffectedObject,'EventName','Action')) ...
             );
 
 
-        hs = handles.maxSlider;
-        hListener = addlistener(hs,'Value','PostSet',...
-                    @(hObject,eventdata)imlook4d('updateImage',imlook4d_handle,eventdata,guidata(imlook4d_handle)) ...
+        hs2 = handles.maxSlider;
+        hs2.addlistener('Value','PostSet',...
+            @(src,data) data.AffectedObject.Callback(data.AffectedObject,struct('Source',data.AffectedObject,'EventName','Action')) ...
             );
+
     
 
     % Update handles structure
@@ -159,3 +162,21 @@ function maxEdit_Callback(hObject, eventdata, handles)
         handles.maxSlider.Max = str2num( handles.maxEdit.String );
     end
     handles.maxSlider.Value = str2num(handles.maxEdit.String);
+
+function ResetPushButton_Callback(hObject, eventdata, handles)
+    initialMin = handles.initial.min;
+    initialMax = handles.initial.max;
+    
+    handles.minSlider.Min = initialMin;
+    handles.minSlider.Max = initialMax;
+    
+    handles.maxSlider.Min = initialMin;
+    handles.maxSlider.Max = initialMax;
+    
+    frame=round(get(handles.imlook4d_handles.FrameNumSlider,'Value'));
+    pixelVector = handles.imlook4d_handles.image.Cdata(:,:,:,frame);
+    minValue = min( pixelVector(:) );
+    maxValue = max( pixelVector(:) );
+    
+    handles.minSlider.Value = minValue;
+    handles.maxSlider.Value = maxValue;

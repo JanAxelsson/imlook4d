@@ -2,7 +2,6 @@ TODO
 =====
 
 DEVELOP
-[  ]   interactive min and max level settings
 
 
 [  ]   HELP files for models 
@@ -49,6 +48,7 @@ DONE
 
 
 [  ]  Saved ROI with locks does not display locks when opened.  COULD NOT REPRODUCE
+[ok]   interactive min and max level settings. 
 [ok]  View / Background image add -- fails on NM-CT.  CT is lost, or takes forever
 [ok]   Move new MODELS to MODELS menu
 [ok]   Save time-activity to different formats from tactWindow window (especially sif and pmod)
