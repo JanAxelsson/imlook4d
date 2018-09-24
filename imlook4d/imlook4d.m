@@ -785,7 +785,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
             %
             % Make Windows menu (let it display to the left of HelpMenu)
             %
-                set(handles.windows,'Position',7);
+                set(handles.windows,'Position',6);
                 %disp('Windows menu')
 
 
