@@ -45,7 +45,20 @@ Create a release
     distributed as is.
 
 -   **Note**: the tagged release will not have the correct `version.txt`, since
-    this is added in  the script `imlook4d-export-to-zip`.
+    this is added in the script `imlook4d-export-to-zip`.
+
+Make release available
+----------------------
+
+-   Starta Google Drive
+
+-   Kopiera zip-file  
+    från: `/Users/jan/Documents/Projects/imlook4d/imlook4d-exports`  
+    till:   `/Users/jan/Google Drive/imlook4d-site/downloads/Current release`
+
+-   Editera `/Users/jan/Google
+    Drive/imlook4d-site/downloads/latest_releases.txt`  
+    (instruktion inne i den filen)
 
  
 
