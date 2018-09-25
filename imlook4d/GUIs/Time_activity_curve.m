@@ -50,7 +50,11 @@ if IS_DYNAMIC
     % Store for use in SaveTact, when called from modelWindow
     a.extras.N = NPixels;
     a.extras.stdev = stdev;
-    a.extras.unit = imlook4d_current_handles.image.unit;
+    try
+        a.extras.unit = imlook4d_current_handles.image.unit;
+    catch
+        a.extras.unit = '';
+    end
     a.extras.frameStartTime = imlook4d_time / 60;
     a.extras.frameDuration = imlook4d_duration / 60;
       
