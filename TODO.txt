@@ -38,9 +38,21 @@ PEARL-PD
 
 ISSUES
 ======
+[  ]  Error using webread (line 122)
+		Could not establish a secure connection to "drive.google.com". The reason is "error:14090086:SSL
+		routines:ssl3_get_server_certificate:certificate verify failed". Check your certificate file (C:\Program
+		Files\MATLAB\R2018b\sys\certificates\ca\rootcerts.pem) for expired, missing or invalid certificates.
+		
+		Error in Update_imlook4d (line 7)
+		text = webread( latestFileListURL);
+		 
+		Error while evaluating Menu Callback.
+		
+		Possible workaround:  
+			o = weboptions('CertificateFilename','');
+			webread('https://self-signed.badssl.com/',o)
 
-
-
+[ok]   Cancel on threshold ROI and others crashes lots of things. Clear all resolves
 
 
 DONE
@@ -56,4 +68,6 @@ DONE
 
 [ok]   PROBLEM -- short frames (GE water scans) have T and dT that does not add up.  How to solve?
 	   Maybe save Tstart and dT as well as midtimes for models?
+[ok]   Cancel on threshold ROI and others crashes lots of things. Clear all resolves
+
 	   

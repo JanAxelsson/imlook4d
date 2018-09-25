@@ -15,6 +15,9 @@ end
 title=[ model_name ' inputs'];
 numlines=1;
 answer=inputdlg(prompt,title,numlines,defaultanswer);
+if isempty(answer) % cancelled inputdlg
+    return
+end
 
 % Store answer as new global dialog default
 StoreValues(model_name, answer); 

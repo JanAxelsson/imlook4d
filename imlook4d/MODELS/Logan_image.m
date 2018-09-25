@@ -12,6 +12,9 @@ numlines=1;
 
 defaultanswer = RetriveEarlierValues('Logan', { num2str(imlook4d_frame), num2str( size(imlook4d_Cdata,4) ), ''}  );  % Read default if exists, or apply these as default
 answer=inputdlg(prompt,title,numlines,defaultanswer);
+if isempty(answer) % cancelled inputdlg
+    return
+end
 
 startFrame = str2num( answer{1});
 endFrame = str2num( answer{2});
