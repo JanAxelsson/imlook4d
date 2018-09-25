@@ -2082,10 +2082,19 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 pressedToggleButton( hObject);
                 [x,y]= ginput(2);
    
-                h = imline( gca,x,y);
-                addNewPositionCallback(h, @(p) displayLineCoordinates( p) );
-                displayLineCoordinates( h.getPosition)
-                
+                try
+                    h = imline( gca,x,y); % Imaging tool box
+                    addNewPositionCallback(h, @(p) displayLineCoordinates( p) );
+                    displayLineCoordinates( h.getPosition);
+                    
+                catch
+                    % If imaging toolbox missing, or other faults
+                    line( x,y,'ButtonDownFcn','delete(gcbo)','LineWidth',3);
+                    pos(:,1) = x;
+                    pos(:,2) = y;
+                    displayLineCoordinates( pos);
+                end
+
                 releasedToggleButton( hObject);
         function displayLineCoordinates( pos)
             disp(mat2str(pos,3))
@@ -2111,7 +2120,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 msg = [ 'Length = ' num2str( length) ' mm (' num2str( pixels) ' pixels long).  Angle = ' num2str(angle_degrees) ' degrees'];
                 disp( msg);
                 displayMessageRow(msg)
-
+                
     function rotateToggleButtonOn_ClickedCallback(hObject, eventdata, handles)
        % Display HELP and get out of callback
        if DisplayHelp(hObject, eventdata, handles)
