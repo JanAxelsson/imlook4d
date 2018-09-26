@@ -1,6 +1,7 @@
 function dispOpenWithImlook4d( varargin )
 
     text = '';
+    message = '';
     if nargin==1
         filePath = varargin{1};
     end
@@ -9,4 +10,17 @@ function dispOpenWithImlook4d( varargin )
         text = varargin{1};
         filePath = varargin{2};
     end
-    disp( [ text '<a href="matlab:imlook4d(''' filePath ''')">' filePath '</a>' ]);
+    
+    % Check if file exists
+    if ~ ( exist(filePath, 'file') == 2 )  % Check full name
+        if ~ ( exist(filePath(1:end-2) , 'file') == 2 ) % TPM.nii,3 => TPM.nii
+            message = 'FILE MISSING: ';
+        end
+    end
+    
+    % Display differently if file exist or not
+    if strcmp( message, 'FILE MISSING: ')
+        dispRed( [ message text '<a href="matlab:imlook4d(''' filePath ''')">' filePath '</a>' ]);
+    else
+        disp( [ message text '<a href="matlab:imlook4d(''' filePath ''')">' filePath '</a>' ]);
+    end
