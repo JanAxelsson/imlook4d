@@ -2896,8 +2896,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             ROINumber=ROINumberMenu.Value;
             
             handles.image.LockedROIs(ROINumber)=0;
-            %contents = regexprep(contents, '\(locked\) ', ''); % Remove (locked) prefix
             contents{ROINumber} = regexprep(contents{ROINumber}, '\(locked\) ', ''); % Remove (locked) prefix
+
             set(handles.ROINumberMenu,'String', contents)
         else
             handles.Lock_ROI.Checked = 'on'; % Lock
