@@ -2712,6 +2712,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     disp('visible')
                     handles.HideROI.Checked = 'off';
                 end
+                
+                % Set context menu locked flag
+                if handles.image.LockedROIs(ROINumber)
+                    handles.Lock_ROI.Checked = 'on'; % Lock check mark
+                else
+                    handles.Lock_ROI.Checked = 'off'; % Unlock
+                end
 
                 % Find first slice of ROI
                 numberOfSlices=size(handles.image.Cdata,3);
@@ -2889,7 +2896,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             ROINumber=ROINumberMenu.Value;
             
             handles.image.LockedROIs(ROINumber)=0;
-            contents = regexprep(contents, '\(locked\) ', ''); % Remove (hidden) prefix
+            contents = regexprep(contents, '\(locked\) ', ''); % Remove (locked) prefix
             set(handles.ROINumberMenu,'String', contents)
         else
             handles.Lock_ROI.Checked = 'on'; % Lock
@@ -6381,8 +6388,6 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             
             numberOfROIs = size(roiNames,2) -1 ;
 
-            set(handles.ROINumberMenu,'String', roiNames);
-            set(handles.ROINumberMenu,'Value', 1 ); %Set to highest ROI number
 
             
             % VisibleROIs
@@ -6396,10 +6401,25 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             % LockedROIs
             if ( exist('LockedROIs') )
                 handles.image.LockedROIs = LockedROIs; % From .roi file
+                for i = 1: length(LockedROIs)
+                    if ~startsWith( roiNames{i}, '(locked)' )
+                        if LockedROIs(i)
+                            roiNames{i} = [ '(locked) ' roiNames{i}];
+                        end
+                    end
+                end
             else
                 handles.image.LockedROIs = zeros( [ 1 numberOfROIs ] );
             end
             
+            % Set locked marker
+            if LockedROIs(i)
+                handles.Lock_ROI.Checked = 'on'; % Lock check mark
+            end
+            
+            % Set ROI names
+            set(handles.ROINumberMenu,'String', roiNames);
+            set(handles.ROINumberMenu,'Value', 1 ); 
             
             guidata(handles.ROINumberMenu,handles);  % Save handles
 
