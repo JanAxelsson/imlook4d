@@ -14,11 +14,13 @@ function [activity, NPixels, stdev, maxActivity]=generateReferenceTACT(handles)
     end
     
     if isempty(roisToCalculate)
-       errordlg({'No reference region defined.', ...
-           'Please Select Reference Region from ', ...
-           ' SCRIPTS/Models on ROIs/Select Reference ROIs'} );
+%        errordlg({'No reference region defined.', ...
+%            'Please Select Reference Region from ', ...
+%            ' SCRIPTS/Models on ROIs/Select Reference ROIs'} );
        
-       error('No reference region defined'); 
+       dispRed('No reference region defined'); 
+       dispRed('Please Select Reference Region from ');
+       dispRed(' SCRIPTS/Models on ROIs/Select Reference ROIs');
     end
     
     ROI(ROI>0) = 1;
