@@ -53,6 +53,7 @@ function varargout = modelWindow_OutputFcn(~, ~, handles)
 
     % Get default command line output from handles structure
     varargout{1} = handles.output;
+    varargout{1} = handles;
 
 % On Open    
 function modelWindow_OpeningFcn(hObject, ~, handles, datastruct, roinames, title, varargin)

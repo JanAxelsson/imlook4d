@@ -1,3 +1,4 @@
+imlook4d_curve_window = [];
 StoreVariables;
 
 % Inhibit model image (which is triggered by existence of functionHandle)
@@ -55,8 +56,16 @@ if IS_DYNAMIC
     catch
         a.extras.unit = '';
     end
-    a.extras.frameStartTime = imlook4d_time / 60;
-    a.extras.frameDuration = imlook4d_duration / 60;
+    try
+        a.extras.frameStartTime = imlook4d_time / 60;
+    catch
+        a.extras.frameStartTime =  1 : size( imlook4d_Cdata,4);
+    end
+    try
+        a.extras.frameDuration = imlook4d_duration / 60;
+    catch
+        a.extras.frameDuration = ones( size( a.extras.frameStartTime));
+    end
       
     n = size(tact,1);
     for i = 1:n
@@ -71,15 +80,17 @@ if IS_DYNAMIC
     % Ref
     try
         REF_EXISTS = length(imlook4d_current_handles.model.common.ReferenceROINumbers) > 0;
-        ref = generateReferenceTACT( imlook4d_current_handles);
-        a.Xref = a.X{1};
-        a.Yref = ref;
+        if REF_EXISTS
+            ref = generateReferenceTACT( imlook4d_current_handles);
+            a.Xref = a.X{1};
+            a.Yref = ref;
+        end
     catch
         REF_EXISTS = false;
     end
     
     % Plot
-    modelWindow( ...
+    imlook4d_curve_window = modelWindow( ...
         a , ...
         imlook4d_ROINames(1:end-1), ...
         [model_name ] ...
