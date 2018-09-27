@@ -23,7 +23,7 @@ if atlasNotAvailable( atlas.atlasFileName)
     dialogTitle = 'Atlas not in Matlab path';
     button1 = 'Select atlas folder';
     cancelButton = 'Cancel';
-    defaultButton = button2;
+    defaultButton = cancelButton;
     dialogText = { ...
         'Atlas not in Matlab path.', ...
         'See matlab command window for more details,', ...
@@ -37,7 +37,7 @@ if atlasNotAvailable( atlas.atlasFileName)
         return % Bail out
     else
         % Add to path
-        newPath=java_uigetdir(previousDirectory,'Select folder containing atlas nifti files'); % Use java directory open dialog (nicer than windows)
+        newPath=java_uigetdir(oldFolder,'Select folder containing atlas nifti files'); % Use java directory open dialog (nicer than windows)
         if newPath == 0
             disp('Cancelled by user');
             return
@@ -49,11 +49,11 @@ if atlasNotAvailable( atlas.atlasFileName)
         savepath;
         
         cd( oldFolder); % Keep Matlab's current directory
-        
-        % run again
-        ClearVariables
-        StoreVariables
-        select_atlas
+%         
+%         % run again
+%         ClearVariables
+%         StoreVariables
+%         select_atlas
     end
 end
 
