@@ -19,4 +19,4 @@ function dispOpenWithImlook4d( varargin )
     end
     
     % Display 
-    disp( [ message text '<a href="matlab:imlook4d(''' filePath ''')">' filePath '</a>' message]);
+    disp( [ text '<a href="matlab:imlook4d(''' filePath ''')">' filePath '</a>' message]);

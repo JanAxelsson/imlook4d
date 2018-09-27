@@ -1,4 +1,4 @@
-atlas=[]; % Make variable, so it will be aves after ClearVariables
+atlas=[]; % Make variable, so it will be available after ClearVariables
 StoreVariables 
 oldFolder = cd();
 folder = fileparts(which('labels_Neuromorphometrics.m') );  % Identify folder by file that I know exists
@@ -34,12 +34,14 @@ if atlasNotAvailable( atlas.atlasFileName)
     answer = questdlg( dialogText, dialogTitle, button1, cancelButton, defaultButton);
     
     if strcmp( answer, cancelButton)
+        cd( oldFolder); % Keep Matlab's current directory
         return % Bail out
     else
         % Add to path
         newPath=java_uigetdir(oldFolder,'Select folder containing atlas nifti files'); % Use java directory open dialog (nicer than windows)
         if newPath == 0
             disp('Cancelled by user');
+            cd( oldFolder); % Keep Matlab's current directory
             return
         end
         
