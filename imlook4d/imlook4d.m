@@ -6410,7 +6410,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     end
                 end
             else
-                handles.image.LockedROIs = zeros( [ 1 numberOfROIs ] );
+                LockedROIs = zeros( [ 1 numberOfROIs ] );
+                handles.image.LockedROIs = LockedROIs;
             end
             
             % Set locked marker

@@ -1,11 +1,11 @@
-atlas=[];
+atlas=[]; % Make variable, so it will be aves after ClearVariables
 StoreVariables 
 oldFolder = cd();
 folder = fileparts(which('labels_Neuromorphometrics.m') );  % Identify folder by file that I know exists
 cd(folder);
 
 [atlasDefinitionFile,path] = uigetfile('*.m','Select an atlas file');
-
+atlas.atlasDefinitionFile = atlasDefinitionFile; % Add this to atlas struct, so it will be available for later scripts
 run(atlasDefinitionFile);
 
 if atlasNotAvailable( atlas.atlasFileName)
@@ -14,12 +14,47 @@ if atlasNotAvailable( atlas.atlasFileName)
     dispRed( 'You may have to download this atlas and "add with subfolders" to the Matlab path');
     dispRed( ['Link to atlas: <a href="' atlas.url '">' atlas.url '</a>.'])
     
-    msgbox({ ...
-        'Atlas not in Matlab path', ...
+%     msgbox({ ...
+%         'Atlas not in Matlab path', ...
+%         'See matlab command window for more details,', ...
+%         'and how to obtain atlas' ...
+%     })
+
+    dialogTitle = 'Atlas not in Matlab path';
+    button1 = 'Select atlas folder';
+    cancelButton = 'Cancel';
+    defaultButton = button2;
+    dialogText = { ...
+        'Atlas not in Matlab path.', ...
         'See matlab command window for more details,', ...
-        'and how to obtain atlas' ...
-    })
-    return % Bail out
+        'and how to obtain atlas', ...
+        ' ', ...
+        'If you have an atlas already, press "Select atlas" button to add atlas folder to path, otherwise "Cancel".' ...
+        };
+    answer = questdlg( dialogText, dialogTitle, button1, cancelButton, defaultButton);
+    
+    if strcmp( answer, cancelButton)
+        return % Bail out
+    else
+        % Add to path
+        newPath=java_uigetdir(previousDirectory,'Select folder containing atlas nifti files'); % Use java directory open dialog (nicer than windows)
+        if newPath == 0
+            disp('Cancelled by user');
+            return
+        end
+        
+        [folderName,name,ext] = fileparts(newPath);
+        p = genpath(folderName);
+        addpath(p);
+        savepath;
+        
+        cd( oldFolder); % Keep Matlab's current directory
+        
+        % run again
+        ClearVariables
+        StoreVariables
+        select_atlas
+    end
 end
 
 

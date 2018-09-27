@@ -3,7 +3,7 @@ TODO
 
 DEVELOP
 
-
+[  ]   SPM/select atlas, dialog (done), ask to show folder.
 [  ]   HELP files for models 
 
 [  ]   Add Models for  clearance
@@ -25,7 +25,6 @@ WISHLIST
 [  ]   Update menu, should it save the new downloaded path by default?  Dialog window asking to save?
 
 
-[ok]   measure tool, make handles on line to adjust
 
 IDEAS
 [   ]	Can I make robuster SRTM-like model by fixing BPs calculated from Logan ?
@@ -52,14 +51,15 @@ ISSUES
 			o = weboptions('CertificateFilename','');
 			webread('https://self-signed.badssl.com/',o)
 
-[ok]   Cancel on threshold ROI and others crashes lots of things. Clear all resolves
 
 
 DONE
 ====
 
 
-[  ]  Saved ROI with locks does not display locks when opened.  COULD NOT REPRODUCE
+[ok]   measure tool, make handles on line to adjust (unfortunately draws ROI while moving line, if ROI exists)
+[ok]  Saved ROI with locks does not display locks when opened.  
+[ok]   Cancel on threshold ROI and others crashes lots of things. Clear all resolves
 [ok]   interactive min and max level settings. 
 [ok]  View / Background image add -- fails on NM-CT.  CT is lost, or takes forever
 [ok]   Move new MODELS to MODELS menu
