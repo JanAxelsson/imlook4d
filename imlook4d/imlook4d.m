@@ -6704,6 +6704,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                  return 
              end
              
+           if nargin == 5
+                setColorBar( thisHandles, [  varargin{1} , varargin{2}  ] );
+                updateImage(hObject, eventdata, thisHandles);
+                return
+           end
+             
            % Try to get input from workspace INPUTS variable
           try
               % Try to get input from workspace INPUTS variable
