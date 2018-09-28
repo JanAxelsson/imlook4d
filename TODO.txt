@@ -3,7 +3,7 @@ TODO
 
 DEVELOP
 
-[  ]   SPM/select atlas, dialog (done), ask to show folder.
+[  ]   Warn if SPM saknas när man väljer meny
 [  ]   HELP files for models 
 
 [  ]   Add Models for  clearance
@@ -56,6 +56,7 @@ ISSUES
 DONE
 ====
 
+[ok]   SPM/select atlas, dialog (done), ask to show folder.
 
 [ok]   measure tool, make handles on line to adjust (unfortunately draws ROI while moving line, if ROI exists)
 [ok]  Saved ROI with locks does not display locks when opened.  

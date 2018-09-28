@@ -1,11 +1,23 @@
-function recordInputsText(answer)
-% Translate the cell array answer = { '1', '2'}
-% to text
+function recordInputsText(varargin)
+% Translate the cell array  { '1', '2'}
+% to text in imlook4d recording window:
 % INPUTS = Parameters({ '1', '2'});
+%
+% 
+% Inputs:
+%    (Optional) handle to imlook4d handles (assume gcf if not specified)
+%    cell array of string comments  
+%
 
-    % I don't know which is best here:
-    %imlook4d_current_handles = evalin('base','imlook4d_current_handles');
-    imlook4d_current_handles = guidata(gcf);
+test = varargin{1};
+if isstruct(test)
+    answer = varargin{2};
+    imlook4d_current_handles = test;
+else
+    answer = varargin{1};
+end
+    
+ 
     
    % Bail out if not record mode
    try

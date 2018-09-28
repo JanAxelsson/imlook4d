@@ -24,7 +24,7 @@ function varargout = adjustLevel(varargin)
 
 % Edit the above text to modify the response to help adjustLevel
 
-% Last Modified by GUIDE v2.5 22-Sep-2018 20:06:53
+% Last Modified by GUIDE v2.5 28-Sep-2018 12:13:50
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -180,3 +180,9 @@ function ResetPushButton_Callback(hObject, eventdata, handles)
     
     handles.minSlider.Value = minValue;
     handles.maxSlider.Value = maxValue;
+
+function closereq_Callback(hObject, eventdata, handles)
+    if handles.imlook4d_handles.record.enabled % Script recording on
+        recordInputsText(handles.imlook4d_handles,{ handles.minEdit.String, handles.maxEdit.String});  % Insert text at caret
+    end
+    closereq

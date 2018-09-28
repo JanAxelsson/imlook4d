@@ -6698,46 +6698,26 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             end    
 
     % Window-levels submenu   
-        % Generated at program start
         function EditScale_Callback(hObject, eventdata, thisHandles,varargin)
          % Display HELP and get out of callback
              if DisplayHelp(hObject, eventdata, thisHandles) 
                  return 
              end
              
-         try
-            h=thisHandles.ColorBar;  % Get handle to colorbar
-            CLim=get(h,'YLim');  % Read limits from current color bar
-            slice=round(get(thisHandles.SliceNumSlider,'Value'));
-            frame=round(get(thisHandles.FrameNumSlider,'Value'));
-            tempData=thisHandles.image.CachedImage;      % Read cached image, Image data (not flipped or rotated)
-            disp('drawCursorInYokes2 - Read CachedImage');
-            %CLim=[min(tempData(:)) max(tempData(:) )]; % Calculated min and max
-            %
-            % Dialog for Colorbar
-            %
-            
-            disp('ColorBar_ButtonDownFcn');
-
-            prompt={'Min','Max'};
-            title='Set color range';
-            numlines=1;
-            defaultanswer={...
-                num2str(CLim(1)),...
-                num2str(CLim(2))...
-                };
-            if nargin==3
-                answer=inputdlg(prompt,title,numlines,defaultanswer);
-            else
-                answer=varargin{1};
-            end
-
-            CLim=[str2num(answer{1})  str2num(answer{2})]; % Convert to numbers
-            setColorBar( thisHandles, CLim)
- 
-        catch
-         end
-        updateImage(hObject, eventdata, thisHandles)
+           % Try to get input from workspace INPUTS variable
+          try
+              % Try to get input from workspace INPUTS variable
+              INPUTS=getINPUTS();
+              evalin('base','clear INPUTS'); % Clear INPUTS from workspace
+              setColorBar( thisHandles, [ str2num( INPUTS{1} ), str2num( INPUTS{2} ) ] );
+              updateImage(hObject, eventdata, thisHandles);
+          catch
+              adjustLevel('adjustLevel',hObject,eventdata,guidata(hObject))
+          end
+             
+         
+         return
+        % Other submenues are generated at program start
          
     % Color submenu   
         function Color_Callback(hObject, eventdata, handles, functionName)
