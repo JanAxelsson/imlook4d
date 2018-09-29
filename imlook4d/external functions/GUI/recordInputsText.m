@@ -9,11 +9,12 @@ function recordInputsText(varargin)
 %    cell array of string comments  
 %
 
-test = varargin{1};
-if isstruct(test)
+firstArgument = varargin{1};
+if isstruct(firstArgument)
     answer = varargin{2};
-    imlook4d_current_handles = test;
+    imlook4d_current_handles = firstArgument;
 else
+    imlook4d_current_handles = guidata( gcf);
     answer = varargin{1};
 end
     
@@ -21,8 +22,7 @@ end
     
    % Bail out if not record mode
    try
-    if (imlook4d_current_handles.record.enabled == 0)
-        return
+        if (imlook4d_current_handles.record.enabled == 1)
     end
    catch
        return
