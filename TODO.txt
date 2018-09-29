@@ -37,6 +37,8 @@ PEARL-PD
 
 ISSUES
 ======
+[  ]  Uprade tar inte bort alla gamla ur path:en.  Även /../USER_SCRIPTS ligger kvar från andra versione
+
 [  ]  Error using webread (line 122)
 		Could not establish a secure connection to "drive.google.com". The reason is "error:14090086:SSL
 		routines:ssl3_get_server_certificate:certificate verify failed". Check your certificate file (C:\Program
