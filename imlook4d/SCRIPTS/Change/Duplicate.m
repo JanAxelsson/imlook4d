@@ -73,8 +73,7 @@
      
     % Copy window levels 
     limits = get(imlook4d_current_handles.ColorBar,'Limits');
-    INPUTS = Parameters( { num2str(limits(1)), num2str(limits(2))} );
-    Menu('Edit scale');
+    imlook4d('EditScale_Callback',imlook4d_current_handle, [], imlook4d_current_handles, limits(1), limits(2))
     
     % Copy radiobuttons
     style = 'radiobutton';
