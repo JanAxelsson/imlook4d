@@ -3187,7 +3187,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              if DisplayHelp(h, evd, handles) 
                  return 
              end
-          
+         disp('wbd');
          activeROI=get(handles.ROINumberMenu,'Value');
 
          
@@ -3207,6 +3207,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              return
          end
 
+
          % get the values and store them in the figure's appdata
          props.WindowButtonMotionFcn = get(h,'WindowButtonMotionFcn');
          props.WindowButtonUpFcn = get(h,'WindowButtonUpFcn');
@@ -3220,7 +3221,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
          set(h,'WindowButtonUpFcn','imlook4d(''wbu'',gcbo,[],guidata(gcbo))');    
          
           % Record last mouse position for drawROI track interpolation
-         coordinates=get(gca,'currentpoint')
+         coordinates=get(gca,'currentpoint');
          
          x=round(coordinates(1,1) + 0.5);
          y=round(coordinates(1,2) + 0.5);
@@ -3554,9 +3555,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         UNDOSIZE = length(handles.image.UndoROI.ROI);
         handles = createUndoROI( handles, UNDOSIZE);       
     function handles = storeUndoROI(handles)
+        % Undo positions counted from recent (1) to last (UNDOSIZE)
+        % Current ROI is stored in position 1
         tic
         UNDOSIZE = length(handles.image.UndoROI.ROI);
         ROI3D = handles.image.ROI;
+        % Shift 
         try
             for i=(UNDOSIZE-1):-1:1
                 handles.image.UndoROI.ROI{i+1} = handles.image.UndoROI.ROI{i};
@@ -3566,6 +3570,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             handles.image.UndoROI.position = 1;
         end
 
+        % Store only slices (efficient for large matrices and smaller ROIs)
             activeROI = get(handles.ROINumberMenu,'Value');
             slice = round(get(handles.SliceNumSlider,'Value'));
             slicesWithRois = sum( sum(handles.image.ROI,1) >0 , 2);
@@ -3577,20 +3582,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             end
 
         % If drawing and position in Undo was different from 1, then
-        % the previous are crap
-        if (handles.image.UndoROI.position ~= 1)
-            numberOfRoisToDelete = handles.image.UndoROI.position - 1;
-            % Shift
-            for i = 1:(UNDOSIZE-numberOfRoisToDelete)
-                handles.image.UndoROI.ROI{i} = handles.image.UndoROI.ROI{i+numberOfRoisToDelete};
-            end
-            % zero
-            for i = (UNDOSIZE-numberOfRoisToDelete+1):UNDOSIZE
-                handles.image.UndoROI.ROI{i}.roiSlices = cell(1,size(handles.image.ROI,3));
-                handles.image.UndoROI.ROI{i}.nonzeroSlices = zeros( 1, size(handles.image.ROI,3));
-            end
+       % if (handles.image.UndoROI.position ~= 1)
             handles.image.UndoROI.position = 1; % Always set to 1 when drawing
-        end
+            %storeUndoROI(handles);
+     %   end
 
         % Print current Undo Level and number of pixels in all Undo-ROIs
         printUndoInfo(handles);
