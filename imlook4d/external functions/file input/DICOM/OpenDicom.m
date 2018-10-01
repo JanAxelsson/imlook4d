@@ -326,57 +326,7 @@ function outputImageStruct = LocalOpenDirtyDICOM3(hObject, eventdata, handles, f
                         ny = size(outputMatrix,2);
                         dims = [ nx ny numberOfSlices dim];
                         outputMatrix = reshape( outputMatrix, dims);
-                        
-                        
-                        
-%                         numberOfFrames=1;
-%   
-%                         % NM (0054,0028) Number of frames
-%                          try 
-%                              numberOfFramesInFile=dirtyDICOMHeaderData(outputStruct.dirtyDICOMHeader, 1,'0028', '0008',mode); 
-%                              numberOfFrames=str2num( numberOfFramesInFile.string);
-%                              numberOfSlices=numberOfImages/numberOfFrames;
-%                          catch
-%                              numberOfFrames=1; 
-%                          end
-                         
-                         
-%                          % NM (0054,0021) US #2 [2] Number of Detectors
-%                          try 
-%                              numberOfDetectorsInScan=dirtyDICOMHeaderData(outputStruct.dirtyDICOMHeader, 1,'0054', '0021',mode); 
-%                              numberOfDetectors=numberOfDetectorsInScan.bytes(1)+256*numberOfDetectorsInScan.bytes(2);
-%                              numberOfFrames=numberOfFrames/numberOfSlices/numberOfDetectors;
-%                          catch
-%                              numberOfDetectors=1; 
-%                          end
-%                         
-%                          % Make 5D matrix: x,y,slice,frame,detector
-%                          outputMatrix = reshape(outputMatrix,size(outputMatrix,1),size(outputMatrix,2),numberOfSlices,numberOfFrames, numberOfDetectors); 
-%                          
-%                          % If one slice, allow detectors to go into slice
-%                          % position
-%                          if (numberOfSlices == 1)
-%                              % Exchange Detectors and Slices columns (so
-%                              % that detectors will be in slice slider in
-%                              % imlook4d)
-%                              outputMatrix = permute( outputMatrix, [1 2 5 4 3]);
-%                              numberOfSlices = numberOfDetectors;  % Treat detectors as slices in opening new imlook4d, below
-%                          end
-                         
-                         
-%                          % assume NM, calculate slice locations
-%                          
-%                          startLocation=sliceLocations(1);
-%                          try
-%                             out=dirtyDICOMHeaderData(outputStruct.dirtyDICOMHeader, 1, '0018', '0088',mode);  %Spacing Between Slices (can be negative number)
-%                             sliceStep=str2num(out.string);
-%                          catch
-%                             sliceStep=outputStruct.sliceSpacing;  % This is not a negative number
-%                          end
-%                          
-%                          for i=1:numberOfSlices
-%                              sliceLocations(i)=startLocation+(i-1)*sliceStep;
-%                          end
+            
                          
                          % Set time
                          
@@ -414,6 +364,8 @@ function outputImageStruct = LocalOpenDirtyDICOM3(hObject, eventdata, handles, f
 %                     
 %                     % Close imlook4d, and save only handles
 %                     close(h)
+
+                    outputMatrix = reshape(outputMatrix,size(outputMatrix,1),size(outputMatrix,2),numberOfSlices,[]);
 
                     newhandles.image.Cdata = outputMatrix;
 
