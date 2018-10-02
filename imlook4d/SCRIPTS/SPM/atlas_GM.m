@@ -10,6 +10,9 @@
 %
 % 2) Open a new imlook4d and the code can be executed on your own data from
 %    the menu /SCRIPTS/USER
+if ~verifySpmExists()
+    return
+end
 
 StartScript; % Start a script and open a new instance of imlook4d to play with
 

@@ -10,7 +10,9 @@
 % 
 % 2) Open a new imlook4d and the code can be executed on your own data from
 %    the menu /SCRIPTS/USER
-
+if ~verifySpmExists()
+    return
+end
 
 if ~exist('atlas','var')
     % Defaults

@@ -10,6 +10,10 @@
 %
 % NOTE: Realingment must be performed before!
 
+if ~verifySpmExists()
+    return
+end
+
 StoreVariables;
 aliveChecker = imlook4d_alive('spm'); % Print '.' while 'spm' in call stack (meaning that it is running). Stop-command: delete(aliveChecker)
 Export;
