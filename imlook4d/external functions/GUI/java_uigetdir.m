@@ -1,4 +1,8 @@
-function outputPath=java_uigetdir(guessedDirectory, dialogTitle);
+function outputPath=java_uigetdir(guessedDirectory, dialogTitle, save);
+    % Inputs:
+    % guessedDirectory - default
+    % dialogTitle - title 
+    % (Optional) save - true if save dialog, false if open dialog.  Save default if this parameter is missing
     % Fallback
     import javax.swing.*
     
@@ -30,7 +34,11 @@ function outputPath=java_uigetdir(guessedDirectory, dialogTitle);
 
             fc.setCurrentDirectory(java.io.File(guessedDirectory));
 
-            out=fc.showSaveDialog( f );
+            if save
+                out=fc.showSaveDialog( f );
+            else
+                out=fc.showOpenDialog( f );
+            end
             
             if out == 0
                 outputPath=char(fc.getSelectedFile().toString());
