@@ -6,6 +6,10 @@ function outputPath=java_uigetdir(guessedDirectory, dialogTitle, save);
     % Fallback
     import javax.swing.*
     
+    if ~exist('save','var')
+        save = true;
+    end
+    
     % Matlab bug fix
     pause(0.1); % Any previous inputdlg seems to need some time, otherwise the java code used in java_uigetdir freezes
 
