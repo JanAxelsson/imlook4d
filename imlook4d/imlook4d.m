@@ -5929,8 +5929,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                         maxval = max(max(abs(matrix(:,:,i))));  %Maximum absolute value in image.
                                         scale_factor = maxval/32767;
                                         scale_factor=1.01*scale_factor;   % Play it safe
+                                        
+                                        if scale_factor == 0
+                                            scale_factor = 1;
+                                        end
 
-                                        %%%scale_factor=1;
 
                                         valueString=num2str(scale_factor);
 
