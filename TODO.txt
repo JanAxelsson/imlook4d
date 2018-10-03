@@ -14,6 +14,9 @@ DEVELOP
 
 WISHLIST
 
+[  ]   Make Tissue probability map based ROI when doing "apply atlas" (see script SPM_Segmented_ROIs.m)
+       Copy LUT to current folder
+
 [  ]   ask if wish to rotate linked images with same size, or background image when toggling rotating button off
 [  ]   rotate lines in current axes, when toggling rotating button off
 
