@@ -993,6 +993,9 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
             return
         end
         
+        % Add to path (really only necessary for USER SCRIPTS, but it is fast.)
+        addpath(subMenuFolder);      % Add folder to path (in case you made a new one) 
+        
         % Identify files in folder
         [filesInDir dirs]=listDirectory(subMenuFolder);
         
@@ -1103,9 +1106,8 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                     %handles.image.WindowLevelsSubMenuHandle(i) = uimenu(handles.WindowLevelsMenu, 'Label',nameWithSpaces, 'Callback', callbackString);
                     tag = nameWithSpaces;
                 end
-
-
                 
+
                 % Advanced callback to allow 
                 % - help files for scripts
                 % - set imlook4d_current_handle
