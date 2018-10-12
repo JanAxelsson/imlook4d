@@ -1,6 +1,14 @@
-function outputPath=java_uigetdir(guessedDirectory, dialogTitle);
+function outputPath=java_uigetdir(guessedDirectory, dialogTitle, save);
+    % Inputs:
+    % guessedDirectory - default
+    % dialogTitle - title 
+    % (Optional) save - true if save dialog, false if open dialog.  Save default if this parameter is missing
     % Fallback
     import javax.swing.*
+    
+    if ~exist('save','var')
+        save = true;
+    end
     
     % Matlab bug fix
     pause(0.1); % Any previous inputdlg seems to need some time, otherwise the java code used in java_uigetdir freezes
@@ -30,7 +38,11 @@ function outputPath=java_uigetdir(guessedDirectory, dialogTitle);
 
             fc.setCurrentDirectory(java.io.File(guessedDirectory));
 
-            out=fc.showSaveDialog( f );
+            if save
+                out=fc.showSaveDialog( f );
+            else
+                out=fc.showOpenDialog( f );
+            end
             
             if out == 0
                 outputPath=char(fc.getSelectedFile().toString());

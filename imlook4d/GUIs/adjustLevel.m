@@ -180,6 +180,9 @@ function ResetPushButton_Callback(hObject, eventdata, handles)
     
     handles.minSlider.Value = minValue;
     handles.maxSlider.Value = maxValue;
+    
+    minEdit_Callback(hObject, eventdata, handles)
+    maxEdit_Callback(hObject, eventdata, handles)
 
 function closereq_Callback(hObject, eventdata, handles)
     if handles.imlook4d_handles.record.enabled % Script recording on

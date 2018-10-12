@@ -1,3 +1,9 @@
+if ~verifySpmExists()
+    return
+end
+
+
+
 atlas=[]; % Make variable, so it will be available after ClearVariables
 StoreVariables 
 oldFolder = cd();
@@ -38,15 +44,14 @@ if atlasNotAvailable( atlas.atlasFileName)
         return % Bail out
     else
         % Add to path
-        newPath=java_uigetdir(oldFolder,'Select folder containing atlas nifti files'); % Use java directory open dialog (nicer than windows)
+        newPath=java_uigetdir(oldFolder,'Select folder containing atlas nifti files', false); % Use java directory open dialog (nicer than windows)
         if newPath == 0
             disp('Cancelled by user');
             cd( oldFolder); % Keep Matlab's current directory
             return
         end
         
-        [folderName,name,ext] = fileparts(newPath);
-        p = genpath(folderName);
+        p = genpath(newPath);
         addpath(p);
         savepath;
         

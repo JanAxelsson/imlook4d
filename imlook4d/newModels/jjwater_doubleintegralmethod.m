@@ -2,6 +2,9 @@ function out =  jjwater_doubleintegralmethod( matrix, t, dt_in, Ct1)
 
     % PET Water - double integral method
     %
+    % Reference:
+    % https://doi.org/10.1177/0271678X17730654
+    %
     % Inputs:
     %   matrix = data with last dimension being frames (could be image matrix, or ROI values)
     %   t = frame start times in minutes

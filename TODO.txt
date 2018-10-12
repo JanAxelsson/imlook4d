@@ -12,7 +12,11 @@ DEVELOP
 
 [  ]   Make mask, allowing models on images to work better
 
+
 WISHLIST
+
+[  ]   Make Tissue probability map based ROI when doing "apply atlas" (see script SPM_Segmented_ROIs.m)
+       Copy LUT to current folder.  I have a copy in imlook4d LUT folder called TPM something
 
 [  ]   ask if wish to rotate linked images with same size, or background image when toggling rotating button off
 [  ]   rotate lines in current axes, when toggling rotating button off

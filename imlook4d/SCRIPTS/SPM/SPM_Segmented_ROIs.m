@@ -1,3 +1,4 @@
+% Script recording started at : 20-Jun-2018 08:24:35
 % YOUR SCRIPT NAME HERE
 % ---------------------
 % This is a template for an imlook4d script that runs your code and puts the results into a new imlook4d window.
@@ -10,9 +11,6 @@
 %
 % 2) Open a new imlook4d and the code can be executed on your own data from
 %    the menu /SCRIPTS/USER
-if ~verifySpmExists()
-    return
-end
 
 StartScript; % Start a script and open a new instance of imlook4d to play with
 
@@ -28,48 +26,58 @@ StartScript; % Start a script and open a new instance of imlook4d to play with
 % --------------------------------------------------
 % START OWN CODE:
 % --------------------------------------------------
+%% Open c1-c5
 
-% Probability level to use for GM (between 0 and 1)
-THRESHOLD = 0.25;
+currentFile = imlook4d_current_handles.image.file;
+cFile = [ 'c1' currentFile];
 
-% Open GM file (name c1FILE.nii); this file is called FILE
-fullPath = [imlook4d_current_handles.image.folder imlook4d_current_handles.image.file];
-[folder,FILE,ext] = fileparts(fullPath);
+% Open c1
+V = spm_vol(cFile);
+A = spm_read_vols(V); % Individual's c1... file
 
-GM_ROI_file = [ folder filesep 'c1' FILE ext];
+X = size(A,1);
+Y = size(A,2);
+Z = size(A,3);
 
-try
-    nii = load_nii(GM_ROI_file);
-    openingMode='load_nii';
-catch
-    %  Load NIFTI or ANALYZE dataset, but not applying any appropriate affine
-    %  geometric transform or voxel intensity scaling.
-    %warndlg({'WARNING - load_nii failed.',  'Trying load_untouch_nii.',  'The data will not go through geometrical transforms'});
-    try
-        nii = load_untouch_nii(GM_ROI_file)
-        openingMode='load_untouch_nii';
-    catch
-        disp(['ERROR loading Gray Matter probability mask.  Does file '  GM_ROI_file 'exist?']);
-        return
-    end
+M = zeros( X,Y,Z,5); 
+M(:,:,:,1) = A;
+
+% Open c2-c5
+for i = 2:5
+    cFile = [ 'c' num2str(i) currentFile];
+    V = spm_vol(cFile);
+    A = spm_read_vols(V); % Individual's c1... file
+    M(:,:,:,i) = A;
 end
 
-GM = nii.img;
+%% Create ROI
+maxM = max( M,[],4);
+ROIs = zeros( X,Y,Z);
+ for i = 1:size(M,4) % Loop frames in Y 
+    ROIs = ROIs + i * ( ...
+        ( M(:,:,:,i) == maxM ) & ( M(:,:,:,i) > 0.50 ) ...
+        );
 
-% Remove ROI pixels outside Gray Matter (GM)
-GMmax = max(GM(:));
+    %ROIs = ROIs + i * ( M(:,:,:,i) == maxM );
+end
+NewROIs = reshape(ROIs,X,Y,Z ); 
 
-GMpixels = GM > THRESHOLD * GMmax;
+%% Save ROI file in Nifti
+newFile = [ imlook4d_current_handles.image.folder  'TPM_based_ROIs.nii'];
 
-newROI = zeros( size(GM) );
-newROI(GMpixels) = imlook4d_ROI( GMpixels);
 
-imlook4d_ROI = newROI;
+V.fname = newFile;
+V.dt = [16 0];
+V = spm_write_vol(V, NewROIs);
+
+LoadROI(newFile);
 
 
 % --------------------------------------------------
 % END OF OWN CODE
 % --------------------------------------------------
 
-EndScript; % Import your changes into new instance and clean up your variables
+%EndScript; % Import your changes into new instance and clean up your variables
+
+
 
