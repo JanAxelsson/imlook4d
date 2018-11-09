@@ -2744,13 +2744,15 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         valuesInROIPixels = frame .* ( handles.image.ROI == ROINumber);
                         highestInEachslice = max(  reshape( valuesInROIPixels, dims(1)*dims(2), [])); 
                         highestValue = max( highestInEachslice);
-                        sliceWithHighestValue = find( highestInEachslice==highestValue);
-                        firstOccurence = sliceWithHighestValue(1);
+                        slicesWithHighestValue = find( highestInEachslice==highestValue);
+                        sliceWithHighestValue = slicesWithHighestValue(1);
                         
                         
 
                         % Set SliceNumber in GUI
-                        setSlice(handles, firstOccurence, handles.figure1); %
+                        if sum( highestInEachslice) >0
+                            setSlice(handles, sliceWithHighestValue, handles.figure1); %
+                        end
 
                         updateImage(handles, eventdata, handles);
                         updateROIs(handles);
@@ -3028,7 +3030,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         %updateImage(hObject,{},handles);
         
         % Move to same ROI in new orientation
-        ROINumberMenu_Callback( handles.ROINumberMenu, [], handles);
+        if ~strcmp( handles.ROINumberMenu.String{ handles.ROINumberMenu.Value}, 'Add ROI')
+            ROINumberMenu_Callback( handles.ROINumberMenu, [], handles);
+        end
       function handles = setOrientation(handles, newNumericOrientation)
 
         % Numerical constants
