@@ -1897,7 +1897,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
     function recordOnButton_ClickedCallback(hObject, eventdata, handles)
              % Display HELP and get out of callback
              if DisplayHelp(hObject, eventdata, handles) 
-                 set(hObject,'State', 'off')
+                 set(hObject,'State', 'off');
                  return 
              end
              
@@ -1946,14 +1946,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
            %  buttons  = findobj('Tag','record_toolbar_button');
              for i=1:length(buttons)
                  % Inibit callbacks
-                 set(buttons(i),'OnCallback', [])
+                 set(buttons(i),'OnCallback', []);
 
                  % Copy record struct (editor, enabled, )
                 % imlook4d_handle = get( get( get(buttons(i),'Parent') ,'Parent'));  % Get imlook4d instance for i:th button
                 % imlook4d_handles.record = handles.record;   % Copy the record struct
                  
                  % Set state
-                 set(buttons(i),'State', 'on')
+                 set(buttons(i),'State', 'on');
                  
                  % Copy and store handles.record to other figures
                  h = getParentFigure(buttons(i));
@@ -1961,9 +1961,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                  hHandles.record = handles.record; % Copy 
                  guidata(h, hHandles);
                  
-                 hHandles.record.editor
+                 hHandles.record.editor;
                  % Reset callback functions
-                 set(buttons(i),'OnCallback', tempCallback)
+                 set(buttons(i),'OnCallback', tempCallback);
              end
              
              % Move to top
@@ -1982,7 +1982,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
     function recordOffButton_ClickedCallback(hObject, eventdata, handles)            
              % Display HELP and get out of callback
              if DisplayHelp(hObject, eventdata, handles) 
-                 set(hObject,'State', 'off')
+                 set(hObject,'State', 'off');
                  return 
              end
              releasedToggleButton( hObject);
@@ -1995,7 +1995,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              % Set all record buttons 
              buttons  = findobj('Tag','record_toolbar_button');
              for i=1:length(buttons)
-                 set(buttons(i),'State', 'off')
+                 set(buttons(i),'State', 'off');
    
                  % Copy record struct                               
                  h = getParentFigure(buttons(i));

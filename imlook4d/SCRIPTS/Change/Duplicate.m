@@ -94,13 +94,19 @@
        set( HmatchNew(i), 'Value',  get( HmatchOld(i), 'Value') );
     end
     
-    % Copy checkboxes
+    % Copy edit fields
     style = 'edit';
     HmatchOld = findobj(imlook4d_current_handle,'Style',style);
     HmatchNew = findobj(newHandle,'Style',style);
     for i = 1: length(HmatchOld)
        set( HmatchNew(i), 'String',  get( HmatchOld(i), 'String') );
     end
+    
+    % Copy record-button status
+    tag = 'record_toolbar_button';
+    HmatchOld = findobj(imlook4d_current_handle,'Tag',tag);
+    HmatchNew = findobj(newHandle,'Tag',tag);
+    set( HmatchNew(1), 'State',  get( HmatchOld(1), 'State') );
 
 
  %   
