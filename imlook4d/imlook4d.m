@@ -6809,7 +6809,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
            for i=1:size(hROIObjects)
                set(hROIObjects(i),'Checked','off')
            end
-           %set(hObject,'Checked','on')
+           set(hObject,'Checked','on')
            
            imlook4d_set_ROIColor(handles.figure1, eventdata, handles)
            
