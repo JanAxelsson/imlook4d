@@ -2732,42 +2732,28 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 ROISlice=handles.image.ROI(:,:,currentSlice);
 
 
-                % If current slice not in ROI, start looking in first slice
-                % (otherwise look in current slice)
-                if (size(ROISlice(ROISlice==ROINumber),1)  ==0 )
-                    i=0; % Will be updated by 1 in while loop
-                else
-                    i=currentSlice;
-                end
-
                 if (size(ROISlice(ROISlice==ROINumber),1)  ==0 )
                     try
-%                          % Loop until first slice with a ROI
-%                         while (i<=numberOfSlices)&&(  size(ROISlice(ROISlice==ROINumber),1)  ==0  )
-%                             i=i+1;
-%                             %ROISlice=handles.image.ROI(:,:,i,1);
-%                             ROISlice=handles.image.ROI(:,:,i);
-%                         end
-%                         disp(['Found ROI ' num2str(ROINumber) ' in slice=' num2str(i)]);                        
-%                         
-%                         % Set SliceNumber in GUI
-%                         setSlice(handles, i, handles.figure1);
-                        
+
                         
                         % Find slice with highest pixel in ROI
                         
                         frame = handles.image.Cdata(:,:,:,currentFrame);
-                        maxValueInROI = max( frame(handles.image.ROI == ROINumber) )
-                        indecesToHighest = find( frame(:) == maxValueInROI);
-                        dims = size( handles.image.ROI);
-                        slices = ceil( indecesToHighest / ( dims(1) * dims(2) ) ); % Slice
-                        firstOccurence = slices(1);
+                        dims = size(handles.image.ROI);
+                        
+                        valuesInROIPixels = frame .* ( handles.image.ROI == ROINumber);
+                        highestInEachslice = max(  reshape( valuesInROIPixels, dims(1)*dims(2), [])); 
+                        highestValue = max( highestInEachslice);
+                        sliceWithHighestValue = find( highestInEachslice==highestValue);
+                        firstOccurence = sliceWithHighestValue(1);
+                        
+                        
 
                         % Set SliceNumber in GUI
                         setSlice(handles, firstOccurence, handles.figure1); %
 
                         updateImage(handles, eventdata, handles);
-                        %updateROIs(handles);
+                        updateROIs(handles);
                     catch
                         % No ROI found, catch error because i>numberOfSlices in while
                         % loop
@@ -3025,7 +3011,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
   
         % Set for foreground image
         handles = setOrientation(handles, orientationNumber);
-        guidata(handles.figure1, handles); 
+        guidata(handles.figure1, handles);
+        
 
         
         % Set for background image (call orientationMenu_Callback for background image)
@@ -3038,7 +3025,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             % backgroundimage itself is processed)
         end
         
-        updateImage(hObject,{},handles);
+        %updateImage(hObject,{},handles);
+        
+        % Move to same ROI in new orientation
+        ROINumberMenu_Callback( handles.ROINumberMenu, [], handles);
       function handles = setOrientation(handles, newNumericOrientation)
 
         % Numerical constants
@@ -3086,6 +3076,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 set(handles.axes1, 'YLim', [1 size( handles.image.Cdata,2)]) 
              % Set sliders
                 adjustSliderRanges(handles);
+                
              % Update image   
                 updateROIs(handles);
                 updateImage(handles.figure1, [], handles);
