@@ -786,19 +786,6 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
             % Make Windows menu (let it display to the left of HelpMenu)
             %
                 set(handles.windows,'Position',6);
-                %disp('Windows menu')
-
-
-
-
-            %
-            % Gray out menues requiring special toolboxes
-            %             
-                % Profile
-                if ( strfind('C:\Program Files\MATLAB\R2008b\toolbox\matlab\codetools\profile.m', 'profile.m')>0)
-                else
-                    set(handles.imProfile', 'Enable', 'off');
-                end;       
 
             %
             % Store GUI layout information (use when resizing window)
@@ -8250,8 +8237,235 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                    % fileType variable non-existing
                    displayMessageRow('');
                end
-               
+
             function updateROIs(handles)
+            % ------------------------------------------------------------------------------------------
+            % This function draws ROIs on top of cached image (not flipped and
+            % rotated)
+            % Flip-and-rotate is performed on both ROI and image
+            %
+            % Interpolation of displayed image is performed here.
+            %    
+            % This routine is responsible for updating the screen display
+            % It is called two different ways:
+            % 1) wmb                (when drawing ROI with mouse)
+            %       drawROI         (draws ROI pixels in ROI matrix)
+            %           updateROI   (CachedImage is used here, so it does not need to be recalculated)
+            %
+            % 2) updateImage        (for instance when changing slice or frame.  CachedImage is generated here)
+            %       updateROI       (CachedImage is used here, so it does not need to be recalculated)
+            %
+            % THEORY:
+            %
+            % ImgObject data is plotted inside axes1
+            % axes1     -coordinate system is defined by XLim=[min max], YLim=[min max]
+            %           -DataAspectRatio defines how much space the plot takes in x,y direction 
+            %
+            % ImgObject (data) coordinates are defined by XData, YData
+            %           This is the coordinate system used when clicking
+            %           the mouse
+            % 
+            
+                IMAGINGTOOLBOX = ~isempty( which('bwboundaries') );
+                if IMAGINGTOOLBOX
+                    updateROIsImagingToolbox(handles);
+                    return
+                end
+            
+                % -------------------------------------------------
+                % Initialize
+                % -------------------------------------------------
+                    numberOfSlices=size(handles.image.Cdata,3);
+                    numberOfPixelsX=size(handles.image.Cdata,1);
+                    numberOfPixelsY=size(handles.image.Cdata,2); %Y
+
+                    slice=round(get(handles.SliceNumSlider,'Value'));
+                    frame=round(get(handles.FrameNumSlider,'Value'));
+                    
+                    rois=handles.image.ROI(:,:,slice);                           % ROIs in this slice
+                    
+                    % Rotate and flip
+                    if get(handles.FlipAndRotateRadioButton,'Value')
+                        rois=orientImage(rois);
+                        tempAlphaData = get(handles.ImgObject3,'AlphaData');
+                        set(handles.ImgObject3,'CData', zeros( [size(rois) 3]), 'AlphaData', zeros(size(rois) ) );
+                    else
+                        tempAlphaData = get(handles.ImgObject3,'AlphaData');
+                        set(handles.ImgObject3,'CData', zeros( [size(rois) 3]), 'AlphaData', zeros(size(rois) ) );
+                    end
+                    
+                    % Work matrices
+
+                    activeRoiPicture=zeros(size(handles.image.Cdata,1), size(handles.image.Cdata,2),'single');
+                    activeRoiPicture=zeros(size(rois),'single');
+                    inActiveRoiPicture=zeros(size(activeRoiPicture),'single');
+                    
+
+
+                % -------------------------------------------------
+                % Create image and ROI pixel values
+                % -------------------------------------------------
+
+
+                    % ROI display things
+                       activeROI=get(handles.ROINumberMenu,'Value');             
+  
+                       
+                       % Remove non-visible ROIs from pixels
+                       numberOfROIs = length(handles.image.VisibleROIs);
+                       for i=1:numberOfROIs
+                           if (handles.image.VisibleROIs(i)==0)
+                               rois(rois==i)=0;       % All ROIs
+                           end
+                       end
+                       
+                       % Keep only reference ROIs, if checked in GUI
+                       if strcmp( handles.OnlyRefROIs.Checked, 'on')
+                           roisToCalculate = handles.model.common.ReferenceROINumbers;
+                           roisToHide = setdiff( 1:numberOfROIs , roisToCalculate);
+                           for i = roisToHide
+                               rois(rois==i)=0; 
+                           end
+                       end
+                       
+
+                       % Set pixels in active ROI                              set(handles.ImgObject3,'AlphaData', 0.5);  
+
+
+                       % Set pixels in all other ROIs
+                       logicalA=(rois==activeROI);          % Active ROI
+                       logicalB=(rois~=0);                  % All ROIs
+                       logicalC=xor(logicalA , logicalB);   % Removes Active ROI from All ROIs
+                       
+                       activeRoiPicture(logicalA)=1;    
+                       inActiveRoiPicture(logicalC) = 1;
+                       
+                       % Modify activeRoiPicture (to show only contour)
+                       if ( get(handles.ContourCheckBox,'Value')==1 ) 
+                           a = max( activeRoiPicture(:));
+                           b = max( inActiveRoiPicture(:));
+                            
+                            lineThickness = 1;
+                            
+                            xrange = (lineThickness + 1) : ( size(activeRoiPicture,1) - lineThickness-1 ); 
+                            yrange = (lineThickness + 1) : ( size(activeRoiPicture,2) - lineThickness-1 );
+
+    
+                            activeRoiPicture( xrange, yrange) = ...
+                                  activeRoiPicture( xrange , yrange+lineThickness) ...
+                                  + activeRoiPicture( xrange , yrange-lineThickness) ...
+                                  + activeRoiPicture( xrange+lineThickness , yrange) ...
+                                  + activeRoiPicture( xrange-lineThickness , yrange) ...
+                                ;                               
+
+                            
+                            level = 3*a;
+                           activeRoiPicture( activeRoiPicture > level ) = 0; % hide inside pixels
+                            
+                                
+                            inActiveRoiPicture( xrange, yrange) = ...
+                                  inActiveRoiPicture( xrange , yrange+lineThickness) ...
+                                  + inActiveRoiPicture( xrange , yrange-lineThickness) ...
+                                  + inActiveRoiPicture( xrange+lineThickness , yrange) ...
+                                  + inActiveRoiPicture( xrange-lineThickness , yrange) ...
+                                ;
+                            
+                            
+                            level = 3*b;
+                            inActiveRoiPicture( inActiveRoiPicture > level) = 0;
+                       end
+                       
+                % -------------------------------------------------
+                % Draw ROIs in image (SKIP THIS IF HIDE ROIS IS ON)
+                % -------------------------------------------------
+                        try
+                            ColorfulROI = strcmp( handles.image.ROIColor, 'Colored');
+                            GrayROI = strcmp( handles.image.ROIColor, 'Gray');
+                            MultiColoredROIs = strcmp( handles.image.ROIColor, 'MultiColoredROIs');
+                        catch
+                            handles.image.ROIColor = 'Colored';
+                            ColorfulROI = true;
+                            GrayROI = false;
+                            MultiColoredROIs = false;
+                        end
+                                        
+                        if ( get(handles.hideROIcheckbox,'Value')==0 )
+  
+                            % 1) ColorFul ROI  (Green for active, Red for inactive)
+                            
+                            if ColorfulROI
+                                tempData = activeRoiPicture;
+                                xSize = size(get(handles.ImgObject3,'CData'),1);
+                                ySize = size(get(handles.ImgObject3,'CData'),2);
+                                
+                                act =  ( reshape( reshape(activeRoiPicture,1,[])' * [ 0 1 0 ] , xSize, ySize, []) > 0  );
+                                inact =  ( reshape( reshape(inActiveRoiPicture,1,[])' * [ 1 0 0 ]*0.6 , xSize, ySize, []) > 0  );
+                                set(handles.ImgObject3,'Cdata', act + inact  );
+                                
+                                % 1a) ColorFul ROI - contour
+                                if ( get(handles.ContourCheckBox,'Value')==1 )
+                                    set(handles.ImgObject3,'AlphaData', 1*(activeRoiPicture>0) + 1*(inActiveRoiPicture>0)  );
+                                    
+                                % 1b) ColorFul ROI - solid
+                                else
+                                    set(handles.ImgObject3,'AlphaData', 0.5*(activeRoiPicture>0) + 0.3*(inActiveRoiPicture>0)  );
+                                end
+                                
+                            end
+                            
+                            % 2) Gray ROI
+                            
+                            if GrayROI
+                                
+                                set(handles.ImgObject3,'Cdata', zeros(size(activeRoiPicture) ) );
+                                
+                                % 2a) Gray ROI - contour
+                                if ( get(handles.ContourCheckBox,'Value')==1 )
+                                    set(handles.ImgObject3,'AlphaData', 0.5*(activeRoiPicture>0) + 0.4*(inActiveRoiPicture>0)  );
+                                    
+                                % 2b) Gray ROI - solid
+                                else
+                                    set(handles.ImgObject3,'AlphaData', 0.5*(activeRoiPicture>0) + 0.3*(inActiveRoiPicture>0)  );
+                                end
+                            end
+                              
+                              
+                            % 3) MultiColor ROI 
+                             
+                            if MultiColoredROIs
+                                xSize = size(get(handles.ImgObject3,'CData'),1);
+                                ySize = size(get(handles.ImgObject3,'CData'),2);
+                                
+                                % Set colors for ROI layer
+                                a  = zeros( [size(activeRoiPicture) 3 ]);
+
+                                %for i = 1:length(handles.image.VisibleROIs)
+                                roisInSlice = unique( rois( find( rois >0)));
+                                if length(roisInSlice) > 0
+                                    for i = roisInSlice'  % Set ROI colors only for ROIs in slice
+                                        color = getColor(i);
+                                        a = a +  reshape( reshape( rois == i ,1,[])' * color , xSize, ySize, []) ;
+                                    end
+                                    set(handles.ImgObject3,'Cdata', a  );  % ROI RGB-matrix
+                                end
+                                
+                                % Set transparency
+                                
+                                % 3a) MultiColor ROI - contour
+                                if ( get(handles.ContourCheckBox,'Value') == 1 )
+                                    set(handles.ImgObject3,'AlphaData', 1*(activeRoiPicture + inActiveRoiPicture)  );
+                                % 3b) MultiColor ROI - solid 
+                                else
+                                    set(handles.ImgObject3,'AlphaData', 0.3*(activeRoiPicture + inActiveRoiPicture)  );
+                                end
+                                
+                            end
+                              
+                        else
+                              set(handles.ImgObject3,'Cdata', zeros(size(activeRoiPicture)));  
+                              set(handles.ImgObject3,'AlphaData', 0.0);  
+                        end % END DRAWING ROIS         
+                function updateROIsImagingToolbox(handles)
             % ------------------------------------------------------------------------------------------
             % This function draws ROIs on top of cached image (not flipped and
             % rotated)
@@ -8448,7 +8662,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                               set(handles.ImgObject3,'Cdata', zeros(size(activeRoiPicture)));  
                               set(handles.ImgObject3,'AlphaData', 0.0);  
                         end % END DRAWING ROIS          
-                function contourRoi( binaryMatrix, color)
+                    function contourRoi( binaryMatrix, color)
                     linestyle = '-';
                     linewidth = 2;
                     b = bwboundaries(binaryMatrix);
