@@ -8,9 +8,14 @@ DEVELOP
 
 [  ]   Add Models for  clearance
 [  ]   Add Patlak for images
+	[  ]	Add Input function dialog for Patlak, Include variable name for Cinp
+	[  ]	Make reference Patlak and input Patlak
+
 [  ]   Vectorize SRTM, SRTM2 (possible?)
 
 [  ]   Make mask, allowing models on images to work better
+
+[  ]  Patlak -- add with Cp i
 
 
 WISHLIST
@@ -27,6 +32,8 @@ WISHLIST
 
 [  ]   jpeg dicoms
 [  ]   Update menu, should it save the new downloaded path by default?  Dialog window asking to save?
+
+[  ] Tact window add Edit/copy menu
 
 
 
