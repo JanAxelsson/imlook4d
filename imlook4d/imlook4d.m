@@ -8347,41 +8347,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                        
                        activeRoiPicture(logicalA)=1;    
                        inActiveRoiPicture(logicalC) = 1;
-                       
-                       % Modify activeRoiPicture (to show only contour)
-                       if ( get(handles.ContourCheckBox,'Value')==1 ) 
-                           a = max( activeRoiPicture(:));
-                           b = max( inActiveRoiPicture(:));
-                            
-                            lineThickness = 1;
-                            
-                            xrange = (lineThickness + 1) : ( size(activeRoiPicture,1) - lineThickness-1 ); 
-                            yrange = (lineThickness + 1) : ( size(activeRoiPicture,2) - lineThickness-1 );
 
-    
-                            activeRoiPicture( xrange, yrange) = ...
-                                  activeRoiPicture( xrange , yrange+lineThickness) ...
-                                  + activeRoiPicture( xrange , yrange-lineThickness) ...
-                                  + activeRoiPicture( xrange+lineThickness , yrange) ...
-                                  + activeRoiPicture( xrange-lineThickness , yrange) ...
-                                ;                               
-
-                            
-                            level = 3*a;
-                           activeRoiPicture( activeRoiPicture > level ) = 0; % hide inside pixels
-                            
-                                
-                            inActiveRoiPicture( xrange, yrange) = ...
-                                  inActiveRoiPicture( xrange , yrange+lineThickness) ...
-                                  + inActiveRoiPicture( xrange , yrange-lineThickness) ...
-                                  + inActiveRoiPicture( xrange+lineThickness , yrange) ...
-                                  + inActiveRoiPicture( xrange-lineThickness , yrange) ...
-                                ;
-                            
-                            
-                            level = 3*b;
-                            inActiveRoiPicture( inActiveRoiPicture > level) = 0;
-                       end
                        
                 % -------------------------------------------------
                 % Draw ROIs in image (SKIP THIS IF HIDE ROIS IS ON)
@@ -8402,22 +8368,22 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             % 1) ColorFul ROI  (Green for active, Red for inactive)
                             
                             if ColorfulROI
-                                tempData = activeRoiPicture;
-                                xSize = size(get(handles.ImgObject3,'CData'),1);
-                                ySize = size(get(handles.ImgObject3,'CData'),2);
-                                
-                                act =  ( reshape( reshape(activeRoiPicture,1,[])' * [ 0 1 0 ] , xSize, ySize, []) > 0  );
-                                inact =  ( reshape( reshape(inActiveRoiPicture,1,[])' * [ 1 0 0 ]*0.6 , xSize, ySize, []) > 0  );
-                                set(handles.ImgObject3,'Cdata', act + inact  );
-                                
+
                                 % 1a) ColorFul ROI - contour
                                 if ( get(handles.ContourCheckBox,'Value')==1 )
-                                    %set(handles.ImgObject3,'AlphaData', 1*(activeRoiPicture>0) + 1*(inActiveRoiPicture>0)  );
                                     contourRoi( logicalA, [ 0 1 0 ]);
                                     contourRoi( logicalC, [ 1 0 0 ]);
                                     
                                 % 1b) ColorFul ROI - solid
                                 else
+                                    tempData = activeRoiPicture;
+                                    xSize = size(get(handles.ImgObject3,'CData'),1);
+                                    ySize = size(get(handles.ImgObject3,'CData'),2);
+                                    
+                                    act =  ( reshape( reshape(activeRoiPicture,1,[])' * [ 0 1 0 ] , xSize, ySize, []) > 0  );
+                                    inact =  ( reshape( reshape(inActiveRoiPicture,1,[])' * [ 1 0 0 ]*0.6 , xSize, ySize, []) > 0  );
+                                    set(handles.ImgObject3,'Cdata', act + inact  );
+                                    
                                     set(handles.ImgObject3,'AlphaData', 0.5*(activeRoiPicture>0) + 0.3*(inActiveRoiPicture>0)  );
                                 end
                                 
@@ -8431,7 +8397,6 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                 
                                 % 2a) Gray ROI - contour
                                 if ( get(handles.ContourCheckBox,'Value')==1 )
-                                    %set(handles.ImgObject3,'AlphaData', 0.5*(activeRoiPicture>0) + 0.4*(inActiveRoiPicture>0)  );
                                     contourRoi( logicalA, [ 1 1 1 ]);
                                     contourRoi( logicalC, 0.7* [ 1 1 1 ]);
                                     
@@ -8445,32 +8410,35 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             % 3) MultiColor ROI 
                              
                             if MultiColoredROIs
-                                xSize = size(get(handles.ImgObject3,'CData'),1);
-                                ySize = size(get(handles.ImgObject3,'CData'),2);
-                                
-                                % Set colors for ROI layer
-                                a  = zeros( [size(activeRoiPicture) 3 ]);
-
-                                %for i = 1:length(handles.image.VisibleROIs)
                                 roisInSlice = unique( rois( find( rois >0)));
-                                if length(roisInSlice) > 0
-                                    for i = roisInSlice'  % Set ROI colors only for ROIs in slice
-                                        color = getColor(i);
-                                        a = a +  reshape( reshape( rois == i ,1,[])' * color , xSize, ySize, []) ;
-                                    end
-                                    set(handles.ImgObject3,'Cdata', a  );  % ROI RGB-matrix
-                                end
-                                
-                                % Set transparency
                                 
                                 % 3a) MultiColor ROI - contour
                                 if ( get(handles.ContourCheckBox,'Value') == 1 )
-                                    set(handles.ImgObject3,'AlphaData', 1*(activeRoiPicture + inActiveRoiPicture)  );
-                                    
-                                    
-                                    
+                                   
+                                   if length(roisInSlice) > 0
+                                       for i = roisInSlice'  % Set ROI colors only for ROIs in slice
+                                           color = getColor(i);
+                                            contourRoi( rois == i, color );
+                                       end
+                                   end
+
                                 % 3b) MultiColor ROI - solid 
                                 else
+                                    xSize = size(get(handles.ImgObject3,'CData'),1);
+                                    ySize = size(get(handles.ImgObject3,'CData'),2);
+                                    
+                                    % Set colors for ROI layer
+                                    a  = zeros( [size(activeRoiPicture) 3 ]);
+                                    
+                                    if length(roisInSlice) > 0
+                                        for i = roisInSlice'  % Set ROI colors only for ROIs in slice
+                                            color = getColor(i);
+                                            a = a +  reshape( reshape( rois == i ,1,[])' * color , xSize, ySize, []) ;
+                                        end
+                                        set(handles.ImgObject3,'Cdata', a  );  % ROI RGB-matrix
+                                    end
+                                    
+                                    
                                     set(handles.ImgObject3,'AlphaData', 0.3*(activeRoiPicture + inActiveRoiPicture)  );
                                 end
                                 
@@ -8479,9 +8447,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         else
                               set(handles.ImgObject3,'Cdata', zeros(size(activeRoiPicture)));  
                               set(handles.ImgObject3,'AlphaData', 0.0);  
-                        end % END DRAWING ROIS         
-
-                        
+                        end % END DRAWING ROIS          
                 function contourRoi( binaryMatrix, color)
                     linestyle = '-';
                     linewidth = 2;
