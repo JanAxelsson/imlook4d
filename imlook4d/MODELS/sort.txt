@@ -11,5 +11,8 @@ Zhou_image.m
 SRTM_image.m
 SRTM2_image.m
 ---
+#Irreversible_(Input_function)_:
+Patlak_image.m
+---
 #Flow_(Reference_tissue)_:
 Water_image_DoubleIntegral.m

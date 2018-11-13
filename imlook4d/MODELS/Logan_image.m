@@ -31,3 +31,4 @@ imlook4d_current_handles.model.Logan.k2 = k2ref;
 imlook4d_current_handles.model.SRTM2.imagetype = 1; % BP
 
 Import
+ClearVariables

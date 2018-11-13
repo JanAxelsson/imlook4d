@@ -1,6 +1,9 @@
 %
 % Dialog
 %
+StoreVariables
+ExportUntouched % I do not want recalculation of model for whole matrix, on Export.
+model_name = 'Patlak';
 
 prompt={'Start Frame ', 'Last Frame ', 'Input Function variable-name (times as for dynamic image)' };
 [answer, imlook4d_current_handles] = ModelDialog( imlook4d_current_handles, ...
@@ -26,3 +29,4 @@ imlook4d_current_handles.model.Patlak.Cinp = Cinp_for_this_script;
 
 
 Import
+ClearVariables
