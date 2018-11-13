@@ -15,10 +15,10 @@
 			<LI>  <B>save_cellarray, loadtable </B> by Armin G&uuml;nter.  Used to save and load text table files.<BR><BR>
 			<LI>  <B>Analyze/NIfTI Toolbox</B> by Jimmy Shen for import and export of Analyze/Nifti file formats 
 					(<A HREF=http://www.rotman-baycrest.on.ca/~jimmy/NIfTI"> http://www.rotman-baycrest.on.ca/~jimmy/NIfTI </A> ).<BR><BR>
-
+			<LI>  <B>Donated code</B> from many people. Special thanks to Micael Andersson for many code snippets, and Jarrko Johansson for lending me some modelling code to learn from.<BR><BR>
 
 		</UL>
-		Many web pages were useful in learning DICOM, especially the following link:
+		Many web pages were useful in learning DICOM for my own implementation of the DICOM reader, especially the following link:
 		<UL>
 			<LI>  <A HREF="http://www.dclunie.com/medical-image-faq/html/index.html"> Medical image faq </A> , by David A. Clunie.<BR><BR>
 		</UL>
@@ -29,6 +29,7 @@
 
 		I truly appreciate the works and support of the above mentioned,
 		who made it possible for me to both create this software, and avoid to reinvent the wheel too often.
+		I also truly appreciate the help of collegues and students who have used the software and found bugs and wished features that I have found useful to incorporate.
 	<P></P>
 		/Jan Axelsson (<A HREF="mailto://axelsson.jan@gmail.com">axelsson.jan@gmail.com </A>)
 	</P>
