@@ -8306,7 +8306,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     activeRoiPicture=zeros(size(rois),'single');
                     inActiveRoiPicture=zeros(size(activeRoiPicture),'single');
                     
-
+                    % Clean line-contours
+                    s = findobj(handles.figure1,'Type','Line');
+                    delete(s); % Delete all
 
                 % -------------------------------------------------
                 % Create image and ROI pixel values
@@ -8410,7 +8412,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                 
                                 % 1a) ColorFul ROI - contour
                                 if ( get(handles.ContourCheckBox,'Value')==1 )
-                                    set(handles.ImgObject3,'AlphaData', 1*(activeRoiPicture>0) + 1*(inActiveRoiPicture>0)  );
+                                    %set(handles.ImgObject3,'AlphaData', 1*(activeRoiPicture>0) + 1*(inActiveRoiPicture>0)  );
+                                    contourRoi( logicalA, [ 0 1 0 ]);
+                                    contourRoi( logicalC, [ 1 0 0 ]);
                                     
                                 % 1b) ColorFul ROI - solid
                                 else
@@ -8427,7 +8431,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                 
                                 % 2a) Gray ROI - contour
                                 if ( get(handles.ContourCheckBox,'Value')==1 )
-                                    set(handles.ImgObject3,'AlphaData', 0.5*(activeRoiPicture>0) + 0.4*(inActiveRoiPicture>0)  );
+                                    %set(handles.ImgObject3,'AlphaData', 0.5*(activeRoiPicture>0) + 0.4*(inActiveRoiPicture>0)  );
+                                    contourRoi( logicalA, [ 1 1 1 ]);
+                                    contourRoi( logicalC, 0.7* [ 1 1 1 ]);
                                     
                                 % 2b) Gray ROI - solid
                                 else
@@ -8460,18 +8466,33 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                 % 3a) MultiColor ROI - contour
                                 if ( get(handles.ContourCheckBox,'Value') == 1 )
                                     set(handles.ImgObject3,'AlphaData', 1*(activeRoiPicture + inActiveRoiPicture)  );
+                                    
+                                    
+                                    
                                 % 3b) MultiColor ROI - solid 
                                 else
                                     set(handles.ImgObject3,'AlphaData', 0.3*(activeRoiPicture + inActiveRoiPicture)  );
                                 end
                                 
                             end
-                              
+          
                         else
                               set(handles.ImgObject3,'Cdata', zeros(size(activeRoiPicture)));  
                               set(handles.ImgObject3,'AlphaData', 0.0);  
                         end % END DRAWING ROIS         
 
+                        
+                function contourRoi( binaryMatrix, color)
+                    linestyle = '-';
+                    linewidth = 2;
+                    b = bwboundaries(binaryMatrix);
+                    
+                    hold on
+                    for k=1:numel(b)
+                        h = plot( b{k}(:,2), b{k}(:,1), 'color', color, 'linestyle', linestyle);
+                        h.LineWidth = linewidth;
+                    end
+                    hold off
     % --------------------------------------------------------------------
     % Help and HTML functions
     % --------------------------------------------------------------------

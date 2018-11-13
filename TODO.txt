@@ -7,15 +7,13 @@ DEVELOP
 [  ]   HELP files for models 
 
 [  ]   Add Models for  clearance
-[  ]   Add Patlak for images
-	[  ]	Add Input function dialog for Patlak, Include variable name for Cinp
-	[  ]	Make reference Patlak and input Patlak
+
+[  ]	Make reference Patlak -- or save ref region to variable
 
 [  ]   Vectorize SRTM, SRTM2 (possible?)
 
 [  ]   Make mask, allowing models on images to work better
 
-[  ]  Patlak -- add with Cp i
 
 
 WISHLIST
@@ -68,6 +66,8 @@ ISSUES
 
 DONE
 ====
+
+[ok]  Patlak -- add with Cp 
 
 [ok]   SPM/select atlas, dialog (done), ask to show folder.
 
