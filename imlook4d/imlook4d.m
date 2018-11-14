@@ -955,6 +955,8 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                     set( hObject, 'Position', newPos);
                 catch
                 end
+                
+                resizePushButton_ClickedCallback(hObject, [], handles, 0); % Updata layout with zero increase of size
 
            initpos = get(handles.ColorBar,'Position');
            initpos = [ initpos(1) ,  1.15*initpos(2) ,  initpos(3) , 0.85*initpos(4) ];
@@ -1582,7 +1584,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
     % --------------------------------------------------------------------
     % TOOLBAR BUTTONS
     % --------------------------------------------------------------------
-    function resizePushButton_ClickedCallback(hObject, eventdata, handles)
+    function resizePushButton_ClickedCallback(hObject, eventdata, handles,ySizeIncrease)
         % Performs resizing of the imlook4d when resize button is pressed
         %
         % The strategy is to resize with kept proportions on axes1 (the image),
@@ -1595,6 +1597,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         % - figure1 is resized
         %
         % The lowerLeftY corner is calculated
+        %
+        % The fourth parameter ySizeIncrease is optional, and not used for
+        % callbacks.  
+        %
+        % It is however used if you wish to set the size
+        % manually relative current size.  This is done in
+        % imlook4d_OpeningFcn
         
         % Display HELP and get out of callback
              if DisplayHelp(hObject, eventdata, handles) 
@@ -1602,15 +1611,18 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                  return 
              end
 
-             
+                
              
              
         %
         % Initialize
         %
             set(handles.ColorBar,'Units','Pixels');              % Make colorbar possible to move correct distance
-        
-            ySizeIncrease=100;                                          % Increase in pixels relative current figure (y-direction)
+            
+            if ~exist('ySizeIncrease','var')
+                ySizeIncrease=100;                                          % Increase in pixels relative current figure (y-direction)
+            end
+
             figure1OriginalPosVector=handles.GUILayout.figure1;         % Stored at start of imlook4d
             figure1CurrentPosVector=get(handles.figure1,'Position');    % Current size of figure1
 
@@ -2135,12 +2147,66 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
        
        [az,el] = view;
        handles.image.Cdata = imrotate( handles.image.Cdata, - az, 'bilinear','crop');
+
+% 
+% 
+% 
+%          theta = -az * pi / 180;
+%          t = [cos(theta)  -sin(theta)   0   0
+%              sin(theta)   cos(theta)   0   0
+%              0             0              1     0
+%              0             0              0     1]
+% 
+%         tform = affine3d(t)
+%         
+%         imageSize = [ size(handles.image.Cdata,1) size(handles.image.Cdata,2) size(handles.image.Cdata,3)];
+%        % RA = imref2d( imageSize, handles.image.pixelSizeX, handles.image.pixelSizeY);  
+%         
+%         xlimits = [ -handles.image.pixelSizeX handles.image.pixelSizeX];
+%         ylimits = [ -handles.image.pixelSizeY handles.image.pixelSizeY];
+%         zlimits = [ -handles.image.sliceSpacing handles.image.sliceSpacing];
+%         
+%         %RA = imref3d( imageSize, handles.image.pixelSizeX, handles.image.pixelSizeY, handles.image.sliceSpacing); 
+%         RA = imref3d( imageSize, xlimits, ylimits, zlimits); 
+%         [handles.image.Cdata,RB] = imwarp(handles.image.Cdata,RA,tform,'OutputView', RA);
+        
+        
+        
+        
        view(0,90)
        rotate3d off
-       guidata( handles.figure1,handles);
-       
+       guidata( handles.figure1,handles);       
        updateImage(handles.figure1, [], handles);
-            
+            function rotated3Dmatrix = rotateUsingIsotropic( matrix, pixdim, xyangle)
+                dx = handles.image.pixelSizeX; % pixel size in mm             
+                dy = handles.image.pixelSizeY;
+                
+                DX = 0.5 * dx * size(matrix,1); % Half image width in mm
+                DY = 0.5 * dy * size(matrix,2);
+                
+                halfSide = max(DX,DY); % Required squared image halfside
+%                 step = max( halfSide/dx, halfSide/dy); % Number of pixels required2
+%                 
+%                 step = 
+%                 
+% 
+%                 start =
+%                 stop =
+%                 step =
+                
+                
+                [x,y]   = meshgrid(-DX : dx : DX , -DY : dy : DY);        % Old grid
+                [xi,yi] = meshgrid(-halfSide:step:halfSide, -halfSide:step:halfSide);            % New grid, more steps but same x,y coordinate system
+                
+                for i = 1 : size( matrix,3)
+                    matrix2D = handles.image.Cdata(:,:,i);
+                    %newMatrix2D =interp2(x,y,matrix2D',xi,yi,'bicubic')';
+                    newMatrix2D = interp2(x,y,matrix2D',xi,yi,'bilinear')';  % Make large matrix
+                    rotated2Dmatrix = imrotate( newMatrix2D, - az, 'bilinear','crop');
+                    
+                    matrix(:,:,i) = interp2(xi,yi,rotated2Dmatrix',x,y,'bilinear')'; %  Back to org size
+                end
+                
    % Shading of Pressed Toolbar Buttons
        function pressedToggleButton( hObject)
            if ismac
