@@ -2123,18 +2123,26 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 displayMessageRow(msg)
                 
     function rotateToggleButtonOn_ClickedCallback(hObject, eventdata, handles)
+       % NOTE: 
+       % I have cleared the ButtonDownFct for the rotate toggle button,
+       % and now use my own implementation.  
+       %
+       % Reason: I could not get camzoom(1) and ActionPostCallback
+       % otherwise.
+        
+        
        % Display HELP and get out of callback
        if DisplayHelp(hObject, eventdata, handles)
            set(hObject,'State', 'on')
            return
        end
        
-       pressedToggleButton( hObject);
+        pressedToggleButton( hObject);
        
        h = rotate3d( handles.axes1);
        h.Enable = 'on';
        
-       h.ActionPostCallback = '[az,el] = view; view(az,90) '; % Reset elevation (rotate only in plane)
+        h.ActionPostCallback = '[az,el] = view; view(az,90) '; % Reset elevation (rotate only in plane)
        camzoom(1)
     function rotateToggleButtonOff_ClickedCallback(hObject, eventdata, handles)
        % Display HELP and get out of callback
@@ -2143,10 +2151,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
            return
        end
        
+       
        releasedToggleButton( hObject);
        
        [az,el] = view;
-       handles.image.Cdata = imrotate( handles.image.Cdata, - az, 'bilinear','crop');
+       %handles.image.Cdata = imrotate( handles.image.Cdata, - az, 'bilinear','crop');
+       handles.image.Cdata = rotateUsingIsotropic( handles, handles.image.Cdata, -az)
 
 % 
 % 
@@ -2175,34 +2185,31 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         
        view(0,90)
        rotate3d off
-       guidata( handles.figure1,handles);       
+       guidata( handles.figure1,handles);
+       disp(az);
        updateImage(handles.figure1, [], handles);
-            function rotated3Dmatrix = rotateUsingIsotropic( matrix, pixdim, xyangle)
+            function matrix = rotateUsingIsotropic( handles, matrix, az)
                 dx = handles.image.pixelSizeX; % pixel size in mm             
                 dy = handles.image.pixelSizeY;
                 
-                DX = 0.5 * dx * size(matrix,1); % Half image width in mm
-                DY = 0.5 * dy * size(matrix,2);
+                DX = 0.5 * dx * size(matrix,1) - 0.5 * dx; % Half image width in mm
+                DY = 0.5 * dy * size(matrix,2) - 0.5 * dy;
                 
                 halfSide = max(DX,DY); % Required squared image halfside
-%                 step = max( halfSide/dx, halfSide/dy); % Number of pixels required2
-%                 
-%                 step = 
-%                 
-% 
-%                 start =
-%                 stop =
-%                 step =
+                step = 2*halfSide/1024 ; % Number of pixels required2
+
                 
-                
+                % Define meshes
                 [x,y]   = meshgrid(-DX : dx : DX , -DY : dy : DY);        % Old grid
                 [xi,yi] = meshgrid(-halfSide:step:halfSide, -halfSide:step:halfSide);            % New grid, more steps but same x,y coordinate system
                 
+                % Rotate (TODO: Make 4D rotations)
                 for i = 1 : size( matrix,3)
+                    disp(i)
                     matrix2D = handles.image.Cdata(:,:,i);
                     %newMatrix2D =interp2(x,y,matrix2D',xi,yi,'bicubic')';
                     newMatrix2D = interp2(x,y,matrix2D',xi,yi,'bilinear')';  % Make large matrix
-                    rotated2Dmatrix = imrotate( newMatrix2D, - az, 'bilinear','crop');
+                    rotated2Dmatrix = imrotate( newMatrix2D, az, 'bilinear','crop');
                     
                     matrix(:,:,i) = interp2(xi,yi,rotated2Dmatrix',x,y,'bilinear')'; %  Back to org size
                 end
