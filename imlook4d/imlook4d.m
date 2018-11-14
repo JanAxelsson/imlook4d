@@ -437,29 +437,10 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                     %handles.image.time=handles.image.time+handles.image.duration/2;
                 end
                 
-%                 %%%% Anders code for m4 %%%%%
-%                 if (isa(inpargs,'Matrix4D'))
-%                   m4 = inpargs;
-%                   inpargs = single(m4.matrix);
-%                   handles.image.time = m4.getVolumeTimeStamp('mean');
-%                   handles.image.fileType = 'Matrix4D';
-%                   handles.image.pixelSizeX = m4.voxelSize(1);
-%                   handles.image.pixelSizeY = m4.voxelSize(2);
-%                   handles.image.sliceSpacing = m4.voxelSize(3);
-%                   handles.image.modality = m4.imagingInfo.Modality;
-%                     
-%                 end
-%                 %%%%% End Anders code for m4 %%%%
-                
                 
                 [r,c,z,frames]=size(inpargs);
-                %inpargs=flipdim(inpargs,2);             % flip y axis
-                handles.image.Cdata=inpargs;            % put 4D matrix into handles.image.Cdata
 
-                % ECAT file storage 
-                %handles.image.mainHeader=1;
-                %handles.image.subHeader=1;
-                %handles.image.ECATDirStruct=1;
+                handles.image.Cdata=inpargs;            % put 4D matrix into handles.image.Cdata
 
                 handles.image.StoredFrameSliderValue=0; % Used to store the frame when jumping from image to PC-image.  Zero means no frame stored
 
@@ -496,10 +477,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 
 
                 handles.image.CachedImage=cimg;      % create cached image
-                %handles.ImgObject = imagesc(Img,'Parent',handles.axes1);
 
-
-                % cimg = imscale(cimg,[],[]);
                 set(handles.ImgObject,'Cdata',cimg);
                 set(handles.SliceNumEdit,'String',1);
 
@@ -532,7 +510,6 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 set(handles.axes1,'YLim',[0 c]+0.5);
                 set(handles.axes1,'XLim',[-0.5 r+0.5]);
                 set(handles.axes1,'YLim',[-0.5 c+0.5]);
-                % Set the slider's value and step size
 
                 % Colorbar
 
@@ -540,24 +517,15 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                handles.ColorBar=colorbar('peer',handles.axes1, 'FontSize', 9);
                
                set(handles.ColorBar, 'HitTest', 'off'); % No contextual menu
-               
-               %handles.ColorBar=colorbar(handles.axes1,'eastoutside' ); % Funkar ej i Matlab 2013 o tidigare
-            %   drawnow % force redraw, otherwise axis becomes misplaced in Matlab 2014b
+
 
             %
             % Setup GUI sliders
             %
 
-                %initiateSliderRanges(handles);
                 adjustSliderRanges(handles)
-                  drawnow % force redraw, otherwise axis becomes misplaced in Matlab 2014b
+                drawnow % force redraw, otherwise axis becomes misplaced in Matlab 2014b
   
-                
-
-                % Set the string of the edit box
-                %set(handles.SliceNumEdit,'String','1')
-                % Set the string of the edit box
-                %set(handles.FrameNumEdit,'String','1')
 
             %
             % Make SCRIPT MENUS (from files in imlook4d SCRIPTS directory)
@@ -588,7 +556,6 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
             %
             % Make USER SCRIPT MENUS (from files in imlook4d/../USER_SCRIPTS directory)
             %      -----------------
-        %    
 
                  % Path to look (imlook4d/../USER_SCRIPTS)
                  [pathstr1,name,ext] = fileparts(which('imlook4d'));
@@ -681,16 +648,11 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
             %      ------------
             %   (Models are m-file functions saved in MODELS directory)
                  [pathstr1,name,ext] = fileparts(which('imlook4d'));
-                 %temp=ls([pathstr1 filesep 'MODELS']);             % Read files in SCRIPTS directory
-                 %temp = cellstr(temp(3:end,:));             % Make cell array of all except '.' and '..' 
+
 
                  % Main menu item
                  handles.image.modelsMenuHandle = uimenu(handles.figure1,'Label','MODELS');
-                 set(handles.image.modelsMenuHandle, 'Callback', 'imlook4d(''ModelsMenu_Callback'',gcbo,[],guidata(gcbo))');
-                 %disp('imlook4d: MODELS menu commands');
-
-                 %temp=ls([pathstr1 filesep 'MODELS']);
-                 
+                 set(handles.image.modelsMenuHandle, 'Callback', 'imlook4d(''ModelsMenu_Callback'',gcbo,[],guidata(gcbo))');                 
                  
                  handles = makeSubMenues( handles, handles.image.modelsMenuHandle, [[pathstr1 filesep 'MODELS']]);
                  handles.model.functionHandle=[];
@@ -703,24 +665,6 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                  temp=listDirectory([pathstr1 filesep 'COLORMAPS']);
                  handles = makeSubMenues( handles, handles.Cmaps, [pathstr1 filesep 'COLORMAPS']);
 
-% 
-%                  % Submenu items
-%                  for i=1:length(temp)
-%                     [pathstr,name,ext] = fileparts(temp{i});
-%                     nameWithSpaces= regexprep(name,'_', ' ');  % Replace '_' with ' '
-% 
-%                     if strcmp(ext,'.m')
-%                         % Setup submenu callback              
-%                        callbackString=['imlook4d(''Color_Callback'',gcbo,[],guidata(gcbo), ''' name ''' )'];   
-%                        
-%                        % html text
-%                        [pathstr2,name2,ext2] = fileparts( which(name));
-%                        % label = [ '<html> <img width=100 height=15  src="file://' pathstr1 filesep 'COLORMAPS' filesep name2 '.png" ></img><font color="white">--</font>'  nameWithSpaces '</html>'];
-%                        label = [ '<html> <img width=100 height=15  src="file:///' pathstr2 filesep name2 '.png" ></img><font color="white">--</font>'  nameWithSpaces '</html>'];
-% 
-%                        handles.image.colorSubMenuHandle(i) = uimenu(handles.Cmaps, 'Label',label,'Tag',name, 'Callback', callbackString);
-%                     end
-%                  end  
 
             %
             % Make WINDOW LEVEL menu (from files in imlook4d WINDOW_LEVELS directory)
@@ -737,9 +681,6 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
             % Make NETWORK HOSTS menu (from files in imlook4d PACS directory)
             %     -------------------
                  [pathstr1,name,ext] = fileparts(which('imlook4d'));
-%                  temp=ls([pathstr1 filesep 'WINDOW_LEVELS']);      % Read files in WINDOW_LEVELS directory
-%                  temp=([pathstr1 filesep 'WINDOW_LEVELS']);
-%                  temp = cellstr(temp(3:end,:));             % Make cell array of all except '.' and '..' 
                  
                  temp=listDirectory([pathstr1 filesep 'PACS']);
 
@@ -763,7 +704,6 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                  % Select first item, if not empty
                  try
                         % Select the first item
-                        %NetworkHostsSubMenu_Callback( handles.image.NetworkHostsSubMenuHandle(1),[], guidata(handles.image.NetworkHostsSubMenuHandle(1) ) );
                         pacsDataFileName=get(handles.image.NetworkHostsSubMenuHandle(1),'UserData');
                         
                         handles.image.PACS.HostFile=pacsDataFileName;   % WHY IS THIS LOST after OpeningFunction is done?
@@ -779,9 +719,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
             % Make HELP menu (let it display at far right)
             %
                  set(handles.HelpMenu,'Position',7);
-                 %disp('HELP menu')
 
-                 
             %
             % Make Windows menu (let it display to the left of HelpMenu)
             %
@@ -814,7 +752,6 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 for i=1:size(guiNames,1)
                     h=eval(['handles.' guiNames{i}]);
                     try % Some things in handles struct do not have Units property
-                        %set(h,'Units',units);
                         
                         set(h,'FontName',FONTNAME)
                         
@@ -841,12 +778,6 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                end
 
 
-
-                %disp('setting GUILayout');
-
-               % set(handles.axes1,'Units','Normalized');
-
-
                 % Figure and image
                 handles.GUILayout.figure1=get(handles.figure1, 'Position');
                 handles.GUILayout.axes1=get(handles.axes1, 'Position');
@@ -858,6 +789,9 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 handles.GUILayout.uipanel6=get(handles.uipanel6, 'Position');
                 handles.GUILayout.uipanel7=get(handles.uipanel7, 'Position');
                 %handles.GUILayout.ColorBar=get(handles.ColorBar, 'Position');
+                
+                % Textboxes that should move
+                handles.GUILayout.floatingTextEdit1=get(handles.floatingTextEdit1, 'Position');
 
 
                 set(handles.ColorBar,'Units','normalized');  % Correct above loop (otherwise interactive colorbar does not work)
@@ -883,17 +817,17 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                     @(hObject,eventdata)imlook4d('updateImage',gcf,eventdata,guidata(gcf)) ...
                     );
                 
-            %
-            % Set same background color on all widgets
-            %
-               figureBackgroundColor=get(hObject,'Color');    
-               guiHandles=findobj(hObject, '-not', 'uimenu', '-not', 'Style', 'edit', '-not', 'Style', 'popupmenu');
-               for i=1:size(guiHandles,1)
-                   try  
-                           % set(guiHandles(i),'BackgroundColor',  figureBackgroundColor); 
-                   catch
-                   end
-               end 
+%             %
+%             % Set same background color on all widgets
+%             %
+%                figureBackgroundColor=get(hObject,'Color');    
+%                guiHandles=findobj(hObject, '-not', 'uimenu', '-not', 'Style', 'edit', '-not', 'Style', 'popupmenu');
+%                for i=1:size(guiHandles,1)
+%                    try  
+%                            % set(guiHandles(i),'BackgroundColor',  figureBackgroundColor); 
+%                    catch
+%                    end
+%                end 
 
                
             %
@@ -903,14 +837,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 
                 version=getImlook4dVersion();
                 set(handles.versionText, 'String', ['imlook4d (' version ') /Jan Axelsson'  ]);
- 
 
-                
-
-            %
-            % Generate brush
-            %
-                %BrushSize_Callback(hObject, eventdata, handles);
 
             %
             % Finalize
@@ -919,9 +846,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
          
                 % Set sliders
                 adjustSliderRanges(handles);
-%                 get(handles.PC_high_slider)
-%                 get(handles.PC_high_edit)
-            
+                
                 set(handles.axes1, 'visible', 'off');  % hide 
 
                 set(hObject, 'Name','Name');   
@@ -963,15 +888,6 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
            
            initfontsize = get(handles.ColorBar,'FontSize');
 
-
-% 
-% set(handles.ColorBar, 'Position', ...
-%                 [ initpos(1) ...
-%                  1.1*initpos(2) ...
-%                   initpos(3) ...
-%                   0.8*initpos(4) ], ...
-%                'FontSize',initfontsize*1, ...
-%                'Location', 'EastOutside')
 
  set(handles.ColorBar, 'Position',initpos','Location', 'EastOutside')
  
@@ -2142,8 +2058,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
        h = rotate3d( handles.axes1);
        h.Enable = 'on';
        
-        h.ActionPostCallback = '[az,el] = view; view(az,90) '; % Reset elevation (rotate only in plane)
+       h.ActionPostCallback = '[az,el] = view; view(az,90) '; % Reset elevation (rotate only in plane)
        camzoom(1)
+       
+       handles.infoText1.Visible = 0; % Hide info text at bottom
     function rotateToggleButtonOff_ClickedCallback(hObject, eventdata, handles)
        % Display HELP and get out of callback
        if DisplayHelp(hObject, eventdata, handles)
@@ -2151,6 +2069,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
            return
        end
        
+       handles.infoText1.Visible = 1; % Show infotext at bottom
+
        
        releasedToggleButton( hObject);
        
@@ -2196,7 +2116,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 DY = 0.5 * dy * size(matrix,2) - 0.5 * dy;
                 
                 halfSide = max(DX,DY); % Required squared image halfside
-                step = 2*halfSide/1024 ; % Number of pixels required2
+                
+                pixels = 2* max( size(matrix,1), size(matrix,2) );
+                step = 2*halfSide/pixels ; % Number of pixels required2
 
                 
                 % Define meshes
@@ -2205,14 +2127,20 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 
                 % Rotate (TODO: Make 4D rotations)
                 for i = 1 : size( matrix,3)
-                    disp(i)
+                    if ~mod(i,10)
+                        disp(i)
+                    end
                     matrix2D = handles.image.Cdata(:,:,i);
-                    %newMatrix2D =interp2(x,y,matrix2D',xi,yi,'bicubic')';
                     newMatrix2D = interp2(x,y,matrix2D',xi,yi,'bilinear')';  % Make large matrix
                     rotated2Dmatrix = imrotate( newMatrix2D, az, 'bilinear','crop');
                     
+                    % TODO: I think I need to compensate for the sin and
+                    % cos of the angle in the xi,yi values (because pixels
+                    % are rotated but keeps radial distance)
                     matrix(:,:,i) = interp2(xi,yi,rotated2Dmatrix',x,y,'bilinear')'; %  Back to org size
                 end
+                
+                matrix( isnan(matrix) ) = min(handles.image.Cdata(:));
                 
    % Shading of Pressed Toolbar Buttons
        function pressedToggleButton( hObject)
