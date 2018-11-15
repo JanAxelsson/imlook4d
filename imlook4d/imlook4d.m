@@ -2014,6 +2014,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                 releasedToggleButton( hObject);
         function displayLineCoordinates( pos)
+            
+            handles = guidata(gcf);
             disp(mat2str(pos,3))
             
             dx = pos(2,1) - pos(1,1) ;
@@ -2032,8 +2034,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 length = sqrt( dx_mm^2 + dy_mm^2 ); % length in pixels
                 
                 % angle in degrees
-                angle_degrees = atan2d( dy,dx   );
-                
+                plotboxAspectRatio = handles.axes1.PlotBoxAspectRatio; ratio = plotboxAspectRatio(1) /plotboxAspectRatio(2);
+                angle_degrees = atan2d(  dy / plotboxAspectRatio(2) ,dx / plotboxAspectRatio(1)   )
+                angle_degrees = atan2d(  dy_mm ,dx_mm   )
+
                 msg = [ 'Length = ' num2str( length) ' mm (' num2str( pixels) ' pixels long).  Angle = ' num2str(angle_degrees) ' degrees'];
                 disp( msg);
                 displayMessageRow(msg)
@@ -2052,14 +2056,19 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
            set(hObject,'State', 'on')
            return
        end
-       
-        pressedToggleButton( hObject);
+              
+       pressedToggleButton( hObject);
        
        h = rotate3d( handles.axes1);
        h.Enable = 'on';
+       h.RotateStyle='orbit';
        
        h.ActionPostCallback = '[az,el] = view; view(az,90) '; % Reset elevation (rotate only in plane)
        camzoom(1)
+       
+       % Undocumented, stop showing wrong angle, when non-square image
+       hManager = uigetmodemanager(gcf)
+       hManager.CurrentMode.ModeStateData.textState = 0;
        
        handles.infoText1.Visible = 0; % Hide info text at bottom
     function rotateToggleButtonOff_ClickedCallback(hObject, eventdata, handles)
@@ -2119,6 +2128,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 
                 pixels = 2* max( size(matrix,1), size(matrix,2) );
                 step = 2*halfSide/pixels ; % Number of pixels required2
+                
+                
+                % Fix angle error due to PlotBoxAspectRatio
+                plotboxAspectRatio = handles.axes1.PlotBoxAspectRatio; ratio = plotboxAspectRatio(1) /plotboxAspectRatio(2);
+                az = 180*atan( ratio*tan(pi*az/180))/pi;
 
                 
                 % Define meshes
