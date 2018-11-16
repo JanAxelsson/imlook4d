@@ -8,7 +8,7 @@ guidata( imlook4d_current_handle, imlook4d_current_handles);
 
 Export;
 
-model_name = 'Patlak';
+model_name = 'Patlak_ref';
 ref_name = imlook4d_ROINames{imlook4d_ROI_number};
 
 disp('Calculating time-activity curves ...');
@@ -20,20 +20,18 @@ tact = tacts;  % all ROIs
 % Dialog
 %
 
-prompt={'Start Frame ', 'Last Frame ', 'Input Function variable-name (times as for dynamic image)' };
+prompt={'Start Frame ', 'Last Frame '};
 [answer, imlook4d_current_handles] = ModelDialog( imlook4d_current_handles, ...
     model_name, ...
     prompt, ...
-    { num2str(imlook4d_frame), num2str( size(imlook4d_Cdata,4) ), '' } ...
+    { num2str(imlook4d_frame), num2str( size(imlook4d_Cdata,4) )} ...
     );
 
 startFrame = str2num( answer{1});
 endFrame = str2num( answer{2});
-Cinp_variableName = answer{3};
-
 range = [startFrame endFrame];
-Cinp_for_this_script = eval( Cinp_variableName );  
-Cinp_for_this_script = Cinp_for_this_script(:)'; % Allow both column and row vectors (make a row vector)
+
+Cinp_for_this_script = tacts(imlook4d_ROI_number,:); % Input function in current ROI
 
 %
 % Model
@@ -54,7 +52,7 @@ a = jjpatlak( tact, imlook4d_time/60, imlook4d_duration/60, Cinp_for_this_script
 modelWindow( ...
     a , ...
     imlook4d_ROINames(1:end-1), ...
-    [model_name ' (Cinp=' Cinp_variableName ',  First frame = '  num2str(imlook4d_frame) ')' ] ...
+    [model_name ' (Ref=' ref_name ',  First frame = '  num2str(imlook4d_frame) ')' ] ...
     );
 
 disp('Done!');
