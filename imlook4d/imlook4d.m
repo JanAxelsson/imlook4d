@@ -2034,7 +2034,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 length = sqrt( dx_mm^2 + dy_mm^2 ); % length in pixels
                 
                 % angle in degrees
-                plotboxAspectRatio = handles.axes1.PlotBoxAspectRatio; ratio = plotboxAspectRatio(1) /plotboxAspectRatio(2);
+                plotboxAspectRatio = handles.axes1.PlotBoxAspectRatio; 
+                ratio = plotboxAspectRatio(1) /plotboxAspectRatio(2);
                 angle_degrees = atan2d(  dy / plotboxAspectRatio(2) ,dx / plotboxAspectRatio(1)   )
                 angle_degrees = atan2d(  dy_mm ,dx_mm   )
 
@@ -2059,17 +2060,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
               
        pressedToggleButton( hObject);
        
-       h = rotate3d( handles.axes1);
+       h = rotate2d_jan( handles.axes1);
        h.Enable = 'on';
-       h.RotateStyle='orbit';
-       
-       h.ActionPostCallback = '[az,el] = view; view(az,90) '; % Reset elevation (rotate only in plane)
+
        camzoom(1)
-       
-       % Undocumented, stop showing wrong angle, when non-square image
-       hManager = uigetmodemanager(gcf)
-       hManager.CurrentMode.ModeStateData.textState = 0;
-       
+  
        handles.infoText1.Visible = 0; % Hide info text at bottom
     function rotateToggleButtonOff_ClickedCallback(hObject, eventdata, handles)
        % Display HELP and get out of callback
@@ -2084,36 +2079,19 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
        releasedToggleButton( hObject);
        
        [az,el] = view;
-       %handles.image.Cdata = imrotate( handles.image.Cdata, - az, 'bilinear','crop');
-       handles.image.Cdata = rotateUsingIsotropic( handles, handles.image.Cdata, -az)
+       
+       
 
-% 
-% 
-% 
-%          theta = -az * pi / 180;
-%          t = [cos(theta)  -sin(theta)   0   0
-%              sin(theta)   cos(theta)   0   0
-%              0             0              1     0
-%              0             0              0     1]
-% 
-%         tform = affine3d(t)
-%         
-%         imageSize = [ size(handles.image.Cdata,1) size(handles.image.Cdata,2) size(handles.image.Cdata,3)];
-%        % RA = imref2d( imageSize, handles.image.pixelSizeX, handles.image.pixelSizeY);  
-%         
-%         xlimits = [ -handles.image.pixelSizeX handles.image.pixelSizeX];
-%         ylimits = [ -handles.image.pixelSizeY handles.image.pixelSizeY];
-%         zlimits = [ -handles.image.sliceSpacing handles.image.sliceSpacing];
-%         
-%         %RA = imref3d( imageSize, handles.image.pixelSizeX, handles.image.pixelSizeY, handles.image.sliceSpacing); 
-%         RA = imref3d( imageSize, xlimits, ylimits, zlimits); 
-%         [handles.image.Cdata,RB] = imwarp(handles.image.Cdata,RA,tform,'OutputView', RA);
-        
-        
-        
-        
-       view(0,90)
-       rotate3d off
+        % Fix angle error due to PlotBoxAspectRatio
+        plotboxAspectRatio = handles.axes1.PlotBoxAspectRatio; 
+        ratio = plotboxAspectRatio(1) /plotboxAspectRatio(2);
+        az = 180*atan( ratio*tan(pi*az/180))/pi;
+
+       % rotate
+       handles.image.Cdata = rotateUsingIsotropic( handles, handles.image.Cdata, -az);   
+       view(0,90);
+       
+       rotate2d_jan off
        guidata( handles.figure1,handles);
        disp(az);
        updateImage(handles.figure1, [], handles);
@@ -2128,11 +2106,6 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 
                 pixels = 2* max( size(matrix,1), size(matrix,2) );
                 step = 2*halfSide/pixels ; % Number of pixels required2
-                
-                
-                % Fix angle error due to PlotBoxAspectRatio
-                plotboxAspectRatio = handles.axes1.PlotBoxAspectRatio; ratio = plotboxAspectRatio(1) /plotboxAspectRatio(2);
-                az = 180*atan( ratio*tan(pi*az/180))/pi;
 
                 
                 % Define meshes
@@ -2147,10 +2120,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     matrix2D = handles.image.Cdata(:,:,i);
                     newMatrix2D = interp2(x,y,matrix2D',xi,yi,'bilinear')';  % Make large matrix
                     rotated2Dmatrix = imrotate( newMatrix2D, az, 'bilinear','crop');
-                    
-                    % TODO: I think I need to compensate for the sin and
-                    % cos of the angle in the xi,yi values (because pixels
-                    % are rotated but keeps radial distance)
+
                     matrix(:,:,i) = interp2(xi,yi,rotated2Dmatrix',x,y,'bilinear')'; %  Back to org size
                 end
                 
