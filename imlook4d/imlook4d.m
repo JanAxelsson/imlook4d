@@ -2096,8 +2096,6 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
        disp(az);
        updateImage(handles.figure1, [], handles);
             function matrix = rotateUsingIsotropic( handles, matrix, az)
-                tic
-                
                 dx = handles.image.pixelSizeX; % pixel size in mm             
                 dy = handles.image.pixelSizeY;
                 
@@ -2106,36 +2104,27 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 
                 halfSide = max(DX,DY); % Required squared image halfside
                 
-                pixelFactor = 4; 
-                pixels = pixelFactor * max( size(matrix,1), size(matrix,2) );
-                step = pixelFactor * halfSide/pixels ; % Number of pixels required2
+                pixels = 2* max( size(matrix,1), size(matrix,2) );
+                step = 2*halfSide/pixels ; % Number of pixels required2
 
                 
                 % Define meshes
                 [x,y]   = meshgrid(-DX : dx : DX , -DY : dy : DY);        % Old grid
                 [xi,yi] = meshgrid(-halfSide:step:halfSide, -halfSide:step:halfSide);            % New grid, more steps but same x,y coordinate system
                 
-
-               
-                method = 'linear';
-
-                F = griddedInterpolant( x',y', zeros( size(matrix(:,:,1,1) )), method ); % 2D only
-                G = griddedInterpolant( xi',yi', zeros( length(xi), length(yi) ), method ); % 2D only
-
-                
+                % Rotate (TODO: Make 4D rotations)
                 for i = 1 : size( matrix,3)
-                    if ~mod(i,20)
-                        disp([ num2str(i) ' of ' num2str( size(matrix,3)) ]);
+                    if ~mod(i,10)
+                        disp(i)
                     end
-                    F.Values = matrix(:,:,i,1);
-                    newMatrix2D = F(xi',yi')';  % Make large matrix
-                    G.Values  = imrotate( newMatrix2D, az, 'bilinear','crop');
-                    matrix(:,:,i) = G(x',y')'; %  Back to org size 
+                    matrix2D = handles.image.Cdata(:,:,i);
+                    newMatrix2D = interp2(x,y,matrix2D',xi,yi,'bilinear')';  % Make large matrix
+                    rotated2Dmatrix = imrotate( newMatrix2D, az, 'bilinear','crop');
+
+                    matrix(:,:,i) = interp2(xi,yi,rotated2Dmatrix',x,y,'bilinear')'; %  Back to org size
                 end
-                toc
-
+                
                 matrix( isnan(matrix) ) = min(handles.image.Cdata(:));
-
                 
    % Shading of Pressed Toolbar Buttons
        function pressedToggleButton( hObject)

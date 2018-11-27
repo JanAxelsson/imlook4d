@@ -65,9 +65,6 @@ ISSUES
 			webread('https://self-signed.badssl.com/',o)
 
 
-[  ]  ruta vrida mer än 90
-[  ]  sparar ct, laddar sedan i frames   ( Sannolikt händer framme/slice buggen vid ”put in other matrix” mot nuk bild /TS) 
-
 
 DONE
 ====
