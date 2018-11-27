@@ -498,13 +498,15 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
              pixelSizeY=1;
           end
           
-     % Slice spacing
+     % Slice spacing (can be in either tag)
              try
-                 out2=dirtyDICOMHeaderData(header, i, '0018', '0088',mode); % Spacing Between Slices
+                 out2=dirtyDICOMHeaderData(header, i, '0018', '0050',mode); % Slice Thickness
+                 %out2=dirtyDICOMHeaderData(header, i, '0018', '0088',mode); % Spacing Between Slices
                  sliceSpacing=str2num(out2.string);  %
              catch
                  try
-                     out2=dirtyDICOMHeaderData(header, i, '0018', '0050',mode); % Slice Thickness
+                     out2=dirtyDICOMHeaderData(header, i, '0018', '0088',mode); % Spacing Between Slices
+                     %out2=dirtyDICOMHeaderData(header, i, '0018', '0050',mode); % Slice Thickness
                      sliceSpacing=str2num(out2.string);  %
                  catch
                      %sliceSpacing=-1
