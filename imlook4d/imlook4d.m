@@ -2096,6 +2096,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
        disp(az);
        updateImage(handles.figure1, [], handles);
             function matrix = rotateUsingIsotropic( handles, matrix, az)
+                
+                % Turn off angle textbox (created by rotate2d_jan.m)
+                hManager = uigetmodemanager(handles.figure1);
+                hManager.CurrentMode.ModeStateData.textBoxText.Visible
+                hManager.CurrentMode.ModeStateData.textBoxText.Visible = 'off';
+                hManager.CurrentMode.ModeStateData.textBoxText.Visible
+                drawnow % Force hiding of textBoxText
+                
                 dx = handles.image.pixelSizeX; % pixel size in mm             
                 dy = handles.image.pixelSizeY;
                 
@@ -2112,24 +2120,19 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 [x,y]   = meshgrid(-DX : dx : DX , -DY : dy : DY);        % Old grid
                 [xi,yi] = meshgrid(-halfSide:step:halfSide, -halfSide:step:halfSide);            % New grid, more steps but same x,y coordinate system
                 
-                
-                
-                
-                
- 
-                
+
+                % Define interpolations
                 method = 'linear'; 
- 
                 F = griddedInterpolant( x',y', zeros( size(matrix(:,:,1,1) )), method, 'none'); % 2D only, no extrapolation
                 G = griddedInterpolant( xi',yi', zeros( length(xi), length(yi) ), method, 'none' ); % 2D only, no extrapolation
-                
-                
- 
+
+                % Loop slices
                 frame = 1; % Use only one frame for now
-                
                 for i = 1 : size( matrix,3) 
                     if ~mod(i,20) 
-                        disp([ num2str(i) ' of ' num2str( size(matrix,3)) ]); 
+                        %disp([ num2str(i) ' of ' num2str( size(matrix,3)) ]); 
+                        displayMessageRow([ 'Rotating slice : ' num2str(i) ' of ' num2str( size(matrix,3)) ]); 
+                        drawnow limitrate % Force update at max 20 fps
                     end 
                     F.Values = matrix(:,:,i,frame); 
                     newMatrix2D = F(xi',yi');  % Make large matrix 
@@ -2149,6 +2152,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 matrix( isnan(matrix) ) = min(handles.image.Cdata(:)); % Use lowest value in orginal matrix
                 
                 displayMessageRow( 'Done!');
+                pause(1)
+                
                 
    % Shading of Pressed Toolbar Buttons
        function pressedToggleButton( hObject)
