@@ -2099,10 +2099,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 
                 % Turn off angle textbox (created by rotate2d_jan.m)
                 hManager = uigetmodemanager(handles.figure1);
-                hManager.CurrentMode.ModeStateData.textBoxText.Visible
                 hManager.CurrentMode.ModeStateData.textBoxText.Visible = 'off';
-                hManager.CurrentMode.ModeStateData.textBoxText.Visible
-                drawnow % Force hiding of textBoxText
+                drawnow % Force update of textBoxText to non-visible
                 
                 dx = handles.image.pixelSizeX; % pixel size in mm             
                 dy = handles.image.pixelSizeY;
@@ -5993,13 +5991,44 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                  % File names
                                     %newFileNames{i}=SOPInstanceUID;
                                     newFileNames{i}=num2str(i);
+                                    
+                                    
+                                 
+                                 % image position
+                                 
+ 
+                                    % 1) Image Position Patient
+                                    location = handles.image.imagePosition{i};
+                                    imagePositionString = [ num2str( location(1) ) '\' num2str( location(2) ) '\' num2str( location(3) )];
+                                    headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0020', '0032',mode, imagePositionString);
+
+                                    % 2) Slice Location
+                                    try
+                                        headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0020', '1041',mode, num2str(  handles.image.sliceLocations(i) ) );
+                                    catch
+                                        
+                                    end
+                                    
+
+                                    % 3) Slice Spacing
+                                    try
+                                        sliceSpacing = handles.image.sliceLocations(2) - handles.image.sliceLocations(1);  % Assume same spacing
+                                    catch
+                                        
+                                    end
+                                    
+                                    try
+                                        out2=dirtyDICOMHeaderData(header, i, '0018', '0088',mode); % Spacing Between Slices
+                                        headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0018', '0088',mode, num2str(  sliceSpacing ) );
+                                    catch
+                                        
+                                    end
 
 
 
                                  % TO DO - 
                                  % number of images
                                  % instance number
-                                 % image position
 
                                  % Make static
                                  if size(handles.image.Cdata,4)==1
