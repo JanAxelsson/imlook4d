@@ -454,7 +454,7 @@ function angleEditCallback(hObject,event)
     
     disp(['Read angle = ' angleText ] );
    
-    az = str2num( angleText);
+    azorg = str2num( angleText);
     
     % TODO: Convert to rotate3d type of angle
     
@@ -463,7 +463,15 @@ function angleEditCallback(hObject,event)
     plotboxAspectRatio = hAxes.PlotBoxAspectRatio;
     ratio = plotboxAspectRatio(1) /plotboxAspectRatio(2);
 
-    az = (180/pi) * atan( tan(pi * az / 180) / ratio );
+    az = (180/pi) * atan( tan(pi * azorg / 180) / ratio );
+    
+    % Fix -180 to 180 degrees
+    if azorg > 90
+        az = az + 180;
+    end
+    if azorg < -90
+        az = az - 180;
+    end
 
     view( az , 90);
     
@@ -972,12 +980,21 @@ if(rotaObj.ModeStateData.textState)
     
     % JAN get correct display angle
     % Fix angle error due to PlotBoxAspectRatio
-    az = axView(1);
+    azorg = axView(1);
     plotboxAspectRatio = hAxes.PlotBoxAspectRatio;
     ratio = plotboxAspectRatio(1) /plotboxAspectRatio(2);
     
-    az = 180*atan( ratio*tan(pi*az/180))/pi;
+    az = 180*atan( ratio*tan(pi*azorg/180))/pi;
     
+    % Fix -180 to 180 degrees
+    if azorg > 90
+        az = az + 180;
+    end
+    if azorg < -90
+        az = az - 180;
+    end
+    
+    %rotaObj.ModeStateData.oldAzEl(1) = rem(rem(rotaObj.ModeStateData.oldAzEl(1)+180,360)+180,360)-180;
     set(rotaObj.ModeStateData.textBoxText,'String',sprintf('%4.0f',az));
 end
 
