@@ -602,7 +602,8 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
             outputStruct.modality=modality;
             outputStruct.pixelSizeX=pixelSizeX;
             outputStruct.pixelSizeY=pixelSizeY;
-            outputStruct.sliceSpacing=abs(sliceSpacing);
+            %outputStruct.sliceSpacing=abs(sliceSpacing);
+            outputStruct.sliceSpacing=sliceSpacing;
             outputStruct.imagePosition=imagePosition;
             outputStruct.orientation=outputStruct;
             try
