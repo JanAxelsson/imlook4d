@@ -372,18 +372,8 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
 
                 
                 if  (headerSize>0)  % Ignore really small files
-% %                  % Read header and data
-% %                     fid = fopen(tempFilename, 'r',machineFormat);
-% %                     tempHeader= fread(fid, headerSize);                     % Binary header in memory  
-% %                     
-% %                     % Determine number of bytes per pixel
-% %                     
-% %                    % tempData= fread(fid, numberOfBytesInData, 'int16');     % Data in memory 
-% %                     tempData = fread(fid, numberOfBytesInData / numberOfBytesPerPixel, numberFormat);     % Data in memory 
-% % 
-% %                     fclose(fid);
-                     
-                    % NEW - Read header and data
+                  
+                    % Read header and data
                     tempHeader = A(1:headerSize);
                     tempData = typecast( uint8(A(startOfPixelData:startOfPixelData+numberOfBytesInData-1)), numberFormat);
                    
@@ -500,13 +490,13 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
           
      % Slice spacing (can be in either tag)
              try
-                 out2=dirtyDICOMHeaderData(header, i, '0018', '0050',mode); % Slice Thickness
-                 %out2=dirtyDICOMHeaderData(header, i, '0018', '0088',mode); % Spacing Between Slices
+                 %out2=dirtyDICOMHeaderData(header, i, '0018', '0050',mode); % Slice Thickness
+                 out2=dirtyDICOMHeaderData(header, i, '0018', '0088',mode); % Spacing Between Slices
                  sliceSpacing=str2num(out2.string);  %
              catch
                  try
-                     out2=dirtyDICOMHeaderData(header, i, '0018', '0088',mode); % Spacing Between Slices
-                     %out2=dirtyDICOMHeaderData(header, i, '0018', '0050',mode); % Slice Thickness
+                     %out2=dirtyDICOMHeaderData(header, i, '0018', '0088',mode); % Spacing Between Slices
+                     out2=dirtyDICOMHeaderData(header, i, '0018', '0050',mode); % Slice Thickness
                      sliceSpacing=str2num(out2.string);  %
                  catch
                      %sliceSpacing=-1
@@ -604,6 +594,7 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
             outputStruct.pixelSizeY=pixelSizeY;
             %outputStruct.sliceSpacing=abs(sliceSpacing);
             outputStruct.sliceSpacing=sliceSpacing;
+            disp(['Slice Spacing = ' num2str(sliceSpacing) ]);
             outputStruct.imagePosition=imagePosition;
             outputStruct.orientation=outputStruct;
             try
