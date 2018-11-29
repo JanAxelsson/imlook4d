@@ -123,11 +123,11 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
             %
             % Check if supported
             %
-                if ~supportedTransferSyntaxFlag
-                    warndlg({['NOT SUPPORTED DICOM format'],'',['Transfer syntax UID=' foundTransferSyntaxUID]});
-                    close(waitBarHandle);
-                    throw(exception)                     
-                end
+%                 if ~supportedTransferSyntaxFlag
+%                     warndlg({['NOT SUPPORTED DICOM format'],'',['Transfer syntax UID=' foundTransferSyntaxUID]});
+%                     close(waitBarHandle);
+%                     throw(exception)                     
+%                 end
 
             %
             % User Input (pixels and slices)
@@ -284,12 +284,16 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                 
                 % Get start of data
                 out3=dirtyDICOMHeaderData(headers, 1, '7FE0', '0010',mode);  % Find start of data
-%                 startOfPixelData=out3.indexHigh;
-%                 
-                % Calculate number of data bytes
-%                 numberOfBytesInData=(selectedFileSize-startOfPixelData-4);
-                
                 numberOfBytesInData=out3.valueLength;
+                
+                % For encapsulated DICOM, the value length = -1 (which will
+                % be an extremely large number)
+                if numberOfBytesInData == 4294967295 
+                    startOfPixelData=out3.indexLow;
+                    numberOfBytesInData=(selectedFileSize-startOfPixelData-4);
+                end
+                 
+                
                 
 %                 if (guessedMode==2)
 %                     startOfPixelData=out3.indexHigh;
@@ -348,6 +352,7 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
      %matrix=zeros(rows,columns,iNumberOfSelectedFiles, 'single');
      matrix=zeros(columns,rows,iNumberOfSelectedFiles, 'single'); 
 
+     
         for nr=1:iNumberOfSelectedFiles  %Ignore directories '.' and '..'
             if (mod(nr, 100)==0) waitbar(nr/iNumberOfSelectedFiles); end
 
@@ -366,16 +371,30 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                 numberOfBytesInData=out4.valueLength; 
                 fclose(fid);
                 
+                % For encapsulated DICOM, the value length = -1 (which will
+                % be an extremely large number)
+                if numberOfBytesInData == 4294967295 
+                    temp=dir(tempFilename);
+                    selectedFileSize=temp.bytes;
+                    startOfPixelData=out3.indexLow;
+                    numberOfBytesInData=(selectedFileSize-startOfPixelData-4);
+                end
+                 
+                
                 % Use OLD or NEW fileSize
                 %headerSize = headerSize1;  % From file size
                 headerSize = headerSize2;  % From (7FE0,0010)
 
                 
+                %
+                % Read matrix
+                %
                 if  (headerSize>0)  % Ignore really small files
                   
                     % Read header and data
                     tempHeader = A(1:headerSize);
-                    tempData = typecast( uint8(A(startOfPixelData:startOfPixelData+numberOfBytesInData-1)), numberFormat);
+                    %tempData = typecast( uint8(A(startOfPixelData:startOfPixelData+numberOfBytesInData-1)), numberFormat);
+                    tempData = typecast( uint8(A(startOfPixelData:end)), numberFormat);
                    
                     % Test if DICOM file or Hermes export
                     if strcmp(char(tempHeader(129:132))', 'DICM') || strcmp(char(tempHeader(129:132))', '1000') 
@@ -385,15 +404,31 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                         % b) single image in many files (most often)
                         if SingleFileWithMultipleSlices  % a)
                             count=numberOfBytesInData/(numberOfBytesPerPixel*rows*columns);
-                            matrix=single(reshape(tempData(:),columns,rows,count)); % Allow to grow to number of slices
+                            
+                            % JAN method
+                            % JANmatrix=single(reshape(tempData(:),columns,rows,count)); % Allow to grow to number of slices
+                            
+                            % Imaging toolbox method
+                            info = dicominfo(tempFilename);
+                            fullMatrix = dicomread(info);  % 3D matrix
+                            
+                            % Handle each slice separately
                             for i=1:count
                                 header{i}=tempHeader;% Same header in every image
                                 outputFileName{i}=tempFilename;% Same filename for every image
+                                matrix(:,:,i) = fullMatrix(:,:,i)';  % Transpose each slice
                             end  
                         else  % b)
                             count=count+1;    % Succesful read
                             try
-                                matrix(:,:,count)=single(reshape(tempData(:),columns,rows,1));
+                                % JAN method
+                                %JAN matrix(:,:,count)=single(reshape(tempData(:),columns,rows,1));
+                                
+                                % Imaging toolbox method
+                                info = dicominfo(tempFilename);
+                                matrix(:,:,count) = dicomread(info)';
+                                
+                                
                                 %disp(['      - tempData=[' num2str(size(tempData)) '] rows=' num2str(rows) ' columns=' num2str(columns) ' rows*columns=' num2str(rows*columns) ' file=' tempFilename]);
                             catch
                                 %disp(['ERROR - tempData=[' num2str(size(tempData)) '] rows=' num2str(rows) ' columns=' num2str(columns) ' rows*columns=' num2str(rows*columns) ' file=' tempFilename]);
