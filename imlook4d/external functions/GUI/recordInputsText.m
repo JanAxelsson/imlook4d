@@ -22,8 +22,12 @@ end
     
    % Bail out if not record mode
    try
-        if (imlook4d_current_handles.record.enabled == 1)
-    end
+%         if (imlook4d_current_handles.record.enabled == 1)
+%         end
+        
+        if (imlook4d_current_handles.record.enabled == 0)
+            return 
+        end
    catch
        return
    end

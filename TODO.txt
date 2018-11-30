@@ -23,7 +23,7 @@ WISHLIST
        Copy LUT to current folder.  I have a copy in imlook4d LUT folder called TPM something
 
 [  ]   ask if wish to rotate linked images with same size, or background image when toggling rotating button off
-[  ]   rotate lines in current axes, when toggling rotating button off
+
 
 [  ]   modelWindow and tactWindow:  make column widths optimal to fit more.
 [  ]   modelWindow: show parameters
@@ -66,6 +66,7 @@ ISSUES
 
 DONE
 ====
+[ok]   rotate lines in current axes, when toggling rotating button off -- solved by turning line off instead
 
 [ok]  Upgrade tar inte bort alla gamla ur path:en.  Även /../USER_SCRIPTS ligger kvar från andra versione
 [ok]   Warn if SPM saknas när man väljer meny
