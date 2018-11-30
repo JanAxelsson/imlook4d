@@ -2057,6 +2057,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
            set(hObject,'State', 'on')
            return
        end
+       
+       
+       % Bail out if not imaging toolbox
+       if ~exist('rotate3d')
+           errordlg({'Requires Matlab Imaging Toolbox', 'If you have a license for this, please install' });
+           set(hObject,'State', 'off')
+           return
+       end
               
        pressedToggleButton( hObject);
        
@@ -2069,6 +2077,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
     function rotateToggleButtonOff_ClickedCallback(hObject, eventdata, handles)
        % Display HELP and get out of callback
        if DisplayHelp(hObject, eventdata, handles)
+           set(hObject,'State', 'off')
+           return
+       end
+       
+        % Bail out if not imaging toolbox
+        % (rotateToggleButtonOff_ClickedCallback called from error in
+        % rotateToggleButtonOn_ClickedCallback)
+       if ~exist('rotate3d')
            set(hObject,'State', 'off')
            return
        end

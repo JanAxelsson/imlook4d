@@ -32,7 +32,7 @@ WISHLIST
 
 [  ]   Update menu, should it save the new downloaded path by default?  Dialog window asking to save?
 
-[  ] Tact window add Edit/copy menu
+[  ]   Tact window add Edit/copy menu
 
 
 
