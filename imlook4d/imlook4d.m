@@ -7626,9 +7626,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                         colormap=get(handles.figure1,'Colormap');
                         faktor=(size(colormap,1)+1);
-                        tempData=ind2rgb(round( faktor*( tempData-minValue) /(maxValue -minValue) ),get(handles.figure1,'Colormap')); 
+                        tempDataRGB=ind2rgb(round( faktor*( tempData-minValue) /(maxValue -minValue) ),get(handles.figure1,'Colormap')); 
                         
-                        handles.image.CachedImage = tempData;
+                        handles.image.CachedImage = tempDataRGB;
                     
                 %
                 % Cache  background image
@@ -7688,7 +7688,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                     % First image
                     try
-                        set(handles.ImgObject,'CData',tempData);
+                        set(handles.ImgObject,'CData',tempDataRGB);
                         set(handles.ImgObject,'AlphaData',imAlphaData1);
                     catch
                         disp('First image drawing failed');
@@ -7700,6 +7700,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         % Foreground layer
                         set(handles.ImgObject2,'CData',tempData2);
                         set(handles.ImgObject2,'AlphaData',imAlphaData2);
+                        
+                        % Set transparent below color range
+                        if ~isempty(tempData2)
+                            imAlphaData1 = tempData > minValue;
+                            set(handles.ImgObject,'AlphaData',imAlphaData1);
+                        end
                     catch
                     end
                     
