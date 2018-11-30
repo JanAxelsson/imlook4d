@@ -5080,8 +5080,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         % Reshape matrix
                         nx = size(outputMatrix,1);
                         ny = size(outputMatrix,2);
-                        dims = [ nx ny numberOfSlices dim];
-                        outputMatrix = reshape( outputMatrix, dims);
+                        %dims = [ nx ny numberOfSlices dim];
+                        %outputMatrix = reshape( outputMatrix, dims);
+                        
+                        outputMatrix = reshape( outputMatrix, nx, ny, numberOfSlices, []);
                         
                         
                         
@@ -7714,7 +7716,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                            % set(handles.axes1,'XLim', XLim);
                            % set(handles.axes1,'YLim', YLim);
                             set(handles.axes1,'DataAspectRatio', [ 1 1 1]);
-                            set(handles.axes1,'DataAspectRatio', [ 1/mmX 1/mmY 1]);
+                            set(handles.axes1,'DataAspectRatio', abs( [ 1/mmX 1/mmY 1] ));
                             
                     catch
                         disp('caught error updateImage');
