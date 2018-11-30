@@ -11,7 +11,9 @@
 %
 % 2) Open a new imlook4d and the code can be executed on your own data from
 %    the menu /SCRIPTS/USER
-
+if ~verifySpmExists()
+    return
+end
 StartScript; % Start a script and open a new instance of imlook4d to play with
 
 % Data fields that can be modified in your own code:
@@ -26,6 +28,8 @@ StartScript; % Start a script and open a new instance of imlook4d to play with
 % --------------------------------------------------
 % START OWN CODE:
 % --------------------------------------------------
+
+
 %% Open c1-c5
 
 currentFile = imlook4d_current_handles.image.file;

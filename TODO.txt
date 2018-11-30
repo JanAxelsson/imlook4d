@@ -3,7 +3,7 @@ TODO
 
 DEVELOP
 
-[  ]   Warn if SPM saknas när man väljer meny
+
 [  ]   HELP files for models 
 
 [  ]   Add Models for  clearance
@@ -18,7 +18,6 @@ DEVELOP
 
 WISHLIST
 
-[  ]   Skript vrida vinkel -- kanske med dialogruta när man vrider ?
 
 [  ]   Make Tissue probability map based ROI when doing "apply atlas" (see script SPM_Segmented_ROIs.m)
        Copy LUT to current folder.  I have a copy in imlook4d LUT folder called TPM something
@@ -30,7 +29,7 @@ WISHLIST
 [  ]   modelWindow: show parameters
 [  ]   modelWindow: allow update of model
 
-[  ]   jpeg dicoms
+
 [  ]   Update menu, should it save the new downloaded path by default?  Dialog window asking to save?
 
 [  ] Tact window add Edit/copy menu
@@ -48,7 +47,6 @@ PEARL-PD
 
 ISSUES
 ======
-[  ]  Upgrade tar inte bort alla gamla ur path:en.  Även /../USER_SCRIPTS ligger kvar från andra versione
 
 [  ]  Error using webread (line 122)
 		Could not establish a secure connection to "drive.google.com". The reason is "error:14090086:SSL
@@ -69,6 +67,10 @@ ISSUES
 DONE
 ====
 
+[ok]  Upgrade tar inte bort alla gamla ur path:en.  Även /../USER_SCRIPTS ligger kvar från andra versione
+[ok]   Warn if SPM saknas när man väljer meny
+[ok]   jpeg dicoms
+[ok]   Skript vrida vinkel -- kanske med dialogruta när man vrider ?
 [ok]  Patlak -- add with Cp 
 
 [ok]   SPM/select atlas, dialog (done), ask to show folder.

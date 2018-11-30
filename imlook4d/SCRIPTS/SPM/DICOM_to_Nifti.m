@@ -1,3 +1,8 @@
+if ~verifySpmExists()
+    return
+end
+
+
 StoreVariables;
 % 
 % [file,path] = uigetfile( ...
