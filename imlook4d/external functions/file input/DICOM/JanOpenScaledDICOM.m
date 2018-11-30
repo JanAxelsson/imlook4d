@@ -5,6 +5,9 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
 %     Purpose:  Read multiple DICOM files, storing header in binary format
 %               Allow for reading a single multi-slice DICOM file, if
 %               encountered.
+%               Uses Imaging toolbox for compressed files if toolbox
+%               exists.
+%
 %
 %     Comments: For a multi-slice DICOM file, some tricks have been employed, to keep the structure.
 %               The header and file name is duplicated in all slices (same filename for all slices).
@@ -27,7 +30,10 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
     waitBarHandle = waitbar(0,'Reading DICOM files');	% Initiate waitbar with text
     % Fix directory path so that it always ends with \
     %%directoryPath=strrep( [directoryPath '\'] , '\\', '\'); %Add \ at end of path. Change to \ if \\
-            directoryPath=strrep( [directoryPath filesep] , [filesep filesep], filesep); %Add \ at end of path. Change to \ if \\ 
+    directoryPath=strrep( [directoryPath filesep] , [filesep filesep], filesep); %Add \ at end of path. Change to \ if \\
+    
+    % Imaging toolbox ?
+    IMAGING_TOOLBOX = exist('dicomread');
 %
 % PROBE first selected file
 %
@@ -35,6 +41,13 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
             file=selectedFile;
             disp(selectedFile);
             dummy1=0;dummy3='l'; [Data, headers, dummy]=Dirty_Read_DICOM(directoryPath, dummy1,dummy3, selectedFile); % selected file
+            
+            %
+            % Selected series series-uid
+            %
+            out3=dirtyDICOMHeaderData(headers, 1, '0020', '000E',2);
+            selectedSeriesUID = out3.string;
+
             
     
             %    
@@ -112,7 +125,8 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                             guessedMode=2;      %Explicit
                             foundTransferSyntaxUID=out3.string;
                             explanation='(Little endian, explicit)';                           
-                        end
+                       end
+
                         
 
                     catch end
@@ -121,13 +135,17 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                 
                    
             %
-            % Check if supported
+            % Check if supported, select what to do
             %
-%                 if ~supportedTransferSyntaxFlag
-%                     warndlg({['NOT SUPPORTED DICOM format'],'',['Transfer syntax UID=' foundTransferSyntaxUID]});
-%                     close(waitBarHandle);
-%                     throw(exception)                     
-%                 end
+                if ~supportedTransferSyntaxFlag
+                    if ~IMAGING_TOOLBOX
+                        warndlg({['NOT SUPPORTED DICOM format'],'',['Transfer syntax UID=' foundTransferSyntaxUID]});
+                    	close(waitBarHandle);
+                        throw(exception)    
+                    end
+                end
+                
+                USE_IMAGING_TOOLBOX = (~supportedTransferSyntaxFlag) && IMAGING_TOOLBOX;
 
             %
             % User Input (pixels and slices)
@@ -348,8 +366,9 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
      %Get number of selected files.
      iNumberOfSelectedFiles = length(fileNames);
 
+
      count=0;  % Number of accepted files
-     %matrix=zeros(rows,columns,iNumberOfSelectedFiles, 'single');
+
      matrix=zeros(columns,rows,iNumberOfSelectedFiles, 'single'); 
 
      
@@ -384,61 +403,87 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                 % Use OLD or NEW fileSize
                 %headerSize = headerSize1;  % From file size
                 headerSize = headerSize2;  % From (7FE0,0010)
-
                 
+
                 %
                 % Read matrix
-                %
-                if  (headerSize>0)  % Ignore really small files
+                %                
+                
+                if  (headerSize>0) % Ignore really small files
                   
                     % Read header and data
                     tempHeader = A(1:headerSize);
                     %tempData = typecast( uint8(A(startOfPixelData:startOfPixelData+numberOfBytesInData-1)), numberFormat);
                     tempData = typecast( uint8(A(startOfPixelData:end)), numberFormat);
-                   
-                    % Test if DICOM file or Hermes export
-                    if strcmp(char(tempHeader(129:132))', 'DICM') || strcmp(char(tempHeader(129:132))', '1000') 
+                    
+                    % Series UID
+                    out3=dirtyDICOMHeaderData({tempHeader}, 1, '0020', '000E',2); % fix cell array for first argument
+                    seriesUID = out3.string;
+                    
+                    % Test if DICOM file, Hermes export, or same series
+                    if strcmp(char(tempHeader(129:132))', 'DICM') || strcmp(char(tempHeader(129:132))', '1000')
                         
-                        % Two cases:
-                        % a) multiple images in one file (nuclear medicin) 
-                        % b) single image in many files (most often)
-                        if SingleFileWithMultipleSlices  % a)
-                            count=numberOfBytesInData/(numberOfBytesPerPixel*rows*columns);
+                        if strcmp( seriesUID, selectedSeriesUID)
                             
-                            % JAN method
-                            % JANmatrix=single(reshape(tempData(:),columns,rows,count)); % Allow to grow to number of slices
-                            
-                            % Imaging toolbox method
-                            info = dicominfo(tempFilename);
-                            fullMatrix = dicomread(info);  % 3D matrix
-                            
-                            % Handle each slice separately
-                            for i=1:count
-                                header{i}=tempHeader;% Same header in every image
-                                outputFileName{i}=tempFilename;% Same filename for every image
-                                matrix(:,:,i) = fullMatrix(:,:,i)';  % Transpose each slice
-                            end  
-                        else  % b)
-                            count=count+1;    % Succesful read
-                            try
-                                % JAN method
-                                %JAN matrix(:,:,count)=single(reshape(tempData(:),columns,rows,1));
+                            % Two cases:
+                            % a) multiple images in one file (nuclear medicin)
+                            % b) single image in many files (most often)
+                            if SingleFileWithMultipleSlices  % a)
+                                count=numberOfBytesInData/(numberOfBytesPerPixel*rows*columns);
                                 
-                                % Imaging toolbox method
-                                info = dicominfo(tempFilename);
-                                matrix(:,:,count) = dicomread(info)';
+                                if USE_IMAGING_TOOLBOX
+                                    % Imaging toolbox method
+                                    info = dicominfo(tempFilename);
+                                    fullMatrix = dicomread(info);  % 3D matrix
+%                                     for i=1:count
+%                                         disp('Read matrix using Imaging Toolbox');
+%                                         matrix(:,:,i) = fullMatrix(:,:,i)';  % Transpose each slice
+%                                     end
+                                    matrix = permute(fullMatrix, [2 1 3 4]);
+                                    count = size(matrix,3) * size(matrix,4); % Number of slices
+                                else
+                                    % Jan method
+                                    disp('Read matrix with base Matlab');
+                                    matrix=single(reshape(tempData(:),columns,rows,count)); % Allow to grow to number of slices
+                                end
                                 
+                                % Handle each slice separately
+                                for i=1:count
+                                    header{i}=tempHeader;% Same header in every image
+                                    outputFileName{i}=tempFilename;% Same filename for every image
+                                end
                                 
-                                %disp(['      - tempData=[' num2str(size(tempData)) '] rows=' num2str(rows) ' columns=' num2str(columns) ' rows*columns=' num2str(rows*columns) ' file=' tempFilename]);
-                            catch
-                                %disp(['ERROR - tempData=[' num2str(size(tempData)) '] rows=' num2str(rows) ' columns=' num2str(columns) ' rows*columns=' num2str(rows*columns) ' file=' tempFilename]);
+                            else  % b)
+                                count=count+1;    % Succesful read
+                                try
+                                    if USE_IMAGING_TOOLBOX
+                                        % Write once
+                                        if count == 1
+                                            disp('Read matrix using Imaging Toolbox');
+                                        end
+                                        % Imaging toolbox method
+                                        info = dicominfo(tempFilename);
+                                        matrix(:,:,count) = dicomread(info)';
+                                    else
+                                        % Write once
+                                        if count == 1
+                                            disp('Read matrix with base Matlab');
+                                        end
+                                        matrix(:,:,count)=single(reshape(tempData(1:columns*rows),columns,rows,1));
+                                    end
+                                    
+                                    
+                                    %disp(['      - tempData=[' num2str(size(tempData)) '] rows=' num2str(rows) ' columns=' num2str(columns) ' rows*columns=' num2str(rows*columns) ' file=' tempFilename]);
+                                catch
+                                    disp(['ERROR - tempData=[' num2str(size(tempData)) '] rows=' num2str(rows) ' columns=' num2str(columns) ' rows*columns=' num2str(rows*columns) ' file=' tempFilename]);
+                                end
+                                header{count}=tempHeader;
+                                %fileName{count}=tempFilename;
+                                outputFileName{count}=tempFilename;
+                                
+                                %disp([TAB 'Accepting file='
+                                %sTempFilenameStruct(nr).name ]);
                             end
-                            header{count}=tempHeader;
-                            %fileName{count}=tempFilename;
-                            outputFileName{count}=tempFilename;
-
-                            %disp([TAB 'Accepting file='
-                            %sTempFilenameStruct(nr).name ]);                        
                         end
                         
                     else
