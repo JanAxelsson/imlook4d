@@ -14,6 +14,8 @@ DEVELOP
 
 [  ]   Make mask, allowing models on images to work better
 
+[  ]   Script rotate button
+
 
 
 WISHLIST
