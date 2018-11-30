@@ -49,11 +49,15 @@
     </P><P><B><I> b) Multiple images in the file </I></B>
 	</P><P>
 		If the selected DICOM file consists of multiple images (nuclear medicin), only this DICOM file is considered.  
-        The images are opened, but saving these images are not supported.
 	</P>
 
+<B>2. DICOM opening  - supported formats</B>
+<!---------------------------------------->
+    <P>Non-compressed little-endian DICOM files are supported using basic Matlab. 
+    </P><P>Compressed formats supported by Matlab Imaging Toolbox are opened, if Imaging Toolbox is installed </P>  
+
 	
-<B>2. DICOM opening  - how it works</B>
+<B>4. DICOM opening  - how it works</B>
 <!---------------------------------------->
 	<P>
 		DICOM files are separated into two parts, a header and an image part.  

@@ -469,6 +469,7 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                                         if count == 1
                                             disp('Read matrix with base Matlab');
                                         end
+                                        
                                         matrix(:,:,count)=single(reshape(tempData(1:columns*rows),columns,rows,1));
                                     end
                                     
@@ -476,6 +477,7 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                                     %disp(['      - tempData=[' num2str(size(tempData)) '] rows=' num2str(rows) ' columns=' num2str(columns) ' rows*columns=' num2str(rows*columns) ' file=' tempFilename]);
                                 catch
                                     disp(['ERROR - tempData=[' num2str(size(tempData)) '] rows=' num2str(rows) ' columns=' num2str(columns) ' rows*columns=' num2str(rows*columns) ' file=' tempFilename]);
+
                                 end
                                 header{count}=tempHeader;
                                 %fileName{count}=tempFilename;

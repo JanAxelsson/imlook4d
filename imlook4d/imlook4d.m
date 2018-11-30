@@ -2102,11 +2102,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 hManager.CurrentMode.ModeStateData.textBoxText.Visible = 'off';
                 drawnow % Force update of textBoxText to non-visible
                 
-                dx = handles.image.pixelSizeX; % pixel size in mm             
-                dy = handles.image.pixelSizeY;
+                dx = abs( handles.image.pixelSizeX ); % pixel size in mm             
+                dy = abs( handles.image.pixelSizeY );
                 
-                DX = 0.5 * dx * size(matrix,1) - 0.5 * dx; % Half image width in mm
-                DY = 0.5 * dy * size(matrix,2) - 0.5 * dy;
+                DX = abs( 0.5 * dx * size(matrix,1) - 0.5 * dx ); % Half image width in mm
+                DY = abs( 0.5 * dy * size(matrix,2) - 0.5 * dy );
                 
                 halfSide = max(DX,DY); % Required squared image halfside
                 
