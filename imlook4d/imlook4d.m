@@ -2989,7 +2989,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             contents = {contents{end}}; % Remove all but 'Add ROI'
             set(handles.ROINumberMenu,'String', contents)
             set(handles.ROINumberMenu,'Value', 1)
-            handles.image.ROI = zeros( size( handles.image.Cdata(:,:,:,1))) ;
+            handles.image.ROI = zeros( size( handles.image.Cdata(:,:,:,1)),'uint8') ;
             
             handles.image.VisibleROIs = [];
             handles.image.LockedROIs = [];
@@ -8146,7 +8146,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             
             % Loop through yoke'd images which have same folder and title
             yokes=getappdata( thisHandles.figure1, 'yokes');
-            folder = thisHandles.image.folder;
+            try
+                folder = thisHandles.image.folder;
+            catch
+                folder = ''; 
+            end
             title = get(thisHandles.figure1, 'Name');
             for i=1:length(yokes) 
                 handles=guidata(yokes(i));
