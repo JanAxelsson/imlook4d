@@ -2924,84 +2924,69 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             return
         end
         
-        ROINumberMenu=get(handles.ROINumberMenu);
-        contents = ROINumberMenu.String; % Cell array
+         ROINumberMenu=get(handles.ROINumberMenu);
         ROINumber=ROINumberMenu.Value;
         
-        % Remove if not locked
-        if ( handles.image.LockedROIs(ROINumber) == 1 )
-            disp('LOCKED ROI - not allowed to remove');
-        else
-            
-            % Delete ROI pixels, and Shift down ROIs in ROI-matrix
-            handles.image.ROI( handles.image.ROI == ROINumber ) = 0; % Delete ROI pixels
-            handles.image.ROI( handles.image.ROI > ROINumber ) = handles.image.ROI( handles.image.ROI > ROINumber ) -1;
-            
-            % Shift down ROI names
-            contents = {contents{1:ROINumber-1} , contents{ROINumber+1:end}};
-            set(handles.ROINumberMenu,'String', contents)   
-            
-            % Shift down Visible and Locks
-            handles.image.VisibleROIs = [ handles.image.VisibleROIs(1:ROINumber-1) handles.image.VisibleROIs(ROINumber+1:end)   ];
-            handles.image.LockedROIs = [ handles.image.LockedROIs(1:ROINumber-1) handles.image.LockedROIs(ROINumber+1:end)   ];
 
-            %
-            % Handle Reference ROIs (stored ROI numbers)
-            %
-                % Find position in Reference ROIs list
-                indexToRemove = find( handles.model.common.ReferenceROINumbers== ROINumber); % index in list
+            handles = removeSingleRoi(handles, ROINumber);
+            set(handles.ROINumberMenu,'Value', 1 );
+            guidata(hObject,handles);% Save handles
+            updateROIs(handles);
+        function handles = removeSingleRoi(handles, ROINumber)
+            ROINumberMenu=get(handles.ROINumberMenu);
+            contents = ROINumberMenu.String; % Cell array
+            
+            if ( handles.image.LockedROIs(ROINumber) == 1 )
+                disp(['LOCKED ROI - not allowed to remove ROI = ' contents{ROINumber}] );
+            else
                 
-                % Subtract 1 from ROIs larger than current ROINumber
-                handles.model.common.ReferenceROINumbers( handles.model.common.ReferenceROINumbers > ROINumber ) = ...
-                     handles.model.common.ReferenceROINumbers( handles.model.common.ReferenceROINumbers > ROINumber ) - 1;
-                 
-                % Remove from Reference ROIs, if in list
-                if ~isempty(indexToRemove)
-                    handles.model.common.ReferenceROINumbers = [ ...
-                        handles.model.common.ReferenceROINumbers( 1:(indexToRemove-1) ), ...
-                        handles.model.common.ReferenceROINumbers( (indexToRemove+1):end ) ...
-                        ];
-                end               
-       
-            
-            % Selected ROI
-            if ( ROINumber >= length( contents ) ) % Selected ROI pointing to Add ROI, or outside
-                set(handles.ROINumberMenu,'Value', 1 );
+                % Delete ROI pixels, and Shift down ROIs in ROI-matrix
+                handles.image.ROI( handles.image.ROI == ROINumber ) = 0; % Delete ROI pixels
+                handles.image.ROI( handles.image.ROI > ROINumber ) = handles.image.ROI( handles.image.ROI > ROINumber ) -1;
+                
+                % Shift down ROI names
+                contents = {contents{1:ROINumber-1} , contents{ROINumber+1:end}};
+                set(handles.ROINumberMenu,'String', contents)
+                
+                % Shift down Visible and Locks
+                handles.image.VisibleROIs = [ handles.image.VisibleROIs(1:ROINumber-1) handles.image.VisibleROIs(ROINumber+1:end)   ];
+                handles.image.LockedROIs = [ handles.image.LockedROIs(1:ROINumber-1) handles.image.LockedROIs(ROINumber+1:end)   ];
+                
+                %
+                % Handle Reference ROIs (stored ROI numbers)
+                %
+                try
+                    % Find position in Reference ROIs list
+                    indexToRemove = find( handles.model.common.ReferenceROINumbers== ROINumber); % index in list
+                    
+                    % Subtract 1 from ROIs larger than current ROINumber
+                    handles.model.common.ReferenceROINumbers( handles.model.common.ReferenceROINumbers > ROINumber ) = ...
+                        handles.model.common.ReferenceROINumbers( handles.model.common.ReferenceROINumbers > ROINumber ) - 1;
+                    
+                    % Remove from Reference ROIs, if in list
+                    if ~isempty(indexToRemove)
+                        handles.model.common.ReferenceROINumbers = [ ...
+                            handles.model.common.ReferenceROINumbers( 1:(indexToRemove-1) ), ...
+                            handles.model.common.ReferenceROINumbers( (indexToRemove+1):end ) ...
+                            ];
+                    end
+                catch
+                end
             end
-            
-            %disp([ 'Visible = ' num2str(handles.image.VisibleROIs) ]);
-            %disp([ 'Locked  = ' num2str(handles.image.LockedROIs) ]);
-            guidata(hObject,handles);% Save handles
-            updateROIs(handles);
-        end
     function ROI_Remove_All_Callback(hObject, eventdata, handles, name)
-        if DisplayHelp(hObject, eventdata, handles)
-            return
-        end
-        ROINumberMenu=get(handles.ROINumberMenu);
-        contents= ROINumberMenu.String; % Cell array 
-        
-        % Remove if not locked
-        if ( sum( handles.image.LockedROIs) > 0 )
-            disp('ONE OR MORE LOCKED ROIs - not allowed to remove.  Unlock ROIs first.');
-        else
-            
-            contents = {contents{end}}; % Remove all but 'Add ROI'
-            set(handles.ROINumberMenu,'String', contents)
-            set(handles.ROINumberMenu,'Value', 1)
-            handles.image.ROI = zeros( size( handles.image.Cdata(:,:,:,1)),'uint8') ;
-            
-            handles.image.VisibleROIs = [];
-            handles.image.LockedROIs = [];
-            
-            handles.model.common.ReferenceROINumbers = []; % Reference ROI list
-            
-            %disp([ 'Visible = ' num2str(handles.image.VisibleROIs) ]);
-            %disp([ 'Locked  = ' num2str(handles.image.LockedROIs) ]);
-            
-            guidata(hObject,handles);% Save handles
-            updateROIs(handles);
-        end
+                if DisplayHelp(hObject, eventdata, handles)
+                    return
+                end
+                ROINumberMenu=get(handles.ROINumberMenu);
+                contents= ROINumberMenu.String; % Cell array
+                
+                for i = length(contents)-1 : -1: 1
+                    handles = removeSingleRoi(handles, i);
+                end
+
+                set(handles.ROINumberMenu,'Value', 1 );
+                guidata(hObject,handles);% Save handles
+                updateROIs(handles);
     function ResetROILevel_Callback(hObject, eventdata, handles, name)
         lowestValue = min( handles.image.Cdata(:));
         set(handles.ROILevelEdit,'String', num2str(lowestValue));
