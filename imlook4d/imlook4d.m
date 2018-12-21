@@ -2666,7 +2666,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
     % --------------------------------------------------------------------
     % SELECTIONS
     % --------------------------------------------------------------------
-    function ROINumberMenu_Callback(hObject, eventdata, handles, name)
+    function handles = ROINumberMenu_Callback(hObject, eventdata, handles, name)
        % This function asks for a ROI name, and creates an empty ROI.
        % If input parameter name is given, this will be the ROI name, and no dialog will be displayed.  
        try
@@ -3002,6 +3002,53 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         end
         
         updateROIs(handles);
+        function ROI_Merge_Rois_Callback(hObject, eventdata, handles, name)
+
+            ROINames = handles.ROINumberMenu.String;
+            s = handles.ROINumberMenu.Value;
+            if length(ROINames) > 1
+                % Display list
+                [s,ok] = listdlg('PromptString','Select one or many ROIs as Reference Region',...
+                    'SelectionMode','multiple',...
+                    'ListSize', [700 400], ...
+                    'ListString',ROINames(1:end-1),...
+                    'InitialValue', s );
+                
+                % Bail out if cancelled dialog
+                if ~ok
+                    return
+                end
+            else
+                dispRed('Define one or more ROIs, and run this command again')
+                return
+            end
+            
+            % ROI name
+            prompt={'Enter ROI name:'};
+            name='Input ROI name';
+            numlines=1;
+            defaultanswer= 'Merged';
+            for i = 1 : length(s)
+                defaultanswer=[defaultanswer ' ' ROINames{s(i)} ] ;
+            end
+            answer=inputdlg(prompt,name,numlines,{defaultanswer});
+            name=answer{1};
+            
+            % Make new ROI at end of list
+            newROINumber = length(ROINames);
+            set(handles.ROINumberMenu,'Value',length(ROINames) ); % Add ROI is the last one
+            handles = ROINumberMenu_Callback(handles.ROINumberMenu, eventdata, handles, name);
+            
+            % Make compund ROI
+            for i = s
+                handles.image.ROI( handles.image.ROI == i) = newROINumber;
+            end
+            
+            % Set
+            guidata(handles.figure1,handles);% Save handles 
+            updateROIs(handles);
+
+            
 
     function orientationMenu_Callback(hObject, eventdata, handles, name)
         
