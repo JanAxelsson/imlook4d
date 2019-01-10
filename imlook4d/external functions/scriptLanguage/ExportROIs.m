@@ -144,7 +144,7 @@
                 dX=imlook4d_current_handles.image.pixelSizeX;  % mm
                 dY=imlook4d_current_handles.image.pixelSizeY;  % mm
                 dZ=imlook4d_current_handles.image.sliceSpacing;% mm
-                dV=dX*dY*dZ/1000;  % cm3
+                dV=abs( dX*dY*dZ/1000 );  % cm3
             catch
                 dX=0;
                 dY=0;
