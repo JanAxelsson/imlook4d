@@ -1,0 +1,23 @@
+<h1>Grow ROI</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	This grows the currently selected ROI until it is filling the volume down to a threshold value. 
+	</P><P>	
+This script <B>extends</B> the current ROI volume starting to grow from the highest pixel in the marked ROI until all connected pixels are above threshold.
+.
+This can be compared to "Threshold within ROI" which <B>decreases</B> the selected ROI until all pixels are above threshold.
+
+	</P> 
+	<P>The input in the dialog is:
+	
+		<TABLE>
+
+			
+			<TR>
+			<TD> <B> Threshold value</B></TD>
+			<TD> This is the threshold defining the edge where the growing of the ROI stops.  Absolute or % of max pixel value in frame.</TD>
+			</TR>
+
+		</TABLE>
+

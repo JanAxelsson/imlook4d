@@ -12,6 +12,7 @@ ROI_naming_from_file.m
 Threshold_within_ROI.m
 Threshold_ROI.m
 Highest_pixels_within_ROI.m
+Grow_ROI.m
 ---
 ROI_data_to_workspace.m
 ROI_info.m
