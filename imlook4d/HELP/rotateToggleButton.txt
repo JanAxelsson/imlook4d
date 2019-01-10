@@ -16,3 +16,6 @@
 		NOTE: each applied rotation will degrade the image.  It is therefore advisable to perform maximum one rotation in each Axial, Coronal and Sagital plane.
 	</P>
 	
+	<P>
+		NOTE: Requires Matlab Imaging Toolbox
+	</P>	

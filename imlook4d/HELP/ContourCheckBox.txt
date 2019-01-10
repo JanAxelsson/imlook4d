@@ -8,5 +8,7 @@
 	If not checked, the ROIs are drawn as shaded areas <u>exactly<u> representing the the pixels of the ROI.
 	</P>
 
-
-
+	
+	<P>
+		NOTE: A nicer contour will be drawn if Matlab Imaging Toolbox is present
+	</P>	

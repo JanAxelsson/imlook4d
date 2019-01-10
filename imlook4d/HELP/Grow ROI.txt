@@ -21,3 +21,7 @@ This can be compared to "Threshold within ROI" which <B>decreases</B> the select
 
 		</TABLE>
 
+	
+	<P>
+		NOTE: Requires Matlab Imaging Toolbox
+	</P>	
