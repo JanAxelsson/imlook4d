@@ -27,7 +27,11 @@
             return
         end
 
-    % Threshold value
+    %
+    % First iteration, use max value from input ROI
+    %        
+        
+        % Threshold value
         thresholdString = num2str(answer{1});
 
         if strcmp( thresholdString(end), '%')
@@ -36,12 +40,36 @@
             thresVal=  eval(thresholdString) ;  % If not percent, then whole string is a number
         end
 
-    StoreValues('RegionGrowth', answer ); % Store answer as new dialog default
+        StoreValues('RegionGrowth', answer ); % Store answer as new dialog default
     
 
 
-    % Find pos of max value
+    % 1) Find pos of max value in drawn ROI
         indecesToMaxVal = find( (imlook4d_Cdata.*ROI == maxVal) );
+        indexToMaxVal = indecesToMaxVal(1); % First index to maxVal, if many
+        [x,y,z] = ind2sub(s,indexToMaxVal);
+        initPos = [x,y,z] ;
+        
+    % Region growth
+        [P, J] = regionGrowing(cIM, initPos, thresVal);
+        
+        
+    %
+    % Second iteration, need new max value
+    %
+
+        % Determine new max value (from found binary matrix)
+        valuesInROI = ( cIM( J));
+        maxVal = max( valuesInROI(:) );
+
+        if strcmp( thresholdString(end), '%')
+            thresVal=0.01 * maxVal * str2num(thresholdString(1:end-1)) ;
+        else
+            thresVal=  eval(thresholdString) ;  % If not percent, then whole string is a number
+        end
+        
+        % Find pos of max value in found ROI
+        indecesToMaxVal = find( (imlook4d_Cdata.*J == maxVal) );
         indexToMaxVal = indecesToMaxVal(1); % First index to maxVal, if many
         [x,y,z] = ind2sub(s,indexToMaxVal);
         initPos = [x,y,z] ;
@@ -51,6 +79,7 @@
         %[P, J] = regionGrowing(cIM, initPos, thresVal, maxDist, tfMean, tfFillHoles, tfSimplify)
 
     % Set ROI
+        imlook4d_ROI(imlook4d_ROI == imlook4d_ROI_number) = 0;
         imlook4d_ROI(J) = imlook4d_ROI_number;
 
 
