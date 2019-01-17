@@ -2014,6 +2014,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                 releasedToggleButton( hObject);
         function displayLineCoordinates( pos)
+            disp('displayLineCoordinates');
             
             handles = guidata(gcf);
             disp(mat2str(pos,3))
@@ -3231,7 +3232,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              if DisplayHelp(h, evd, handles) 
                  return 
              end
-         disp('wbd');
+         %disp('wbd');
          activeROI=get(handles.ROINumberMenu,'Value');
 
          
@@ -3276,11 +3277,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
     function wbm(h, evd, handles)
          % executes while the mouse moves and mouse button is pressed
         % tic;
+
         try
-            drawROI(h, evd, handles);
-            if strcmp(get(handles.markerToggleTool,'State'), 'on')
-                drawCursorInYokes2(handles)
-            end
+                drawROI(h, evd, handles);
+                if strcmp(get(handles.markerToggleTool,'State'), 'on')
+                    drawCursorInYokes2(handles)
+                end
         catch
         end
     function wbm2(h, evd, handles)
@@ -3441,6 +3443,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              disp('Exception in wbu');
          end
     function drawROI(hObject, eventdata, handles)
+        
+                % Bail out if hand (such as in Measure Tape movement)
+                pointerIcon = get(handles.figure1, 'Pointer');
+                if strcmp(pointerIcon,'hand')
+                    return;
+                end
         
                 contents = get(handles.ROINumberMenu,'String'); % Cell array  
                 numberOfROIs=size(contents,1)-1;
