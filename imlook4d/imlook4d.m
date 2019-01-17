@@ -8624,7 +8624,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     inActiveRoiPicture=zeros(size(activeRoiPicture),'single');
                     
                     % Clean line-contours
-                    s = findobj(handles.figure1,'Type','Line');
+                    s = findobj(handles.figure1,'Tag','contourROI'); % Only find ROIs
                     delete(s); % Delete all
 
                 % -------------------------------------------------
@@ -8772,7 +8772,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     
                     hold on
                     for k=1:numel(b)
-                        h = plot( b{k}(:,2), b{k}(:,1), 'color', color, 'linestyle', linestyle);
+                        h = plot( b{k}(:,2), b{k}(:,1), 'color', color, 'linestyle', linestyle,'Tag','contourROI');
                         h.LineWidth = linewidth;
                     end
                     hold off
