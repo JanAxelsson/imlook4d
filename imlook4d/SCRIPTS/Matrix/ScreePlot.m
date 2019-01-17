@@ -7,10 +7,15 @@
 
     %  imlook4d_current_handles is updated whenever SCRIPTS menu in imlook4d is
     %  selected
+    StoreVariables
     disp('SCRIPTS/ScreePlot.m entered');
+    
+    Radiobutton('PC Image')
+    Export
 
     ScreePlotEigenValues=imlook4d_current_handles.image.eigenValues/ sum(imlook4d_current_handles.image.eigenValues');   % Fetch normalized eigenvalues (which are updated for each time imlook4d image is updated)
 
+    Radiobutton('Image')
 
 % PLOT Scree plot
     figure;
@@ -27,7 +32,9 @@
 
     hold off
 
-    clear ScreePlotEigenValues;
+    ClearVariables
+    
+    
 
 % 
 % GUIDANCE ON HOW TO CONTROL AN IMLOOK4D INSTANCE FROM SCRIPTS
