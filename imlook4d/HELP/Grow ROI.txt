@@ -2,23 +2,12 @@
 <HR></HR>
 <!------------------->
 	<P>
-	This grows the currently selected ROI down to a specified threshold value. Growing stops when no further connected voxels are found above the threshold value.
+	This grows the currently selected ROI. The region growth starts at the highest pixel in the ROI and stops when no further connected voxels are found above the threshold value. 
+
 	</P><P>	
-This script <B>extends</B> the current ROI volume starting to grow from the highest pixel in the marked ROI until all connected pixels are above threshold.
-This process is done in two iterations: 
-		<TABLE>
-
-			
-			<ul>
-			<li> first iteration finds a threshold from the highest pixel in the selected ROI, and the 
-			<li> second iteration uses the highest pixel from the first iteration as a seed for one more region growth. 
-			</li>
-			</ul>
-		</TABLE>
 
 
-In effect, this is the same as a region growth followed by "Threshold within ROI".
-This can be compared to "Threshold within ROI" which <B>only decreases</B> the selected ROI until all pixels are above threshold.
+This can be viewed as the opposite to "Threshold within ROI" which <B>only decreases</B> the selected ROI until all pixels are above threshold.
 
 	</P> 
 	<P>The input in the dialog is:

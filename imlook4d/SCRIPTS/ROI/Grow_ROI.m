@@ -4,9 +4,8 @@
     % Export to workspace
     StoreVariables
     Export
-
     % Setup
-    cIM = imlook4d_Cdata;
+    cIM = imlook4d_Cdata(:,:,:,imlook4d_frame);
     s = size(imlook4d_Cdata);
     ROI = ( imlook4d_ROI == imlook4d_ROI_number );
 
@@ -45,7 +44,7 @@
 
 
     % 1) Find pos of max value in drawn ROI
-        indecesToMaxVal = find( (imlook4d_Cdata.*ROI == maxVal) );
+        indecesToMaxVal = find( (cIM.*ROI == maxVal) );
         indexToMaxVal = indecesToMaxVal(1); % First index to maxVal, if many
         [x,y,z] = ind2sub(s,indexToMaxVal);
         initPos = [x,y,z] ;
@@ -69,19 +68,33 @@
         end
         
         % Find pos of max value in found ROI
-        indecesToMaxVal = find( (imlook4d_Cdata.*J == maxVal) );
+        indecesToMaxVal = find( (cIM.*J == maxVal) );
         indexToMaxVal = indecesToMaxVal(1); % First index to maxVal, if many
         [x,y,z] = ind2sub(s,indexToMaxVal);
         initPos = [x,y,z] ;
 
     % Region growth
-        [P, J] = regionGrowing(cIM, initPos, thresVal); % using default values for maxDist, tfMean, tfFillHoles, tfSimplify
-        %[P, J] = regionGrowing(cIM, initPos, thresVal, maxDist, tfMean, tfFillHoles, tfSimplify)
+        [P, newROIMatrix] = regionGrowing(cIM, initPos, thresVal); % using default values for maxDist, tfMean, tfFillHoles, tfSimplify
 
-    % Set ROI
-        imlook4d_ROI(imlook4d_ROI == imlook4d_ROI_number) = 0;
-        imlook4d_ROI(J) = imlook4d_ROI_number;
 
+    %
+    % Write to all except locked ROI pixels
+    %
+
+        % Make matrix of locked pixels
+        lockedMatrix = zeros( size(imlook4d_ROI) ,'logical'); % Assume all unlocked
+        numberOfROIs = length( imlook4d_current_handles.image.LockedROIs );
+        for i=1:numberOfROIs
+            lockedMatrix(imlook4d_ROI == i ) = imlook4d_current_handles.image.LockedROIs(i); % Pixels = 0 if locked, 1 if not locked
+        end
+
+        newROIMatrix( lockedMatrix) = false; % Remove pixels that are locked from newROI
+        
+        % Set ROI
+         imlook4d_ROI( ROI ) = 0;
+         imlook4d_ROI(newROIMatrix) = imlook4d_ROI_number;
+        
+        
 
 %
 % FINALIZE
@@ -89,9 +102,6 @@
 
     % Import into imlook4d from Workspace
     ImportUntouched
-
-    % Store default until next tim
-    imlook4d_store.RegionGrowth.inputs =  answer;
 
     ClearVariables
     %disp('SCRIPTS/Threshold.m DONE');

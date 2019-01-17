@@ -1,0 +1,27 @@
+<h1>Threshold single region within ROI</h1>
+<HR></HR>
+<!------------------->
+This script finds a single region of connected voxels within the selected ROI.
+
+	<P>
+	This is similar to "Grow ROI" script, but only grows within the volume of the selected ROI.  The region growth starts at the highest pixel in the ROI and stops at the ROI border, or when no further connected voxels are found above the threshold value. 
+	</P><P>	
+
+
+	</P> 
+	<P>The input in the dialog is:
+	
+		<TABLE>
+
+			
+			<TR>
+			<TD> <B> Threshold value</B></TD>
+			<TD> This is the threshold defining the edge where the growing of the ROI stops.  Absolute or % of max pixel value in frame.</TD>
+			</TR>
+
+		</TABLE>
+
+	
+	<P>
+		NOTE: Requires Matlab Imaging Toolbox
+	</P>	

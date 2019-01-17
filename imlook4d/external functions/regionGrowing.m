@@ -14,7 +14,7 @@ function [P, J] = regionGrowing(cIM, initPos, thresVal, maxDist, tfMean, tfFillH
 %     thresVal: Absolute threshold level to be included     {5% of max-min}
 %      maxDist: Maximum distance to the initial position in [px]      {Inf}
 %       tfMean: Updates the initial value to the region mean (slow) {false}
-%  tfFillHoles: Fills enclosed holes in the binary mask              {true}
+%  tfFillHoles: Fills enclosed holes in the binary mask {false} % JAN modidied from {true}
 %   tfSimplify: Reduces the number of vertices {true, if dpsimplify exists}
 %
 % Outputs:
@@ -84,6 +84,7 @@ if ~exist('tfMean', 'var') || isempty(tfMean)
 end
 if ~exist('tfFillHoles', 'var')
     tfFillHoles = true;
+    tfFillHoles = false;
 end
 if isequal(ndims(cIM), 2)
     initPos(3) = 1;
