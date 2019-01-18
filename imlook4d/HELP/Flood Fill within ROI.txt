@@ -21,7 +21,13 @@ This script finds a single region of connected voxels within the selected ROI, u
 
 		</TABLE>
 
-	
+
+	</P> 
+	<P>
+	If preceeding the absolute value with "<" the Flood Fill finds pixels below the given ROI level. For instance "<10" draws only in pixels below value 10.  
+    <BR>NOTE: this does not work with "%" notation
+
+	</P> 
 	<P>
 		NOTE: Requires Matlab Imaging Toolbox
 	</P>	

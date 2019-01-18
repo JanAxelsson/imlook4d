@@ -1,4 +1,4 @@
-function [B] = FloodFill3D(cIM, initPos, threshVal);
+function [B] = FloodFill3D(cIM, initPos, threshVal,BELOW_THRESHOLD);
 % [B] = FloodFill3D(A, slice);
 % This program flood fills a 6-connected 3D region. The input matrix MUST
 % be a binary image. The user will select a seed (point) in the matrix to
@@ -8,11 +8,16 @@ function [B] = FloodFill3D(cIM, initPos, threshVal);
 % Inputs:
 %            cIM: 2D/3D grayscale matrix                     
 %      initPos: Coordinates for initial seed position     
-%     thresVal: Absolute threshold level to be included    
+%     thresVal: Absolute threshold level to be included   
+%   BELOW_THRESHOLD : true if flood fill in opposite direction (up to threshold, instead of down to threshold)
 %
 % Built on FloodFill3D from F. Dinath
 
 A = single( cIM >= threshVal );      % Make
+
+if BELOW_THRESHOLD
+    A = 1 - A;  % Reverse
+end
 
 A(1,:,:) = NaN;     % Pad the border of the matrix
 A(end,:,:) = NaN;   % so the program doesn't attempt 

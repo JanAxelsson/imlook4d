@@ -27,13 +27,27 @@ ALGORITHM = 'FloodFill3D';
         if isempty(answer) % cancelled inputdlg
             return
         end
+        thresholdString = num2str(answer{1});
+        
+        BELOW_THRESHOLD = strcmp( '<', thresholdString(1) );
+        if BELOW_THRESHOLD
+           thresholdString = thresholdString(2:end); % Remove '<' 
+           % Error message if bad inputs
+           if strcmp( thresholdString(end), '%')
+               dispRed('ERROR: < and % is an impossible combination');
+               return
+           end
+        end
+        
+        if strcmp( '>', thresholdString(1) )
+           thresholdString = thresholdString(2:end); % Remove '>' 
+        end
 
     %
     % First iteration, use max value from input ROI
     %        
         
         % Threshold value
-        thresholdString = num2str(answer{1});
 
         if strcmp( thresholdString(end), '%')
             thresVal=0.01 * maxVal * str2num(thresholdString(1:end-1)) ;
@@ -56,7 +70,7 @@ ALGORITHM = 'FloodFill3D';
         	[P, J] = regionGrowing(cIM, initPos, thresVal);
         end
         if strcmp(ALGORITHM,'FloodFill3D');
-            J = FloodFill3D(cIM, initPos, thresVal);
+            J = FloodFill3D(cIM, initPos, thresVal,BELOW_THRESHOLD);
         end
         
         
@@ -86,7 +100,7 @@ ALGORITHM = 'FloodFill3D';
         	[ P, newROIMatrix] = regionGrowing(cIM, initPos, thresVal); 
         end
         if strcmp(ALGORITHM,'FloodFill3D');
-            newROIMatrix = FloodFill3D(cIM, initPos, thresVal);
+            newROIMatrix = FloodFill3D(cIM, initPos, thresVal,BELOW_THRESHOLD);
         end
 
     %
