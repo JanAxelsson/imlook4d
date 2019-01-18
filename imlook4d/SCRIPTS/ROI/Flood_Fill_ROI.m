@@ -1,3 +1,5 @@
+ALGORITHM = 'FloodFill3D';
+%ALGORITHM = 'regionGrowing';
 
 % INITIALIZE
 
@@ -6,7 +8,7 @@
     Export
     % Setup
     cIM = imlook4d_Cdata(:,:,:,imlook4d_frame);
-    s = size(imlook4d_Cdata);
+    s = size(cIM);
     ROI = ( imlook4d_ROI == imlook4d_ROI_number );
 
     % Determine max value
@@ -50,7 +52,12 @@
         initPos = [x,y,z] ;
         
     % Region growth
-        [P, J] = regionGrowing(cIM, initPos, thresVal);
+        if strcmp(ALGORITHM,'regionGrowing');
+        	[P, J] = regionGrowing(cIM, initPos, thresVal);
+        end
+        if strcmp(ALGORITHM,'FloodFill3D');
+            J = FloodFill3D(cIM, initPos, thresVal);
+        end
         
         
     %
@@ -74,8 +81,13 @@
         initPos = [x,y,z] ;
 
     % Region growth
-        [P, newROIMatrix] = regionGrowing(cIM, initPos, thresVal); % using default values for maxDist, tfMean, tfFillHoles, tfSimplify
 
+        if strcmp(ALGORITHM,'regionGrowing');
+        	[ P, newROIMatrix] = regionGrowing(cIM, initPos, thresVal); 
+        end
+        if strcmp(ALGORITHM,'FloodFill3D');
+            newROIMatrix = FloodFill3D(cIM, initPos, thresVal);
+        end
 
     %
     % Write to all except locked ROI pixels

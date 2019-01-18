@@ -11,8 +11,8 @@ Threshold_within_ROI.m
 Threshold_ROI.m
 Highest_pixels_within_ROI.m
 ---
-Grow_ROI.m
-Threshold_single_region_within_ROI.m
+Flood_Fill_ROI.m
+Flood_Fill_within_ROI.m
 ---
 Make_background_ROI.m
 ---

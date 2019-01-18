@@ -1,5 +1,8 @@
 % Same as Grow_ROI, except code-section at the bottom
 
+ALGORITHM = 'FloodFill3D';
+%ALGORITHM = 'regionGrowing';
+
 % INITIALIZE
 
     % Export to workspace
@@ -51,7 +54,12 @@
         initPos = [x,y,z] ;
         
     % Region growth
-        [P, J] = regionGrowing(cIM, initPos, thresVal);
+        if strcmp(ALGORITHM,'regionGrowing');
+        	[P, J] = regionGrowing(cIM, initPos, thresVal);
+        end
+        if strcmp(ALGORITHM,'FloodFill3D');
+            J = FloodFill3D(cIM, initPos, thresVal);
+        end
         
  
     % Keep only voxels within original ROI
