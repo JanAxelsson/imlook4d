@@ -7279,7 +7279,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
          
          
          try
-            adjustSliderRanges(handles);
+            adjustSliderRanges(handles);             
             updateImage(hObject, eventdata, handles); 
          catch
          end
@@ -8606,6 +8606,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 % -------------------------------------------------
                 % Initialize
                 % -------------------------------------------------
+                    axisHandle = handles.axes1;
+                
                     numberOfSlices=size(handles.image.Cdata,3);
                     numberOfPixelsX=size(handles.image.Cdata,1);
                     numberOfPixelsY=size(handles.image.Cdata,2); %Y
@@ -8696,8 +8698,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                                 % 1a) ColorFul ROI - contour
                                 if ( get(handles.ContourCheckBox,'Value')==1 )
-                                    contourRoi( logicalA, [ 0 1 0 ]);
-                                    contourRoi( logicalC, [ 1 0 0 ]);
+                                    contourRoi(axisHandle, logicalA, [ 0 1 0 ]);
+                                    contourRoi(axisHandle,  logicalC, [ 1 0 0 ]);
                                     
                                 % 1b) ColorFul ROI - solid
                                 else
@@ -8722,8 +8724,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                 
                                 % 2a) Gray ROI - contour
                                 if ( get(handles.ContourCheckBox,'Value')==1 )
-                                    contourRoi( logicalA, [ 1 1 1 ]);
-                                    contourRoi( logicalC, 0.7* [ 1 1 1 ]);
+                                    contourRoi(axisHandle,  logicalA, [ 1 1 1 ]);
+                                    contourRoi(axisHandle,  logicalC, 0.7* [ 1 1 1 ]);
                                     
                                 % 2b) Gray ROI - solid
                                 else
@@ -8743,7 +8745,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                    if length(roisInSlice) > 0
                                        for i = roisInSlice'  % Set ROI colors only for ROIs in slice
                                            color = getColor(i);
-                                            contourRoi( rois == i, color );
+                                            contourRoi(axisHandle,  rois == i, color );
                                        end
                                    end
 
@@ -8773,17 +8775,17 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                               set(handles.ImgObject3,'Cdata', zeros(size(activeRoiPicture)));  
                               set(handles.ImgObject3,'AlphaData', 0.0);  
                         end % END DRAWING ROIS          
-                    function contourRoi( binaryMatrix, color)
+                    function contourRoi( axisHandle, binaryMatrix, color)
                     linestyle = '-';
                     linewidth = 2;
                     b = bwboundaries(binaryMatrix);
                     
-                    hold on
+                    hold(axisHandle, 'on')
                     for k=1:numel(b)
-                        h = plot( b{k}(:,2), b{k}(:,1), 'color', color, 'linestyle', linestyle,'Tag','contourROI');
+                        h = plot( b{k}(:,2), b{k}(:,1), 'color', color, 'linestyle', linestyle,'Tag','contourROI', 'Parent',axisHandle);
                         h.LineWidth = linewidth;
                     end
-                    hold off
+                    hold(axisHandle, 'off')
     % --------------------------------------------------------------------
     % Help and HTML functions
     % --------------------------------------------------------------------
