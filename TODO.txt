@@ -39,7 +39,6 @@ WISHLIST
 [  ]   modelWindow: allow update of model
 
 
-[  ]   Update menu, should it save the new downloaded path by default?  Dialog window asking to save?
 
 [  ]   Tact window add Edit/copy menu
 
@@ -75,6 +74,10 @@ ISSUES
 
 DONE
 ====
+
+[ok]   Update menu, should it save the new downloaded path by default?  Dialog window asking to save?
+	   Fixed this way: 1) Downloads if not already on disk  2) Update gives link to make default version, without downloading if on disk.
+	   
 [ok]   Histogram of ROI
 [ok]   rotate lines in current axes, when toggling rotating button off -- solved by turning line off instead
 

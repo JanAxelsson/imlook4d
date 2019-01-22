@@ -11,24 +11,11 @@ url = data{2}; % URL for latest version
 
 disp( [ 'Latest available version = ' ver ]);
 
-%% Compare if already at latest version
-try
-    version=getImlook4dVersion();
-    if strcmp( version, ver)
-        disp([ 'You already have the latest version = ' ver ]);
-        return
-    end
-catch
-    % Continue and download (probably failed because getImlook4dVersion did
-    % not exist in old imlook4d)
-end
 
 urlToLatestImlook4d = url;
 
-%% Download latest imlook4d
+%% Define Paths
 
-
-disp( [ 'Downloading version = ' ver ]);
 
 % /aaa/bbb/ccc/imlook4d/imlook4d.m
 % /aaa/bbb/ccc/imlook4d/
@@ -49,24 +36,56 @@ zipFilePath = [ zipFileFolder filesep 'latestImlook4d.zip']; % zipFilePath = /aa
 
 unzipFolderPath = [ zipFileFolder filesep 'latestImlook4d']; % unzipFolderPath = /aaa/bbb/ccc/latestImlook4d
 
-% Get file
-options = weboptions('RequestMethod','get');
-options = weboptions('Timeout',Inf);
-zipFilePath = websave(zipFilePath, urlToLatestImlook4d,options);
 
-%% unzip
-disp( [ 'Unzipping' ]);
+%% Compare if already at latest version
+try
+    version=getImlook4dVersion();
+    if strcmp( version, ver)
+        disp([ 'You already run the latest version = ' ver ]);
+        disp(['<a href="matlab:savepath;disp(''DONE!'')">Click to make version "imlook4d ' ver '" default </a>' ])
+        return
+    end
+catch
+    % Continue and download (probably failed because getImlook4dVersion did
+    % not exist in old imlook4d)
+end
 
-folderName = unzip(zipFilePath, unzipFolderPath);
-delete( zipFilePath)
+%%
+% Download if folder is not already in place
+%
+    
+    
+    [parentFolder,name,ext] = fileparts(unzipFolderPath);
+    newFolderName = [ parentFolder filesep  'imlook4d_' ver  ];
+    
+if ~isfolder(newFolderName)
+    
+    % Get file
+    options = weboptions('RequestMethod','get');
+    options = weboptions('Timeout',Inf);
+    
+    % Download latest imlook4d
+    disp( [ 'Downloading version = ' ver ]);
+    zipFilePath = websave(zipFilePath, urlToLatestImlook4d,options);
+    
 
-%% Change name of folder
-[parentFolder,name,ext] = fileparts(unzipFolderPath);
-
-newFolderName = [ parentFolder filesep  'imlook4d_' ver  ];
-
-disp( [ 'Installing to folder = ' newFolderName ]);
-movefile( unzipFolderPath, newFolderName);
+    % unzip
+    disp( [ 'Unzipping' ]);
+    
+    folderName = unzip(zipFilePath, unzipFolderPath);
+    [parentFolder,name,ext] = fileparts(unzipFolderPath);
+    newFolderName = [ parentFolder filesep  'imlook4d_' ver  ];
+    
+    delete( zipFilePath)
+    
+    % Change name of folder
+    [parentFolder,name,ext] = fileparts(unzipFolderPath);
+    disp( [ 'Installing to folder = ' newFolderName ]);
+    movefile( unzipFolderPath, newFolderName);
+    
+else
+    disp( [ 'The latest version already on disk, no need to download again = ' newFolderName]);
+end
 
 %% Set Matlab path
 disp( [ 'Removing old imlook4d from matlab path = ' folder]);
@@ -84,12 +103,15 @@ end
 
 % Add new imlook4d to path
 disp(' ')
-disp( [ 'Set new imlook4d matlab path = ' newFolderName]);
+disp( [ 'Setting new imlook4d matlab path = ' newFolderName]);
 addpath(genpath( newFolderName ));
 
 
 disp( [ 'Installation DONE!  Old version remains on disk']);
 disp( [ ' ']);
 
-%% TODO : Save path
-disp('<a href="matlab:savepath">Click to save path (makes new version default) </a>')
+%% Save path
+disp(['Temporary running new version until set as default.' ])
+disp(['If this version works well for you, please click below link, or do Update again to get another chance to set this as default version.' ])
+
+disp(['<a href="matlab:savepath;disp(''DONE!'')">Click to make new version "imlook4d ' ver '" default </a>' ])
