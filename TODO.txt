@@ -3,7 +3,6 @@ TODO
 
 DEVELOP
 
-[  ]   Histogram of ROI
 
 
 
@@ -76,6 +75,7 @@ ISSUES
 
 DONE
 ====
+[ok]   Histogram of ROI
 [ok]   rotate lines in current axes, when toggling rotating button off -- solved by turning line off instead
 
 [ok]  Upgrade tar inte bort alla gamla ur path:en.  Även /../USER_SCRIPTS ligger kvar från andra versione
