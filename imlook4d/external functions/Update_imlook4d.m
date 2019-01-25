@@ -4,7 +4,11 @@ disp( [ 'Determining latest available version ']);
 ID='13mGVhbnZYUyr6BWq4mXTTo12PvM7gykJ';
 latestFileListURL = ['https://drive.google.com/uc?export=download&id=' ID ];
 
-text = webread( latestFileListURL);
+% Test to fix error behind firewall
+%text = webread( latestFileListURL);
+o = weboptions('CertificateFilename','');
+webread(latestFileListURL,o)
+
 data = strsplit( text);
 ver = data{1}; % Latest version
 url = data{2}; % URL for latest version
