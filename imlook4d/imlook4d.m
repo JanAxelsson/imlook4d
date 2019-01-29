@@ -874,9 +874,9 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                     imlook4d_current_handle = evalin('base', 'imlook4d_current_handle');
                     dx = 24;
                     dy = 24;
-                    oldPos = get( imlook4d_current_handle, 'Position')
-                    newPos = get( gcf, 'Position') % width and height is OK
-                    newPos = [ oldPos(1) + dx, oldPos(2) - dy, newPos(3), newPos(4) ] % Shift Pos from old window
+                    oldPos = get( imlook4d_current_handle, 'Position');
+                    newPos = get( gcf, 'Position'); % width and height is OK
+                    newPos = [ oldPos(1) + dx, oldPos(2) - dy, newPos(3), newPos(4) ]; % Shift Pos from old window
                     set( hObject, 'Position', newPos);
                 catch
                 end
@@ -1011,7 +1011,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                     %handles.image.WindowLevelsSubMenuHandle(i) = uimenu(handles.WindowLevelsMenu, 'Label',nameWithSpaces, 'Callback', callbackString);
                     tag = nameWithSpaces;
                 end
-                
+
 
                 % Advanced callback to allow 
                 % - help files for scripts
@@ -1045,6 +1045,21 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 
                 handles.scriptsMenuSubItemHandle(j).Separator= lineOnOff;
                 lineOnOff = 'off';
+                
+                                
+                % Missing toolboxes, disable menu
+                [ satisfied, missing ] = requiredToolboxSatisfied( name);
+                if ~satisfied
+                    set( handles.scriptsMenuSubItemHandle(j), 'Enable', 'off' );
+                    newLabel = [ label ' (missing toolbox)'];
+                    set( handles.scriptsMenuSubItemHandle(j), 'Label', newLabel );
+                    for k = 1 : length(missing)
+                        disp([ missing{k} ' is required for script "' name '"' ]);
+                    end
+                end
+                
+                
+                
             end
 
             
