@@ -49,12 +49,12 @@
 
 
 			<TR>
-			<TD> <B> imlook4d_ROI_data.skewness</B> (requires statistical toolbox)</TD>
+			<TD> <B> imlook4d_ROI_data.skewness</B></TD>
 			<TD>  A 2D matrix [ROI, frame] with skewness value calculated for pixels in each frame and ROI</TD>
 			</TR>
 
 			<TR>
-			<TD> <B> imlook4d_ROI_data.kurtosis</B> (requires statistical toolbox)</TD>
+			<TD> <B> imlook4d_ROI_data.kurtosis</B> </TD>
 			<TD>  A 2D matrix [ROI, frame] with kurtosis value calculated for pixels in each frame and ROI</TD>
 			</TR>
 

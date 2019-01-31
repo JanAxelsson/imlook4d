@@ -88,8 +88,8 @@ data =oneFrame(imlook4d_ROI==imlook4d_ROI_number);
     % Statistical toolbox
     try
         STAT_TOOLBOX = 1;
-        skewnessValue = skewness(data(:)');
-        kurtosisValue=kurtosis(data(:)');
+        skewnessValue = imlook4d_skewness(data(:)');
+        kurtosisValue=imlook4d_kurtosis(data(:)');
     catch
         % Missing Statistical toolbox
         STAT_TOOLBOX = 0;

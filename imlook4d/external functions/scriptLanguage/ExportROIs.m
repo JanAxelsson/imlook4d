@@ -113,8 +113,8 @@
             imlook4d_ROI_data.stdev(:,i)=std(roiPixels)';
             
             try
-                imlook4d_ROI_data.skewness(:,i)=skewness(roiPixels)';
-                imlook4d_ROI_data.kurtosis(:,i)=kurtosis(roiPixels)';
+                imlook4d_ROI_data.skewness(:,i)=imlook4d_skewness(roiPixels)';
+                imlook4d_ROI_data.kurtosis(:,i)=imlook4d_kurtosis(roiPixels)';
             catch
                 % Missing Statistical toolbox
                 STAT_TOOLBOX = 0;
