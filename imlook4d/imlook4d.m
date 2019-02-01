@@ -1048,7 +1048,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 
                                 
                 % Missing toolboxes, disable menu
-                [ satisfied, missing ] = requiredToolboxSatisfied( name);
+                [ satisfied, missing ] = requiredToolboxSatisfied( name, 'requiredToolboxesForSCRIPTS');
                 if ~satisfied
                     set( handles.scriptsMenuSubItemHandle(j), 'Enable', 'off' );
                     newLabel = [ label ' (missing toolbox)'];

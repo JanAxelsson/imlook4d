@@ -1,12 +1,11 @@
-function [ satisfied, missing ] = requiredToolboxSatisfied( scriptName)
+function [ satisfied, missing ] = requiredToolboxSatisfied( scriptName, definitionFile)
+
+    eval(definitionFile)
 
     % Guess defaults
     satisfied = true;
     missing = {};
 
-    % Defininition of required toolboxes
-    hash.Flood_Fill_ROI = {'imagingToolbox'};
-    hash.Flood_Fill_within_ROI = {'imagingToolbox'};
 
 
     % Find if satisfied, and list missing toolboxes
