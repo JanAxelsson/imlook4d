@@ -2172,7 +2172,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                           F.Values = matrix(:,:,i,frame);
                           newMatrix2D = F(xi',yi');  % Make large matrix
                           
-                          G.Values  = imrotate( newMatrix2D, az, 'bilinear','crop');
+                          G.Values  = imrotate( newMatrix2D, az, 'bilinear','crop'); % TODO: allow 'loose' if matrix should grow.  Next row does not work then.  Solve how?
                           matrix(:,:,i,frame) = G(x',y'); %  Back to org size
                           
                       end

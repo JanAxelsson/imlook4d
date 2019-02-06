@@ -81,8 +81,8 @@
 
     % User input: Verify input parameters
         prompt={'Patient Weight [kg] ',...
-                'Injection time [hhmmss]',...
-                'Injected activity [MBq]'};
+                'Time of activity measure [hhmmss]',...
+                'Measured injected activity [MBq]'};
         title='SUV parameters';
         numlines=1;
         answer=inputdlg(prompt,title,numlines,defaultanswer);
