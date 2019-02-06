@@ -2125,64 +2125,64 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
        
        rotate2d_jan off
        guidata( handles.figure1,handles);
-       disp(az);
+       disp([ 'Rotated ' num2str(az) ' degrees in ' handles.orientationMenu.String{ handles.orientationMenu.Value} ' plane']);
        updateImage(handles.figure1, [], handles);
-            function matrix = rotateUsingIsotropic( handles, matrix, az)
-                
-                % Turn off angle textbox (created by rotate2d_jan.m)
-                hManager = uigetmodemanager(handles.figure1);
-                hManager.CurrentMode.ModeStateData.textBoxText.Visible = 'off';
-                drawnow % Force update of textBoxText to non-visible
-                
-                dx = abs( handles.image.pixelSizeX ); % pixel size in mm             
-                dy = abs( handles.image.pixelSizeY );
-                
-                DX = abs( 0.5 * dx * size(matrix,1) - 0.5 * dx ); % Half image width in mm
-                DY = abs( 0.5 * dy * size(matrix,2) - 0.5 * dy );
-                
-                halfSide = max(DX,DY); % Required squared image halfside
-                
-                pixels = 2* max( size(matrix,1), size(matrix,2) );
-                step = 2*halfSide/pixels ; % Number of pixels required2
+              function matrix = rotateUsingIsotropic( handles, matrix, az)
+                  
+                  % Bail out if zero rotation
+                  if az == 0
+                     return 
+                  end
 
-                
-                % Define meshes
-                [x,y]   = meshgrid(-DX : dx : DX , -DY : dy : DY);        % Old grid
-                [xi,yi] = meshgrid(-halfSide:step:halfSide, -halfSide:step:halfSide);            % New grid, more steps but same x,y coordinate system
-                
-
-                % Define interpolations
-                method = 'linear'; 
-                F = griddedInterpolant( x',y', zeros( size(matrix(:,:,1,1) )), method, 'none'); % 2D only, no extrapolation
-                G = griddedInterpolant( xi',yi', zeros( length(xi), length(yi) ), method, 'none' ); % 2D only, no extrapolation
-
-                % Loop slices
-                frame = 1; % Use only one frame for now
-                for i = 1 : size( matrix,3) 
-                    if ~mod(i,20) 
-                        %disp([ num2str(i) ' of ' num2str( size(matrix,3)) ]); 
-                        displayMessageRow([ 'Rotating slice : ' num2str(i) ' of ' num2str( size(matrix,3)) ]); 
-                        drawnow limitrate % Force update at max 20 fps
-                    end 
-                    F.Values = matrix(:,:,i,frame); 
-                    newMatrix2D = F(xi',yi');  % Make large matrix 
-
-                    G.Values  = imrotate( newMatrix2D, az, 'bilinear','crop'); 
-                    matrix(:,:,i) = G(x',y'); %  Back to org size  
-                    
-%                     % Compare w OLD
-%                     matrix2D = matrix(:,:,i);
-%                     newMatrix2DOLD = interp2(x,y,matrix2D',xi,yi,'linear')';  % Make large matrix
-%                     rotated2Dmatrix = imrotate( newMatrix2DOLD, az, 'bilinear','crop');
-%                     matrixOLD(:,:,i) = interp2(xi,yi,rotated2Dmatrix',x,y,'linear',0)'; %  Back to org size
-                end 
-                toc 
-
-                
-                matrix( isnan(matrix) ) = min(handles.image.Cdata(:)); % Use lowest value in orginal matrix
-                
-                displayMessageRow( 'Done!');
-                pause(1)
+                  % Turn off angle textbox (created by rotate2d_jan.m)
+                  hManager = uigetmodemanager(handles.figure1);
+                  hManager.CurrentMode.ModeStateData.textBoxText.Visible = 'off';
+                  drawnow % Force update of textBoxText to non-visible
+                  
+                  dx = abs( handles.image.pixelSizeX ); % pixel size in mm
+                  dy = abs( handles.image.pixelSizeY );
+                  
+                  DX = abs( 0.5 * dx * size(matrix,1) - 0.5 * dx ); % Half image width in mm
+                  DY = abs( 0.5 * dy * size(matrix,2) - 0.5 * dy );
+                  
+                  halfSide = max(DX,DY); % Required squared image halfside
+                  
+                  pixels = 2* max( size(matrix,1), size(matrix,2) );
+                  step = 2*halfSide/pixels ; % Number of pixels required2
+                  
+                  
+                  % Define meshes
+                  [x,y]   = meshgrid(-DX : dx : DX , -DY : dy : DY);        % Old grid
+                  [xi,yi] = meshgrid(-halfSide:step:halfSide, -halfSide:step:halfSide);            % New grid, more steps but same x,y coordinate system
+                  
+                  
+                  % Define interpolations
+                  method = 'linear';
+                  F = griddedInterpolant( x',y', zeros( size(matrix(:,:,1,1) )), method, 'none'); % 2D only, no extrapolation
+                  G = griddedInterpolant( xi',yi', zeros( length(xi), length(yi) ), method, 'none' ); % 2D only, no extrapolation
+                  
+                  % Loop frames and slices
+                  for frame = 1 : size(matrix,4)
+                      for i = 1 : size( matrix,3)
+                          if ~mod(i,20)
+                              %disp([ num2str(i) ' of ' num2str( size(matrix,3)) ]);
+                              displayMessageRow([ 'Rotating frame ' num2str(frame) ' of ' num2str( size(matrix,4)) ' ( slice  ' num2str(i) ' of ' num2str( size(matrix,3)) ')' ]);
+                              drawnow limitrate % Force update at max 20 fps
+                          end
+                          F.Values = matrix(:,:,i,frame);
+                          newMatrix2D = F(xi',yi');  % Make large matrix
+                          
+                          G.Values  = imrotate( newMatrix2D, az, 'bilinear','crop');
+                          matrix(:,:,i,frame) = G(x',y'); %  Back to org size
+                          
+                      end
+                  end
+                  
+                  
+                  matrix( isnan(matrix) ) = min(handles.image.Cdata(:)); % Use lowest value in orginal matrix
+                  
+                  displayMessageRow( 'Done!');
+                  pause(1)
                 
                 
    % Shading of Pressed Toolbar Buttons
