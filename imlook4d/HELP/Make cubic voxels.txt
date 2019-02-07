@@ -9,3 +9,8 @@ This script converts voxels to cubic voxels. The dimension may be edited by user
 
 
 
+<p> 
+Note: DICOM cannot be saved if this script changes the number of slices.  If the voxel size matches that in the scanner z-direction,  the number of slices should be fine.
+</p>
+
+
