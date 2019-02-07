@@ -7,18 +7,7 @@
 
 
 % INITIALIZE
-        
-    % Define filter
-        prompt={'New number of pixels in X ',...
-                'New number of pixels in Y ',...
-                'Interpolation type (bilinear, nearest, bicubic).  See Matlab interp2 function.'};
-        title='Resize image matrix';
-        numlines=1;
-        defaultanswer={ '128', '128', 'bilinear'};
-        answer=inputdlg(prompt,title,numlines,defaultanswer);
-        Xpixels=(str2num(answer{1}));
-        Ypixels=(str2num(answer{2}));
-        interpolationType=answer{3};
+
         
     %
     % Display in new imlook4d window
@@ -28,7 +17,19 @@
 
     % Export to workspace (from duplicated imlook4d)
         imlook4d('exportToWorkspace_Callback', newHandle,{},newHandles);  % Export to workspace
-        
+      
+                
+    % Define filter
+        prompt={'New number of pixels in X ',...
+                'New number of pixels in Y ',...
+                'Interpolation type (bilinear, nearest, bicubic).  See Matlab interp2 function.'};
+        title='Resize image matrix';
+        numlines=1;
+        defaultanswer={ num2str( size(imlook4d_Cdata,1) ) , num2str( size(imlook4d_Cdata,2) ), 'bilinear'};
+        answer=inputdlg(prompt,title,numlines,defaultanswer);
+        Xpixels=(str2num(answer{1}));
+        Ypixels=(str2num(answer{2}));
+        interpolationType=answer{3};
 
 %
 %  PROCESS
