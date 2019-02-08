@@ -2,7 +2,7 @@ disp( [ 'Determining latest available version ']);
 
 
 ID='13mGVhbnZYUyr6BWq4mXTTo12PvM7gykJ';
-latestFileListURL = ['https://drive.google.com/uc?export=download&id=' ID ];
+latestFileListURL = ['https://drive.google.com/uc?export=download&id=' ID ]; 
 
 % Test to fix error behind firewall
 %text = webread( latestFileListURL);
