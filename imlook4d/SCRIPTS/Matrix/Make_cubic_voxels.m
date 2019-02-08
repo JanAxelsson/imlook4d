@@ -47,7 +47,16 @@ StartScript
     [X2 ,Y2, Z2]=ndgrid(x2, y2, z2);
     clear x2 y2 z2
     
-    imlook4d_Cdata = interpn(X1, Y1, Z1, imlook4d_Cdata, X2, Y2, Z2, 'linear');
+    % Resize 4D
+    waitBarHandle = waitbar(0,'Making cubic voxels');	% Initiate waitbar with text
+    last = size(imlook4d_Cdata,4);
+    for i = 1 : last
+        waitbar(i /last);   % Show progress 
+        newMatrix(:,:,:,i) = interpn(X1, Y1, Z1, imlook4d_Cdata(:,:,:,i), X2, Y2, Z2, 'linear');
+    end
+    close(waitBarHandle);
+
+    imlook4d_Cdata = newMatrix;
 
     % Set new pixel sizes
     imlook4d_current_handles.image.pixelSizeX = isotropicPixelSize;
