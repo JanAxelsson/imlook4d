@@ -6189,6 +6189,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
          % Flip and rotate, and swap head-feet are performed on Save according
          % to radio buttons
          %
+         
+            % Make axial     
+            handles = resetOrientation(handles);
+            
             try  
                 [file,path] = uiputfile(['filename' '.mat'] ,'Save as .mat file (only matrix, no header)');
                 fullPath=[path file];

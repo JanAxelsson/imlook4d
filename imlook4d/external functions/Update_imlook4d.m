@@ -7,7 +7,7 @@ latestFileListURL = ['https://drive.google.com/uc?export=download&id=' ID ];
 % Test to fix error behind firewall
 %text = webread( latestFileListURL);
 o = weboptions('CertificateFilename','');
-text = webread(latestFileListURL,o);
+text = webread(latestFileListURL,o)
 
 data = strsplit( text);
 ver = data{1}; % Latest version
