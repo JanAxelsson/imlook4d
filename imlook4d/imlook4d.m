@@ -5963,10 +5963,48 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                         % Modify headers
 
-                            iNumberOfSelectedFiles = size(headers,2);
+                            iNumberOfHeaders = size(headers,2);
                             iNumberOfSelectedFiles=size(matrix,3);  % This definition allows for truncated matrices, as for instance from Patlak model
-
                             
+                            % Fill in headers, if more images than original 
+                                s = size( handles.image.Cdata);
+
+                                switch length(s)
+                                    case 2
+                                    numberOfImages = 1;    
+                                    case 3
+                                    numberOfImages = s(3);
+                                    case 4
+                                    numberOfImages = s(3)*s(4);    
+                                end 
+
+                                % Copy headers from template
+                               % if numberOfImages ~= iNumberOfHeaders
+                                    template = headers{1};
+                                    for i = 1:numberOfImages
+                                        newHeaders{i} = template;
+                                    end
+                                    headers = newHeaders;
+                              %  end
+
+                            % Build slice Locations
+                                slices = size( handles.image.Cdata,3);
+                                frames = size( handles.image.Cdata,4);
+                                corner = handles.image.imagePosition{1};
+                                for i = 1:frames
+                                    for j= 1:slices
+                                        x = corner(1);
+                                        y = corner(2);
+                                        z = corner(3) + (j-1) * handles.image.sliceSpacing ;
+                                        index = (i-1) * slices + j;
+                                        handles.image.imagePosition{ index } = [ x y z ];
+                                        
+                                        handles.image.sliceLocations(i) = z;
+                                    end
+                                end
+                            
+                            
+                                 
                             
                             
                             
@@ -5975,7 +6013,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                             seriesInstanceUID=generateUID();
                             interval = round( iNumberOfSelectedFiles/50);
-                             for i=1:iNumberOfSelectedFiles
+                            for j = 1:frames
+                               for k= 1:slices
+                               %for i=1:iNumberOfSelectedFiles
+                                 i = k + (j-1) * slices;
                                  %disp(i)
                                  if (mod(i, interval)==0) waitbar(i/iNumberOfSelectedFiles); end 
                                  
@@ -6096,6 +6137,28 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                     catch
                                         
                                     end
+                                    
+                                    
+                                % Time and duration
+                                    try
+                                        time = handles.image.time(j);
+                                        duration = handles.image.duration(j);
+                                        
+                                        % TODO update only if element exist
+                                        % from beginning.  Test  :
+                                        % isempty( dirtyDICOMHeaderData(headers,i, '1234', '1300',mode)  ) == true
+                                        % 
+                                        headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0054', '1300',mode, num2str(  time ) );
+                                        headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0018', '1242',mode, num2str(  duration ) );
+                                        
+                                        % TODO: update acquisition time if
+                                        % possible (see
+                                        % dirtyDICOMTimeFromAcqTime.m)
+                                       
+                                    catch
+                                        disp('Error in making time and duration');
+                                    end
+
 
 
 
@@ -6111,7 +6174,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                  end
 
                                  %
-                             end
+                               end
+                            end
                             close(waitBarHandle);
                             
                             

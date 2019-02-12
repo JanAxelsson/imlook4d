@@ -168,4 +168,7 @@ function data=dirtyDICOMHeaderData(headers, col, group, element,explicit,stopAt)
         end
 
     end  % LOOP
+    
+    else % no tag found
+        data = [];
     end %IF
