@@ -310,7 +310,7 @@ function drawPlots( handles,roinumbers)
 % Callbacks
 %
 function uitable_CellSelectionCallback(~, eventdata, handles)
-    roinumbers = eventdata.Indices(:,1);
+    roinumbers = unique( eventdata.Indices(:,1) );
     drawPlots( handles,roinumbers);
     handles.selectedRow = roinumbers;
     guidata(handles.modelWindow, handles);
