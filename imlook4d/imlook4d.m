@@ -421,6 +421,10 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 
                 %inpargs = varargin{:};
                 inpargs = varargin{1};    % Matrix
+                
+                
+                handles.image.time = 0:(size( inpargs,4)-1); % Default time for frames 0,1... (frames-1)
+                handles.image.duration = ones( size(handles.image.time)); % Default duration 1 for each frame
 
 
                 %INPUT time and duration (this is the only way to get them into
