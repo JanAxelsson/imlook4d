@@ -32,7 +32,8 @@ startFrame = str2num( answer{1});
 endFrame = str2num( answer{2});
 range = [startFrame endFrame];
 
-Cinp_for_this_script = tacts(imlook4d_ROI_number,:); % Input function in current ROI
+%Cinp_for_this_script = tacts(imlook4d_ROI_number,:); % Input function in current ROI
+Cinp_for_this_script = generateReferenceTACT( imlook4d_current_handles);
 
 %
 % Model

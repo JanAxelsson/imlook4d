@@ -103,7 +103,7 @@ function out =  jjlogan( matrix, t, dt, Cr, range, k2ref)
         tempY = newY(regressionRange)';  % Y-values in range
         
         % Two alternatives:
-        if sum( isinf(tempY) ) == 0
+        if sum( ~isfinite(tempY) ) == 0
 
             p = linortfit2(double(tempX), double(tempY)); % Orthogonal regression (Best alternative)
             % p = [tempX ones(length(tempX),1) ] \ tempY;    % Normal regression (works badly, Rank deficient)

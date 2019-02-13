@@ -12,7 +12,7 @@
     % --------------------------------------------------------------------
     % OPEN FILE DIALOG
     %   imlook4d   
-    %   h=imlook4d dialog
+    %   h=imlook4d 
     %
     % OPEN A MATRIX
     %   imlook4d(matrix)
