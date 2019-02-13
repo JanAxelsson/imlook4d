@@ -65,7 +65,7 @@ tic
             Cr,...
             [ handles.model.Logan.startFrame handles.model.Logan.endFrame] ...
             );
-        outputImage(:,:,1,1) = a.pars{2}; % DVR
+        outputImage(:,:,1,1) = a.pars{handles.model.SRTM.imagetype}; 
         
 toc
 
