@@ -1,6 +1,16 @@
 TODO
 =====
 
+ERRORS
+
+
+[  ] TACT from nifti fails
+
+
+
+
+
+
 DEVELOP
 
 

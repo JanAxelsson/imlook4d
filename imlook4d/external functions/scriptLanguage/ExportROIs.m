@@ -224,7 +224,7 @@
                 imlook4d_ROI_data.min(frame,:), 
                 imlook4d_ROI_data.stdev(frame,:)]';
             
-            if (STAT_TOOLBOX)
+            if (STAT_TOOLBOX)  % No need for STAT_TOOLBOX anymore
                 % Append columns to the right
                 data = [ data imlook4d_ROI_data.skewness(frame,:)' imlook4d_ROI_data.kurtosis(frame,:)'];   
                 data = [ data imlook4d_ROI_data.uniformity(frame,:)' imlook4d_ROI_data.entropy(frame,:)' ];   
