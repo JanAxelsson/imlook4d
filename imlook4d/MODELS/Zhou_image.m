@@ -2,6 +2,7 @@
 % Dialog
 %
 StoreVariables
+ReferenceModel
 ExportUntouched % I do not want recalculation of model for whole matrix, on Export.
 
 model_name = 'Zhou';

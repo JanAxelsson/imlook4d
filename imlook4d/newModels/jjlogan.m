@@ -103,9 +103,15 @@ function out =  jjlogan( matrix, t, dt, Cr, range, k2ref)
         tempY = newY(regressionRange)';  % Y-values in range
         
         % Two alternatives:
-        p = linortfit2(double(tempX), double(tempY)); % Orthogonal regression (Best alternative)
-        % p = [tempX ones(length(tempX),1) ] \ tempY;    % Normal regression (works badly, Rank deficient)
-        %p = lscov(double([tempX ones(length(tempX),1) ]), double(tempY)); % Normal regression (more stable)
+        if sum( isinf(tempY) ) == 0
+
+            p = linortfit2(double(tempX), double(tempY)); % Orthogonal regression (Best alternative)
+            % p = [tempX ones(length(tempX),1) ] \ tempY;    % Normal regression (works badly, Rank deficient)
+            %p = lscov(double([tempX ones(length(tempX),1) ]), double(tempY)); % Normal regression (more stable)
+        else
+            p(1) = 0;
+            p(2) = 0;
+        end
       
         DVR(i) = p(1);
         BP(i) = DVR(i) - 1;

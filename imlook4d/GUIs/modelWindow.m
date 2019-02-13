@@ -154,7 +154,7 @@ function drawPlots( handles,roinumbers)
 
             hold(handles.mainAxes,'on');
         catch
-            disp('reference plot error');
+            %disp('reference plot error');
         end
 
         
