@@ -117,4 +117,4 @@
      
      imlook4d('updateImage',newHandle, {}, newHandles);
     
-    clear tempHandle tempHandles
+    clear tempHandle tempHandles HmatchOld HmatchNew i style tag
