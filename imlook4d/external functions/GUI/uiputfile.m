@@ -23,14 +23,14 @@ function [file,path, filterindex] = uiputfile(varargin)
       try
           % Try to get input from workspace INPUTS variable
           INPUTS=getINPUTS();
-          [pathstr,name,ext] = fileparts(INPUTS{1})
+          [pathstr,name,ext] = fileparts(INPUTS{1});
           file = [name ext];
           path = [pathstr filesep];
           evalin('base','clear INPUTS');
       catch
           % Call default function instead
           shipped = getShaddowedFunction(this);
-          [file,path, filterindex] = shipped(varargin{:})
+          [file,path, filterindex] = shipped(varargin{:});
           INPUTS = {[ path file ]};
           recordInputsText(INPUTS);  % Insert text at caret
 

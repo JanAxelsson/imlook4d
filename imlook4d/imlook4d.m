@@ -5568,6 +5568,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         % Save .sif file if time-data exists
                         try
                             [folder file extension] = fileparts(destination);
+                            cd(folder); % Make current directory 
                             sifFilePath = [ folder filesep file '.sif'];
                             write_sif( handles, sifFilePath);
                         catch

@@ -4,7 +4,6 @@ TODO
 ERRORS
 
 
-[  ] TACT from nifti fails
 
 
 
@@ -85,6 +84,8 @@ ISSUES
 DONE
 ====
 
+
+[ok]   TACT from nifti fails
 [ok]   Update menu, should it save the new downloaded path by default?  Dialog window asking to save?
 	   Fixed this way: 1) Downloads if not already on disk  2) Update gives link to make default version, without downloading if on disk.
 	   
