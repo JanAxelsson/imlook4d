@@ -6132,6 +6132,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                     % 3) Slice Spacing
                                     try
                                         sliceSpacing = handles.image.sliceLocations(2) - handles.image.sliceLocations(1);  % Assume same spacing
+                                        headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0018', '0050',mode, num2str(  sliceSpacing ) );
                                     catch
                                         
                                     end
