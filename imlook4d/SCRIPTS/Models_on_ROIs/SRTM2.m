@@ -19,31 +19,38 @@ model_name = 'SRTM2';
 
     ref = generateReferenceTACT( imlook4d_current_handles);
     tact = tacts;  % all ROIs
-
-
-    disp('Calculating SRTM ...');
-    a = jjsrtm( tact, imlook4d_time/60, imlook4d_duration/60, ref);
-
-    % store for use in SRTM2
-    k2p_values = a.pars{3};
-    BP_values = a.pars{1};
-
-    % Version 1) Calculate k2p
-    k2p_specific_bindings = k2p_values( BP_values > 0);
-
-    RoiNumbers = (1:length(BP_values)); % All ROIs
-    ReferenceROINumbers = imlook4d_current_handles.model.common.ReferenceROINumbers;
-    roisToCalculate = setdiff( RoiNumbers(BP_values > 0 ), ReferenceROINumbers);
-
-    k2p = median( k2p_values(roisToCalculate) );  
-    disp(['Median of k2p values for specific binding (outside ref rois) = ' num2str(k2p) ]);
-
-    % Version 2) Calculate k2p
-    k2p = median( k2p_values(k2p_values>0) );  % Positive k2p 
-    disp(['Use this: Median of positive k2p values = ' num2str(k2p) ]);
+% 
+% 
+%     disp('Calculating SRTM ...');
+%     a = jjsrtm( tact, imlook4d_time/60, imlook4d_duration/60, ref);
+% 
+%     % store for use in SRTM2
+%     k2p_values = a.pars{3};
+%     BP_values = a.pars{1};
+% 
+%     % Version 1) Calculate k2p
+%     k2p_specific_bindings = k2p_values( BP_values > 0);
+% 
+%     RoiNumbers = (1:length(BP_values)); % All ROIs
+%     ReferenceROINumbers = imlook4d_current_handles.model.common.ReferenceROINumbers;
+%     roisToCalculate = setdiff( RoiNumbers(BP_values > 0 ), ReferenceROINumbers);
+% 
+%     k2p = median( k2p_values(roisToCalculate) );  
+%     disp(['Median of k2p values for specific binding (outside ref rois) = ' num2str(k2p) ]);
+% 
+%     % Version 2) Calculate k2p
+%     k2p = median( k2p_values(k2p_values>0) );  % Positive k2p 
+%     disp(['Use this: Median of positive k2p values = ' num2str(k2p) ]);
+    
+%
+% Dialog 1 -- SRTM k2p
+%
+    prompt={'k2p'};
+    [answer, imlook4d_current_handles]  = ModelDialog( imlook4d_current_handles, model_name, prompt, {'0.2'} );
+    k2p = str2num( answer{1});
 
 %
-% Model
+% Model -- SRTM2
 %
     disp('Calculating SRTM2 ...');
 
