@@ -5420,6 +5420,26 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                      return 
                  end
                  
+            % Ask user : really want to save 
+            % (for PC-image, Residual-image, or PCA-filtered image)
+                if handles.PCImageRadioButton.Value && ...
+                   strcmp( 'Cancel', questdlg('PC images : Do you really want to save PC images','Warning','Save','Cancel','Cancel') ) 
+                        return
+                end
+                
+                if handles.ResidualRadiobutton.Value && ...
+                   strcmp( 'Cancel', questdlg('Residual Images : Do you really want to save residual images','Warning','Save','Cancel','Cancel') ) 
+                        return
+                end               
+ 
+                                
+                if handles.ImageRadioButton.Value && ...
+                   str2num( handles.PC_high_edit.String ) < size( handles.image.Cdata, 4) && ...
+                   strcmp( 'Cancel', questdlg('PCA-filtered images : Do you really want to save filtered images','Warning','Save','Cancel','Cancel') ) 
+                        return
+                end  
+
+ 
             % Make axial     
             handles = resetOrientation(handles);
 
