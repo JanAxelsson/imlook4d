@@ -6024,7 +6024,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                         index = (i-1) * slices + j;
                                         handles.image.imagePosition{ index } = [ x y z ];
                                         
-                                        handles.image.sliceLocations(i) = z;
+                                        handles.image.sliceLocations(index) = z;
                                     end
                                 end
                             
