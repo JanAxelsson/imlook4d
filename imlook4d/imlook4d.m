@@ -6187,7 +6187,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                                  % TO DO - 
                                  % number of images
+                                 
+                                 
                                  % instance number
+                                 headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0020', '0013',mode, num2str(  i ) );
 
                                  % Make static
                                  if size(handles.image.Cdata,4)==1
