@@ -1,4 +1,4 @@
-<h1>SPM Segmented ROIs</h1>
+<h1>SPM Tissue probability map ROIs</h1>
 <HR></HR>
 <!------------------->
 	<P>
