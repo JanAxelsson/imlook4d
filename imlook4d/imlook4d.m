@@ -4055,6 +4055,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     newHandles = guidata(newHandle);
                     newHandles.image.folder = path;
                     newHandles.image.file = file;
+                    newHandles.cd.TooltipString = [ 'Go to folder = ' handles.image.folder];
+                    
                     guidata(newHandle,newHandles);
 
 
@@ -5474,6 +5476,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 cd(oldPath);    % Restore path
                 try
                     displayMessageRow(['DONE writing file'   ]);
+                    handles.cd.TooltipString = [ 'Go to folder = ' handles.image.folder];
                 catch
                     % Fails if gcf not an imlook4d (for instance, after error dialog)
                 end
