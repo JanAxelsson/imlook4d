@@ -1,0 +1,16 @@
+<h1>Center origin</h1>
+<HR></HR>
+<!------------------->
+	<P>
+		Centers the origin in a nifti file, using SPM routines
+	</P>
+
+	<P> 
+        Sometimes a registration between images fails because the coordinate system differs to much.  This routines sets the center of the image to origin.
+	</P>
+
+	<P> 
+        Build on code by Fumio Yamashita
+	</P>
+
+
