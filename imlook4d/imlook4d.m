@@ -3948,11 +3948,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         end
 
                     % Test if DICOM
-                        if( strcmp(FILETYPE,'UNKNOWN'))
-                            dummy1=1;dummy3='l'; % Assume a stupidly small image
-                            [Data, headers, fileNames]=Dirty_Read_DICOM(path, dummy1,dummy3, file); % selected file
-                            if strcmp(char(headers{1}(129:132))', 'DICM')  FILETYPE='DICOM';end
-                        end
+                        fid = fopen( fullPath, 'r', 'l');
+                        tempHeader= fread(fid, 132);                     % Binary header in memory  
+                        fclose(fid);
+                        if strcmp(char(tempHeader(129:132))', 'DICM')  FILETYPE='DICOM';end
 
                     % Test if HERMES (taken from CD cache)
                         if( strcmp(FILETYPE,'UNKNOWN'))
