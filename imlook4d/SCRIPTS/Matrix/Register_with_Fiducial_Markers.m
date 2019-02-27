@@ -7,11 +7,13 @@ ExportUntouched;
 B_dyn = imlook4d_Cdata; % Possibly 4D matrix
 
 % Read fiducial markers for current image
-PB = getRoiCGs(imlook4d_ROI)'
+PB = getRoiCGs(imlook4d_ROI)';
+disp('Move from points :');
+disp([ [ 'x: ';'y: ';'z: '] num2str(PB) ]);
 sizeB = size(imlook4d_ROI);
-x = size(B_dyn,1) * imlook4d_current_handles.image.pixelSizeX;
-y = size(B_dyn,2) * imlook4d_current_handles.image.pixelSizeY;
-z = size(B_dyn,3) * imlook4d_current_handles.image.sliceSpacing;
+x = sizeB(1) * imlook4d_current_handles.image.pixelSizeX;
+y = sizeB(2) * imlook4d_current_handles.image.pixelSizeY;
+z = sizeB(3) * imlook4d_current_handles.image.sliceSpacing;
 RB = imref3d(sizeB,[-x x],[-y y],[-z z]); %  real world coordinates
 
 
@@ -21,17 +23,22 @@ imlook4d_current_handle = figure(templateHandle.Parent); % New window
 
 % Read fiducial markers for template image
 ExportUntouched;
-PA = getRoiCGs(imlook4d_ROI)'
+PA = getRoiCGs(imlook4d_ROI)';
+disp('to points :');
+disp([ [ 'x: ';'y: ';'z: '] num2str(PA) ]);
 sizeA = size(imlook4d_ROI);
-x = size(B_dyn,1) * imlook4d_current_handles.image.pixelSizeX;
-y = size(B_dyn,2) * imlook4d_current_handles.image.pixelSizeY;
-z = size(B_dyn,3) * imlook4d_current_handles.image.sliceSpacing;
+x = sizeA(1) * imlook4d_current_handles.image.pixelSizeX;
+y = sizeA(2) * imlook4d_current_handles.image.pixelSizeY;
+z = sizeA(3) * imlook4d_current_handles.image.sliceSpacing;
 RA = imref3d(sizeA,[-x x],[-y y],[-z z]); %  real world coordinates
 
 
 % Calculate Registration Parameters
 [regParams,Bfit,ErrorStats]=absor(PA,PB,'DoScale',1);
 T = regParams.M.';
+
+T = [regParams.s * regParams.R ,[0 0 0]';[0 0 0 1] ]'; % Ignore translation
+
 AT=affine3d(T);
 
 
