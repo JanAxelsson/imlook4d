@@ -1,7 +1,7 @@
 function kurt_out = imlook4d_kurtosis(x)
 % See https://www.itl.nist.gov/div898/handbook/eda/section3/eda35b.htm
 
-N = size(x,1)
+N = size(x,1);
 frames = size(x,2);
 
 for j = 1:frames
