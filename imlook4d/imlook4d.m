@@ -2776,16 +2776,26 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         frame = handles.image.Cdata(:,:,:,currentFrame);
                         dims = size(handles.image.ROI);
                         
-                        valuesInROIPixels = frame .* ( handles.image.ROI == ROINumber);
-                        highestInEachslice = max(  reshape( valuesInROIPixels, dims(1)*dims(2), [])); 
-                        highestValue = max( highestInEachslice);
-                        slicesWithHighestValue = find( highestInEachslice==highestValue);
-                        sliceWithHighestValue = slicesWithHighestValue(1);
+%                         valuesInROIPixels = frame .* ( handles.image.ROI == ROINumber);
+%                         highestInEachslice = max(  reshape( valuesInROIPixels, dims(1)*dims(2), [])); 
+%                         highestValue = max( highestInEachslice);
+%                         slicesWithHighestValue = find( highestInEachslice==highestValue);
+%                         sliceWithHighestValue = slicesWithHighestValue(1);
+ 
+                        indeces = find( handles.image.ROI== ROINumber); % ROI pixel indeces
+                        
+                        valuesInROIPixels = frame( indeces ); % Values in ROI pixels
+                        highestValue = max( valuesInROIPixels);
+                        indexToHighestSingleValueInROIPixels = find( valuesInROIPixels == highestValue);
+                        indexToHighest = indeces(indexToHighestSingleValueInROIPixels); % Index to highest in ROI matrix
+                        
+                        [I,J,sliceWithHighestValue] = ind2sub(dims,indexToHighest);
+                        disp(['Found ROI in slice number = ' num2str(sliceWithHighestValue) ]);
                         
                         
 
                         % Set SliceNumber in GUI
-                        if sum( highestInEachslice) >0
+                        if not( isempty(sliceWithHighestValue) )
                             setSlice(handles, sliceWithHighestValue, handles.figure1); %
                         end
 
