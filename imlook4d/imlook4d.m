@@ -8028,30 +8028,43 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 % -------------------------------------------------
                 % PCA filter both single and multi-slice time-series
                 % -------------------------------------------------
+                
+                    IsNormalImage = get(handles.ImageRadioButton,'Value');
+                    IsPCAFilter = not( (get(handles.PC_low_slider, 'Value')==1) &&  (get(handles.PC_high_slider, 'Value')==numberOfFrames) ); % PCA-filter selected with sliders
+                    IsPCImage = get(handles.PCImageRadioButton,'Value');      % PC images radio button selected
+                    
+                    IsModel =  isa(handles.model.functionHandle, 'function_handle');
+                   
+                    IsDynamic = (numberOfFrames>1);
 
+                    % Default guess
+                    fullEigenValues=1;   % Must be defined so it can be stored.
+                    explainedFraction=1; % Must be defined so it can be stored.  
+                    
+                    % Shortcut if normal image (not PCA or Residual image)
+                    % AND NONE of Model or PCA-filtered
+                    if ( IsNormalImage && ~IsModel && ~IsPCAFilter)
+                        modelOutput=handles.image.Cdata(:,:,inputSliceRange,outputFrameRange);
+                        %disp('shortcut calculation - no model no PCA');
+                        return 
+                    end
+                       
                     % Define default size for output from PCA-filter
                     %filterOutput=zeros(size(handles.image.Cdata));  % THIS IS TOO BIG FOR MANY CASES
                     
-
-                    filterOutput=zeros( size(handles.image.Cdata,1), size(handles.image.Cdata,2), length(outputSliceRange), numberOfFrames, 'single');
-                    filterOutput(:,:,outputSliceRange,:)=handles.image.Cdata(:,:,inputSliceRange,:);
+                    
 
                     % Handles both theses scenarios:
                     % 1) outputSliceRange=1         => filteredOutput [:,:,1,:]
                     % 2) outputSliceRange=range     => filteredOutput [:,:,range,:]
-                       fullEigenValues=1;   % Must be defined so it can be stored.
-                       explainedFraction=1; % Must be defined so it can be stored.               
+                    filterOutput=zeros( size(handles.image.Cdata,1), size(handles.image.Cdata,2), length(outputSliceRange), numberOfFrames, 'single');
+                    filterOutput(:,:,outputSliceRange,:)=handles.image.Cdata(:,:,inputSliceRange,:);
+             
 
                     %
                     % Do PCA calculations if needed
                     %
 
-                    % Necessary:
-                    IsDynamic=(numberOfFrames>1);
-
-                    % One of the following must be true
-                    IsPCAFilter=not( (get(handles.PC_low_slider, 'Value')==1) &&  (get(handles.PC_high_slider, 'Value')==numberOfFrames) ); % PCA-filter selected with sliders
-                    IsPCImage=get(handles.PCImageRadioButton,'Value');      % PC images radio button selected
 
                     % Test if needs to calculate following (save time otherwise)
                     if ((IsPCAFilter || IsPCImage   ) && IsDynamic  )   % PC image or PCA-filtering   (AND, of course, dynamic scan)          
