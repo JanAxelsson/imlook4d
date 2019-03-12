@@ -2093,7 +2093,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
        camzoom(1)
   
-       handles.infoText1.Visible = 0; % Hide info text at bottom
+       handles.infoText1.Visible = 'off'; % Hide info text at bottom
     function rotateToggleButtonOff_ClickedCallback(hObject, eventdata, handles)
        % Display HELP and get out of callback
        if DisplayHelp(hObject, eventdata, handles)
@@ -2109,7 +2109,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
            return
        end
        
-       handles.infoText1.Visible = 1; % Show infotext at bottom
+       handles.infoText1.Visible = 'on'; % Show infotext at bottom
 
        
        releasedToggleButton( hObject);
@@ -2124,14 +2124,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         az = 180*atan( ratio*tan(pi*az/180))/pi;
 
        % rotate
-       handles.image.Cdata = rotateUsingIsotropic( handles, handles.image.Cdata, -az);   
+       [handles.image.Cdata, handles.image.ROI]  = rotateUsingIsotropic( handles, handles.image.Cdata, -az, handles.image.ROI);   
        view(0,90);
        
        rotate2d_jan off
        guidata( handles.figure1,handles);
        disp([ 'Rotated ' num2str(az) ' degrees in ' handles.orientationMenu.String{ handles.orientationMenu.Value} ' plane']);
        updateImage(handles.figure1, [], handles);
-              function matrix = rotateUsingIsotropic( handles, matrix, az)
+              function [matrix, roi] = rotateUsingIsotropic( handles, matrix, az, roi)
                   
                   % Bail out if zero rotation
                   if az == 0
@@ -2164,8 +2164,26 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                   method = 'linear';
                   F = griddedInterpolant( x',y', zeros( size(matrix(:,:,1,1) )), method, 'none'); % 2D only, no extrapolation
                   G = griddedInterpolant( xi',yi', zeros( length(xi), length(yi) ), method, 'none' ); % 2D only, no extrapolation
+ 
+                                    
+                  % Rotate ROI (if ROI exists)
+                  if ( nnz(roi) > 0  ) % at least one non-zero ROI pixel 
+                      for i = 1 : size( roi,3)
+                          if ~mod(i,20)
+                              %disp([ num2str(i) ' of ' num2str( size(matrix,3)) ]);
+                              displayMessageRow([ 'Rotating ROIs slice  ' num2str(i) ' of ' num2str( size(roi,3))  ]);
+                              drawnow limitrate % Force update at max 20 fps
+                          end
+                          F.Values = single( roi(:,:,i) );
+                          newMatrix2D =  F(xi',yi') ;  % Make large matrix
+
+                          G.Values  = imrotate( newMatrix2D, az, 'nearest','crop'); % TODO: allow 'loose' if matrix should grow.  Next row does not work then.  Solve how?
+                          roi(:,:,i) = uint8( G(x',y')); %  Back to org size
+                      end
+                  end
                   
-                  % Loop frames and slices
+                  
+                  % Rotate image -- Loop frames and slices
                   for frame = 1 : size(matrix,4)
                       for i = 1 : size( matrix,3)
                           if ~mod(i,20)
@@ -2178,12 +2196,16 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                           
                           G.Values  = imrotate( newMatrix2D, az, 'bilinear','crop'); % TODO: allow 'loose' if matrix should grow.  Next row does not work then.  Solve how?
                           matrix(:,:,i,frame) = G(x',y'); %  Back to org size
-                          
                       end
                   end
+
+
+                  
+                  
                   
                   
                   matrix( isnan(matrix) ) = min(handles.image.Cdata(:)); % Use lowest value in orginal matrix
+                  roi( isnan(roi) ) = 0; % Set to non-roi pixel
                   
                   displayMessageRow( 'Done!');
                   pause(1)
