@@ -572,18 +572,20 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
           
      % Slice spacing (can be in either tag)
              try
-                 %out2=dirtyDICOMHeaderData(header, i, '0018', '0050',mode); % Slice Thickness
-                 out2=dirtyDICOMHeaderData(header, i, '0018', '0088',mode); % Spacing Between Slices
+                 out2=dirtyDICOMHeaderData(header, i, '0018', '0050',mode); % Slice Thickness
+                 %out2=dirtyDICOMHeaderData(header, i, '0018', '0088',mode); % Spacing Between Slices
                  sliceSpacing=str2num(out2.string);  %
                  if isempty(sliceSpacing) 
-                     ME = MException('JanOpenScaledDICOM:EmptyTag', ...
-                    '(0018,0088) Spacing Between Slices is empty');
+                    ME = MException('JanOpenScaledDICOM:EmptyTag', ...
+                    '(0018,0050) Slice Thickness is empty');
+%                      ME = MException('JanOpenScaledDICOM:EmptyTag', ...
+%                     '(0018,0088) Spacing Between Slices is empty');
                     throw(ME);
                  end
              catch
                  try
-                     %out2=dirtyDICOMHeaderData(header, i, '0018', '0088',mode); % Spacing Between Slices
-                     out2=dirtyDICOMHeaderData(header, i, '0018', '0050',mode); % Slice Thickness
+                     out2=dirtyDICOMHeaderData(header, i, '0018', '0088',mode); % Spacing Between Slices
+                     %out2=dirtyDICOMHeaderData(header, i, '0018', '0050',mode); % Slice Thickness
                      sliceSpacing=str2num(out2.string);  %
                  catch
                      %sliceSpacing=-1
