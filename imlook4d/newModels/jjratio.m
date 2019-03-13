@@ -76,6 +76,10 @@ function out =  jjratio( matrix, t, dt, Cr, frame)
             
             out.X{i} = tmid(indecesToNumbers);
             out.Y{i} = newY(indecesToNumbers);
+            
+            out.Xmodel{i} = out.X{i};
+            out.Ymodel{i} = out.Y{i};
+            out.residual{i} = zeros(size(out.Y{i}));
         end
         
         ratio(i) = newY(frame);
@@ -93,7 +97,7 @@ function out =  jjratio( matrix, t, dt, Cr, frame)
     
     if IS_ROI
         out.Xref = out.X{i};
-        out.Yref = 1; % Cr / Cr
+        out.Yref = ones(size(out.Xref)); % Cr / Cr
     end
     
     % --------
