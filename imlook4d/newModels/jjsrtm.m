@@ -37,9 +37,13 @@ function out =  jjsrtm( matrix, t, dt, Cr)
         return
     end
     
+   % Keep frame start time and duration (in seconds)
+    out.extras.frameStartTime = t;
+    out.extras.frameDuration = dt;
+    
     % time
     tmid = t + 0.5 * dt;
-    dt      = [tmid(1), tmid(2:length(tmid))-tmid(1:length(tmid)-1)];
+    dt      = [tmid(1), tmid(2:length(tmid))-tmid(1:length(tmid)-1)]; % For integration
     
     % activity
     s = size(matrix);

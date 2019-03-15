@@ -331,39 +331,45 @@ function export_curve_menu_Callback(hObject, eventdata, handles)
     TACThandles.TACT.roiNames = handles.roinames;
     TACThandles.TACT.frameNumber = ( 1 : length(datastruct.X{1}) )';
     
-    % Times
-    try
-        midtime = 60 * datastruct.X{1};  % Modelwindow has time in minutes, convert to seconds for SaveTact
-        TACThandles.TACT.midTime = midtime;
-        
-        % Jans way to get start time and dT from midtime
-        %
-        % NOTE: There is not enough information for short water scans on GE
-        % scanner, where the T and dT:s don't add up.
+     % Times
+     T = 60 * datastruct.X{1};  % Modelwindow has time in minutes, convert to seconds for SaveTact
+     TACThandles.TACT.startTime = T';
+     %dt = [T(1), T(2:length(T))-T(1:length(T)-1)];
+     %TACThandles.TACT.duration = dt';
+     
+%     try
+%         midtime = 60 * datastruct.X{1};  % Modelwindow has time in minutes, convert to seconds for SaveTact
+%         TACThandles.TACT.midTime = midtime;
+%         
+%         % Jans way to get start time and dT from midtime
+%         %
+%         % NOTE: There is not enough information for short water scans on GE
+%         % scanner, where the T and dT:s don't add up.
+% 
+%         % tmid(i) = T(i) + 0.5 * dT(i);
+%         % T(i) = tmid(i) - 0.5 * dT(i);
+%         
+%         %  <-  dT(1)  -><-  dT(2)  ->    ...   <-  dT(i-1) -><-  dT(i)  -> 
+%         %  |           |            |    ...   |            |            | 
+%         % T(1)    .   T(2)   .    T(3)   ...  T(i-1)  .   T(i)   .    T(i+1)   
+%         %         .          .           ...          .           .
+%         %       mid(1)      mid(2)       ...       mid(i-1)      mid(i)
+%         %
+%         dT(1) = 2 * midtime(1);
+%         T(1) = 0;
+%         
+%         for i = 2:length(midtime)
+%             T(i)  = T(i-1) + dT(i-1);
+%             dT(i) = 2 * ( midtime(i) - T(i) );
+%         end
+%         
+%         
+%         TACThandles.TACT.startTime = T';
+%         TACThandles.TACT.duration = dT';
+%     catch
+%         disp('newTACT error -- time information missing?');
+%     end
 
-        % tmid(i) = T(i) + 0.5 * dT(i);
-        % T(i) = tmid(i) - 0.5 * dT(i);
-        
-        %  <-  dT(1)  -><-  dT(2)  ->    ...   <-  dT(i-1) -><-  dT(i)  -> 
-        %  |           |            |    ...   |            |            | 
-        % T(1)    .   T(2)   .    T(3)   ...  T(i-1)  .   T(i)   .    T(i+1)   
-        %         .          .           ...          .           .
-        %       mid(1)      mid(2)       ...       mid(i-1)      mid(i)
-        %
-        dT(1) = 2 * midtime(1);
-        T(1) = 0;
-        
-        for i = 2:length(midtime)
-            T(i)  = T(i-1) + dT(i-1);
-            dT(i) = 2 * ( midtime(i) - T(i) );
-        end
-        
-        
-        TACThandles.TACT.startTime = T';
-        TACThandles.TACT.duration = dT';
-    catch
-        disp('newTACT error -- time information missing?');
-    end
     
     % If startTime and duration stored in extras
     try

@@ -29,7 +29,7 @@ try
     dt = imlook4d_duration/60;
     
     tmid = t + 0.5 * dt;
-    dt = [tmid(1), tmid(2:length(tmid))-tmid(1:length(tmid)-1)];
+    %dt = [tmid(1), tmid(2:length(tmid))-tmid(1:length(tmid)-1)];
     
     
     a.xlabel = 'time';

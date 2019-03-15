@@ -37,6 +37,9 @@ function out =  jjsrtm2( matrix, t, dt, Cr, k2p)
         return
     end
     
+   % Keep frame start time and duration (in seconds)
+    out.extras.frameStartTime = t;
+    out.extras.frameDuration = dt;    
 
     % time
     tmid = t + 0.5 * dt;
