@@ -7332,6 +7332,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         end;
   
     function handles = importUntouched_Callback(hObject, eventdata, handles,varargin)
+        % This function Imports data from workspace EXCLUDING imlook4d_Cdata
         % Imports everything where and letting imlook4d-variables override
         % imlook4d_current_handles
         
@@ -7431,7 +7432,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
          guidata(hObject,handles); 
          a = whos('handles');disp([ 'Size = ' num2str( round( a.bytes/1e6 )) ' MB']);            
     function importFromWorkspace_Callback(hObject, eventdata, handles,varargin)
-        % This function Imports data from workspace INCLUDING Cdata
+        % This function Imports data from workspace INCLUDING imlook4d_Cdata
 
         handles = importUntouched_Callback(hObject, eventdata, handles,varargin);
 
