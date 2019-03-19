@@ -108,8 +108,11 @@ function modelWindow_OpeningFcn(hObject, ~, handles, datastruct, roinames, title
     % Draw initial graphs
      %handles.selectedRow = 1;    
 %     drawPlots( handles,handles.selectedRow);
-    
-    roinumbers = 1 : length( roinames );
+    numberOfRois = length( roinames );
+    roinumbers = 1; % Guess only first ROI
+    if numberOfRois < 10 % Draw all ROIs if less than 10 rois
+        roinumbers = 1 : numberOfRois;
+    end
     drawPlots( handles,roinumbers);
     handles.selectedRow = roinames;
 
