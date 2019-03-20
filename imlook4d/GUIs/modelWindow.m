@@ -103,18 +103,15 @@ function modelWindow_OpeningFcn(hObject, ~, handles, datastruct, roinames, title
             handles.uitable.ColumnWidth = {200, 'auto'};
          end
 
-        
 
-    % Draw initial graphs
-     %handles.selectedRow = 1;    
-%     drawPlots( handles,handles.selectedRow);
-    numberOfRois = length( roinames );
-    roinumbers = 1; % Guess only first ROI
-    if numberOfRois < 10 % Draw all ROIs if less than 10 rois
-        roinumbers = 1 : numberOfRois;
-    end
-    drawPlots( handles,roinumbers);
-    handles.selectedRow = roinumbers;
+    % Draw initial graphs 
+        numberOfRois = length( roinames );
+        roinumbers = 1; % Guess only first ROI
+        if numberOfRois < 10 % Draw all ROIs if less than 10 rois
+            roinumbers = 1 : numberOfRois;
+        end
+        drawPlots( handles,roinumbers);
+        handles.selectedRow = roinumbers;
 
     % % Make uitable sortable
     % % (From https://undocumentedmatlab.com/blog/uitable-sorting)
@@ -124,7 +121,19 @@ function modelWindow_OpeningFcn(hObject, ~, handles, datastruct, roinames, title
     % jtable.setAutoResort(true);
     % jtable.setMultiColumnSortable(true);
     % jtable.setPreserveSelectionsAfterSorting(true);
-
+    
+    %
+    % Gray out menues 
+    %
+        % if Logan or Patlak (because export/copy curves is not implemented)
+        if  strcmp( title(1:5), 'Logan') || ...
+                strcmp( title(1:4), 'Zhou') || ...
+                strcmp( title(1:6), 'Patlak') 
+       
+            menuToGray = findobj(hObject,'Tag', 'copy_curves');menuToGray.Enable='off';
+            menuToGray = findobj(hObject,'Tag', 'copy_all_curves');menuToGray.Enable='off';
+            menuToGray = findobj(hObject,'Tag', 'export_curve_menu');menuToGray.Enable='off';
+        end
 
     % Update handles structure
     guidata(hObject, handles);
@@ -328,90 +337,89 @@ function PercentResidualRadioButton_Callback(~, eventdata, handles)
 function LockYradiobutton_Callback(~, eventdata, handles)
      drawPlots( handles,handles.selectedRow); 
     
+% TODO: These works for time-axes graphs (but not for graphical models such
+% as Logan or Patlak).  Gray out menues for these models
 function export_curve_menu_Callback(hObject, eventdata, handles)
     TACThandles = buildTACTs(handles); % TODO : Use this in below functions, to get time info into copied TACTS
     SaveTact(hObject, eventdata, TACThandles)
 function copy_curves_Callback(hObject, eventdata, handles)
-        roinumbers = handles.selectedRow; 
-        s = selectedTACTs(handles,roinumbers);
+        selectedRoinumbers = handles.selectedRow; 
+        s = selectedTACTs(handles, selectedRoinumbers);
         clipboard('copy',s)
 function copy_all_curves_Callback(hObject, eventdata, handles)
         numberOfRois = length( handles.roinames );
         allroinumbers = 1 : numberOfRois;
-    
-        s = selectedTACTs(handles,allroinumbers);
+        s = selectedTACTs(handles, allroinumbers);
         clipboard('copy',s)
     function s = selectedTACTs(handles,roinumbers)
-        TAB=sprintf('\t');
-        EOL=sprintf('\n');
-                  
-        TACThandles = buildTACTs(handles);
-        activity = TACThandles.TACT.tact;
-        contents = TACThandles.TACT.roiNames;
+        % Initiate
+            TAB=sprintf('\t');
+            EOL=sprintf('\n');
 
-        N=size(activity,1);  %Number of ROIs
-        M=size(activity,2);  %Number of frames
+            TACThandles = buildTACTs(handles);
+            activity = TACThandles.TACT.tact;
+            contents = TACThandles.TACT.roiNames;
 
-        %s='';
-        
-        s=['frame' TAB 'time [s]' TAB 'duration [s]' TAB];
-        
-        % Loop number of ROIs
-        for i = 1:length(roinumbers);
-            index = roinumbers(i);
-            s=[ s contents{index} TAB];
-        end
-        s=[ s(1:end-1) EOL];
+            N=size(activity,1);  %Number of ROIs
+            M=size(activity,2);  %Number of frames
 
-        for i=1:N % Loop number of frames
-            timeCols = [ num2str(uint8(i)) TAB num2str( TACThandles.TACT.startTime(i) ) TAB num2str( TACThandles.TACT.duration(i) ) TAB];
-            s = [ s timeCols ];
-            for j = 1:length(roinumbers); % Loop number of ROIs
-                index = roinumbers(j);
-                s=[ s num2str(activity(i,index)) TAB];
+        % Build header
+            s=['frame' TAB 'time [s]' TAB 'duration [s]' TAB];
+
+            for i = 1:length(roinumbers) % Loop number of ROIs
+                index = roinumbers(i);
+                s=[ s contents{index} TAB];
             end
             s=[ s(1:end-1) EOL];
+
+        % Build data
+            for i=1:N % Loop number of frames
+                timeCols = [ num2str(uint8(i)) TAB num2str( TACThandles.TACT.startTime(i) ) TAB num2str( TACThandles.TACT.duration(i) ) TAB];
+                s = [ s timeCols ];
+                for j = 1:length(roinumbers); % Loop number of ROIs
+                    index = roinumbers(j);
+                    s=[ s num2str(activity(i,index)) TAB];
+                end
+                s=[ s(1:end-1) EOL];
+            end
+    function TACThandles = buildTACTs(handles)
+        datastruct = handles.datastruct;
+
+        %
+        % Make struct to export to button
+        %
+
+        TACThandles = [];
+        TACThandles.TACT.roiNames = handles.roinames;
+        TACThandles.TACT.frameNumber = ( 1 : length(datastruct.X{1}) )';
+
+         % Times
+         T = 60 * datastruct.X{1};  % Modelwindow has time in minutes, convert to seconds for SaveTact
+         TACThandles.TACT.startTime = T';
+
+
+        % If startTime and duration stored in extras
+        try
+            TACThandles.TACT.startTime = 60 * datastruct.extras.frameStartTime';
+            TACThandles.TACT.duration = 60 * datastruct.extras.frameDuration';
+        catch
+
         end
 
-        disp(s);
-    function TACThandles = buildTACTs(handles)
-    datastruct = handles.datastruct;
+        % Statistics
+        TACThandles.TACT.tact = cell2mat(datastruct.Y')'; % ROI value for each frame
+        try
+            TACThandles.TACT.std = datastruct.extras.stdev';
+            TACThandles.TACT.pixels = datastruct.extras.N';
+        catch
+            disp('Statistics info missing');
+            TACThandles.TACT.std = zeros( size(T))';
+            TACThandles.TACT.pixels = zeros( size(T))'; 
+        end
 
-    %
-    % Make struct to export to button
-    %
-
-    TACThandles = [];
-    TACThandles.TACT.roiNames = handles.roinames;
-    TACThandles.TACT.frameNumber = ( 1 : length(datastruct.X{1}) )';
-    
-     % Times
-     T = 60 * datastruct.X{1};  % Modelwindow has time in minutes, convert to seconds for SaveTact
-     TACThandles.TACT.startTime = T';
-
-    
-    % If startTime and duration stored in extras
-    try
-        TACThandles.TACT.startTime = 60 * datastruct.extras.frameStartTime';
-        TACThandles.TACT.duration = 60 * datastruct.extras.frameDuration';
-    catch
-        
-    end
-
-    % Statistics
-    TACThandles.TACT.tact = cell2mat(datastruct.Y')'; % ROI value for each frame
-    try
-        TACThandles.TACT.std = datastruct.extras.stdev';
-        TACThandles.TACT.pixels = datastruct.extras.N';
-    catch
-        disp('Statistics info missing');
-        TACThandles.TACT.std = zeros( size(T))';
-        TACThandles.TACT.pixels = zeros( size(T))'; 
-    end
-    
-    % Additional
-    try
-        TACThandles.image.unit = datastruct.extras.unit;
-    catch
-        TACThandles.image.unit = ' ';
-    end
+        % Additional
+        try
+            TACThandles.image.unit = datastruct.extras.unit;
+        catch
+            TACThandles.image.unit = ' ';
+        end
