@@ -106,8 +106,15 @@ function out =  jjsrtm( matrix, t, dt, Cr)
         A(:,3) = -cumsum( Ct(i,:) .* dt); % -int(C(t))
 
         %LSQ-estimation using, solving for X = lscov(A,C)
-        [X se mse]   = lscov(A,Ct(i,:)'); 
-        %X = A\Ct(i,:)';  % Faster!
+            %[X se mse]   = lscov(A,Ct(i,:)'); 
+            %X = A\Ct(i,:)';  % Faster!
+        
+        % Faster!
+        if ( rank(A) == 3)
+            X = A\Ct(i,:)';  
+        else
+            X = [0; 0; 0];
+        end
 
         % modfit_srtm = A * X;
         R1(i)  = X(1); %K1/K1p
