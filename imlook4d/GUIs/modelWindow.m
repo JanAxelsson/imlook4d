@@ -23,7 +23,7 @@ function varargout = modelWindow(varargin)
 
     % Edit the above text to modify the response to help modelWindow
 
-    % Last Modified by GUIDE v2.5 14-Sep-2018 18:21:39
+    % Last Modified by GUIDE v2.5 20-Mar-2019 17:46:06
 
     % Begin initialization code - DO NOT EDIT
 gui_Singleton = 0;
@@ -114,7 +114,7 @@ function modelWindow_OpeningFcn(hObject, ~, handles, datastruct, roinames, title
         roinumbers = 1 : numberOfRois;
     end
     drawPlots( handles,roinumbers);
-    handles.selectedRow = roinames;
+    handles.selectedRow = roinumbers;
 
     % % Make uitable sortable
     % % (From https://undocumentedmatlab.com/blog/uitable-sorting)
@@ -327,7 +327,54 @@ function PercentResidualRadioButton_Callback(~, eventdata, handles)
      drawPlots( handles,handles.selectedRow); 
 function LockYradiobutton_Callback(~, eventdata, handles)
      drawPlots( handles,handles.selectedRow); 
+    
 function export_curve_menu_Callback(hObject, eventdata, handles)
+    TACThandles = buildTACTs(handles); % TODO : Use this in below functions, to get time info into copied TACTS
+    SaveTact(hObject, eventdata, TACThandles)
+function copy_curves_Callback(hObject, eventdata, handles)
+        roinumbers = handles.selectedRow; 
+        s = selectedTACTs(handles,roinumbers);
+        clipboard('copy',s)
+function copy_all_curves_Callback(hObject, eventdata, handles)
+        numberOfRois = length( handles.roinames );
+        allroinumbers = 1 : numberOfRois;
+    
+        s = selectedTACTs(handles,allroinumbers);
+        clipboard('copy',s)
+    function s = selectedTACTs(handles,roinumbers)
+        TAB=sprintf('\t');
+        EOL=sprintf('\n');
+                  
+        TACThandles = buildTACTs(handles);
+        activity = TACThandles.TACT.tact;
+        contents = TACThandles.TACT.roiNames;
+
+        N=size(activity,1);  %Number of ROIs
+        M=size(activity,2);  %Number of frames
+
+        %s='';
+        
+        s=['frame' TAB 'time [s]' TAB 'duration [s]' TAB];
+        
+        % Loop number of ROIs
+        for i = 1:length(roinumbers);
+            index = roinumbers(i);
+            s=[ s contents{index} TAB];
+        end
+        s=[ s(1:end-1) EOL];
+
+        for i=1:N % Loop number of frames
+            timeCols = [ num2str(uint8(i)) TAB num2str( TACThandles.TACT.startTime(i) ) TAB num2str( TACThandles.TACT.duration(i) ) TAB];
+            s = [ s timeCols ];
+            for j = 1:length(roinumbers); % Loop number of ROIs
+                index = roinumbers(j);
+                s=[ s num2str(activity(i,index)) TAB];
+            end
+            s=[ s(1:end-1) EOL];
+        end
+
+        disp(s);
+    function TACThandles = buildTACTs(handles)
     datastruct = handles.datastruct;
 
     %
@@ -368,5 +415,3 @@ function export_curve_menu_Callback(hObject, eventdata, handles)
     catch
         TACThandles.image.unit = ' ';
     end
-
-    SaveTact(hObject, eventdata, TACThandles)
