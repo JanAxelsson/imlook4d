@@ -73,18 +73,19 @@ function [activity, NPixels, stdev, maxActivity, roisToCalculate ]=generateTACT(
                 tempData = handles.image.Cdata;
              else
                  % Slow, if PCA-filter or model
-                 if (size(indecesWithRoi(:))==1)
-                     % Single slice, put into slice 1 by generateImage
-                     [tempData(:,:,indecesWithRoi,:), explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, indecesWithRoi, 1:numberOfFrames);
-                 else
-                     % Multiple slices with ROI, correct dimensions of tempData
-                     % matrix
-                     %[tempData, explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, indecesWithRoi, 1:numberOfFrames);
-                     
-                     % Above was slow in imlook4d/generateImage -- this is faster for many ROIs
-                     tempData = handles.image.Cdata;
-                 end
-             end
+%                  if (size(indecesWithRoi(:))==1)
+%                      % Single slice, put into slice 1 by generateImage
+                     %[tempData(:,:,indecesWithRoi,:), explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, indecesWithRoi, 1:numberOfFrames);
+                     [tempData, explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, indecesWithRoi, 1:numberOfFrames);
+%                  else
+%                      % Multiple slices with ROI, correct dimensions of tempData
+%                      % matrix
+%                      %[tempData, explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, indecesWithRoi, 1:numberOfFrames);
+%                      
+%                      % Above was slow in imlook4d/generateImage -- this is faster for many ROIs
+%                      tempData = handles.image.Cdata;
+%                  end
+              end
 
              numberOfFrames=size(tempData,4);
              

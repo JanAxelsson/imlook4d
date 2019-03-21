@@ -23,6 +23,8 @@ IsDynamic = (numberOfFrames>1);
 
 model_name = 'Time-activity curve';
 
+a.ylabel = 'C_t';
+
 % Normal
 try
     t = imlook4d_time/60;
@@ -48,6 +50,7 @@ if IsPCImage
         tmid = 1:numberOfFrames;        
         
         a.xlabel = 'frame';
+        a.ylabel = 'Eigen values';
     catch
     end
     
@@ -59,8 +62,6 @@ end
 disp('Calculating time-activity curves ...');
 
 
-
-a.ylabel = 'C_t';
 
 
 %
@@ -121,7 +122,7 @@ if IsDynamic
     imlook4d_curve_window = modelWindow( ...
         a , ...
         imlook4d_ROINames(1:end-1), ...
-        [model_name ] ...
+        model_name ...
         );
     
 else  % STATIC
@@ -151,7 +152,9 @@ end
 
 % Special for PC image
 if IsPCImage
-    a.Y = abs(a.Y);
+    for i = 1 : length(a.Y)
+        a.Y{i} = abs(a.Y{i});
+    end
 end
 
 

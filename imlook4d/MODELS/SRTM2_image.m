@@ -1,6 +1,6 @@
 StoreVariables
-ReferenceModel
 ExportUntouched % I do not want recalculation of model for whole matrix, on Export.
+ReferenceModel
 
 model_name = 'SRTM2';
 %

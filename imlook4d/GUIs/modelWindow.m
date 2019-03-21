@@ -100,7 +100,7 @@ function modelWindow_OpeningFcn(hObject, ~, handles, datastruct, roinames, title
             handles.uitable.Data = roinames;
             datastruct.names = datastruct.names;
             handles.uitable.ColumnName =  {'ROI'};
-            handles.uitable.ColumnWidth = {200, 'auto'};
+            handles.uitable.ColumnWidth = {250, 'auto'};
          end
 
 
@@ -126,18 +126,65 @@ function modelWindow_OpeningFcn(hObject, ~, handles, datastruct, roinames, title
     % Gray out menues 
     %
         % if Logan or Patlak (because export/copy curves is not implemented)
-        if  strcmp( title(1:5), 'Logan') || ...
-                strcmp( title(1:4), 'Zhou') || ...
-                strcmp( title(1:6), 'Patlak') 
+        test = [ title '                    '];
+        if  strcmp( test(1:5), 'Logan') || ...
+                strcmp( test(1:4), 'Zhou') || ...
+                strcmp( test(1:6), 'Patlak') 
        
-            menuToGray = findobj(hObject,'Tag', 'copy_curves');menuToGray.Enable='off';
-            menuToGray = findobj(hObject,'Tag', 'copy_all_curves');menuToGray.Enable='off';
-            menuToGray = findobj(hObject,'Tag', 'export_curve_menu');menuToGray.Enable='off';
+            handles.copy_curves.Enable='off';
+            handles.copy_all_curves.Enable='off';
+            handles.export_curve_menu.Enable='off';
+        end
+        
+    %
+    % Adjust layout for 'Time-activity curve'
+    %
+        if strcmp( 'Time-activity curve', title)
+            %
+            % Hide residual axis and buttons for residual
+            %
+                handles.residualAxes.Visible='off';
+                handles.residual_uibuttongroup.Visible='off';
+                
+            %
+            % Change dimensions of window, uitable
+            %
+
+                 % Pixel units on objects in figure
+                 hObject = figureUnits( hObject, 'pixels');
+
+                 heightChange = -240;  % Change in y to remove residual axis
+                 widthChange = -280;   % Change in x to make uitable more narrow
+                 y_move = [ 0 heightChange 0 0]; % Move down
+                 y_shrink = [ 0 0 0 heightChange];
+                 x_move = [ widthChange 0 0 0];  % Move left
+                 x_shrink = [ 0 0 widthChange 0];
+
+                 % Shrink
+                 handles.modelWindow.Position = handles.modelWindow.Position + y_shrink + x_shrink;
+                 handles.uitable.Position = handles.uitable.Position  + y_shrink + x_shrink;
+
+                 % Move down and left
+                 handles.mainAxes.Position = handles.mainAxes.Position + y_move + x_move; 
+                 handles.lockedYradiobutton.Position = handles.lockedYradiobutton.Position + y_move + x_move; 
+
+                % Normalized units on objects in figure (objects will change size on window resize)
+                hObject = figureUnits( hObject, 'normalized');
         end
 
-    % Update handles structure
-    guidata(hObject, handles);
-    
+        % Update handles structure
+        guidata(hObject, handles);
+    function hObject = figureUnits( hObject, unitname) % Modify drawing units 
+            hObject.Units = unitname; 
+            objects = hObject.Children;
+            for i = 1 : length(objects)
+                try
+                    objects(i).Units = unitname; 
+                catch
+                end
+            end
+        
+            
 %
 % Utility functions
 %
@@ -238,7 +285,8 @@ function drawPlots( handles,roinumbers)
         end
         
         % Set axis 
-        handles.mainAxes.YLim = [Vmin +Vmax];
+        delta = [ -1e-12 1e-12];
+        handles.mainAxes.YLim = [Vmin +Vmax] + delta;
 
         if get(handles.lockedYradiobutton,'Value')
             handles.mainAxes.YLim = previousMainYLim;
@@ -287,7 +335,7 @@ function drawPlots( handles,roinumbers)
                     set(h, 'MarkerFaceColor', c{i} );% Stored when plotting Data, above
                     hold(handles.residualAxes,'on');
                 catch
-                    disp('residual plot error');
+                    %disp('residual plot error');
                 end
             end
             hold(handles.residualAxes,'off');
@@ -337,8 +385,6 @@ function PercentResidualRadioButton_Callback(~, eventdata, handles)
 function LockYradiobutton_Callback(~, eventdata, handles)
      drawPlots( handles,handles.selectedRow); 
     
-% TODO: These works for time-axes graphs (but not for graphical models such
-% as Logan or Patlak).  Gray out menues for these models
 function export_curve_menu_Callback(hObject, eventdata, handles)
     TACThandles = buildTACTs(handles); % TODO : Use this in below functions, to get time info into copied TACTS
     SaveTact(hObject, eventdata, TACThandles)
@@ -351,6 +397,7 @@ function copy_all_curves_Callback(hObject, eventdata, handles)
         allroinumbers = 1 : numberOfRois;
         s = selectedTACTs(handles, allroinumbers);
         clipboard('copy',s)
+    % utility functions
     function s = selectedTACTs(handles,roinumbers)
         % Initiate
             TAB=sprintf('\t');
@@ -423,3 +470,4 @@ function copy_all_curves_Callback(hObject, eventdata, handles)
         catch
             TACThandles.image.unit = ' ';
         end
+ 
