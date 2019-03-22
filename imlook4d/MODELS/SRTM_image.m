@@ -27,5 +27,5 @@ model_name = 'SRTM';
     imlook4d_current_handles.model.SRTM.imagetype = selection;
     
 
-Import
+ImportUntouched
 ClearVariables

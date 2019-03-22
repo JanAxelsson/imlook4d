@@ -34,5 +34,5 @@ imlook4d_current_handles.model.SRTM2.referenceData = generateReferenceTACT( imlo
 imlook4d_current_handles.model.SRTM2.k2p = k2p;
 imlook4d_current_handles.model.SRTM2.imagetype = selection;
 
-Import
+ImportUntouched
 ClearVariables

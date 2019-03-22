@@ -12,5 +12,5 @@ imlook4d_current_handles.model.functionHandle = @ratio;
 imlook4d_current_handles.model.Ratio.referenceData = generateReferenceTACT( imlook4d_current_handles);
 imlook4d_current_handles.model.Ratio.imagetype = 1; % Ratio
 
-Import
+ImportUntouched
 ClearVariables

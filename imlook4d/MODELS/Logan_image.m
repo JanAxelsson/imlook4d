@@ -33,5 +33,5 @@ imlook4d_current_handles.model.Logan.referenceData = generateReferenceTACT( imlo
 imlook4d_current_handles.model.Logan.k2 = k2ref;
 imlook4d_current_handles.model.Logan.imagetype = 1; % BP
 
-Import
+ImportUntouched
 ClearVariables

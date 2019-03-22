@@ -33,5 +33,5 @@ guidata(imlook4d_current_handle, imlook4d_current_handles)
 imlook4d_current_handles.model.Zhou.referenceData = generateReferenceTACT( imlook4d_current_handles);
 imlook4d_current_handles.model.Zhou.imagetype = 1; % BP
 
-Import
+ImportUntouched
 ClearVariables

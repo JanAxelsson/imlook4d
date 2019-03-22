@@ -3,7 +3,7 @@
 <!------------------->
 
 	<P>
-	Exports the <B>original</B> data to MATLAB workspace.
+	Exports the <B>original matrix</B> to MATLAB workspace.
 		<UL>
 			<LI> The image data is <B>not</B> manipulated by filters or models.
 			<LI> The image data is <B>not</B> manipulated by settings changing the color scale (scale min/max, remove negatives, invert).
@@ -11,9 +11,9 @@
 	</P>
 
 	<P>
-	Exports all the internal variables of the current imlook4d instance to the MATLAB workspace.  
+	Exports useful variables of the current imlook4d instance to the MATLAB workspace.  
 	Variables may be used for subsequent analysis, and can be imported using the "Workspace/Import" menu.  
-	Variables marked with "*" below are available for import.
+
 	</P>
 	
 	<P>

@@ -28,5 +28,5 @@ imlook4d_current_handles.model.Patlak.endFrame = endFrame;
 imlook4d_current_handles.model.Patlak.Cinp = Cinp_for_this_script;
 
 
-Import
+ImportUntouched
 ClearVariables
