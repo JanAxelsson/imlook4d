@@ -29,6 +29,7 @@ function out =  jjsrtm2( matrix, t, dt, Cr, k2p)
     
     warning('off','MATLAB:lscov:RankDefDesignMat')
     warning('off','MATLAB:nearlySingularMatrix')
+    warning('off','MATLAB:rankDeficientMatrix')
     
     out.names = { 'BP_', 'R1_', 'k2_','k2a_'};
     out.units = { '1', '1', 'min-1','min-1'};
@@ -176,5 +177,6 @@ function out =  jjsrtm2( matrix, t, dt, Cr, k2p)
    
     warning('on','MATLAB:lscov:RankDefDesignMat')
     warning('on','MATLAB:nearlySingularMatrix')
+    warning('on','MATLAB:rankDeficientMatrix')
     
 end

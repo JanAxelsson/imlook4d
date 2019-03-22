@@ -25,7 +25,7 @@ model_name = 'SRTM';
     imlook4d_current_handles.model.functionHandle = @srtm;
     imlook4d_current_handles.model.SRTM.referenceData = generateReferenceTACT( imlook4d_current_handles);
     imlook4d_current_handles.model.SRTM.imagetype = selection;
-
+    
 
 Import
 ClearVariables

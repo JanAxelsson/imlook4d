@@ -29,6 +29,7 @@ function out =  jjsrtm( matrix, t, dt, Cr)
     
     warning('off','MATLAB:lscov:RankDefDesignMat')
     warning('off','MATLAB:nearlySingularMatrix')
+    warning('off','MATLAB:rankDeficientMatrix')
     
     out.names = { 'BP', 'R1', 'k2', 'k2p','k2a'};
     out.units = { '1','1', 'min-1', 'min-1','min-1'};   
@@ -115,6 +116,7 @@ function out =  jjsrtm( matrix, t, dt, Cr)
         else
             X = [0; 0; 0];
         end
+        
 
         % modfit_srtm = A * X;
         R1(i)  = X(1); %K1/K1p
@@ -162,5 +164,6 @@ function out =  jjsrtm( matrix, t, dt, Cr)
    
     warning('on','MATLAB:lscov:RankDefDesignMat')
     warning('on','MATLAB:nearlySingularMatrix')
+    warning('on','MATLAB:rankDeficientMatrix')
     
 end

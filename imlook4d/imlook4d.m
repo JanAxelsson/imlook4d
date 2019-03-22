@@ -2291,14 +2291,17 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         function setSlicesInYokes(slice, this_imlook4d_instance)
             yokes=getappdata( this_imlook4d_instance, 'yokes');
             this_handles=guidata(this_imlook4d_instance);
-            for i=1:length(yokes) 
-                handles=guidata(yokes(i));
-                if this_imlook4d_instance~=yokes(i)
-                    if strcmp( handles.image.plane, this_handles.image.plane)
-                        set(handles.SliceNumEdit,'String', num2str(slice));
-                        set(handles.SliceNumSlider,'Value',slice);
-                        imlook4d('updateImage', handles.figure1,{}, handles);
-                        updateImage(yokes(i), [], handles);
+            for i=1:length(yokes)
+                
+                if isgraphics(yokes(i)) % Otherwise deleted figure handle
+                    handles=guidata(yokes(i));
+                    if this_imlook4d_instance~=yokes(i)
+                        if strcmp( handles.image.plane, this_handles.image.plane)
+                            set(handles.SliceNumEdit,'String', num2str(slice));
+                            set(handles.SliceNumSlider,'Value',slice);
+                            imlook4d('updateImage', handles.figure1,{}, handles);
+                            updateImage(yokes(i), [], handles);
+                        end
                     end
                 end
 
