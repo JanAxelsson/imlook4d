@@ -6207,7 +6207,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                         time = handles.image.time(j);
                                         duration = handles.image.duration(j);
 
-                                        headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0054', '1300',mode, num2str(  time ) );
+                                        % Frame Reference Time (in ms)
+                                        time_ms = time * 1000;
+                                        headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0054', '1300',mode, num2str(  time_ms ) );
+                                        
+                                        % Actual Frame Duration (in ms)
                                         duration_ms = duration * 1000;
                                         headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0018', '1242',mode, num2str(  duration_ms ) );
                                         
