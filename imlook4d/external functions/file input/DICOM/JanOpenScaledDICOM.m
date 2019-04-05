@@ -41,15 +41,7 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
             file=selectedFile;
             disp(selectedFile);
             dummy1=0;dummy3='l'; [Data, headers, dummy]=Dirty_Read_DICOM(directoryPath, dummy1,dummy3, selectedFile); % selected file
-            
-            %
-            % Selected series series-uid
-            %
-            out3=dirtyDICOMHeaderData(headers, 1, '0020', '000E',2);
-            selectedSeriesUID = out3.string;
 
-            
-    
             %    
             % Transfer Syntax (Explicit/Implicit, Byte order)
             % 
@@ -116,36 +108,52 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                                 supportedTransferSyntaxFlag=0;
                             end                  
                         catch end 
-                        
-                       % Not supported!
-                       if ~supportedTransferSyntaxFlag
-                            % Compressed transfer syntax UIDs use explanation='(Little endian, explicit)';
-                            % Guess that this is the case for all not supported, which makes sense
-                            guessByteOrder='l'; %Little endian
-                            guessedMode=2;      %Explicit
-                            foundTransferSyntaxUID=out3.string;
-                            explanation='(Little endian, explicit)';                           
-                       end
 
-                        
 
                     catch end
-                    
-                    disp(['Transfer syntax UID=' foundTransferSyntaxUID ' ' explanation]); 
-                
-                   
+             
+  
             %
             % Check if supported, select what to do
             %
-                if ~supportedTransferSyntaxFlag
-                    if ~IMAGING_TOOLBOX
-                        warndlg({['NOT SUPPORTED DICOM format'],'',['Transfer syntax UID=' foundTransferSyntaxUID]});
+            if ~supportedTransferSyntaxFlag
+                msg1 = ['NOT SUPPORTED DICOM format','','Transfer syntax UID=' foundTransferSyntaxUID, '  ', explanation];
+                msg_dialog = {['NOT SUPPORTED DICOM format'],'',['Transfer syntax UID=' foundTransferSyntaxUID], [ explanation ]};
+                
+                if ~IMAGING_TOOLBOX
+                        warning(msg1);
+                        warndlg(msg_dialog);
                     	close(waitBarHandle);
                         throw(exception)    
                     end
-                end
-                
-                USE_IMAGING_TOOLBOX = (~supportedTransferSyntaxFlag) && IMAGING_TOOLBOX;
+
+                    if strcmp(explanation, '(Big endian, explicit)')
+                        warning(msg1);
+                        warndlg(msg_dialog);
+                    	close(waitBarHandle);
+                        throw(exception)    
+                    end
+                    
+                    % Assume compressed, that can be handled by imaging toolbox
+                    %
+                    % Compressed transfer syntax UIDs use explanation='(Little endian, explicit)';
+                    % Guess that this is the case for all not supported, which makes sense
+                    guessByteOrder='l'; %Little endian
+                    guessedMode=2;      %Explicit
+                    foundTransferSyntaxUID=out3.string;
+                    explanation='(Little endian, explicit)';
+                    
+                end                
+                USE_IMAGING_TOOLBOX = (~supportedTransferSyntaxFlag) && IMAGING_TOOLBOX;                   
+                disp(['Transfer syntax UID=' foundTransferSyntaxUID ' ' explanation]); 
+              
+            %
+            % Selected series series-uid
+            %
+            out3=dirtyDICOMHeaderData(headers, 1, '0020', '000E',2);
+            selectedSeriesUID = out3.string;
+
+
 
             %
             % User Input (pixels and slices)
