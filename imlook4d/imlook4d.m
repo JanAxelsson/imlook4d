@@ -5114,7 +5114,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     try
                         [outputStruct]=dirtyDICOMTimeAndDuration( outputStruct);
                     catch
-                        disp('imlook4d ERROR: Failed reading time and duration');
+                        disp('Time and duration missing');
                     end
 
                     % If "File/Open and merge" is selected, the time is calculated
@@ -5134,6 +5134,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     % Get number of patient positions (column 3) that equals first patient position
                     % => number of frames /gates/ phases
                     numberOfFrames=sum( sortedIndexList(:,3)==sortedIndexList(1,3)); % Number of frames
+                    
+                    % numberOfFrames can be wrong in MR which is scanned Sagital in same position
+                    numberOfImages = size(sortedIndexList,1);
+                    if (numberOfImages == numberOfFrames)
+                        numberOfFrames = 1;
+                    end
 
                     % Get number of slices from total number of images, and number
                     % of frames
