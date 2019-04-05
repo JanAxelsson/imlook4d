@@ -6300,6 +6300,15 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                i=1;
                                headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '7FE0', '0010',mode, num2str(length(matrix)*2 )); % New valuelength for image
                             end
+                            
+                        % Set Transfer Syntax UID
+                            out = dirtyDICOMHeaderData(headers, 1, '0002', '0010',2);
+                            Default_TSUID = '1.2.840.10008.1.2.1'; % Explicit Little Endian is imlook4d default
+                            if ~strcmp( Default_TSUID, out.string)
+                                for i = 1 : length(headers)
+                                    headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0002', '0010',mode, Default_TSUID); 
+                                end
+                            end
 
 
                         % Write to DICOM

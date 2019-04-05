@@ -21,6 +21,9 @@ For instance, PCA-filter is applied before save.
 Display features, such as remove-negatives or invert, are not saved.
 </P>
 
+<P>
+DICOM JPEG-files are saved without JPEG compression".
+</P>
 
 <P>
 Files opened by other formats can be saved to an imlook4d state, using menu "File/Save state".
