@@ -7,13 +7,14 @@
 
 		<UL>
 			<LI> <B><a href="javascript:;" onclick="document.location.hash='DICOM';">DICOM</a> </B>
+			<LI>  <B><a href="javascript:;" onclick="document.location.hash='Nifti';">Nifti</a> </B> (.nii, .hdr, .img)
 
 			<LI>  <B><a href="javascript:;" onclick="document.location.hash='ECAT';">Siemens/CTI ECAT 7</a></B> (.v)
 			<LI>  <B><a href="javascript:;" onclick="document.location.hash='Analyze';">Analyze</a> </B> (.hdr, .img)
-			<LI>  <B><a href="javascript:;" onclick="document.location.hash='Nifti';">Nifti</a> </B> (.nii, .hdr, .img)
 			<LI>  <B><a href="javascript:;" onclick="document.location.hash='Freesurfer';">Freesurfer</a> </B> (.mgz, .mgh)
             <LI>  <B><a href="javascript:;" onclick="document.location.hash='ITK';">ITK</a> </B> (.mhd , and possibly .mha)
 			<LI>  <B><a href="javascript:;" onclick="document.location.hash='SHR';">Hamamatsu SHR-7700</a> </B> (.ima)
+			<LI>  <B><a href="javascript:;" onclick="document.location.hash='RDF';">GE PET Raw data</a> </B> 
 			<LI>  <B>Imlook4d state </B> (.mat) 
 				 (as saved from menu "File/Save state" )
 			<LI>  <B><a href="javascript:;" onclick="document.location.hash='Binary';">Binary</a> </B>
@@ -89,6 +90,21 @@
 
 <a href="javascript:;" onclick="document.location.hash='top';">[top]</a>
 
+
+<h2><a id="Nifti">Nifti file opening</a></h2>
+<!------------------------>
+
+	<P>
+		Opens  .nii files (one binary file), or .img + .hdr (two files as in Analyze format).  
+	</P>
+
+	<P>
+		If a .sif file with the same name exists, imlook4d takes the frame time information from this file.<BR> 
+		See the Analyze section above for information about .sif files.
+	</P>
+
+		
+<a href="javascript:;" onclick="document.location.hash='top';">[top]</a>
 <h2><a id="ECAT">Siemens ECAT file opening</a></h2>
 <!------------------------>
 
@@ -122,20 +138,6 @@
 
 <a href="javascript:;" onclick="document.location.hash='top';">[top]</a>
 
-<h2><a id="Nifti">Nifti file opening</a></h2>
-<!------------------------>
-
-	<P>
-		Opens  .nii files (one binary file), or .img + .hdr (two files as in Analyze format).  
-	</P>
-
-	<P>
-		If a .sif file with the same name exists, imlook4d takes the frame time information from this file.<BR> 
-		See the Analyze section above for information about .sif files.
-	</P>
-
-		
-<a href="javascript:;" onclick="document.location.hash='top';">[top]</a>
 
 <h2><a id="Freesurfer">Freesurfer</a></h2>
 <!------------------------>
@@ -156,6 +158,24 @@
 		All .ima_* files in the same directory are then read.	
 		Scaling is performed by reading the scale factor from the .inf file in the same directory.
 		Timing data is read from the .mon file in the same directory.
+
+	</P>
+
+
+		
+<a href="javascript:;" onclick="document.location.hash='top';">[top]</a>
+
+ <h2><a id="RDF">GE PET Raw data</a></h2>
+<!------------------------>
+
+	<P>
+		Modern GE PET sinograms, rdf-files, are saved in a format called HDF.
+	</P><P>	
+		Opens decompressed GE sinograms extracted from modern GE PET scanners.
+        Location of files SINO0000, SINO0001 etc are determined by the "diagAnalysis" command line tool, and decompressed with "rdfDecomp" command (both on the scanner).
+
+	</P><P>	
+        Time-of-flight dimension is summed to conserve memory.  Data is presented in dimensions x = radial bin, y = projection plane, z = rotation angle.  2D-like sinograms can be viewed in coronal view.
 
 	</P>
 

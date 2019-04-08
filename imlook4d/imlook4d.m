@@ -485,7 +485,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 set(handles.ImgObject,'Cdata',cimg);
                 set(handles.SliceNumEdit,'String',1);
 
-                htable = feval('jet');
+                htable = feval('gray');
                 set(handles.figure1,'Colormap',htable); 
                 set(handles.ImgObject,'Cdata',cimg);
                 set(handles.ImgObject,'Xdata',[0 r]+0.5);
@@ -1226,8 +1226,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         end %switch
                         
                     catch
-                         handles.image.ColormapName = 'Gray';
-                         Color_Callback(hObject, eventdata, handles, 'Gray')
+                        if isfield(handles.image, 'modality') % Only do if Modality known and 
+                            handles.image.ColormapName = 'Gray';
+                            Color_Callback(hObject, eventdata, handles, 'Gray')
+                        end
                     end  
                     
                     guidata(handles.figure1, handles);
@@ -3205,7 +3207,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     voxelSize(2)=handles.image.pixelSizeY;
                     voxelSize(3)=handles.image.sliceSpacing;
                 catch
-                    disp('ERROR - pixelsizes undefined, setting them to 1');
+                    disp('Pixelsizes undefined, setting them to 1');
                     voxelSize(1)=1;
                     voxelSize(2)=1;
                     voxelSize(3)=1;
@@ -3942,7 +3944,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                    file_in_cell  = gunzip(file); % gunzipped path => file
                                    file = file_in_cell{1};
                                end
-                            end 
+                            end
+                            
+                            % Test if RDF (HDF-format) GE Raw data
+                            try
+                                info_sino = h5info( file ,'/SegmentData/Segment2');
+                                FILETYPE='ModernRDF';
+                            catch
+                            end
                             
                             % Dynamic SHR
                             if size(ext,2)>3 
@@ -3997,6 +4006,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                 disp([ 'Probably a Hermes DICOM-like image, trying to open it.  Bytes that should read DICM=' char(headers{1}(129:132))' ]);
                             end
                         end
+                        
+
                         
                     % Open if M4
                     if( strcmp(FILETYPE,'MATLAB'))
@@ -4066,6 +4077,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     if( strcmp(FILETYPE,'ITK'))     LocalOpenBinary(hObject, eventdata, handles, file,path,'ITK' );end                   
                     if( strcmp(FILETYPE,'MGH'))     LocalOpenMGH(hObject, eventdata, handles, file,path );end
                     if( strcmp(FILETYPE,'INTERFILE'))  LocalOpenBinary(hObject, eventdata, handles, file,path,'INTERFILE' );end
+                    if( strcmp(FILETYPE,'ModernRDF'))  LocalOpenModernRDF(hObject, eventdata, handles, file,path);end
                  
 % Own analyze and nifty reader                    
 %                     if( strcmp(FILETYPE,'ANALYZE'))  LocalOpenBinary(hObject, eventdata, handles, file,path,'ANALYZE' );end
@@ -4699,7 +4711,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                          [newhandles.image.pixelSizeX newhandles.image.pixelSizeY newhandles.image.sliceSpacing]=pixel_dims;
                     catch
 
-                        disp('imlook4d/OpenMat_Callback:ERROR - Failded Importing pixel_dims');
+                        disp('imlook4d/OpenMat_Callback: Failed Importing pixel_dims');
                     end
                     
 
@@ -4717,7 +4729,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         size(dirstruct)
                     catch
 
-                        disp('imlook4d/OpenMat_Callback:ERROR - Failded Importing ECAT headers');
+                        disp('imlook4d/OpenMat_Callback: Failed Importing ECAT headers');
                     end
 
                     % Store DICOM headers
@@ -4728,7 +4740,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         newhandles.image.dirtyDICOMHeader=DICOMHeader;
                     catch
 
-                        disp('imlook4d/OpenMat_Callback:ERROR - Failded Importing DICOM headers');
+                        disp('imlook4d/OpenMat_Callback: Failed Importing DICOM headers');
                     end
 
                     % Store isotope half time
@@ -4738,7 +4750,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         %newhandles = guidata(h);
                         newhandles.image.halflife=halflife;
                     catch
-                        disp('imlook4d/OpenMat_Callback:ERROR  Failed Importing isotope halflife');
+                        disp('imlook4d/OpenMat_Callback: Failed Importing isotope halflife');
                     end           
 
                     % Store file type
@@ -4747,7 +4759,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         disp('Importing fileType');
                         newhandles.image.fileType=fileType;
                     catch
-                        disp('imlook4d/OpenMat_Callback:ERROR  Failed importing fileType');
+                        disp('imlook4d/OpenMat_Callback: Failed importing fileType');
                     end       
                     
                     
@@ -4760,7 +4772,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         newhandles.image.sliceSpacing=pixel_dims(3);
                             
                     catch
-                        disp('imlook4d/OpenMat_Callback:ERROR  Failed importing pixel_dims');
+                        disp('imlook4d/OpenMat_Callback: Failed importing pixel_dims');
                     end
 
 
@@ -4943,7 +4955,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     try
                         [outputMatrix, outputStruct]=dirtyDICOMsort( outputMatrix, outputStruct);  
                     catch
-                        disp('imlook4d ERROR: Failed sorting images');
+                        disp('imlook4d: Failed sorting images');
                     end
                     
                     sliceLocations=outputStruct.dirtyDICOMsortedIndexList(:,3);
@@ -5052,7 +5064,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         try
                             [outputMatrix, outputStruct]=dirtyDICOMsort( outputMatrix, outputStruct);  
                         catch
-                            disp('imlook4d ERROR: Failed sorting images');
+                            disp('imlook4d: Failed sorting images');
                         end
                         
                     end % End selection if more than one series
@@ -5414,6 +5426,15 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             catch
                                 disp([ '   [    ]' '  (' group ',' element ')   ' name(1:NAMELENGTH) '=' 'not defined' ]);
                             end
+            function LocalOpenModernRDF(hObject, eventdata, handles, file,path)
+                fullPath=[path file];
+                [path,name,ext] = fileparts(fullPath);
+                disp([ 'Opening Modern RDF (GE Raw data) from path=' fullPath ]);
+                SINO3D = jan_readNewRdf(fullPath);
+                h=imlook4d(SINO3D);
+                set(h,'Name', [file]);
+                Color_Callback(h, [],guidata(h), 'Sokolof'); % TODO Why does it make it gray after this ?
+                
                             
             function OpenFromPacs_Callback(hObject, eventdata, handles)
                 
@@ -6374,7 +6395,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     time=handles.image.time;
                     duration=handles.image.duration;
                 catch
-                    disp('imlook4d/Savemat_Callback:ERROR time or duration not available');
+                    disp('imlook4d/Savemat_Callback: time or duration not available');
                 end
 
                 % Save mat file
@@ -6386,12 +6407,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 try % 1)
                     save(fullPath, 'Data','time', 'duration');
                 catch 
-                    disp('imlook4d/Savemat_Callback:ERROR did not save duration (maybe was not available)');
+                    disp('imlook4d/Savemat_Callback: did not save duration (maybe was not available)');
                     try % 2) 
                         save(fullPath, 'Data','time');
                     catch % 3)
                         save(fullPath, 'Data');
-                        disp('imlook4d/Savemat_Callback:ERROR did not save time (maybe was not available)');
+                        disp('imlook4d/Savemat_Callback: did not save time (maybe was not available)');
                     end
                 end
 
@@ -6402,7 +6423,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     time2D=handles.image.time2D;
                     save(fullPath, '-append', 'time2D');
                 catch
-                    disp('imlook4d/Savemat_Callback:ERROR  Failed appending time2D');
+                    disp('imlook4d/Savemat_Callback: Failed appending time2D');
                 end
 
                 try
@@ -6410,7 +6431,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     time2D=handles.image.time2D;
                     save(fullPath, '-append', 'duration2D');
                 catch
-                    disp('imlook4d/Savemat_Callback:ERROR  Failed appending duration2D');
+                    disp('imlook4d/Savemat_Callback: Failed appending duration2D');
                 end
 
 
@@ -6429,7 +6450,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                     save(fullPath, '-append', 'subHeader', 'mainHeader', 'dirstruct');
                 catch
-                    disp('imlook4d/Savemat_Callback:ERROR  Failed appending ECAT headers');
+                    disp('imlook4d/Savemat_Callback: Failed appending ECAT headers');
                 end
 
 
@@ -6441,7 +6462,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                     save(fullPath, '-append', 'DICOMHeader');
                 catch
-                    disp('imlook4d/Savemat_Callback:ERROR  Failed appending DICOM headers');
+                    disp('imlook4d/Savemat_Callback: Failed appending DICOM headers');
                 end           
 
                 % Save isotope half time
@@ -6451,7 +6472,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     halflife=handles.image.halflife;
                     save(fullPath, '-append', 'halflife');
                 catch
-                    disp('imlook4d/Savemat_Callback:ERROR  Failed appending isotope halflife');
+                    disp('imlook4d/Savemat_Callback: Failed appending isotope halflife');
                 end
 
                 % Save file type
@@ -6461,14 +6482,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     fileType=handles.image.fileType;
                     save(fullPath, '-append', 'fileType');
                 catch
-                    disp('imlook4d/Savemat_Callback:ERROR  Failed appending fileType');
+                    disp('imlook4d/Savemat_Callback: Failed appending fileType');
                 end    
                 
                  try
                     pixel_dims=[handles.image.pixelSizeX handles.image.pixelSizeY handles.image.sliceSpacing];
                     save(fullPath, '-append', 'pixel_dims');
                  catch
-                    disp('imlook4d/Savemat_Callback:ERROR  Failed appending pixel_dims');
+                    disp('imlook4d/Savemat_Callback: Failed appending pixel_dims');
                  end 
                 
 %                 try
@@ -6757,7 +6778,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         strcmp( get(g(i),'Tag'), 'tactWindow' ) ...
                         )
                      h(j,1) = g(i);
-                     get(h(j),'Tag')
+                     get(h(j),'Tag');
                      j = j+1;
                 end
             end      
