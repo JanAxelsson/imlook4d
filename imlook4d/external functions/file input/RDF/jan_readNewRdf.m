@@ -62,10 +62,10 @@ function [SINO3D, SINO4D] = jan_readNewRdf( filepath)
             Matrix3D = h5read(filepath,[SINO_FORMAT '/view1' ]);
             s = size(Matrix3D);
 
-            N_Rs = s(1);   % radial bins 357 (Example values for GE SIGNA PETMR)
-            N_Tofs = s(2); % tof bins  27
-            N_Omega = s(3);% sinograms 1981
-            N_Phis = length(listOfDatasets); % Number of projection angles 224
+            N_Rs = s(1);   % radial bins 357 (Example values for GE SIGNA PETMR).  GE calls this U
+            N_Tofs = s(2); % tof bins  27.  GE calls this T
+            N_Omega = s(3);% sinograms 1981.  GE calls this V
+            N_Phis = length(listOfDatasets); % Number of projection angles 224. GE cals this Phi
 
             % Correct if non-TOF
             if not(TOF_IN_MATRIX )
@@ -85,20 +85,20 @@ function [SINO3D, SINO4D] = jan_readNewRdf( filepath)
             disp( ['Reading  ' views{i} '  (' num2str(i) ' of ' num2str(N_Phis)  ')'] );
             
             Matrix3D = h5read(filepath,[SINO_FORMAT '/' views{i} ]);  % Matlab reads in wrong order to matrix 357 x 27 x 1981 per view (224 views)
-            newMatrix3D = reshape( Matrix3D, [N_Omega, N_Tofs, N_Rs]); % Data stored as chunked HDF5:  1981 x 27,  357 times -- reshape to that size
+            newMatrix3D = reshape( Matrix3D, [N_Omega, N_Tofs, N_Rs]); % Data stored as chunked HDF5:  1981 x 27,  357 times -- reshape to that size. [V T U]
 
             % Sum TOF sinograms
             if TOF_IN_MATRIX
-                MatrixNoTof =  squeeze( sum(newMatrix3D, TOF_DIM)  )'; % Sum TOF, and transpose because of Matlab
+                MatrixNoTof =  permute( squeeze( sum(newMatrix3D, TOF_DIM)  ), [ 2 1] ); % Sum TOF, and transpose because of Matlab. [U V]
             else
                 % TODO: This I have not tested yet.
                 MatrixNoTof = newMatrix3D';
             end
 
-            SINO3D(:,:,i) = MatrixNoTof;
+            SINO3D(:,:,i) = MatrixNoTof; % [U V Phi]
 
             % Output non-summed TOF Sinogram (if two output arguments when calling function)
             if OUTPUT_TOF
-                SINO4D(:,:,:,i) = permute(newMatrix3D, [3, 2, 1]); % 357 x 27 x 1981 x 224
+                SINO4D(:,:,:,i) = permute(newMatrix3D, [3, 2, 1]); % 357 x 27 x 1981 x 224.  [U T V Phi]
             end
         end
