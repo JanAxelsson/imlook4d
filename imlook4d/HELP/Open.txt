@@ -175,8 +175,12 @@
         Location of files SINO0000, SINO0001 etc are determined by the "diagAnalysis" command line tool, and decompressed with "rdfDecomp" command (both on the scanner).
 
 	</P><P>	
-        Time-of-flight dimension is summed to conserve memory.  Data is presented in dimensions x = radial bin, y = projection plane, z = rotation angle.  2D-like sinograms can be viewed in coronal view.
+        Time-of-flight dimension is summed to conserve memory.  Data is presented in dimensions x = radial bin, y = projection plane, z = rotation angle.  
+        Assuming that we hava a brain scan, the imlook4d axial view shows multiple projections of the brain at different ring differences.  The coronal imlook4d view shows classic 2D-like sinograms.
 
+	</P><P>	
+        In case you wish to read the full 4D sinogram, you can force this from the file open dialog. In the open dialog, select file type 'GE RAW (4D, w ToF)'.  
+        Data is presented in dimensions x = radial bin, y = projection plane, z = rotation angle, frame = time-of-flight bin.  On some systems (Macs?), you first have to press a button "Alternative" to be able to select the file type.
 	</P>
 
 
