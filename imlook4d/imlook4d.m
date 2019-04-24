@@ -3881,13 +3881,16 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
             % General method to automatically open correct image type
             dispLine;
-
+            
+            % Make these state variables defined (in case try-catch error)
+            SelectedRaw3D = false;
+            SelectedRaw4D = false;
+            
             try % Catch if error or "Cancel" from GUI
-
                 if isempty(varargin)
                     try
                     % Select file
-                       [file,path] = uigetfile( ...
+                       [file,path,indx] = uigetfile( ...
                             {'*',  'All Files'; ...
                            '*.dcm',  'DICOM files (*.dcm)'; ...
                             '*.v','ECAT Files (*.v)'; ...
@@ -3897,10 +3900,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                            '*.mhd;*.mha',  'ITK files (*.mhd, *.mha)'; ...
                            '*.mgh;*.mgz',  'Freesurfer files (*.mgh, *.mgz)'; ...
                            '*.ima*','SHR files (*.ima)'; ...
+                           'SINO*','GE RAW (3D, sum ToF)'; ...
+                           'SINO*','GE RAW (4D, w ToF)'; ...
                            '*.mat','State files (*.mat)';...
                            '*.mat','m4 object (*.mat)'} ...
                            ,'Select one file to open');
                            
+                        SelectedRaw3D = (indx == 10); % 'GE RAW (3D, sum ToF)'
+                        SelectedRaw4D = (indx == 11); % 'GE RAW (4D, w ToF)'
                         fullPath=[path file];
                         cd(path);
                     catch
@@ -3922,7 +3929,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     FILETYPE='UNKNOWN';
                     [pathstr,name,ext] = fileparts(file);
 
-                    % Test if ECAT, MATLAB, SHR, ITK (mhd, mha)
+                    % Test if ECAT, MATLAB, SHR, ITK (mhd, mha), RDF
                         try
                             if strcmp(ext,'.v') FILETYPE='ECAT'; end
                             if strcmp(ext,'.mhd') FILETYPE='ITK'; end
@@ -4077,7 +4084,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     if( strcmp(FILETYPE,'ITK'))     LocalOpenBinary(hObject, eventdata, handles, file,path,'ITK' );end                   
                     if( strcmp(FILETYPE,'MGH'))     LocalOpenMGH(hObject, eventdata, handles, file,path );end
                     if( strcmp(FILETYPE,'INTERFILE'))  LocalOpenBinary(hObject, eventdata, handles, file,path,'INTERFILE' );end
-                    if( strcmp(FILETYPE,'ModernRDF'))  LocalOpenModernRDF(hObject, eventdata, handles, file,path);end
+                    if( strcmp(FILETYPE,'ModernRDF'))  LocalOpenModernRDF(hObject, eventdata, handles, file,path, SelectedRaw4D);end
                  
 % Own analyze and nifty reader                    
 %                     if( strcmp(FILETYPE,'ANALYZE'))  LocalOpenBinary(hObject, eventdata, handles, file,path,'ANALYZE' );end
@@ -5426,14 +5433,22 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             catch
                                 disp([ '   [    ]' '  (' group ',' element ')   ' name(1:NAMELENGTH) '=' 'not defined' ]);
                             end
-            function LocalOpenModernRDF(hObject, eventdata, handles, file,path)
+            function LocalOpenModernRDF(hObject, eventdata, handles, file,path,ForcedRaw4D)
                 fullPath=[path file];
                 [path,name,ext] = fileparts(fullPath);
                 disp([ 'Opening Modern RDF (GE Raw data) from path=' fullPath ]);
-                SINO3D = jan_readNewRdf(fullPath);
-                h=imlook4d(SINO3D);
+                if ForcedRaw4D
+                    [~, SINO4D] = jan_readNewRdf(fullPath); % Reads a 4D sinogram 
+                    h=imlook4d(SINO4D);
+                else
+                    SINO3D = jan_readNewRdf(fullPath); % Reads a 3D sinogram summing ToF Dimension
+                    h=imlook4d(SINO3D);
+                end
                 set(h,'Name', [file]);
                 Color_Callback(h, [],guidata(h), 'Sokolof'); % TODO Why does it make it gray after this ?
+                newHandles = guidata(h);
+                newHandles.image.fileType = 'ModernRDF';
+                guidata(h, newHandles);
                 
                             
             function OpenFromPacs_Callback(hObject, eventdata, handles)
@@ -5533,6 +5548,18 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 if( strcmp(FILETYPE,'NIFTY_ONEFILE'))  LocalSaveNifti(handles, tempData);end  % Single-file NIFTY
                 if( strcmp(FILETYPE,'Matrix4D')) localSaveM4(handles, tempData); end  % M4 Ume format
                 
+                if( strcmp(FILETYPE,'ModernRDF'))
+                    % TEST :
+                    templateFile = [handles.image.folder filesep handles.image.file];
+                    name = handles.image.file;
+                    
+                    %[file,path] = uiputfile('','Save as Modern RDF');
+                    [file,path] = uiputfile('*.*', 're-save file as', handles.image.file);
+                    filepath_out = [path file];
+                    
+                    %klara_writeNewRdf4D( handles.image.Cdata, templateFile, filepath_out);
+                    jan_writeNewRdf4D( handles.image.Cdata, templateFile, filepath_out);
+                end
                 if( strcmp(FILETYPE,'BINARY'))  warndlg('Saving Binary is not supported');end
                 if( strcmp(FILETYPE,'UNKNOWN')) end    
 

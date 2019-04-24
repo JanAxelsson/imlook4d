@@ -85,7 +85,7 @@ function [SINO3D, SINO4D] = jan_readNewRdf( filepath)
             disp( ['Reading  ' views{i} '  (' num2str(i) ' of ' num2str(N_Phis)  ')'] );
             
             Matrix3D = h5read(filepath,[SINO_FORMAT '/' views{i} ]);  % Matlab reads in wrong order to matrix 357 x 27 x 1981 per view (224 views)
-            newMatrix3D = reshape( Matrix3D, [N_Omega, N_Tofs, N_Rs]); % Data stored as chunked HDF5:  1981 x 27,  357 times -- reshape to that size. [V T U]
+            newMatrix3D = reshape( Matrix3D, [N_Omega, N_Tofs, N_Rs]); % Data is stored as chunked HDF5:  1981 x 27,  357 times -- reshape to that size. [V T U]
 
             % Sum TOF sinograms
             if TOF_IN_MATRIX
@@ -95,10 +95,15 @@ function [SINO3D, SINO4D] = jan_readNewRdf( filepath)
                 MatrixNoTof = newMatrix3D';
             end
 
-            SINO3D(:,:,i) = MatrixNoTof; % [U V Phi]
+            SINO3D(:,:,i) = MatrixNoTof; % [U V Phi]  357 x 1981 x 224
 
             % Output non-summed TOF Sinogram (if two output arguments when calling function)
             if OUTPUT_TOF
-                SINO4D(:,:,:,i) = permute(newMatrix3D, [3, 2, 1]); % 357 x 27 x 1981 x 224.  [U T V Phi]
+                % original -- not changing dimensions
+                %SINO4D(:,:,:,i) = permute(newMatrix3D, [3, 2, 1]); % 357 x 27 x 1981 x 224.  [U T V Phi]
+                
+                % Change dimensions so TOF is in 4:th dimension
+                temp = permute(newMatrix3D, [3, 2, 1]); % 357 x 27 x 1981 x 224.  [U T V Phi]
+                SINO4D(:,:,i,:) = permute(temp, [1, 3, 4, 2]); % 357 x 1981 x 224 x 27.  [U V Phi T]
             end
         end

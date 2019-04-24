@@ -58,16 +58,9 @@
     </P><P>Compressed formats supported by Matlab Imaging Toolbox are opened, if Imaging Toolbox is installed </P>  
 
 	
-<B>4. DICOM opening  - how it works</B>
+<B>3. DICOM opening  - how it works</B>
 <!---------------------------------------->
 	<P>
-		DICOM files are separated into two parts, a header and an image part.  
-		The assumption is that the last N bytes in the file is a single image, where N=2*pixels*pixels.
-		The image data is scaled according to the DICOM tags 
-			<U><SPAN title="Tag='0028', '1053'">Rescale Slope</SPAN></U>
-		and
-			<U><SPAN title="Tag='0028', '1052'">Rescale Intercept</SPAN></U>
-	</P><P>
 
 		The DICOM files are sorted in the below order, using the tags that are available: 
 		<UL>
@@ -175,8 +168,12 @@
         Location of files SINO0000, SINO0001 etc are determined by the "diagAnalysis" command line tool, and decompressed with "rdfDecomp" command (both on the scanner).
 
 	</P><P>	
-        Time-of-flight dimension is summed to conserve memory.  Data is presented in dimensions x = radial bin, y = projection plane, z = rotation angle.  2D-like sinograms can be viewed in coronal view.
+        Time-of-flight dimension is summed to conserve memory.  Data is presented in dimensions x = radial bin, y = projection plane, z = rotation angle.  
+        Assuming that we hava a brain scan, the imlook4d axial view shows multiple projections of the brain at different ring differences.  The coronal imlook4d view shows classic 2D-like sinograms.
 
+	</P><P>	
+        In case you wish to read the full 4D sinogram, you can force this from the file open dialog. In the open dialog, select file type 'GE RAW (4D, w ToF)'.  
+        Data is presented in dimensions x = radial bin, y = projection plane, z = rotation angle, frame = time-of-flight bin.  On some systems (Macs?), you first have to press a button "Alternative" to be able to select the file type.
 	</P>
 
 
