@@ -68,8 +68,11 @@
  %
         
     % Copy colorscale
+    try
     newHandles.image.ColormapName = imlook4d_current_handles.image.ColormapName;
     imlook4d('Color',newHandle, {}, newHandles,newHandles.image.ColormapName );
+    catch
+    end
      
     % Copy window levels 
     if get(imlook4d_current_handles.autoColorScaleRadioButton,'Value')==0 % auto color scale = off
