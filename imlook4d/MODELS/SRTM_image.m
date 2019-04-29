@@ -1,6 +1,6 @@
 StoreVariables
-ReferenceModel
 ExportUntouched % I do not want recalculation of model for whole matrix, on Export.
+ReferenceModel
 
 model_name = 'SRTM';
 
@@ -25,7 +25,7 @@ model_name = 'SRTM';
     imlook4d_current_handles.model.functionHandle = @srtm;
     imlook4d_current_handles.model.SRTM.referenceData = generateReferenceTACT( imlook4d_current_handles);
     imlook4d_current_handles.model.SRTM.imagetype = selection;
+    
 
-
-Import
+ImportUntouched
 ClearVariables

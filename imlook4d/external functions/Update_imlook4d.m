@@ -6,8 +6,9 @@ latestFileListURL = ['https://drive.google.com/uc?export=download&id=' ID ];
 
 % Test to fix error behind firewall
 %text = webread( latestFileListURL);
-o = weboptions('CertificateFilename','');
-text = webread(latestFileListURL,o)
+%o = weboptions('CertificateFilename','');
+o = weboptions('Timeout', 30);
+text = webread(latestFileListURL,o);
 
 data = strsplit( text);
 ver = data{1}; % Latest version
@@ -70,10 +71,12 @@ if ~isfolder(newFolderName)
     
     % Download latest imlook4d
     disp( [ 'Downloading version = ' ver ]);
+    disp( [ 'from = ' url ]);
     zipFilePath = websave(zipFilePath, urlToLatestImlook4d,options);
     
 
     % unzip
+    disp(' ');
     disp( [ 'Unzipping' ]);
     
     folderName = unzip(zipFilePath, unzipFolderPath);
@@ -100,22 +103,25 @@ b = strsplit(a,':'); % Cell array of paths
 % Remove old imlook4d paths
 for i = 1:length(b)
     if ~isempty(strfind( b{i}, folder)) % Remove everything containing path to imlook4d installation
-        %disp (b{i});
         rmpath( b{i} );
     end
 end
 
 % Add new imlook4d to path
-disp(' ')
 disp( [ 'Setting new imlook4d matlab path = ' newFolderName]);
 addpath(genpath( newFolderName ));
 
 
-disp( [ 'Installation DONE!  Old version remains on disk']);
-disp( [ ' ']);
 
 %% Save path
-disp(['Temporary running new version until set as default.' ])
-disp(['If this version works well for you, please click below link, or do Update again to get another chance to set this as default version.' ])
+%disp(['Temporary running new version until set as default.' ])
+%disp(['If this version works well for you, please click below link, or do Update again to get another chance to set this as default version.' ])
 
-disp(['<a href="matlab:savepath;disp(''DONE!'')">Click to make new version "imlook4d ' ver '" default </a>' ])
+%disp(['<a href="matlab:savepath;disp(''DONE!'')">Click to make new version "imlook4d ' ver '" default </a>' ])
+
+disp(['Saving as default path' ])
+savepath
+
+disp(' ');
+disp( [ 'Installation DONE!  Old version remains on disk']);
+disp( [ ' ']);

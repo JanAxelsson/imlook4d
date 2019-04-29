@@ -2,14 +2,9 @@
 <HR></HR>
 <!------------------->
 	<P>
-	Imports variables from MATLAB workspace to imlook4d instance.
-    See the "Workspace/Export" menu for more information about what variables will be imported.
+	Imports variables from MATLAB workspace to imlook4d instance. Changes to imlook4d_Cdata are not imported (use Import command instead).
 	</P>
-	
-	<P>
-	Changes to <CODE> imlook4d_current_handles </CODE> can be imported by issuing the MATLAB command 
-	<CODE> guidata(imlook4d_current_handle,imlook4d_current_handles) </CODE>
-	</P>
+
 	
 		
 	<P>

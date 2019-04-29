@@ -65,7 +65,14 @@ tic
             Cr,...
             [ handles.model.Logan.startFrame handles.model.Logan.endFrame] ...
             );
-        outputImage(:,:,1,1) = a.pars{handles.model.SRTM.imagetype}; 
+        
+        if strcmp(handles.model.Logan.type, 'BP')
+            outputImage(:,:,1,1) = a.pars{1}; % BP
+        end
+         
+        if strcmp(handles.model.Logan.type, 'slope')
+            outputImage(:,:,1,1) = a.pars{2}; % DVR
+        end 
         
 toc
 

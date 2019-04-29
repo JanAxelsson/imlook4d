@@ -29,6 +29,7 @@ function out =  jjsrtm2( matrix, t, dt, Cr, k2p)
     
     warning('off','MATLAB:lscov:RankDefDesignMat')
     warning('off','MATLAB:nearlySingularMatrix')
+    warning('off','MATLAB:rankDeficientMatrix')
     
     out.names = { 'BP_', 'R1_', 'k2_','k2a_'};
     out.units = { '1', '1', 'min-1','min-1'};
@@ -37,6 +38,9 @@ function out =  jjsrtm2( matrix, t, dt, Cr, k2p)
         return
     end
     
+   % Keep frame start time and duration (in seconds)
+    out.extras.frameStartTime = t;
+    out.extras.frameDuration = dt;    
 
     % time
     tmid = t + 0.5 * dt;
@@ -122,8 +126,13 @@ function out =  jjsrtm2( matrix, t, dt, Cr, k2p)
         A(:,2) = -cumsum(  Ct(i,:) .* dt);  % -int(Ct(0:t))
 
         %LSQ-estimation using, solving for X = lscov(A,C)
-        X  = lscov(A,Ct(i,:)'); 
-        %X = A\Ct(i,:)';  % Faster!
+            %X  = lscov(A,Ct(i,:)'); 
+        % Faster!
+        if ( rank(A) == 2)
+            X = A\Ct(i,:)'; 
+        else
+            X = [0; 0];
+        end
 
         R1_(i)= X(1); %K1/K1p
         k2_(i) = k2p * R1_(i); 
@@ -168,5 +177,6 @@ function out =  jjsrtm2( matrix, t, dt, Cr, k2p)
    
     warning('on','MATLAB:lscov:RankDefDesignMat')
     warning('on','MATLAB:nearlySingularMatrix')
+    warning('on','MATLAB:rankDeficientMatrix')
     
 end

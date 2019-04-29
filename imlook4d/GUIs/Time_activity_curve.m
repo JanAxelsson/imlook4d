@@ -9,23 +9,51 @@ guidata( imlook4d_current_handle, imlook4d_current_handles);
 
 Export;
 
-IS_DYNAMIC = size(imlook4d_Cdata,4) > 1 % One frame if more than one column
+numberOfFrames=size(imlook4d_current_handles.image.Cdata,4);
+
+% Determine mode of operation
+IsNormalImage = get(imlook4d_current_handles.ImageRadioButton,'Value');
+IsPCAFilter = not( (get(imlook4d_current_handles.PC_low_slider, 'Value')==1) &&  (get(imlook4d_current_handles.PC_high_slider, 'Value')==numberOfFrames) ); % PCA-filter selected with sliders
+IsPCImage = get(imlook4d_current_handles.PCImageRadioButton,'Value');      % PC images radio button selected
+
+IsModel =  isa(imlook4d_current_handles.model.functionHandle, 'function_handle');
+
+IsDynamic = (numberOfFrames>1);
 
 
 model_name = 'Time-activity curve';
 
+a.ylabel = 'C_t';
+
+% Normal
 try
     t = imlook4d_time/60;
     dt = imlook4d_duration/60;
     
     tmid = t + 0.5 * dt;
-    dt = [tmid(1), tmid(2:length(tmid))-tmid(1:length(tmid)-1)];
+    %dt = [tmid(1), tmid(2:length(tmid))-tmid(1:length(tmid)-1)];
     
     
     a.xlabel = 'time';
 catch
     tmid = 1 : size( imlook4d_Cdata,4);
     a.xlabel = 'frame';
+end
+
+% Special for PC image
+if IsPCImage
+    model_name = 'Principal component plot';
+    try
+        t = 1:numberOfFrames;
+        dt = ones(size(dt));
+        
+        tmid = 1:numberOfFrames;        
+        
+        a.xlabel = 'frame';
+        a.ylabel = 'Eigen values';
+    catch
+    end
+    
 end
 
 %
@@ -35,14 +63,12 @@ disp('Calculating time-activity curves ...');
 
 
 
-a.ylabel = 'C_t';
-
 
 %
 % Alternative analysis DYNAMIC / STATIC
 %
 
-if IS_DYNAMIC
+if IsDynamic
     [tact, NPixels, stdev, maxActivity, roisToCalculate ] = generateTACT(imlook4d_current_handles,imlook4d_ROI);  % ROIs
     a.names = {};
     a.units = {};
@@ -71,6 +97,9 @@ if IS_DYNAMIC
     for i = 1:n
         a.X{i} = tmid;
         a.Y{i} = tact(i,:);
+        if IsPCImage
+            a.Y{i} = abs(a.Y{i} ); % PCA arbitrary direction
+        end
     end
     
     % Store same data points in model (will be drawn as a line)
@@ -93,9 +122,10 @@ if IS_DYNAMIC
     imlook4d_curve_window = modelWindow( ...
         a , ...
         imlook4d_ROINames(1:end-1), ...
-        [model_name ] ...
+        model_name ...
         );
-else
+    
+else  % STATIC
     ExportROIs
     a.names = {'mean', 'volume', 'pixels','max', 'min', 'std'};
     a.units = {'', '', '', '', '', ''};
@@ -107,17 +137,24 @@ else
         imlook4d_ROI_data.stdev', ...
         };
     
-    if (STAT_TOOLBOX)
+    %if (STAT_TOOLBOX)
         a.pars =  [ a.pars, imlook4d_ROI_data.skewness', imlook4d_ROI_data.kurtosis' ]; 
         a.names = [ a.names, 'skewness', 'kurtosis']
         a.units = [ a.units, ' ', ' ']
-    end
+    %end
    
     model_name = 'ROI data';
     tactWindow( ...
         imlook4d_ROI_data , ...
         [model_name ] ...
         );
+end
+
+% Special for PC image
+if IsPCImage
+    for i = 1 : length(a.Y)
+        a.Y{i} = abs(a.Y{i});
+    end
 end
 
 

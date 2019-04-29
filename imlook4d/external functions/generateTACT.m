@@ -49,32 +49,47 @@ function [activity, NPixels, stdev, maxActivity, roisToCalculate ]=generateTACT(
             slicesWithRoi=slicesWithRoi(:);     % row index is slice number.
             indecesWithRoi=find(slicesWithRoi>0);
 
+            
+            % Determine mode of operation
+                    IsNormalImage = get(handles.ImageRadioButton,'Value');
+                    IsPCAFilter = not( (get(handles.PC_low_slider, 'Value')==1) &&  (get(handles.PC_high_slider, 'Value')==numberOfFrames) ); % PCA-filter selected with sliders
+                    IsPCImage = get(handles.PCImageRadioButton,'Value');      % PC images radio button selected
+                    
+                    IsModel =  isa(handles.model.functionHandle, 'function_handle');
+                   
+                    IsDynamic = (numberOfFrames>1);
 
                         
             % Generate 4D image ONLY for slices with ROIs (zero for other slices)
             % This is to speed up calculations!
 
-             
-             % Generate 4D image only for slices containing ROI
-             %[tempData(:,:,indecesWithRoi,1:numberOfFrames), explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, indecesWithRoi, 1:numberOfFrames); 
-             %[tempData, explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, indecesWithRoi, 1:numberOfFrames);
+
+             % NEW Version
              
              % Fix that generateImage puts a single slice into a matrix of dimensions [:,:,1,:]
              % by putting generated image back into correct slice
-%              if (size(indecesWithRoi(:))==1)
-%                  % Single slice, put into slice 1 by generateImage
-%                  [tempData(:,:,indecesWithRoi,:), explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, indecesWithRoi, 1:numberOfFrames);
-%              else
-%                  % Multiple slices with ROI, correct dimensions of tempData
-%                  % matrix
-%                 %[tempData, explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, indecesWithRoi, 1:numberOfFrames);
-%                 
-%                 % Above was slow in imlook4d/generateImage -- this is faster for many ROIs
+             if ( IsNormalImage && ~IsModel && ~IsPCAFilter)
+                 % Quick
                 tempData = handles.image.Cdata;
-%              end
+             else
+                 % Slow, if PCA-filter or model
+                 if (size(indecesWithRoi(:))==1)
+                     % Single slice, put into slice 1 by generateImage
+                     [tempData(:,:,indecesWithRoi,:), explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, indecesWithRoi, 1:numberOfFrames);
+                     %[tempData, explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, indecesWithRoi, 1:numberOfFrames);
+                 else
+                     % Multiple slices with ROI, correct dimensions of tempData
+                     % matrix
+                     [tempData, explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, indecesWithRoi, 1:numberOfFrames);
+                     
+                     % Above was slow in imlook4d/generateImage -- this is faster for many ROIs
+                     %tempData = handles.image.Cdata;
+                     
+                 end
+              end
+
              numberOfFrames=size(tempData,4);
-
-
+             
 
             % Calculate TACT for each ROI
              for i= 1:length(roisToCalculate)

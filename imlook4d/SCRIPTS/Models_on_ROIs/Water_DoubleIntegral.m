@@ -31,10 +31,6 @@ model_name = 'Water Double Integral Method';
         imlook4d_ROINames( 1:(end-1) ), ...
         [model_name ] ...
         );
-    
-    % Restore functionHandle
-    imlook4d_current_handles.model.functionHandle = keepFunctionHandle;
 
     disp('Done!');
-    Import;
     ClearVariables;

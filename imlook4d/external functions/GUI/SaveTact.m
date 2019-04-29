@@ -42,6 +42,7 @@ function SaveTact(hObject, eventdata, handles)
                 frameNumbers = handles.TACT.frameNumber ;
                 timeScale = handles.TACT.startTime;
                 duration = handles.TACT.duration ;
+
                 activity = handles.TACT.tact;
                 stdev = handles.TACT.std;
 

@@ -55,5 +55,4 @@ modelWindow( ...
 
 disp('Done!');
 
-Import; % Because ModelDialog adds to imlook4d_current_handles.model.Zhou.inputs
 ClearVariables;

@@ -41,6 +41,10 @@ function out =  jjwater_doubleintegralmethod( matrix, t, dt_in, Ct1)
         
     out.names = { 'f'};
     out.units = { 'mL/cm3/min'};
+    
+    % Keep frame start time and duration (in seconds)
+    out.extras.frameStartTime = t;
+    out.extras.frameDuration = dt_in;
         
     if nargin == 0    
         return

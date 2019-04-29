@@ -1,9 +1,9 @@
 % Dialog
 %
 StoreVariables
+ExportUntouched % I do not want recalculation of model for whole matrix, on Export.
 ReferenceModel
 
-ExportUntouched % I do not want recalculation of model for whole matrix, on Export.
 model_name = 'Logan';
 
 prompt={'Start Frame ',...
@@ -28,9 +28,10 @@ StoreValues(model_name, answer); % Store answer as new dialog default
 imlook4d_current_handles.model.functionHandle = @logan;
 imlook4d_current_handles.model.Logan.startFrame = startFrame;
 imlook4d_current_handles.model.Logan.endFrame = endFrame;
+imlook4d_current_handles.model.Logan.type = 'BP';
 imlook4d_current_handles.model.Logan.referenceData = generateReferenceTACT( imlook4d_current_handles);
 imlook4d_current_handles.model.Logan.k2 = k2ref;
 imlook4d_current_handles.model.Logan.imagetype = 1; % BP
 
-Import
+ImportUntouched
 ClearVariables
