@@ -4145,14 +4145,16 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     end;       
                 
                 % Read files
-                    fullPath=[path file];                
+                    fullPath=[path file]; 
+                    [pathstr, name, ext] = fileparts(fullPath);               
                     disp([ 'Opening MGH/MGZ from path=' fullPath ]);
                     mri = MRIread(fullPath,0);    
-                    mri.vol = permute(mri.vol,[2 3 1]);  % Freesurfer direction
+                    if strcmp(ext,'.mgz')
+                        mri.vol = permute(mri.vol,[2 3 1]);  % Freesurfer direction
+                    end
 
                 % Operate on the new imlook4d instance
                     h=imlook4d(mri.vol);
-                    [pathstr, name, ext] = fileparts(fullPath);
                     set(h,'Name', [name]);
                     newhandles = guidata(h);
 
