@@ -5,7 +5,7 @@
 
 % INITIALIZE
 StoreVariables
-Export
+ExportUntouched
 
     %  imlook4d_current_handles is updated whenever SCRIPTS menu in imlook4d is
     %  selected
@@ -21,7 +21,7 @@ Export
         
     % Import into imlook4d
    % imlook4d('importFromWorkspace_Callback', imlook4d_current_handle,{},imlook4d_current_handles); % Import from workspace to current imlook4d instance
-    Import
+    ImportUntouched
     
     ClearVariables
     disp('SCRIPTS/UpsideDown.m DONE');
