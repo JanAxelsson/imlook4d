@@ -5549,16 +5549,22 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 if( strcmp(FILETYPE,'Matrix4D')) localSaveM4(handles, tempData); end  % M4 Ume format
                 
                 if( strcmp(FILETYPE,'ModernRDF'))
-                    % TEST :
                     templateFile = [handles.image.folder filesep handles.image.file];
                     name = handles.image.file;
                     
-                    %[file,path] = uiputfile('','Save as Modern RDF');
                     [file,path] = uiputfile('*.*', 're-save file as', handles.image.file);
                     filepath_out = [path file];
                     
-                    %klara_writeNewRdf4D( handles.image.Cdata, templateFile, filepath_out);
-                    jan_writeNewRdf4D( handles.image.Cdata, templateFile, filepath_out);
+                    % Call function for 3D or 4D raw data
+                    s = size(handles.image.Cdata);
+                    if length(s) == 4
+                        jan_writeNewRdf4D( handles.image.Cdata, templateFile, filepath_out);
+                    end
+                    if length(s) == 3
+                        jan_writeNewRdf3D( handles.image.Cdata, templateFile, filepath_out);
+                    end
+                    
+                    
                 end
                 if( strcmp(FILETYPE,'BINARY'))  warndlg('Saving Binary is not supported');end
                 if( strcmp(FILETYPE,'UNKNOWN')) end    

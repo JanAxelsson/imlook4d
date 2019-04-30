@@ -52,10 +52,11 @@ function [SINO3D, SINO4D] = jan_readNewRdf( filepath)
             
             % Verify that uncompressed
             name = listOfDatasets(1).Name;
-            if not( strcmp( name(1:4), 'view' ) )
-                error('Not uncompressed data. Try to run "rdfDecomp" on scanner');
+            if not( strcmp( name(1:3), 'vie' ) )
+                dispRed('Not uncompressed data. Try to run "rdfDecomp" on scanner');
                 return
             end
+
 
 
         % Read dimensions from data: 
@@ -64,7 +65,9 @@ function [SINO3D, SINO4D] = jan_readNewRdf( filepath)
 
             N_Rs = s(1);   % radial bins 357 (Example values for GE SIGNA PETMR).  GE calls this U
             N_Tofs = s(2); % tof bins  27.  GE calls this T
-            N_Omega = s(3);% sinograms 1981.  GE calls this V
+            if (length(s) > 2 )
+                N_Omega = s(3);% sinograms 1981.  GE calls this V
+            end
             N_Phis = length(listOfDatasets); % Number of projection angles 224. GE cals this Phi
 
             % Correct if non-TOF
@@ -75,35 +78,49 @@ function [SINO3D, SINO4D] = jan_readNewRdf( filepath)
             end
 
     %
-    % Input data
+    % Case 1: Input TOF data
     %
 
-        % Read and sort
-        for i = 1: N_Phis
-            % Read one view ( = one projection angle phi) 
-            views{i} = [ 'view' num2str(i) ]; % Name of dataset
-            disp( ['Reading  ' views{i} '  (' num2str(i) ' of ' num2str(N_Phis)  ')'] );
-            
-            Matrix3D = h5read(filepath,[SINO_FORMAT '/' views{i} ]);  % Matlab reads in wrong order to matrix 357 x 27 x 1981 per view (224 views)
-            newMatrix3D = reshape( Matrix3D, [N_Omega, N_Tofs, N_Rs]); % Data is stored as chunked HDF5:  1981 x 27,  357 times -- reshape to that size. [V T U]
+        if TOF_IN_MATRIX 
+            % Read and sort
+            for i = 1: N_Phis
+                % Read one view ( = one projection angle phi) 
+                views{i} = [ 'view' num2str(i) ]; % Name of dataset
+                disp( ['Reading  ' views{i} '  (' num2str(i) ' of ' num2str(N_Phis)  ')'] );
 
-            % Sum TOF sinograms
-            if TOF_IN_MATRIX
+                Matrix3D = h5read(filepath,[SINO_FORMAT '/' views{i} ]);  % Matlab reads in wrong order to matrix 357 x 27 x 1981 per view (224 views)
+                newMatrix3D = reshape( Matrix3D, [N_Omega, N_Tofs, N_Rs]); % Data is stored as chunked HDF5:  1981 x 27,  357 times -- reshape to that size. [V T U]
+
+                % Sum TOF sinograms
                 MatrixNoTof =  permute( squeeze( sum(newMatrix3D, TOF_DIM)  ), [ 2 1] ); % Sum TOF, and transpose because of Matlab. [U V]
-            else
-                % TODO: This I have not tested yet.
-                MatrixNoTof = newMatrix3D';
-            end
 
-            SINO3D(:,:,i) = MatrixNoTof; % [U V Phi]  357 x 1981 x 224
+                SINO3D(:,:,i) = MatrixNoTof; % [U V Phi]  357 x 1981 x 224
 
-            % Output non-summed TOF Sinogram (if two output arguments when calling function)
-            if OUTPUT_TOF
-                % original -- not changing dimensions
-                %SINO4D(:,:,:,i) = permute(newMatrix3D, [3, 2, 1]); % 357 x 27 x 1981 x 224.  [U T V Phi]
-                
-                % Change dimensions so TOF is in 4:th dimension
-                temp = permute(newMatrix3D, [3, 2, 1]); % 357 x 27 x 1981 x 224.  [U T V Phi]
-                SINO4D(:,:,i,:) = permute(temp, [1, 3, 4, 2]); % 357 x 1981 x 224 x 27.  [U V Phi T]
+                % Output non-summed TOF Sinogram (if two output arguments when calling function)
+                if OUTPUT_TOF
+                    % original -- not changing dimensions
+                    %SINO4D(:,:,:,i) = permute(newMatrix3D, [3, 2, 1]); % 357 x 27 x 1981 x 224.  [U T V Phi]
+
+                    % Change dimensions so TOF is in 4:th dimension
+                    temp = permute(newMatrix3D, [3, 2, 1]); % 357 x 27 x 1981 x 224.  [U T V Phi]
+                    SINO4D(:,:,i,:) = permute(temp, [1, 3, 4, 2]); % 357 x 1981 x 224 x 27.  [U V Phi T]
+                end
             end
+        end
+
+    %
+    % Case 2 : Input non-TOF data
+    %    
+        if not( TOF_IN_MATRIX )
+            % Read and sort
+            for i = 1: N_Phis
+                % Read one view ( = one projection angle phi) 
+                views{i} = [ 'view' num2str(i) ]; % Name of dataset
+                disp( ['Reading  ' views{i} '  (' num2str(i) ' of ' num2str(N_Phis)  ')'] );
+
+                Matrix3D = h5read(filepath,[SINO_FORMAT '/' views{i} ]);  % Matlab reads in wrong order to matrix 357 x 27 x 1981 per view (224 views)
+
+                SINO3D(:,:,i) = Matrix3D; % 357 x 1981 x 224.  [U V Phi]
+
+            end        
         end
