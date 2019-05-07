@@ -9,7 +9,7 @@ function jan_writeNewRdf4D( SINO4D, template_filePath, filepath_out)
     %
     % Klara Leffler 2019-APR-15
     % (klara.leffler@umu.se)
-    % Jan Axelsson 2019-APR-24
+    % Jan Axelsson 2019-APR-30
     % (axelsson.jan$gmail.com)
     
     % 
