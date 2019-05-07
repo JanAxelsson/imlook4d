@@ -145,7 +145,7 @@ function minSlider_Callback(hObject, eventdata, handles)
 function maxSlider_Callback(hObject, eventdata, handles)
     handles.maxEdit.String = num2str( handles.maxSlider.Value);
     if handles.maxSlider.Value < handles.minSlider.Value  
-        handles.minSlider.Value = handles.maxSlider.Value ;
+        handles.minSlider.Value = handles.maxSlider.Value - 1e-12; % Make slightly less than max value
     end
     update_imlook4d(handles);
 function minEdit_Callback(hObject, eventdata, handles)
