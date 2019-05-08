@@ -2164,13 +2164,17 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                   [x,y]   = meshgrid(-DX : dx : DX , -DY : dy : DY);        % Old grid
                   [xi,yi] = meshgrid(-halfSide:step:halfSide, -halfSide:step:halfSide);            % New grid, more steps but same x,y coordinate system
                   
+                   
+                  %
+                  % Rotate ROI -- Loop slices
+                  %
                   
                   % Define interpolations
                   method = 'linear';
+                  method = 'nearest';
                   F = griddedInterpolant( x',y', zeros( size(matrix(:,:,1,1) )), method, 'none'); % 2D only, no extrapolation
                   G = griddedInterpolant( xi',yi', zeros( length(xi), length(yi) ), method, 'none' ); % 2D only, no extrapolation
- 
-                                    
+                  
                   % Rotate ROI (if ROI exists)
                   if ( nnz(roi) > 0  ) % at least one non-zero ROI pixel 
                       for i = 1 : size( roi,3)
@@ -2179,16 +2183,27 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                               displayMessageRow([ 'Rotating ROIs slice  ' num2str(i) ' of ' num2str( size(roi,3))  ]);
                               drawnow limitrate % Force update at max 20 fps
                           end
-                          F.Values = single( roi(:,:,i) );
-                          newMatrix2D =  F(xi',yi') ;  % Make large matrix
-
-                          G.Values  = imrotate( newMatrix2D, az, 'nearest','crop'); % TODO: allow 'loose' if matrix should grow.  Next row does not work then.  Solve how?
-                          roi(:,:,i) = uint8( G(x',y')); %  Back to org size
+                          ROIslice = roi(:,:,i);
+                          % Save time -- only if ROI pixels in slice
+                          if sum(ROIslice(:)) > 0
+                              F.Values = single( ROIslice );
+                              newMatrix2D =  F(xi',yi') ;  % Make large matrix
+                              
+                              G.Values  = imrotate( newMatrix2D, az, 'nearest','crop'); % TODO: allow 'loose' if matrix should grow.  Next row does not work then.  Solve how?
+                              roi(:,:,i) = uint8( G(x',y')); %  Back to org size
+                          end
                       end
                   end
                   
-                  
+                  %
                   % Rotate image -- Loop frames and slices
+                  %
+                                    
+                  % Define interpolations
+                  method = 'linear';
+                  F = griddedInterpolant( x',y', zeros( size(matrix(:,:,1,1) )), method, 'none'); % 2D only, no extrapolation
+                  G = griddedInterpolant( xi',yi', zeros( length(xi), length(yi) ), method, 'none' ); % 2D only, no extrapolation
+                  
                   for frame = 1 : size(matrix,4)
                       for i = 1 : size( matrix,3)
                           if ~mod(i,20)
