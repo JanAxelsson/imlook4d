@@ -12,7 +12,7 @@ ERRORS
 
 DEVELOP
 
-
+[OK]   User script -- make work in top folder, or force to make subfolder
 
 
 [  ]   HELP files for models 

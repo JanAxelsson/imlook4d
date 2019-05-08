@@ -595,8 +595,11 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 
                       % Main menu item
                      handles.scriptsMenuUserHandle = uimenu(handles.scriptsMenuHandle,'Label','USER','Separator','on'); % Under SCRIPTS
+                     
+                     % Menus for scripts at main level in USER_SCRIPTS 
+                     handles = makeSubMenues( handles, handles.scriptsMenuUserHandle, [userScriptFolderPath  ]);
 
-                     % Submenues
+                     % Submenues (from folders in USER_SCRIPTS)
                      [files dirs]=listDirectory( userScriptFolderPath );
                      for i=1:length(dirs)
                          nameWithSpaces= regexprep(dirs{i},'_', ' ');  % Replace '_' with ' '
