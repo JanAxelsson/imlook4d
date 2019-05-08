@@ -29,12 +29,6 @@ DEVELOP
 
 
 WISHLIST
-[  ]   Check if toolboxes exists for scripts. For instance Grow_ROI.m needing Imaging Toolbox
-			How?  
-			- flag-file SCRIPTS/ROI/Grow_ROI.toolbox  ?
-			- function hard-coded in imlook4d that checks named files
-			
-			
 
 [  ]   Make Tissue probability map based ROI when doing "apply atlas" (see script SPM_Segmented_ROIs.m)
        Copy LUT to current folder.  I have a copy in imlook4d LUT folder called TPM something
@@ -83,6 +77,7 @@ ISSUES
 DONE
 ====
 
+[OK]   Check if toolboxes exists for scripts. For instance Grow_ROI.m needing Imaging Toolbox (Solution : add script to requiredToolboxSatisfied.m)
 
 [OK]   User script -- make work in top folder, or force to make subfolder
 [ok]   TACT from nifti fails

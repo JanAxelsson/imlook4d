@@ -2274,7 +2274,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              if DisplayHelp(hObject, eventdata, handles) 
                  return 
              end
-            setSlice( handles,round(get(hObject,'Value')) , handles.figure1)
+             setSlice( handles,round(get(hObject,'Value')) , handles.figure1)
         function setSliceWithoutUpdatingYokes(handles, slice, this_imlook4d_instance)
             highestSlice= size(handles.image.Cdata,3);
             newSlice=round(slice);

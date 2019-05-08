@@ -72,5 +72,8 @@ dispOpenWithImlook4d( 'Write MNI ROI file          = ', [ folder filesep newFile
 fullRoiFile = [ folder filesep roiFile ];
 LoadROI( fullRoiFile );
 
+%% Load ROI-names
+ROI_naming_from_file( which( atlas.atlasLUT));
+
 
 ClearVariables
