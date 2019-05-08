@@ -6565,7 +6565,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             end  
             
     % Load ROI
-       function LoadRoiPushbutton_Callback(hObject, eventdata, handles, fullPath)
+        function LoadRoiPushbutton_Callback(hObject, eventdata, handles, fullPath)
             % Display HELP and get out of callback
             if DisplayHelp(hObject, eventdata, handles) 
                 return 

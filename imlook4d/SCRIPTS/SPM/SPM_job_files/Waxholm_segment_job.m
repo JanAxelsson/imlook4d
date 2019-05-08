@@ -7,11 +7,30 @@ NONE = [0 0];
 NATIVE_TISSUE_CLASS_IMAGE = [1 0]; % No = [0 0] ; Native = [ 1 0 ]; Dartel Import [ 0 1]; Both [1 1]
 
 
+% Unzip if .nii atlas not exists
+nii = which(atlas.atlasFileName);
+nii_gz = which([atlas.atlasFileName '.gz']);
+if ~exist(nii,'file')
+    disp( [ 'Unzipping file = ' nii_gz]);
+    gunzip(nii_gz);
+end
+    
+    
+% TPM (unzip if not exists)
+TPM1 = 'WHS_SD_rat_T2star_v1.01.nii';
+nii = which(TPM1);
+nii_gz = which([TPM1 '.gz']);
+if ~exist(nii,'file')
+    disp( [ 'Unzipping file = ' nii_gz]);
+    gunzip(nii_gz);
+end
+
+
 %matlabbatch{1}.spm.spatial.preproc.channel.vols = { [imlook4d_current_handles.image.folder imlook4d_current_handles.image.file] };
 matlabbatch{1}.spm.spatial.preproc.channel.biasreg = 0;
 matlabbatch{1}.spm.spatial.preproc.channel.biasfwhm = Inf;
 matlabbatch{1}.spm.spatial.preproc.channel.write = [0 0];
-matlabbatch{1}.spm.spatial.preproc.tissue(1).tpm = { [which('WHS_SD_rat_T2star_v1.01.nii') ',1']}; % MRI
+matlabbatch{1}.spm.spatial.preproc.tissue(1).tpm = { [which(TPM1) ',1']}; % MRI
 matlabbatch{1}.spm.spatial.preproc.tissue(1).ngaus = 1;
 matlabbatch{1}.spm.spatial.preproc.tissue(1).native = NATIVE_TISSUE_CLASS_IMAGE;
 matlabbatch{1}.spm.spatial.preproc.tissue(1).warped = NONE;

@@ -26,9 +26,14 @@ DEVELOP
 
 [  ]   Script rotate button
 
+[  ]   Trim2D and Trim3D, change location
+[  ]   SPM, if DICOM, automatically make DICOM
+[  ]   SPM, "coregister to", allow to click and select other window (as well as file dialog which we have now)
 
 
 WISHLIST
+
+[  ]   Fiducial Marker skript
 
 [  ]   Make Tissue probability map based ROI when doing "apply atlas" (see script SPM_Segmented_ROIs.m)
        Copy LUT to current folder.  I have a copy in imlook4d LUT folder called TPM something
@@ -77,6 +82,7 @@ ISSUES
 DONE
 ====
 
+[OK]   Perform unzip of nii file, if nii.gz exists but not nii (in Waxholm_segment_job.m )
 [OK]   Check if toolboxes exists for scripts. For instance Grow_ROI.m needing Imaging Toolbox (Solution : add script to requiredToolboxSatisfied.m)
 
 [OK]   User script -- make work in top folder, or force to make subfolder
