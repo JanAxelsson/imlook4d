@@ -24,8 +24,10 @@
 %      set( newHandle, 'Position', newPos);
 %      
      
+     
      % Copy handles.image
-     newHandles.image=imlook4d_current_handles.image;           
+     newHandles.image=imlook4d_current_handles.image;  
+     newHandles.image.windowOpenedTime = now(); % Set new 
      
      % Copy handles.record
      newHandles.record=imlook4d_current_handles.record;   

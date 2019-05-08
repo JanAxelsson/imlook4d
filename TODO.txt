@@ -12,7 +12,6 @@ ERRORS
 
 DEVELOP
 
-[OK]   User script -- make work in top folder, or force to make subfolder
 
 
 [  ]   HELP files for models 
@@ -85,6 +84,7 @@ DONE
 ====
 
 
+[OK]   User script -- make work in top folder, or force to make subfolder
 [ok]   TACT from nifti fails
 [ok]   Update menu, should it save the new downloaded path by default?  Dialog window asking to save?
 	   Fixed this way: 1) Downloads if not already on disk  2) Update gives link to make default version, without downloading if on disk.

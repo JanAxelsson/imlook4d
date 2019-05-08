@@ -868,6 +868,8 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 % Store currently selected radio button
                 handles.imageRadioButtonGroupActiveButton = handles.ImageRadioButton;
                 
+                % Store time when this window was opened
+                handles.image.windowOpenedTime = now();
 
                 % Update handles structure
                 guidata(hObject, handles);
@@ -7620,7 +7622,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                  % Submenu items
                     callback='imlook4d(''windowsSubMenu_Callback'',gcbo,[],guidata(gcbo))';
 
-                    htemp=uimenu(handles.windows,'Label', windowDescriptions{i},'Callback', callback, 'UserData', h(i));  % Store handle to window in 'UserData'
+                    htemp=uimenu(handles.windows,'Label',  windowDescriptions{i},'Callback', callback, 'UserData', h(i));  % Store handle to window in 'UserData'
                                     
                    
                         % Mark current window with a checkbox
@@ -9462,7 +9464,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 table{i,3}='';
                 table{i,4}='';
                 table{i,5}='';
+                table{i,6}=''; % This is time when window opened
  
+                
                 
 
                 
@@ -9473,6 +9477,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     
                     % Here we have gui applications (i.e. imlook4d)
                     tempHandles=guidata(listOfWindows(i));
+                    
+                    % Window opened time
+                    try
+                        table{i,6} = tempHandles.image.windowOpenedTime;
+                    catch
+                    end
                     
                     %
                     % Yoke
@@ -9551,7 +9561,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             %
 
                 % Sort rows
-                [table, index] = sortrows(table,[3,4,2,5]);
+                %[table, index] = sortrows(table,[3,4,2,5]);
+                [table, index] = sortrows(table,[6,3,4,2,5]); % Sort on window opened time (column 6)
 
                 % Set sorted handles
                 sortedListOfWindows=listOfWindows(index);
