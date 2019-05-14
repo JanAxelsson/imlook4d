@@ -191,38 +191,60 @@
             
 
     end
+    
+    %
+    % PVE-correction (if created by script)
+    %
+    if exist('pveFactors')
+        try
+            imlook4d_ROI_data.pve = (pveFactors' \ imlook4d_ROI_data.mean')';
+        catch
+        end
+    end
+    
+    %
+    % Print data
+    %
 
-          
-        % Display output
-            TAB=sprintf('\t');
-            disp(' ');
-            if (STAT_TOOLBOX)
-                disp([ 'ROI-name'  TAB 'mean'  TAB 'volume[cm3]' TAB '# of pixels' TAB 'max     ' TAB 'min     ' TAB 'stdev   '  TAB 'skewness   ' TAB 'kurtosis   ' TAB 'uniformity   ' TAB 'entropy   ']);
-            else
-                disp([ 'ROI-name'  TAB 'mean'  TAB 'volume[cm3]' TAB '# of pixels' TAB 'max     ' TAB 'min     ' TAB 'stdev   ' TAB 'uniformity   ' TAB 'entropy   ' ]);
-            end
-%             
-%             data=[imlook4d_ROI_data(:).mean , 
-%                 imlook4d_ROI_data(:).volume, 
-%                 imlook4d_ROI_data(:).Npixels,
-%                 imlook4d_ROI_data(:).max,
-%                 imlook4d_ROI_data(:).min, 
-%                 imlook4d_ROI_data(:).stdev 
-%                 imlook4d_ROI_data(:).stdev_pos_values]';  % Transpose so that each ROI is in a row
-            
-            % Find frame to use (set to frame=1 when a model is used)
+        % Find frame to use (set to frame=1 when a model is used)
             
             frame=imlook4d_frame;
             if (frame>size(imlook4d_ROI_data.mean,1))
                 frame=1;
             end
+            
+        % Not PVE-corrected data
+        data=[ imlook4d_ROI_data.mean(frame,:),
+            imlook4d_ROI_data.volume(:)',
+            imlook4d_ROI_data.Npixels(:)',
+            imlook4d_ROI_data.max(frame,:),
+            imlook4d_ROI_data.min(frame,:),
+            imlook4d_ROI_data.stdev(frame,:)]';
+        
+        
+        TAB=sprintf('\t');
+        disp(' ');
+        if (STAT_TOOLBOX)
+            if isfield(imlook4d_ROI_data,'pve')
+                % PVE-corrected
+                disp([ 'ROI-name'  TAB 'pvc-mean'  TAB 'mean'  TAB 'volume[cm3]' TAB '# of pixels' TAB 'max     ' TAB 'min     ' TAB 'stdev   '  TAB 'skewness   ' TAB 'kurtosis   ' TAB 'uniformity   ' TAB 'entropy   ']);
+                data=[ imlook4d_ROI_data.pve(frame,:),
+                    imlook4d_ROI_data.mean(frame,:),
+                    imlook4d_ROI_data.volume(:)',
+                    imlook4d_ROI_data.Npixels(:)',
+                    imlook4d_ROI_data.max(frame,:),
+                    imlook4d_ROI_data.min(frame,:),
+                    imlook4d_ROI_data.stdev(frame,:)]';
+            else
+                % Not corrected
+                disp([ 'ROI-name'  TAB 'mean'  TAB 'volume[cm3]' TAB '# of pixels' TAB 'max     ' TAB 'min     ' TAB 'stdev   '  TAB 'skewness   ' TAB 'kurtosis   ' TAB 'uniformity   ' TAB 'entropy   ']);
+            end
+        else
+            disp([ 'ROI-name'  TAB 'mean'  TAB 'volume[cm3]' TAB '# of pixels' TAB 'max     ' TAB 'min     ' TAB 'stdev   ' TAB 'uniformity   ' TAB 'entropy   ' ]);
+        end
+     
 
-            data=[ imlook4d_ROI_data.mean(frame,:),
-                imlook4d_ROI_data.volume(:)', 
-                imlook4d_ROI_data.Npixels(:)',
-                imlook4d_ROI_data.max(frame,:),
-                imlook4d_ROI_data.min(frame,:), 
-                imlook4d_ROI_data.stdev(frame,:)]';
+
             
             if (STAT_TOOLBOX)  % No need for STAT_TOOLBOX anymore
                 % Append columns to the right
