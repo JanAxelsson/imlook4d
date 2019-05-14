@@ -6716,7 +6716,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 
             end
             
-            numberOfROIs = size(roiNames,2) -1 ;
+            %numberOfROIs = size(roiNames,2) -1 ;
+            numberOfROIs = length(roiNames) -1 ;
 
 
             
@@ -9474,7 +9475,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 table{i,3}='';
                 table{i,4}='';
                 table{i,5}='';
-                table{i,6}=''; % This is time when window opened
+                table{i,6}=1e8; % This is time when window opened
  
                 
                 
@@ -9492,6 +9493,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     try
                         table{i,6} = tempHandles.image.windowOpenedTime;
                     catch
+                        table{i,6} = 1e8; % Will be sorted at end (higher value than windowOpenedTime  
                     end
                     
                     %

@@ -26,6 +26,7 @@ bins = str2num(answer{1});% Number of histogram bins
 low = imlook4d_current_handles.ColorBar.Limits(1);
 high = imlook4d_current_handles.ColorBar.Limits(2);
 step = ceil( (high - low) / bins );
+step =  (high - low) / bins ;
 
 %data = imlook4d_ROI_data.pixels{imlook4d_ROI_number}(:,imlook4d_frame);
 
@@ -88,8 +89,8 @@ data =oneFrame(imlook4d_ROI==imlook4d_ROI_number);
     % Statistical toolbox
     try
         STAT_TOOLBOX = 1;
-        skewnessValue = imlook4d_skewness(data(:)');
-        kurtosisValue=imlook4d_kurtosis(data(:)');
+        skewnessValue = imlook4d_skewness(data(:));
+        kurtosisValue=imlook4d_kurtosis(data(:));
     catch
         % Missing Statistical toolbox
         STAT_TOOLBOX = 0;
@@ -126,6 +127,11 @@ data =oneFrame(imlook4d_ROI==imlook4d_ROI_number);
 
 
 % Finish    
+    set(gcf,'NumberTitle','off') %don't show the figure number
+    windowTitle = [ 'Histogram : ' imlook4d_current_handles.figure1.Name ];
+    set(gcf,'Name', windowTitle) % set window title
+
+
     StoreValues('HistogramNumberOfBins', answer ); % Store answer as new dialog default
     ClearVariables    
 
