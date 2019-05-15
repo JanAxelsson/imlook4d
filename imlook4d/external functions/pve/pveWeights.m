@@ -1,6 +1,8 @@
 function W = pveWeights( ROIs, PSF)
 %
 % This function calculates  partial-volume weights for cross talk between all ROIs
+% using Geometric Transfer Matrix (GTM) method 
+% (Rousset OG, Ma Y, Evans AC, J Nucl Med. 1998 May;39(5):904-11).
 % Assumptions are:
 % - neighboring regions can be treated as homogenous
 % - scanner resolutions in x,y,z directions are.
@@ -22,7 +24,7 @@ function W = pveWeights( ROIs, PSF)
 %   fwhm_pixels = pixels( [ 3.59, 3.40, 4.32], vox);  
 %   % Convert from fwhm to sigma
 %   sigma_pixels = fwhm_pixels / 2.35;  
-%   % Create pve-map
+%   % Create pve-weights
 %   W = pveWeights( imlook4d_ROI, sigma_pixels);            
 
     roiNumbers = unique(ROIs);  % List of available ROIs (starting with ROI 0, which is empty)

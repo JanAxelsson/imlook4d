@@ -1,8 +1,11 @@
 function [answer, handles] = ModelDialog( handles, model_name, prompt, failedDefaultAnswers)
-
 %
 % Dialog
 %
+% Stores input variables in imlook4d instance, 
+% and global in workspace as fallback.
+%
+% 
 
 % Defaults from local instance if exists, otherwise second alternative
 try 
