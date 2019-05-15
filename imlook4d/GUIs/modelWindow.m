@@ -231,16 +231,21 @@ function drawPlots( handles,roinumbers)
                     'LineStyle','none',...
                     'Parent',handles.mainAxes ...
                     );
+                try
+                    c{i} = get(h, 'Color'); % Store colors for each ROI
+                    set(h, 'MarkerFaceColor', c{i} );
+                catch
+                    disp('Data Marker Color Error');
+                end
                 
-                c{i} = get(h, 'Color'); % Store colors for each ROI
-                
-                set(h, 'MarkerFaceColor', c{i} );
                 myLegends = [ myLegends handles.roinames{roinumber}  ];
                 
                 hold(handles.mainAxes,'on');
             catch
                 disp('data plot error');
             end
+            
+                %hold(handles.mainAxes,'on');
         end
 
         
@@ -253,8 +258,12 @@ function drawPlots( handles,roinumbers)
                 'Parent',handles.mainAxes ...
                 );
             
-                set(h, 'Color', c{i} ); % Stored when plotting Data, above
-                hold(handles.mainAxes,'on');
+                try
+                    %c{i} = get(h, 'Color'); % Store colors for each ROI
+                    set(h, 'Color', c{i} );
+                catch
+                    disp('Model Marker Color Error');
+                end
             catch
                 disp('model plot error');
             end

@@ -106,6 +106,21 @@ if IsDynamic
     a.Xmodel = a.X;
     a.Ymodel = a.Y;
     
+    
+    % PVE-correction (if weights exist)
+    
+    if exist('pveFactors')
+        numberOfFrames = size(tact,2);
+        for i = 1:numberOfFrames
+            pvc_tact(:,i) = (pveFactors' \ tact(:,i) );
+        end
+        
+        for i = 1 : n % Number of ROIs
+            a.Y{i} = pvc_tact(i,:);
+        end
+    end
+    
+    
     % Ref
     try
         REF_EXISTS = length(imlook4d_current_handles.model.common.ReferenceROINumbers) > 0;
@@ -142,6 +157,9 @@ else  % STATIC
 %         a.names = [ a.names, 'skewness', 'kurtosis']
 %         a.units = [ a.units, ' ', ' ']
 %     %end
+
+
+% PVE-correction (is calculated in ExportROIs)
    
     model_name = 'ROI data';
     tactWindow( ...

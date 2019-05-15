@@ -193,7 +193,7 @@
     end
     
     %
-    % PVE-correction (if created by script)
+    % PVE-correction (if correction factors exist in pveFactors, typically generated in script beforehand)
     %
     if exist('pveFactors')
         try
