@@ -7,14 +7,16 @@ TESTDATA = [ BASE filesep 'test_data' filesep];
 INPUTS = Parameters( {[ TESTDATA 'Test_puck_gaussian3D_FWHM=11.75mm.mat']} );
 imlook4d_current_handle = Open(INPUTS{1}); % Handle to imlook4d window
 
-%INPUTS = Parameters( {[ TESTDATA 'Test_puck.roi' ]} );
-INPUTS = Parameters( {[ TESTDATA 'ROIs.roi' ]} );
+INPUTS = Parameters( {[ TESTDATA 'Test_puck.roi' ]} );
+%INPUTS = Parameters( {[ TESTDATA 'ROIs.roi' ]} );
 Menu('Load ROI')
 
 Export
 ROI_data_to_workspace
 
-sigma_pixels = [ 5 5  5];
+fwhm_mm = [ 11.75 11.75 11.75];
+vox = voxel_size(imlook4d_current_handles);
+sigma_pixels  = pixels( fwhm_mm, vox)  / 2.35;
 
 % On images
 
