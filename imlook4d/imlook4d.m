@@ -6767,6 +6767,19 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             set(handles.ROINumberMenu,'String', roiNames);
             set(handles.ROINumberMenu,'Value', 1 ); 
             
+            % Set reference ROIs
+            counter = 0;
+            handles.model.common.ReferenceROINumbers = [];
+            for i = 1 : numberOfROIs
+                try
+                    if strcmp( '*', roiNames{i}(1) )
+                        counter = counter + 1;
+                        handles.model.common.ReferenceROINumbers(counter) = i;
+                    end
+                catch
+                end
+            end
+            
             guidata(handles.ROINumberMenu,handles);  % Save handles
 
             updateImage(hObject, eventdata, handles);                  
