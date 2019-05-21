@@ -203,25 +203,9 @@ function drawPlots( handles,roinumbers)
     %
     % Draw reference, data, model 
     %   
-    
-        % Reference
-        try 
-            plot (handles.datastruct.Xref,handles.datastruct.Yref,...
-                'Marker','o', ...
-                'MarkerSize',7, ...
-                'LineStyle','none',...
-                'Color','black',...
-                'Parent',handles.mainAxes ...
-                );
-            myLegends = [ myLegends 'Reference'];
 
-            hold(handles.mainAxes,'on');
-        catch
-            %disp('reference plot error');
-        end
-
-        
         % Data
+        held = false;
         for i = 1:length(roinumbers)
             roinumber = roinumbers(i);
             try 
@@ -240,13 +224,33 @@ function drawPlots( handles,roinumbers)
                 
                 myLegends = [ myLegends handles.roinames{roinumber}  ];
                 
-                hold(handles.mainAxes,'on');
+                if held == false
+                    hold(handles.mainAxes,'on');
+                    held = true;
+                end
             catch
                 disp('data plot error');
             end
-            
-                %hold(handles.mainAxes,'on');
-        end
+        end   
+        %legend(handles.mainAxes,myLegends, 'Interpreter', 'none','Location','east');   
+        
+        
+        legend(handles.mainAxes,myLegends, 'Interpreter', 'none','Location','east');  
+     
+        % Reference
+        try 
+            plot (handles.datastruct.Xref,handles.datastruct.Yref,...
+                'Marker','o', ...
+                'MarkerSize',10, ...
+                'LineStyle','none',...
+                'Color','black',...
+                'Parent',handles.mainAxes ...
+                );
+            myLegends = [ myLegends 'Reference'];
+
+        catch
+            disp('reference plot error');
+        end       
 
         
         % Model
@@ -268,12 +272,12 @@ function drawPlots( handles,roinumbers)
                 disp('model plot error');
             end
         end
-        hold(handles.mainAxes,'off');
+
         
     %
     % Set axes
     %
-
+    
         % Find max absolute value (exclude non-numbers)
         v = [0 100]; % Default value, one lowest and one highest
         try v = [ handles.datastruct.Y{roinumbers} ]; catch; end
@@ -300,7 +304,8 @@ function drawPlots( handles,roinumbers)
         if get(handles.lockedYradiobutton,'Value')
             handles.mainAxes.YLim = previousMainYLim;
         end
-    
+        
+        hold(handles.mainAxes,'off'); 
     
     %
     % Write info
@@ -310,6 +315,7 @@ function drawPlots( handles,roinumbers)
         title(handles.mainAxes,'Data');
 
         legend(handles.mainAxes,myLegends, 'Interpreter', 'none','Location','east');    
+        hold(handles.mainAxes,'off');
 
  
     %
@@ -363,19 +369,19 @@ function drawPlots( handles,roinumbers)
    %
    % Restore positions
    %
-        try % May not be set first time
-            handles.mainAxes.Legend.Position = [
-                previousMainAxisLegendPosition(1), ... 
-                previousMainAxisLegendPosition(2) + previousMainAxisLegendPosition(4) - handles.mainAxes.Legend.Position(4), ... 
-                handles.mainAxes.Legend.Position(3), ... 
-                handles.mainAxes.Legend.Position(4), ... 
-                ];
-            handles.residualAxes.Legend.Position = [
-                previousResidualAxisLegendPosition(1), ... 
-                previousResidualAxisLegendPosition(2) + previousResidualAxisLegendPosition(4) - handles.residualAxes.Legend.Position(4), ... 
-                handles.residualAxes.Legend.Position(3), ... 
-                handles.residualAxes.Legend.Position(4), ... 
-                ];
+          try % May not be set first time
+%             handles.mainAxes.Legend.Position = [
+%                 previousMainAxisLegendPosition(1), ... 
+%                 previousMainAxisLegendPosition(2) + previousMainAxisLegendPosition(4) - handles.mainAxes.Legend.Position(4), ... 
+%                 handles.mainAxes.Legend.Position(3), ... 
+%                 handles.mainAxes.Legend.Position(4), ... 
+%                 ];
+%             handles.residualAxes.Legend.Position = [
+%                 previousResidualAxisLegendPosition(1), ... 
+%                 previousResidualAxisLegendPosition(2) + previousResidualAxisLegendPosition(4) - handles.residualAxes.Legend.Position(4), ... 
+%                 handles.residualAxes.Legend.Position(3), ... 
+%                 handles.residualAxes.Legend.Position(4), ... 
+%                 ];
         catch
         end
 
