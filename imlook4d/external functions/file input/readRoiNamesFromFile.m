@@ -1,5 +1,7 @@
 function imlook4d_ROINames = readRoiNamesFromFile( filePath, imlook4d_ROINames) 
 
+    % imlook4d_ROINames is populated with the numbers 
+
     [pathstr,name,ext] = fileparts(filePath);
     file = [name ext];  
 

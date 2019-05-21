@@ -25,23 +25,25 @@ if nargin==0
     [file,path] = uigetfile('*.txt','Select a lookup file with number in left column and names in second column');
 end
 
-try
-    newNames = loadtable( [ path file] );
-catch
-    newNames = loadtable( which(file) );
-end
-OLDCOLUMN = 1;
-NEWCOLUMN = 2;
+% try
+%     newNames = loadtable( [ path file] );
+% catch
+%     newNames = loadtable( which(file) );
+% end
+% OLDCOLUMN = 1;
+% NEWCOLUMN = 2;
+% 
+% 
+% stop = length(imlook4d_ROINames)-1; % Exclude 'Add ROI'
+% for i=1:stop
+%     currentName = imlook4d_ROINames{i};
+%     row = find(strcmp(newNames(:,OLDCOLUMN),currentName ));
+%     if ~isempty(row) 
+%         imlook4d_ROINames{i} = newNames{ row, NEWCOLUMN};
+%     end
+% end
 
-
-stop = length(imlook4d_ROINames)-1; % Exclude 'Add ROI'
-for i=1:stop
-    currentName = imlook4d_ROINames{i};
-    row = find(strcmp(newNames(:,OLDCOLUMN),currentName ));
-    if ~isempty(row) 
-        imlook4d_ROINames{i} = newNames{ row, NEWCOLUMN};
-    end
-end
+imlook4d_ROINames = readRoiNamesFromFile([path file], imlook4d_ROINames);
 
 
 
