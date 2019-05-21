@@ -6749,6 +6749,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 handles.Lock_ROI.Checked = 'on'; % Lock check mark
             end
             
+            % Read ROI names from file
+            roiNameFile = [pathstr filesep name '.txt'];
+            if exist( roiNameFile )
+                roiNames = readRoiNamesFromFile( roiNameFile, roiNames) 
+            end
+            
             % Set ROI names
             set(handles.ROINumberMenu,'String', roiNames);
             set(handles.ROINumberMenu,'Value', 1 ); 
