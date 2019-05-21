@@ -171,6 +171,14 @@ function modelWindow_OpeningFcn(hObject, ~, handles, datastruct, roinames, title
                 % Normalized units on objects in figure (objects will change size on window resize)
                 hObject = figureUnits( hObject, 'normalized');
         end
+        
+        %
+        % Data cursor
+        %
+              % Set data cursor function
+              dcm = datacursormode(hObject);
+              set(dcm,'UpdateFcn',@modelWindowDataCursorUpdateFunction)
+        
 
         % Update handles structure
         guidata(hObject, handles);
@@ -250,7 +258,10 @@ function drawPlots( handles,roinumbers)
 
         catch
             disp('reference plot error');
-        end       
+        end      
+        
+        
+
 
         
         % Model
