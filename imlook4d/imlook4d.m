@@ -9053,7 +9053,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     
                     hold(axisHandle, 'on')
                     for k=1:numel(b)
-                        h = plot( b{k}(:,2), b{k}(:,1), 'color', color, 'linestyle', linestyle,'Tag','contourROI', 'Parent',axisHandle);
+                        h = plot( b{k}(:,2) - 0.5, b{k}(:,1) - 0.5, 'color', color, 'linestyle', linestyle,'Tag','contourROI', 'Parent',axisHandle); % 0.5 to make nodes in middle of pixels
                         h.LineWidth = linewidth;
                     end
                     hold(axisHandle, 'off')
