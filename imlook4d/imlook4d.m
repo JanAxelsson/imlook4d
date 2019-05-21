@@ -319,6 +319,9 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
             % handles    structure with handles and user data (see GUIDATA)
             % varargin   command line arguments to imlook4d (see VARARGIN)
             %
+            
+            % Run script to fix Incompatibilities
+            fixIncompatibilities;
 
             
             % Set recording to off
@@ -4271,7 +4274,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         fullPath=[path filesep name '.sif'];  % hdr file (img file was opened) 
                         fid=fopen(fullPath);
 
-                        C = textscan(fid, '%f %f %f %f', 'headerLines', 1);
+                        C = textscan(fid, '%f %f %f %f %f', 'headerLines', 1);
                         time=C{1}';
                         duration= (C{2}-C{1})';                           
                         [ 'time' 'duration'];
@@ -6648,6 +6651,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 
                 %roiNames
                 pixelValues = unique(rois);
+                if length(pixelValues) > 255
+                    dispRed(['Cannot open.  Too many pixel values (' num2str(length(pixelValues)) ').  This is probably not a ROI file. ' ]);
+                    return
+                end
+                
                 pixelValues = pixelValues( ~isnan( pixelValues)); % Remove NaNs that are treated as unique
                 roiNames={};
                 roiValue = 1; % First ROI should have this value
@@ -6752,7 +6760,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             % Read ROI names from file
             roiNameFile = [pathstr filesep name '.txt'];
             if exist( roiNameFile )
-                roiNames = readRoiNamesFromFile( roiNameFile, roiNames) 
+                roiNames = readRoiNamesFromFile( roiNameFile, roiNames);
             end
             
             % Set ROI names

@@ -57,4 +57,7 @@ function ok = verifySpmExists()
         cd( oldFolder); % Keep Matlab's current directory
         ok = true;
         disp('SPM added to Matlab path');
+        
+        % Fix imlook4d incompatibilities with SPM
+        fix_SPM_Incompatibilities;
     end
