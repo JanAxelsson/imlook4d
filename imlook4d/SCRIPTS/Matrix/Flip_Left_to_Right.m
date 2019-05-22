@@ -25,7 +25,7 @@ ExportUntouched
         
     % Import into imlook4d
    % imlook4d('importFromWorkspace_Callback', imlook4d_current_handle,{},imlook4d_current_handles); % Import from workspace to current imlook4d instance
-    ImportUntouched
+    Import
     
     ClearVariables
     disp('SCRIPTS/Flip_Left_to_Right.m DONE');
