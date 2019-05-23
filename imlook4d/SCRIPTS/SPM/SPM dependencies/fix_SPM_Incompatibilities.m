@@ -5,3 +5,5 @@
     warning('off', 'MATLAB:rmpath:DirNotFound');
     rmpath( genpath( [parentDir(out) filesep 'compat'] ) ); % Remove compat directory and downwards
     warning('on', 'MATLAB:rmpath:DirNotFound');
+    
+    savepath
