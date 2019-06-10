@@ -10,7 +10,9 @@
 % 
 % 2) Open a new imlook4d and the code can be executed on your own data from
 %    the menu /SCRIPTS/USER
-
+if ~verifySpmExists()
+    return
+end
 
 if ~exist('atlas','var')
     % Defaults
@@ -69,6 +71,9 @@ dispOpenWithImlook4d( 'Write MNI ROI file          = ', [ folder filesep newFile
 %% Open ROI
 fullRoiFile = [ folder filesep roiFile ];
 LoadROI( fullRoiFile );
+
+%% Load ROI-names
+ROI_naming_from_file( which( atlas.atlasLUT));
 
 
 ClearVariables

@@ -39,7 +39,7 @@ parentWindowHandle=gcf;
           handle = answer;
       catch
          % Get handle from
-            h = msgbox(message,title)
+            h = msgbox(message,title);
             while ishandle(h)
                 pause(3)
                 if gcf~=parentWindowHandle

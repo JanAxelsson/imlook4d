@@ -32,6 +32,10 @@ function out =  jjratio( matrix, t, dt, Cr, frame)
     
     out.names =  { 'ratio'};
     out.units = { '1'}; 
+    
+    % Keep frame start time and duration (in seconds)
+    out.extras.frameStartTime = t;
+    out.extras.frameDuration = dt;
         
     if nargin == 0
         return
@@ -39,8 +43,8 @@ function out =  jjratio( matrix, t, dt, Cr, frame)
 
     
     % time
-    tmid = t + 0.5 * dt;
-    dt      = [tmid(1), tmid(2:length(tmid))-tmid(1:length(tmid)-1)];
+    %t = t + 0.5 * dt;
+    %dt      = [tmid(1), tmid(2:length(tmid))-tmid(1:length(tmid)-1)];
     
     % activity
     s = size(matrix);
@@ -68,15 +72,23 @@ function out =  jjratio( matrix, t, dt, Cr, frame)
 
     for i = 1:n
         
-        newY = Ct(i,frame)./Cr(frame);  % ratio 
+        newY = Ct(i,:)./Cr(:)';  % ratio 
                 
         % For modelWindow compatibility: Store X,Y
         if IS_ROI 
+            newY( find(~isfinite(newY)) ) = 0; % Make NaN or Inf = 0;
+            
+            tmid = t + 0.5 * dt;
             out.X{i} = tmid;
             out.Y{i} = newY;
+            
+            out.Xmodel{i} = out.X{i};
+            out.Ymodel{i} = out.Y{i};
+            out.residual{i} = zeros(size(out.Y{i}));
+            
         end
         
-        ratio(i) = newY;
+        ratio(i) = newY(frame);
 
     end
           
@@ -91,8 +103,9 @@ function out =  jjratio( matrix, t, dt, Cr, frame)
     
     if IS_ROI
         out.Xref = out.X{i};
-        out.Yref = 1; % Cr / Cr
+        out.Yref = ones(size(out.Xref)); % Cr / Cr
     end
+
     
     % --------
     % Clean up

@@ -3,12 +3,12 @@
 <!------------------->
 	<P>
 	In PCA a "Scree plot" can be used to determined the importance of the different principal components.  The Scree plot shows the eigenvalues on the Y-axis
-        and the corresponding principal-component on the X-axis.
+        and the corresponding principal-component on the X-axis for the dynamic series in the currently selected slice.
 	</P>
 
 
 
 	<P>
-	Tho calculate the Scree Plot, the "PC Image" radiobutton should be selected, or alternatively, the PCA-filter applied.  Since principal component analysis
+	Tho calculate the Scree Plot, the "PC Image" radiobutton will be briefly selected automatically.  Since principal component analysis
         requires a 4th dimension, this can only be used four dynamic images
 	</P>

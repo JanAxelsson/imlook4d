@@ -1,4 +1,4 @@
-function newHeader=dirtyDICOMModifyHeaderString(header, group, element,explicit, newString)
+function newHeader=dirtyDICOMModifyHeaderString(header, group, element,explicit, newString, stopAt)
 %
 % ASSUMPTION:  Little Endian file, Little Endian operating system
 %
@@ -81,10 +81,15 @@ function newHeader=dirtyDICOMModifyHeaderString(header, group, element,explicit,
 %     element   hexadecimal value, for instance '1053'
 %     explicit  =2 means two extra bytes before valueLengthL, otherwise =0
 %
-%     newString string we want to put into this tag
+%     newString  string we want to put into this tag
+%     stopAt  OPTIONAL, normally stops at first occurence, if stopAT=N then set stop at occurence N
 %
 % Output:
 %     newHeader   a modified header.
+
+if ~exist( 'stopAt')
+    stopAt = 1;
+end
 
 try
 %
@@ -125,7 +130,7 @@ try
         % byte position.
     end
     
-    data2=dirtyDICOMHeaderData({header}, 1, group, element,explicit); % the tag we want to modify
+    data2=dirtyDICOMHeaderData({header}, 1, group, element,explicit,stopAt); % the tag we want to modify
 
     % Start header
     startHeader=header(1 : data1.indexLow-8-1);
@@ -253,7 +258,7 @@ try
             disp( ['Valuelength:  was=' num2str(valueLength) ' became=' num2str(newValueLength) ]);
         else
             disp( ['Valuelength:  was=' num2str(valueLength) ' became=' num2str(newValueLength) ]);
-            test=dirtyDICOMHeaderData({newHeader}, 1, group, element,explicit);
+            test=dirtyDICOMHeaderData({newHeader}, 1, group, element,explicit,stopAt);
             disp([ 'Data:         was = ' data2.string '-END    became= ' newString '-END']);
         end
     end   
@@ -264,7 +269,7 @@ try
     
     % TEST
     if (length(header)~= length(newHeader) )
-        test=dirtyDICOMHeaderData({newHeader}, 1, group, element,explicit);
+        test=dirtyDICOMHeaderData({newHeader}, 1, group, element,explicit,stopAt);
 %         disp(['(' group ',' element ') ' 'Was =' data2.string '-END']);
 %         disp(['(' group ',' element ') ' 'Goal=' newString '-END']);
 %         disp(['(' group ',' element ') ' 'Is  =' test.string '-END']);

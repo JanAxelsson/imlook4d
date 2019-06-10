@@ -5,6 +5,9 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
 %     Purpose:  Read multiple DICOM files, storing header in binary format
 %               Allow for reading a single multi-slice DICOM file, if
 %               encountered.
+%               Uses Imaging toolbox for compressed files if toolbox
+%               exists.
+%
 %
 %     Comments: For a multi-slice DICOM file, some tricks have been employed, to keep the structure.
 %               The header and file name is duplicated in all slices (same filename for all slices).
@@ -27,7 +30,10 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
     waitBarHandle = waitbar(0,'Reading DICOM files');	% Initiate waitbar with text
     % Fix directory path so that it always ends with \
     %%directoryPath=strrep( [directoryPath '\'] , '\\', '\'); %Add \ at end of path. Change to \ if \\
-            directoryPath=strrep( [directoryPath filesep] , [filesep filesep], filesep); %Add \ at end of path. Change to \ if \\ 
+    directoryPath=strrep( [directoryPath filesep] , [filesep filesep], filesep); %Add \ at end of path. Change to \ if \\
+    
+    % Imaging toolbox ?
+    IMAGING_TOOLBOX = exist('dicomread');
 %
 % PROBE first selected file
 %
@@ -35,8 +41,7 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
             file=selectedFile;
             disp(selectedFile);
             dummy1=0;dummy3='l'; [Data, headers, dummy]=Dirty_Read_DICOM(directoryPath, dummy1,dummy3, selectedFile); % selected file
-            
-    
+
             %    
             % Transfer Syntax (Explicit/Implicit, Byte order)
             % 
@@ -103,31 +108,52 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                                 supportedTransferSyntaxFlag=0;
                             end                  
                         catch end 
-                        
-                       % Not supported!
-                       if ~supportedTransferSyntaxFlag
-                            % Compressed transfer syntax UIDs use explanation='(Little endian, explicit)';
-                            % Guess that this is the case for all not supported, which makes sense
-                            guessByteOrder='l'; %Little endian
-                            guessedMode=2;      %Explicit
-                            foundTransferSyntaxUID=out3.string;
-                            explanation='(Little endian, explicit)';                           
-                        end
-                        
+
 
                     catch end
-                    
-                    disp(['Transfer syntax UID=' foundTransferSyntaxUID ' ' explanation]); 
+             
+  
+            %
+            % Check if supported, select what to do
+            %
+            if ~supportedTransferSyntaxFlag
+                msg1 = ['NOT SUPPORTED DICOM format','','Transfer syntax UID=' foundTransferSyntaxUID, '  ', explanation];
+                msg_dialog = {['NOT SUPPORTED DICOM format'],'',['Transfer syntax UID=' foundTransferSyntaxUID], [ explanation ]};
                 
-                   
+                if ~IMAGING_TOOLBOX
+                        warning(msg1);
+                        warndlg(msg_dialog);
+                    	close(waitBarHandle);
+                        throw(exception)    
+                    end
+
+                    if strcmp(explanation, '(Big endian, explicit)')
+                        warning(msg1);
+                        warndlg(msg_dialog);
+                    	close(waitBarHandle);
+                        throw(exception)    
+                    end
+                    
+                    % Assume compressed, that can be handled by imaging toolbox
+                    %
+                    % Compressed transfer syntax UIDs use explanation='(Little endian, explicit)';
+                    % Guess that this is the case for all not supported, which makes sense
+                    guessByteOrder='l'; %Little endian
+                    guessedMode=2;      %Explicit
+                    foundTransferSyntaxUID=out3.string;
+                    explanation='(Little endian, explicit)';
+                    
+                end                
+                USE_IMAGING_TOOLBOX = (~supportedTransferSyntaxFlag) && IMAGING_TOOLBOX;                   
+                disp(['Transfer syntax UID=' foundTransferSyntaxUID ' ' explanation]); 
+              
             %
-            % Check if supported
+            % Selected series series-uid
             %
-                if ~supportedTransferSyntaxFlag
-                    warndlg({['NOT SUPPORTED DICOM format'],'',['Transfer syntax UID=' foundTransferSyntaxUID]});
-                    close(waitBarHandle);
-                    throw(exception)                     
-                end
+            out3=dirtyDICOMHeaderData(headers, 1, '0020', '000E',2);
+            selectedSeriesUID = out3.string;
+
+
 
             %
             % User Input (pixels and slices)
@@ -284,12 +310,16 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                 
                 % Get start of data
                 out3=dirtyDICOMHeaderData(headers, 1, '7FE0', '0010',mode);  % Find start of data
-%                 startOfPixelData=out3.indexHigh;
-%                 
-                % Calculate number of data bytes
-%                 numberOfBytesInData=(selectedFileSize-startOfPixelData-4);
-                
                 numberOfBytesInData=out3.valueLength;
+                
+                % For encapsulated DICOM, the value length = -1 (which will
+                % be an extremely large number)
+                if numberOfBytesInData == 4294967295 
+                    startOfPixelData=out3.indexLow;
+                    numberOfBytesInData=(selectedFileSize-startOfPixelData-4);
+                end
+                 
+                
                 
 %                 if (guessedMode==2)
 %                     startOfPixelData=out3.indexHigh;
@@ -344,10 +374,12 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
      %Get number of selected files.
      iNumberOfSelectedFiles = length(fileNames);
 
+
      count=0;  % Number of accepted files
-     %matrix=zeros(rows,columns,iNumberOfSelectedFiles, 'single');
+
      matrix=zeros(columns,rows,iNumberOfSelectedFiles, 'single'); 
 
+     
         for nr=1:iNumberOfSelectedFiles  %Ignore directories '.' and '..'
             if (mod(nr, 100)==0) waitbar(nr/iNumberOfSelectedFiles); end
 
@@ -366,54 +398,102 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                 numberOfBytesInData=out4.valueLength; 
                 fclose(fid);
                 
+                % For encapsulated DICOM, the value length = -1 (which will
+                % be an extremely large number)
+                if numberOfBytesInData == 4294967295 
+                    temp=dir(tempFilename);
+                    selectedFileSize=temp.bytes;
+                    startOfPixelData=out3.indexLow;
+                    numberOfBytesInData=(selectedFileSize-startOfPixelData-4);
+                end
+                 
+                
                 % Use OLD or NEW fileSize
                 %headerSize = headerSize1;  % From file size
                 headerSize = headerSize2;  % From (7FE0,0010)
-
                 
-                if  (headerSize>0)  % Ignore really small files
-% %                  % Read header and data
-% %                     fid = fopen(tempFilename, 'r',machineFormat);
-% %                     tempHeader= fread(fid, headerSize);                     % Binary header in memory  
-% %                     
-% %                     % Determine number of bytes per pixel
-% %                     
-% %                    % tempData= fread(fid, numberOfBytesInData, 'int16');     % Data in memory 
-% %                     tempData = fread(fid, numberOfBytesInData / numberOfBytesPerPixel, numberFormat);     % Data in memory 
-% % 
-% %                     fclose(fid);
-                     
-                    % NEW - Read header and data
-                    tempHeader = A(1:headerSize);
-                    tempData = typecast( uint8(A(startOfPixelData:startOfPixelData+numberOfBytesInData-1)), numberFormat);
-                   
-                    % Test if DICOM file or Hermes export
-                    if strcmp(char(tempHeader(129:132))', 'DICM') || strcmp(char(tempHeader(129:132))', '1000') 
-                        
-                        % Two cases:
-                        % a) multiple images in one file (nuclear medicin) 
-                        % b) single image in many files (most often)
-                        if SingleFileWithMultipleSlices  % a)
-                            count=numberOfBytesInData/(numberOfBytesPerPixel*rows*columns);
-                            matrix=single(reshape(tempData(:),columns,rows,count)); % Allow to grow to number of slices
-                            for i=1:count
-                                header{i}=tempHeader;% Same header in every image
-                                outputFileName{i}=tempFilename;% Same filename for every image
-                            end  
-                        else  % b)
-                            count=count+1;    % Succesful read
-                            try
-                                matrix(:,:,count)=single(reshape(tempData(:),columns,rows,1));
-                                %disp(['      - tempData=[' num2str(size(tempData)) '] rows=' num2str(rows) ' columns=' num2str(columns) ' rows*columns=' num2str(rows*columns) ' file=' tempFilename]);
-                            catch
-                                %disp(['ERROR - tempData=[' num2str(size(tempData)) '] rows=' num2str(rows) ' columns=' num2str(columns) ' rows*columns=' num2str(rows*columns) ' file=' tempFilename]);
-                            end
-                            header{count}=tempHeader;
-                            %fileName{count}=tempFilename;
-                            outputFileName{count}=tempFilename;
 
-                            %disp([TAB 'Accepting file='
-                            %sTempFilenameStruct(nr).name ]);                        
+                %
+                % Read matrix
+                %                
+                
+                if  (headerSize>0) % Ignore really small files
+                  
+                    % Read header and data
+                    tempHeader = A(1:headerSize);
+                    %tempData = typecast( uint8(A(startOfPixelData:startOfPixelData+numberOfBytesInData-1)), numberFormat);
+                    tempData = typecast( uint8(A(startOfPixelData:end)), numberFormat);
+                    
+                    % Series UID
+                    out3=dirtyDICOMHeaderData({tempHeader}, 1, '0020', '000E',2); % fix cell array for first argument
+                    seriesUID = out3.string;
+                    
+                    % Test if DICOM file, Hermes export, or same series
+                    if strcmp(char(tempHeader(129:132))', 'DICM') || strcmp(char(tempHeader(129:132))', '1000')
+                        
+                        if strcmp( seriesUID, selectedSeriesUID)
+                            
+                            % Two cases:
+                            % a) multiple images in one file (nuclear medicin)
+                            % b) single image in many files (most often)
+                            if SingleFileWithMultipleSlices  % a)
+                                count=numberOfBytesInData/(numberOfBytesPerPixel*rows*columns);
+                                
+                                if USE_IMAGING_TOOLBOX
+                                    % Imaging toolbox method
+                                    info = dicominfo(tempFilename);
+                                    fullMatrix = dicomread(info);  % 3D matrix
+%                                     for i=1:count
+%                                         disp('Read matrix using Imaging Toolbox');
+%                                         matrix(:,:,i) = fullMatrix(:,:,i)';  % Transpose each slice
+%                                     end
+                                    matrix = permute(fullMatrix, [2 1 3 4]);
+                                    count = size(matrix,3) * size(matrix,4); % Number of slices
+                                else
+                                    % Jan method
+                                    disp('Read matrix with base Matlab');
+                                    matrix=single(reshape(tempData(:),columns,rows,count)); % Allow to grow to number of slices
+                                end
+                                
+                                % Handle each slice separately
+                                for i=1:count
+                                    header{i}=tempHeader;% Same header in every image
+                                    outputFileName{i}=tempFilename;% Same filename for every image
+                                end
+                                
+                            else  % b)
+                                count=count+1;    % Succesful read
+                                try
+                                    if USE_IMAGING_TOOLBOX
+                                        % Write once
+                                        if count == 1
+                                            disp('Read matrix using Imaging Toolbox');
+                                        end
+                                        % Imaging toolbox method
+                                        info = dicominfo(tempFilename);
+                                        matrix(:,:,count) = dicomread(info)';
+                                    else
+                                        % Write once
+                                        if count == 1
+                                            disp('Read matrix with base Matlab');
+                                        end
+                                        
+                                        matrix(:,:,count)=single(reshape(tempData(1:columns*rows),columns,rows,1));
+                                    end
+                                    
+                                    
+                                    %disp(['      - tempData=[' num2str(size(tempData)) '] rows=' num2str(rows) ' columns=' num2str(columns) ' rows*columns=' num2str(rows*columns) ' file=' tempFilename]);
+                                catch
+                                    disp(['ERROR - tempData=[' num2str(size(tempData)) '] rows=' num2str(rows) ' columns=' num2str(columns) ' rows*columns=' num2str(rows*columns) ' file=' tempFilename]);
+
+                                end
+                                header{count}=tempHeader;
+                                %fileName{count}=tempFilename;
+                                outputFileName{count}=tempFilename;
+                                
+                                %disp([TAB 'Accepting file='
+                                %sTempFilenameStruct(nr).name ]);
+                            end
                         end
                         
                     else
@@ -451,7 +531,7 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
             matrix(:,:,i)=scaleFactor*matrix(:,:,i)+intercept;
         end
     catch
-       warning('Did not find DICOM tag (0028,1053) or (0028,1052)  - intercept and slope');
+       disp('Did not find DICOM tag (0028,1053) or (0028,1052)  - intercept and slope');
 %        msgbox({'Did not find DICOM tag (0028,1053) or (0028,1052)  ',...
 %                'Creating fake scale factor (=1)'...
 %                },...
@@ -498,20 +578,34 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
              pixelSizeY=1;
           end
           
-     % Slice spacing
-           try
-            out2=dirtyDICOMHeaderData(header, i, '0018', '0050',mode);
-            sliceSpacing=str2num(out2.string);  %
-          catch   
-             %sliceSpacing=-1
-             sliceSpacing=1
-           end    
+     % Slice spacing (can be in either tag)
+             try
+                 out2=dirtyDICOMHeaderData(header, i, '0018', '0050',mode); % Slice Thickness
+                 %out2=dirtyDICOMHeaderData(header, i, '0018', '0088',mode); % Spacing Between Slices
+                 sliceSpacing=str2num(out2.string);  %
+                 if isempty(sliceSpacing) 
+                    ME = MException('JanOpenScaledDICOM:EmptyTag', ...
+                    '(0018,0050) Slice Thickness is empty');
+%                      ME = MException('JanOpenScaledDICOM:EmptyTag', ...
+%                     '(0018,0088) Spacing Between Slices is empty');
+                    throw(ME);
+                 end
+             catch
+                 try
+                     out2=dirtyDICOMHeaderData(header, i, '0018', '0088',mode); % Spacing Between Slices
+                     %out2=dirtyDICOMHeaderData(header, i, '0018', '0050',mode); % Slice Thickness
+                     sliceSpacing=str2num(out2.string);  %
+                 catch
+                     %sliceSpacing=-1
+                     sliceSpacing=1
+                 end
+             end
           
            
            % ImagePosition
            for i=1:lastIndex;
                try
-                   out2=dirtyDICOMHeaderData(headers, 1, '0020', '0032',guessedMode);
+                   out2=dirtyDICOMHeaderData(header, i, '0020', '0032',guessedMode);
                    str=out2.string;
                    temp=strfind(str,'\');
                    x=str2num( str(1:temp(1)-1 ));      % X-pos (mm)
@@ -522,6 +616,34 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                    imagePosition{i}=[0; 0; 0];
                end
            end
+           
+           %
+           % NM special
+           %
+           if strcmp( 'NM', modality)
+               out=dirtyDICOMHeaderData(headers, 1, '0028', '0009',guessedMode); % Frame increment pointer
+               tag = [ uint8_to_hex( out.bytes(2)) uint8_to_hex( out.bytes(1)) uint8_to_hex( out.bytes(4)) uint8_to_hex( out.bytes(3))];
+               
+               if strcmp('00540080', tag) % Slice Vector
+                   
+                   % Create slice positions
+                       for i=1:lastIndex;
+                           try
+                               pos = imagePosition{i};
+                               x = pos(1);
+                               y = pos(2);
+                               z = pos(3) + (i-1) * sliceSpacing;
+                               imagePosition{i}=[x; y; z];
+                           catch
+                           end
+                       end
+               end
+           end
+               
+               
+               
+           
+           
            
 %            % PatientOrientation
 %             %(0020,0037) DS #14 [-1\0\0\0\-1\0] Image Orientation (Patient)
@@ -567,7 +689,9 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
             outputStruct.modality=modality;
             outputStruct.pixelSizeX=pixelSizeX;
             outputStruct.pixelSizeY=pixelSizeY;
+            %outputStruct.sliceSpacing=abs(sliceSpacing);
             outputStruct.sliceSpacing=sliceSpacing;
+            disp(['Slice Spacing = ' num2str(sliceSpacing) ]);
             outputStruct.imagePosition=imagePosition;
             outputStruct.orientation=outputStruct;
             try

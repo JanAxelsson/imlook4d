@@ -10,16 +10,23 @@
 %
 % NOTE: Realingment must be performed before!
 
+if ~verifySpmExists()
+    return
+end
+
 StoreVariables;
 aliveChecker = imlook4d_alive('spm'); % Print '.' while 'spm' in call stack (meaning that it is running). Stop-command: delete(aliveChecker)
 Export;
+
+
+numberOfFrames = size(imlook4d_Cdata,4);
 
 % From image 
 % (realinged image, but could also be original without realingment -- 
 % prefix=r if realigned,   no prefix otherwise)
 realingedPath = [ imlook4d_current_handles.image.folder  imlook4d_current_handles.image.file ];
 
-% meanImagePath -- depending on if starting from realinged PET, or skipping realigned PET
+% Name : meanImagePath -- depending on if starting from realinged PET, or skipping realigned PET
 if strcmp( imlook4d_current_handles.image.file(1), 'r') % starts with 'r'?
     % 3D Image used as source in registration (mean image from realingment, which is in same space as
     meanImagePath = [ imlook4d_current_handles.image.folder  'mean' imlook4d_current_handles.image.file(2:end) ]; % remove 'r' in 'rSharp.nii', make it 'meanSharp.nii'   
@@ -29,6 +36,9 @@ end
 
 % TODO : if 3D image, then there is no need to create a mean image.  Use
 % existing 3D image as meanImage
+if numberOfFrames == 1
+    meanImagePath = realingedPath; % Use existing image as 3D image 
+end
 
 % If mean image does not exist : Create mean image of dynamic PET (called realingedPath)
 if ~exist(meanImagePath, 'file')

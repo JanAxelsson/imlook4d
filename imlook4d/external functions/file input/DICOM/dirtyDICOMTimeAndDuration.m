@@ -74,7 +74,7 @@
         DICOMStruct.duration2D=duration;
         DICOMStruct.duration=duration(1,1:numberOfFrames);
     catch
-        message='dirtyDICOMTimeAndDuration error:  Error reading time or duration';
+        message='dirtyDICOMTimeAndDuration error:  Missing time or duration';
         %warning(message);
         disp(message);
     end   

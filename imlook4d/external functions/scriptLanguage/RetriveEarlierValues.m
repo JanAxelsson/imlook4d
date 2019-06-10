@@ -11,6 +11,13 @@ assignin('base','imlook4d_variables_before_script', [imlook4d_variables_before_s
 try 
     % exists, do nothing
     outCellArray = evalin('base', ['imlook4d_store.' name '.inputs']);
+    
+    % If empty 
+    % (which may happen if somebody uses StoreValues after cancel in inputdlg)
+    if isempty( outCellArray)
+        StoreValues( name, defaultValues);
+        outCellArray = defaultValues;
+    end
 catch
     % does not exist -- make new
     StoreValues( name, defaultValues);

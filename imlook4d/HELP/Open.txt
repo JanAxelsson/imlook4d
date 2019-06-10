@@ -7,13 +7,14 @@
 
 		<UL>
 			<LI> <B><a href="javascript:;" onclick="document.location.hash='DICOM';">DICOM</a> </B>
+			<LI>  <B><a href="javascript:;" onclick="document.location.hash='Nifti';">Nifti</a> </B> (.nii, .hdr, .img)
 
 			<LI>  <B><a href="javascript:;" onclick="document.location.hash='ECAT';">Siemens/CTI ECAT 7</a></B> (.v)
 			<LI>  <B><a href="javascript:;" onclick="document.location.hash='Analyze';">Analyze</a> </B> (.hdr, .img)
-			<LI>  <B><a href="javascript:;" onclick="document.location.hash='Nifti';">Nifti</a> </B> (.nii, .hdr, .img)
 			<LI>  <B><a href="javascript:;" onclick="document.location.hash='Freesurfer';">Freesurfer</a> </B> (.mgz, .mgh)
             <LI>  <B><a href="javascript:;" onclick="document.location.hash='ITK';">ITK</a> </B> (.mhd , and possibly .mha)
 			<LI>  <B><a href="javascript:;" onclick="document.location.hash='SHR';">Hamamatsu SHR-7700</a> </B> (.ima)
+			<LI>  <B><a href="javascript:;" onclick="document.location.hash='RDF';">GE PET Raw data</a> </B> 
 			<LI>  <B>Imlook4d state </B> (.mat) 
 				 (as saved from menu "File/Save state" )
 			<LI>  <B><a href="javascript:;" onclick="document.location.hash='Binary';">Binary</a> </B>
@@ -49,20 +50,17 @@
     </P><P><B><I> b) Multiple images in the file </I></B>
 	</P><P>
 		If the selected DICOM file consists of multiple images (nuclear medicin), only this DICOM file is considered.  
-        The images are opened, but saving these images are not supported.
 	</P>
 
+<B>2. DICOM opening  - supported formats</B>
+<!---------------------------------------->
+    <P>Non-compressed little-endian DICOM files are supported using basic Matlab. 
+    </P><P>Compressed formats supported by Matlab Imaging Toolbox are opened, if Imaging Toolbox is installed </P>  
+
 	
-<B>2. DICOM opening  - how it works</B>
+<B>3. DICOM opening  - how it works</B>
 <!---------------------------------------->
 	<P>
-		DICOM files are separated into two parts, a header and an image part.  
-		The assumption is that the last N bytes in the file is a single image, where N=2*pixels*pixels.
-		The image data is scaled according to the DICOM tags 
-			<U><SPAN title="Tag='0028', '1053'">Rescale Slope</SPAN></U>
-		and
-			<U><SPAN title="Tag='0028', '1052'">Rescale Intercept</SPAN></U>
-	</P><P>
 
 		The DICOM files are sorted in the below order, using the tags that are available: 
 		<UL>
@@ -85,6 +83,21 @@
 
 <a href="javascript:;" onclick="document.location.hash='top';">[top]</a>
 
+
+<h2><a id="Nifti">Nifti file opening</a></h2>
+<!------------------------>
+
+	<P>
+		Opens  .nii files (one binary file), or .img + .hdr (two files as in Analyze format).  
+	</P>
+
+	<P>
+		If a .sif file with the same name exists, imlook4d takes the frame time information from this file.<BR> 
+		See the Analyze section above for information about .sif files.
+	</P>
+
+		
+<a href="javascript:;" onclick="document.location.hash='top';">[top]</a>
 <h2><a id="ECAT">Siemens ECAT file opening</a></h2>
 <!------------------------>
 
@@ -118,20 +131,6 @@
 
 <a href="javascript:;" onclick="document.location.hash='top';">[top]</a>
 
-<h2><a id="Nifti">Nifti file opening</a></h2>
-<!------------------------>
-
-	<P>
-		Opens  .nii files (one binary file), or .img + .hdr (two files as in Analyze format).  
-	</P>
-
-	<P>
-		If a .sif file with the same name exists, imlook4d takes the frame time information from this file.<BR> 
-		See the Analyze section above for information about .sif files.
-	</P>
-
-		
-<a href="javascript:;" onclick="document.location.hash='top';">[top]</a>
 
 <h2><a id="Freesurfer">Freesurfer</a></h2>
 <!------------------------>
@@ -153,6 +152,28 @@
 		Scaling is performed by reading the scale factor from the .inf file in the same directory.
 		Timing data is read from the .mon file in the same directory.
 
+	</P>
+
+
+		
+<a href="javascript:;" onclick="document.location.hash='top';">[top]</a>
+
+ <h2><a id="RDF">GE PET Raw data</a></h2>
+<!------------------------>
+
+	<P>
+		Modern GE PET sinograms, rdf-files, are saved in a format called HDF.
+	</P><P>	
+		Opens decompressed GE sinograms extracted from modern GE PET scanners.
+        Location of files SINO0000, SINO0001 etc are determined by the "diagAnalysis" command line tool, and decompressed with "rdfDecomp" command (both on the scanner).
+
+	</P><P>	
+        Time-of-flight dimension is summed to conserve memory.  Data is presented in dimensions x = radial bin, y = projection plane, z = rotation angle.  
+        Assuming that we hava a brain scan, the imlook4d axial view shows multiple projections of the brain at different ring differences.  The coronal imlook4d view shows classic 2D-like sinograms.
+
+	</P><P>	
+        In case you wish to read the full 4D sinogram, you can force this from the file open dialog. In the open dialog, select file type 'GE RAW (4D, w ToF)'.  
+        Data is presented in dimensions x = radial bin, y = projection plane, z = rotation angle, frame = time-of-flight bin.  On some systems (Macs?), you first have to press a button "Alternative" to be able to select the file type.
 	</P>
 
 

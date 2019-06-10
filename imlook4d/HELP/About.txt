@@ -2,10 +2,6 @@
 <HR></HR>
 <!------------------->
 
-<p>
-<b>Imlook4d version: </b>
-VERSIONPLACEHOLDER
-</p>
 
 <p>
 <b>Contact: </b>

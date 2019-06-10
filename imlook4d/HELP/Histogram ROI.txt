@@ -1,0 +1,13 @@
+<h1>Histogram ROI</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	Displays a histogram of pixels values from the currently selected ROI.
+	</P>
+
+	<P>
+	The histogram display the frequency of the ROI pixel values. If a 4D image, the pixel data is from the currently selected frame.  
+
+
+	The x-axis range is defined by the color bar limits.
+	</P>

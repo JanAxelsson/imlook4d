@@ -1,4 +1,5 @@
 StoreVariables;
+ReferenceModel; % Makes sure Reference Region is defined
 
 % Inhibit model image (which is triggered by existence of functionHandle)
 keepFunctionHandle = imlook4d_current_handles.model.functionHandle;
@@ -54,5 +55,4 @@ modelWindow( ...
 
 disp('Done!');
 
-Import; % Because ModelDialog adds to imlook4d_current_handles.model.Zhou.inputs
 ClearVariables;

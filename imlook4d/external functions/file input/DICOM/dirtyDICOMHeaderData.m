@@ -1,4 +1,4 @@
-function data=dirtyDICOMHeaderData(headers, col, group, element,explicit)
+function data=dirtyDICOMHeaderData(headers, col, group, element,explicit,stopAt)
 %
 % ASSUMPTION:  Little Endian file, Little Endian operating system
 %
@@ -26,6 +26,7 @@ function data=dirtyDICOMHeaderData(headers, col, group, element,explicit)
 %     group     hexadecimal value, for instance '0028'
 %     element   hexadecimal value, for instance '1053'
 %     explicit  =2 means two extra bytes before valueLengthL, otherwise =0
+%     stopAt    OPTIONAL, normally stops at first occurence, if stopAT=N then set stop at occurence N
 %
 % Output:
 %     data.bytes       in byte format (uint8)
@@ -65,8 +66,9 @@ function data=dirtyDICOMHeaderData(headers, col, group, element,explicit)
     indecesToFirstByte = strfind(header', [groupL groupH elementL elementH]);
 
     % Loop all indices that matched first byte 
+    countElement = 0; % counter to number of found elements
     if ~isempty(indecesToFirstByte)
-    for j=1:size(indecesToFirstByte,1)
+    for j=1:length(indecesToFirstByte)
         i=indecesToFirstByte(j);  % Look only in positions where first byte was found
 
         try
@@ -80,10 +82,10 @@ function data=dirtyDICOMHeaderData(headers, col, group, element,explicit)
                 if (explicit)
                     % Always same
                     VR.pos=i+4;
-                    VR=char( header( VR.pos: VR.pos+1))';
+                    vr=char( header( VR.pos: VR.pos+1))';
 
                     % Select method depending on VR
-                    if ( max(strcmp( VR,{'OB', 'OW', 'OF', 'SQ', 'UT', 'UN'})) )
+                    if ( max(strcmp( vr,{'OB', 'OW', 'OF', 'SQ', 'UT', 'UN'})) )
                         % One of: OB, OW, OF, SQ, UT OR UN
                         % 00 01   02 03   04 05   06 07   08 09 10 11   12 13 ...  
                         % GR GR | EL EL | VR VR | xx xx | VL VL VL VL | Data bytes.....
@@ -101,8 +103,9 @@ function data=dirtyDICOMHeaderData(headers, col, group, element,explicit)
                         Data.length=header(VL.pos)+256*header(VL.pos+1);
                     end
 
+
                     % Get data
-                    data.valueRepresentation=VR;
+                    data.valueRepresentation=vr;
                     %data.bytes=header(Data.pos:Data.pos+Data.length-1);  
                     data.valueLength=Data.length;
                     try
@@ -146,7 +149,14 @@ function data=dirtyDICOMHeaderData(headers, col, group, element,explicit)
             %data.bigEndianBytes=header(index+ValueLength_bytes-1:-1:index);
             data.string=char(data.bytes)';
         
-            return % Break so only first instance is reported back
+            if exist( 'stopAt')
+                countElement = countElement +1;
+                if stopAt == countElement
+                    return % Break so only first instance is reported back
+                end
+            else
+                return % Break so only first instance is reported back
+            end
         catch
             if ~strcmp( element, '0000') && ~strcmp( group, '7FE0')
                 % The element '0000' is not mandatory
@@ -155,8 +165,10 @@ function data=dirtyDICOMHeaderData(headers, col, group, element,explicit)
                 % If error caught for other conditions, report them:
                 disp([ '(' group ',' element ') index='  num2str(i) '  ERROR in dirtyDICOMHeaderData - keep looking in this header' ]);
             end
-                % Keep looping if random hit 
         end
 
     end  % LOOP
+    
+    else % no tag found
+        %data = [];
     end %IF

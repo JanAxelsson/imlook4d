@@ -212,7 +212,7 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                 end
                 
             catch % Error handling (too small files are not accepted)
-                disp([TAB 'ERROR Ignoring file=' tempFilename '  (Error caught)']);
+                disp([TAB 'Ignoring file=' tempFilename '  (Error caught)']);
             end
 
         end

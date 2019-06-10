@@ -5,6 +5,9 @@
 % Output: realigned Nifti file (same file name but prefix 'r')
 %
 % If .sif file exists with time information, that is copied.
+if ~verifySpmExists()
+    return
+end
 
 StoreVariables;
 aliveChecker = imlook4d_alive('spm'); % Print '.' while 'spm' in call stack (meaning that it is running). Stop-command: delete(aliveChecker)

@@ -1,7 +1,15 @@
 function write_sif( handles, filePath)
 
-    disp([ 'Writing .sif file = ' filePath ]);
+    % Bail out if default times (0,1,2...)
+    defaultTimes = 0:size(handles.image.Cdata,4) -1; % If no sif-file was present when opened nifti
+    if isequal( handles.image.time, defaultTimes)
+        disp([ 'Skip writing .sif file, because default time information (times= 0,1,2, ...) indicates time-information no known' ]);
+        return
+    else
+        disp([ 'Writing .sif file = ' filePath ]);
+    end
 
+    % Initiate
     roiNames=get(handles.ROINumberMenu,'String');
     roiNames=roiNames(1:end-1);
 

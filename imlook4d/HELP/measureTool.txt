@@ -2,8 +2,11 @@
 <HR></HR>
 <!------------------->
 	<P>
-	This tools measures lengths.  It is activated by pressing the measure button, and you click the start and end position.
-The length is displayed in the image format's unit, which often is in millimeters.  The line representing the measurement is shown in the image.
+	This tools measures lengths and angle of the line to the horizontal axis. 
+ The drawing of the measurement line is activated by pressing the measure button, and you then click the start and end position, 
+starting drawing from left to right is the best practice.
+The length is displayed in the image format's unit, which often is in millimeters.  The angle is displayed relative the horizontal axis.
+ The line representing the measurement is shown in the image.
 	</P>
 
 	<P>
@@ -11,6 +14,6 @@ The measured data is shown at the bottom of the imlook4d window, and also in the
 	</P>
 	
 	<P>
-The line may be removed by Shift-clicking, or Right-clicking on the line.
+The line may be removed by Right-clicking on the line and selecting delete.
 	</P>
 	

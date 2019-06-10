@@ -1,6 +1,6 @@
 % =========================================================================
 % 
-% imlook4d DOCUMENTATION 
+% imlook4d DOCUMENTATION  
 %
 % =========================================================================
     %
@@ -12,7 +12,7 @@
     % --------------------------------------------------------------------
     % OPEN FILE DIALOG
     %   imlook4d   
-    %   h=imlook4d dialog
+    %   h=imlook4d 
     %
     % OPEN A MATRIX
     %   imlook4d(matrix)
@@ -319,6 +319,9 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
             % handles    structure with handles and user data (see GUIDATA)
             % varargin   command line arguments to imlook4d (see VARARGIN)
             %
+            
+            % Run script to fix Incompatibilities
+            fixIncompatibilities;
 
             
             % Set recording to off
@@ -421,6 +424,10 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 
                 %inpargs = varargin{:};
                 inpargs = varargin{1};    % Matrix
+                
+                
+                handles.image.time = 0:(size( inpargs,4)-1); % Default time for frames 0,1... (frames-1)
+                handles.image.duration = ones( size(handles.image.time)); % Default duration 1 for each frame
 
 
                 %INPUT time and duration (this is the only way to get them into
@@ -437,29 +444,10 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                     %handles.image.time=handles.image.time+handles.image.duration/2;
                 end
                 
-%                 %%%% Anders code for m4 %%%%%
-%                 if (isa(inpargs,'Matrix4D'))
-%                   m4 = inpargs;
-%                   inpargs = single(m4.matrix);
-%                   handles.image.time = m4.getVolumeTimeStamp('mean');
-%                   handles.image.fileType = 'Matrix4D';
-%                   handles.image.pixelSizeX = m4.voxelSize(1);
-%                   handles.image.pixelSizeY = m4.voxelSize(2);
-%                   handles.image.sliceSpacing = m4.voxelSize(3);
-%                   handles.image.modality = m4.imagingInfo.Modality;
-%                     
-%                 end
-%                 %%%%% End Anders code for m4 %%%%
-                
                 
                 [r,c,z,frames]=size(inpargs);
-                %inpargs=flipdim(inpargs,2);             % flip y axis
-                handles.image.Cdata=inpargs;            % put 4D matrix into handles.image.Cdata
 
-                % ECAT file storage 
-                %handles.image.mainHeader=1;
-                %handles.image.subHeader=1;
-                %handles.image.ECATDirStruct=1;
+                handles.image.Cdata=inpargs;            % put 4D matrix into handles.image.Cdata
 
                 handles.image.StoredFrameSliderValue=0; % Used to store the frame when jumping from image to PC-image.  Zero means no frame stored
 
@@ -496,14 +484,11 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 
 
                 handles.image.CachedImage=cimg;      % create cached image
-                %handles.ImgObject = imagesc(Img,'Parent',handles.axes1);
 
-
-                % cimg = imscale(cimg,[],[]);
                 set(handles.ImgObject,'Cdata',cimg);
                 set(handles.SliceNumEdit,'String',1);
 
-                htable = feval('jet');
+                htable = feval('gray');
                 set(handles.figure1,'Colormap',htable); 
                 set(handles.ImgObject,'Cdata',cimg);
                 set(handles.ImgObject,'Xdata',[0 r]+0.5);
@@ -532,7 +517,6 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 set(handles.axes1,'YLim',[0 c]+0.5);
                 set(handles.axes1,'XLim',[-0.5 r+0.5]);
                 set(handles.axes1,'YLim',[-0.5 c+0.5]);
-                % Set the slider's value and step size
 
                 % Colorbar
 
@@ -540,24 +524,15 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                handles.ColorBar=colorbar('peer',handles.axes1, 'FontSize', 9);
                
                set(handles.ColorBar, 'HitTest', 'off'); % No contextual menu
-               
-               %handles.ColorBar=colorbar(handles.axes1,'eastoutside' ); % Funkar ej i Matlab 2013 o tidigare
-            %   drawnow % force redraw, otherwise axis becomes misplaced in Matlab 2014b
+
 
             %
             % Setup GUI sliders
             %
 
-                %initiateSliderRanges(handles);
                 adjustSliderRanges(handles)
-                  drawnow % force redraw, otherwise axis becomes misplaced in Matlab 2014b
+                drawnow % force redraw, otherwise axis becomes misplaced in Matlab 2014b
   
-                
-
-                % Set the string of the edit box
-                %set(handles.SliceNumEdit,'String','1')
-                % Set the string of the edit box
-                %set(handles.FrameNumEdit,'String','1')
 
             %
             % Make SCRIPT MENUS (from files in imlook4d SCRIPTS directory)
@@ -588,7 +563,6 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
             %
             % Make USER SCRIPT MENUS (from files in imlook4d/../USER_SCRIPTS directory)
             %      -----------------
-        %    
 
                  % Path to look (imlook4d/../USER_SCRIPTS)
                  [pathstr1,name,ext] = fileparts(which('imlook4d'));
@@ -624,8 +598,11 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 
                       % Main menu item
                      handles.scriptsMenuUserHandle = uimenu(handles.scriptsMenuHandle,'Label','USER','Separator','on'); % Under SCRIPTS
+                     
+                     % Menus for scripts at main level in USER_SCRIPTS 
+                     handles = makeSubMenues( handles, handles.scriptsMenuUserHandle, [userScriptFolderPath  ]);
 
-                     % Submenues
+                     % Submenues (from folders in USER_SCRIPTS)
                      [files dirs]=listDirectory( userScriptFolderPath );
                      for i=1:length(dirs)
                          nameWithSpaces= regexprep(dirs{i},'_', ' ');  % Replace '_' with ' '
@@ -681,16 +658,11 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
             %      ------------
             %   (Models are m-file functions saved in MODELS directory)
                  [pathstr1,name,ext] = fileparts(which('imlook4d'));
-                 %temp=ls([pathstr1 filesep 'MODELS']);             % Read files in SCRIPTS directory
-                 %temp = cellstr(temp(3:end,:));             % Make cell array of all except '.' and '..' 
+
 
                  % Main menu item
                  handles.image.modelsMenuHandle = uimenu(handles.figure1,'Label','MODELS');
-                 set(handles.image.modelsMenuHandle, 'Callback', 'imlook4d(''ModelsMenu_Callback'',gcbo,[],guidata(gcbo))');
-                 %disp('imlook4d: MODELS menu commands');
-
-                 %temp=ls([pathstr1 filesep 'MODELS']);
-                 
+                 set(handles.image.modelsMenuHandle, 'Callback', 'imlook4d(''ModelsMenu_Callback'',gcbo,[],guidata(gcbo))');                 
                  
                  handles = makeSubMenues( handles, handles.image.modelsMenuHandle, [[pathstr1 filesep 'MODELS']]);
                  handles.model.functionHandle=[];
@@ -703,24 +675,6 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                  temp=listDirectory([pathstr1 filesep 'COLORMAPS']);
                  handles = makeSubMenues( handles, handles.Cmaps, [pathstr1 filesep 'COLORMAPS']);
 
-% 
-%                  % Submenu items
-%                  for i=1:length(temp)
-%                     [pathstr,name,ext] = fileparts(temp{i});
-%                     nameWithSpaces= regexprep(name,'_', ' ');  % Replace '_' with ' '
-% 
-%                     if strcmp(ext,'.m')
-%                         % Setup submenu callback              
-%                        callbackString=['imlook4d(''Color_Callback'',gcbo,[],guidata(gcbo), ''' name ''' )'];   
-%                        
-%                        % html text
-%                        [pathstr2,name2,ext2] = fileparts( which(name));
-%                        % label = [ '<html> <img width=100 height=15  src="file://' pathstr1 filesep 'COLORMAPS' filesep name2 '.png" ></img><font color="white">--</font>'  nameWithSpaces '</html>'];
-%                        label = [ '<html> <img width=100 height=15  src="file:///' pathstr2 filesep name2 '.png" ></img><font color="white">--</font>'  nameWithSpaces '</html>'];
-% 
-%                        handles.image.colorSubMenuHandle(i) = uimenu(handles.Cmaps, 'Label',label,'Tag',name, 'Callback', callbackString);
-%                     end
-%                  end  
 
             %
             % Make WINDOW LEVEL menu (from files in imlook4d WINDOW_LEVELS directory)
@@ -737,9 +691,6 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
             % Make NETWORK HOSTS menu (from files in imlook4d PACS directory)
             %     -------------------
                  [pathstr1,name,ext] = fileparts(which('imlook4d'));
-%                  temp=ls([pathstr1 filesep 'WINDOW_LEVELS']);      % Read files in WINDOW_LEVELS directory
-%                  temp=([pathstr1 filesep 'WINDOW_LEVELS']);
-%                  temp = cellstr(temp(3:end,:));             % Make cell array of all except '.' and '..' 
                  
                  temp=listDirectory([pathstr1 filesep 'PACS']);
 
@@ -763,7 +714,6 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                  % Select first item, if not empty
                  try
                         % Select the first item
-                        %NetworkHostsSubMenu_Callback( handles.image.NetworkHostsSubMenuHandle(1),[], guidata(handles.image.NetworkHostsSubMenuHandle(1) ) );
                         pacsDataFileName=get(handles.image.NetworkHostsSubMenuHandle(1),'UserData');
                         
                         handles.image.PACS.HostFile=pacsDataFileName;   % WHY IS THIS LOST after OpeningFunction is done?
@@ -778,27 +728,12 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
             %
             % Make HELP menu (let it display at far right)
             %
-                 set(handles.HelpMenu,'Position',8);
-                 %disp('HELP menu')
+                 set(handles.HelpMenu,'Position',7);
 
-                 
             %
             % Make Windows menu (let it display to the left of HelpMenu)
             %
-                set(handles.windows,'Position',7);
-                %disp('Windows menu')
-
-
-
-
-            %
-            % Gray out menues requiring special toolboxes
-            %             
-                % Profile
-                if ( strfind('C:\Program Files\MATLAB\R2008b\toolbox\matlab\codetools\profile.m', 'profile.m')>0)
-                else
-                    set(handles.imProfile', 'Enable', 'off');
-                end;       
+                set(handles.windows,'Position',6);
 
             %
             % Store GUI layout information (use when resizing window)
@@ -827,7 +762,6 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 for i=1:size(guiNames,1)
                     h=eval(['handles.' guiNames{i}]);
                     try % Some things in handles struct do not have Units property
-                        %set(h,'Units',units);
                         
                         set(h,'FontName',FONTNAME)
                         
@@ -854,12 +788,6 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                end
 
 
-
-                %disp('setting GUILayout');
-
-               % set(handles.axes1,'Units','Normalized');
-
-
                 % Figure and image
                 handles.GUILayout.figure1=get(handles.figure1, 'Position');
                 handles.GUILayout.axes1=get(handles.axes1, 'Position');
@@ -871,6 +799,9 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 handles.GUILayout.uipanel6=get(handles.uipanel6, 'Position');
                 handles.GUILayout.uipanel7=get(handles.uipanel7, 'Position');
                 %handles.GUILayout.ColorBar=get(handles.ColorBar, 'Position');
+                
+                % Textboxes that should move
+                handles.GUILayout.floatingTextEdit1=get(handles.floatingTextEdit1, 'Position');
 
 
                 set(handles.ColorBar,'Units','normalized');  % Correct above loop (otherwise interactive colorbar does not work)
@@ -896,17 +827,17 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                     @(hObject,eventdata)imlook4d('updateImage',gcf,eventdata,guidata(gcf)) ...
                     );
                 
-            %
-            % Set same background color on all widgets
-            %
-               figureBackgroundColor=get(hObject,'Color');    
-               guiHandles=findobj(hObject, '-not', 'uimenu', '-not', 'Style', 'edit', '-not', 'Style', 'popupmenu');
-               for i=1:size(guiHandles,1)
-                   try  
-                           % set(guiHandles(i),'BackgroundColor',  figureBackgroundColor); 
-                   catch
-                   end
-               end 
+%             %
+%             % Set same background color on all widgets
+%             %
+%                figureBackgroundColor=get(hObject,'Color');    
+%                guiHandles=findobj(hObject, '-not', 'uimenu', '-not', 'Style', 'edit', '-not', 'Style', 'popupmenu');
+%                for i=1:size(guiHandles,1)
+%                    try  
+%                            % set(guiHandles(i),'BackgroundColor',  figureBackgroundColor); 
+%                    catch
+%                    end
+%                end 
 
                
             %
@@ -916,14 +847,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 
                 version=getImlook4dVersion();
                 set(handles.versionText, 'String', ['imlook4d (' version ') /Jan Axelsson'  ]);
- 
 
-                
-
-            %
-            % Generate brush
-            %
-                %BrushSize_Callback(hObject, eventdata, handles);
 
             %
             % Finalize
@@ -932,9 +856,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
          
                 % Set sliders
                 adjustSliderRanges(handles);
-%                 get(handles.PC_high_slider)
-%                 get(handles.PC_high_edit)
-            
+                
                 set(handles.axes1, 'visible', 'off');  % hide 
 
                 set(hObject, 'Name','Name');   
@@ -949,6 +871,8 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 % Store currently selected radio button
                 handles.imageRadioButtonGroupActiveButton = handles.ImageRadioButton;
                 
+                % Store time when this window was opened
+                handles.image.windowOpenedTime = now();
 
                 % Update handles structure
                 guidata(hObject, handles);
@@ -962,27 +886,20 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                     imlook4d_current_handle = evalin('base', 'imlook4d_current_handle');
                     dx = 24;
                     dy = 24;
-                    oldPos = get( imlook4d_current_handle, 'Position')
-                    newPos = get( gcf, 'Position') % width and height is OK
-                    newPos = [ oldPos(1) + dx, oldPos(2) - dy, newPos(3), newPos(4) ] % Shift Pos from old window
+                    oldPos = get( imlook4d_current_handle, 'Position');
+                    newPos = get( gcf, 'Position'); % width and height is OK
+                    newPos = [ oldPos(1) + dx, oldPos(2) - dy, newPos(3), newPos(4) ]; % Shift Pos from old window
                     set( hObject, 'Position', newPos);
                 catch
                 end
+                
+                resizePushButton_ClickedCallback(hObject, [], handles, 0); % Updata layout with zero increase of size
 
            initpos = get(handles.ColorBar,'Position');
            initpos = [ initpos(1) ,  1.15*initpos(2) ,  initpos(3) , 0.85*initpos(4) ];
            
            initfontsize = get(handles.ColorBar,'FontSize');
 
-
-% 
-% set(handles.ColorBar, 'Position', ...
-%                 [ initpos(1) ...
-%                  1.1*initpos(2) ...
-%                   initpos(3) ...
-%                   0.8*initpos(4) ], ...
-%                'FontSize',initfontsize*1, ...
-%                'Location', 'EastOutside')
 
  set(handles.ColorBar, 'Position',initpos','Location', 'EastOutside')
  
@@ -992,6 +909,9 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
         if strcmp( subMenuFolder(end), '.') % Ignore '.' and '..'
             return
         end
+        
+        % Add to path (really only necessary for USER SCRIPTS, but it is fast.)
+        addpath(subMenuFolder);      % Add folder to path (in case you made a new one) 
         
         % Identify files in folder
         [filesInDir dirs]=listDirectory(subMenuFolder);
@@ -1043,6 +963,9 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
         lineOnOff = 'off';
         for j=1:length(menuItemNames)
             [pathstr,name,ext] = fileparts(menuItemNames{j});
+            if isempty(name)
+               name = pathstr(1:end-1);  % Fix for older Matlab 
+            end
             
             % Make line separator above next item
             if startsWith( name, '---')
@@ -1076,10 +999,10 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 label = nameWithSpaces;
                 tag = nameWithSpaces;
                 
-                % Special for MODEL menu
-                if strcmp( get(parentMenuHandle, 'Label'), 'MODELS')
-                    callBack = [name '_control(gcbo)']; % For Models
-                end
+%                % Special for OLD MODEL menu
+%                 if strcmp( get(parentMenuHandle, 'Label'), 'MODELS')
+%                     callBack = [name '_control(gcbo)']; % For Models
+%                 end
                                 
                 % Special for COLOR menu
                 if strcmp( get(parentMenuHandle, 'Label'), 'Color')
@@ -1102,7 +1025,6 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 end
 
 
-                
                 % Advanced callback to allow 
                 % - help files for scripts
                 % - set imlook4d_current_handle
@@ -1135,6 +1057,21 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 
                 handles.scriptsMenuSubItemHandle(j).Separator= lineOnOff;
                 lineOnOff = 'off';
+                
+                                
+                % Missing toolboxes, disable menu
+                [ satisfied, missing ] = requiredToolboxSatisfied( name, 'requiredToolboxesForSCRIPTS');
+                if ~satisfied
+                    set( handles.scriptsMenuSubItemHandle(j), 'Enable', 'off' );
+                    newLabel = [ label ' (missing toolbox)'];
+                    set( handles.scriptsMenuSubItemHandle(j), 'Label', newLabel );
+                    for k = 1 : length(missing)
+                        disp([ missing{k} ' is required for script "' name '"' ]);
+                    end
+                end
+                
+                
+                
             end
 
             
@@ -1164,7 +1101,6 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 % --------------------------------------------------------------------
 % GUI CREATION, this is where a GUI is defined
 % --------------------------------------------------------------------
-  
 
     function SliceNumSlider_CreateFcn(hObject, eventdata, handles)
         % hObject    handle to SliceNumSlider (see GCBO)
@@ -1298,8 +1234,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         end %switch
                         
                     catch
-                         handles.image.ColormapName = 'Gray';
-                         Color_Callback(hObject, eventdata, handles, 'Gray')
+                        if isfield(handles.image, 'modality') % Only do if Modality known and 
+                            handles.image.ColormapName = 'Gray';
+                            Color_Callback(hObject, eventdata, handles, 'Gray')
+                        end
                     end  
                     
                     guidata(handles.figure1, handles);
@@ -1591,7 +1529,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
     % --------------------------------------------------------------------
     % TOOLBAR BUTTONS
     % --------------------------------------------------------------------
-    function resizePushButton_ClickedCallback(hObject, eventdata, handles)
+    function resizePushButton_ClickedCallback(hObject, eventdata, handles,ySizeIncrease)
         % Performs resizing of the imlook4d when resize button is pressed
         %
         % The strategy is to resize with kept proportions on axes1 (the image),
@@ -1604,6 +1542,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         % - figure1 is resized
         %
         % The lowerLeftY corner is calculated
+        %
+        % The fourth parameter ySizeIncrease is optional, and not used for
+        % callbacks.  
+        %
+        % It is however used if you wish to set the size
+        % manually relative current size.  This is done in
+        % imlook4d_OpeningFcn
         
         % Display HELP and get out of callback
              if DisplayHelp(hObject, eventdata, handles) 
@@ -1611,15 +1556,18 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                  return 
              end
 
-             
+                
              
              
         %
         % Initialize
         %
             set(handles.ColorBar,'Units','Pixels');              % Make colorbar possible to move correct distance
-        
-            ySizeIncrease=100;                                          % Increase in pixels relative current figure (y-direction)
+            
+            if ~exist('ySizeIncrease','var')
+                ySizeIncrease=100;                                          % Increase in pixels relative current figure (y-direction)
+            end
+
             figure1OriginalPosVector=handles.GUILayout.figure1;         % Stored at start of imlook4d
             figure1CurrentPosVector=get(handles.figure1,'Position');    % Current size of figure1
 
@@ -1893,7 +1841,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
     function recordOnButton_ClickedCallback(hObject, eventdata, handles)
              % Display HELP and get out of callback
              if DisplayHelp(hObject, eventdata, handles) 
-                 set(hObject,'State', 'off')
+                 set(hObject,'State', 'off');
                  return 
              end
              
@@ -1942,14 +1890,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
            %  buttons  = findobj('Tag','record_toolbar_button');
              for i=1:length(buttons)
                  % Inibit callbacks
-                 set(buttons(i),'OnCallback', [])
+                 set(buttons(i),'OnCallback', []);
 
                  % Copy record struct (editor, enabled, )
                 % imlook4d_handle = get( get( get(buttons(i),'Parent') ,'Parent'));  % Get imlook4d instance for i:th button
                 % imlook4d_handles.record = handles.record;   % Copy the record struct
                  
                  % Set state
-                 set(buttons(i),'State', 'on')
+                 set(buttons(i),'State', 'on');
                  
                  % Copy and store handles.record to other figures
                  h = getParentFigure(buttons(i));
@@ -1957,9 +1905,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                  hHandles.record = handles.record; % Copy 
                  guidata(h, hHandles);
                  
-                 hHandles.record.editor
+                 hHandles.record.editor;
                  % Reset callback functions
-                 set(buttons(i),'OnCallback', tempCallback)
+                 set(buttons(i),'OnCallback', tempCallback);
              end
              
              % Move to top
@@ -1978,7 +1926,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
     function recordOffButton_ClickedCallback(hObject, eventdata, handles)            
              % Display HELP and get out of callback
              if DisplayHelp(hObject, eventdata, handles) 
-                 set(hObject,'State', 'off')
+                 set(hObject,'State', 'off');
                  return 
              end
              releasedToggleButton( hObject);
@@ -1991,7 +1939,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              % Set all record buttons 
              buttons  = findobj('Tag','record_toolbar_button');
              for i=1:length(buttons)
-                 set(buttons(i),'State', 'off')
+                 set(buttons(i),'State', 'off');
    
                  % Copy record struct                               
                  h = getParentFigure(buttons(i));
@@ -2079,30 +2027,214 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 
                 pressedToggleButton( hObject);
                 [x,y]= ginput(2);
-                
+   
+                try
+                    h = imline( gca,x,y); % Imaging tool box
+                    addNewPositionCallback(h, @(p) displayLineCoordinates( p) );
+                    displayLineCoordinates( h.getPosition);
+                    
+                catch
+                    % If imaging toolbox missing, or other faults
+                    line( x,y,'ButtonDownFcn','delete(gcbo)','LineWidth',3);
+                    pos(:,1) = x;
+                    pos(:,2) = y;
+                    displayLineCoordinates( pos);
+                end
+
+                releasedToggleButton( hObject);
+        function displayLineCoordinates( pos)
+            disp('displayLineCoordinates');
+            
+            handles = guidata(gcf);
+            disp(mat2str(pos,3))
+            
+            dx = pos(2,1) - pos(1,1) ;
+            dy = pos(2,2) - pos(1,2) ;
+            
+                pixels  = sqrt( dx^2 + dy^2 ); % length in pixels
                 
                 % side in mm
-                dx = x(2) - x(1);
-                dy = y(2) - y(1);
-                length  = sqrt( dx^2 + dy^2 ); % length in mm
-                
-                % side in pixels
                 try
-                    px = dx * handles.image.pixelSizeX;
-                    py = dy * handles.image.pixelSizeY;
+                    dx_mm = dx * handles.image.pixelSizeX;
+                    dy_mm = dy * handles.image.pixelSizeY;
                 catch
-                    px = dx;
-                    py = dy;
+                    dx_mm = dx;
+                    dy_mm = dy;
                 end
-                pixels = sqrt( px^2 + py^2 ); % length in pixels
+                length = sqrt( dx_mm^2 + dy_mm^2 ); % length in pixels
                 
-                msg = [ 'Length = ' num2str( length) ' mm    (' num2str( pixels) ' pixels long)'];
+                % angle in degrees
+                plotboxAspectRatio = handles.axes1.PlotBoxAspectRatio; 
+                ratio = plotboxAspectRatio(1) /plotboxAspectRatio(2);
+                angle_degrees = atan2d(  dy / plotboxAspectRatio(2) ,dx / plotboxAspectRatio(1)   )
+                angle_degrees = atan2d(  dy_mm ,dx_mm   )
+
+                msg = [ 'Length = ' num2str( length) ' mm (' num2str( pixels) ' pixels long).  Angle = ' num2str(angle_degrees) ' degrees'];
                 disp( msg);
                 displayMessageRow(msg)
                 
-                line( x,y,'ButtonDownFcn','delete(gcbo)','LineWidth',3);
+    function rotateToggleButtonOn_ClickedCallback(hObject, eventdata, handles)
+       % NOTE: 
+       % I have cleared the ButtonDownFct for the rotate toggle button,
+       % and now use my own implementation.  
+       %
+       % Reason: I could not get camzoom(1) and ActionPostCallback
+       % otherwise.
+        
+        
+       % Display HELP and get out of callback
+       if DisplayHelp(hObject, eventdata, handles)
+           set(hObject,'State', 'on')
+           return
+       end
+       
+       
+       % Bail out if not imaging toolbox
+       if ~exist('rotate3d')
+           errordlg({'Requires Matlab Imaging Toolbox', 'If you have a license for this, please install' });
+           set(hObject,'State', 'off')
+           return
+       end
+              
+       pressedToggleButton( hObject);
+       
+       h = rotate2d_jan( handles.axes1);
+       h.Enable = 'on';
+
+       camzoom(1)
+  
+       handles.infoText1.Visible = 'off'; % Hide info text at bottom
+    function rotateToggleButtonOff_ClickedCallback(hObject, eventdata, handles)
+       % Display HELP and get out of callback
+       if DisplayHelp(hObject, eventdata, handles)
+           set(hObject,'State', 'off')
+           return
+       end
+       
+        % Bail out if not imaging toolbox
+        % (rotateToggleButtonOff_ClickedCallback called from error in
+        % rotateToggleButtonOn_ClickedCallback)
+       if ~exist('rotate3d')
+           set(hObject,'State', 'off')
+           return
+       end
+       
+       handles.infoText1.Visible = 'on'; % Show infotext at bottom
+
+       
+       releasedToggleButton( hObject);
+       
+       [az,el] = view;
+       
+       
+
+        % Fix angle error due to PlotBoxAspectRatio
+        plotboxAspectRatio = handles.axes1.PlotBoxAspectRatio; 
+        ratio = plotboxAspectRatio(1) /plotboxAspectRatio(2);
+        az = 180*atan( ratio*tan(pi*az/180))/pi;
+
+       % rotate
+       [handles.image.Cdata, handles.image.ROI]  = rotateUsingIsotropic( handles, handles.image.Cdata, -az, handles.image.ROI);   
+       view(0,90);
+       
+       rotate2d_jan off
+       guidata( handles.figure1,handles);
+       disp([ 'Rotated ' num2str(az) ' degrees in ' handles.orientationMenu.String{ handles.orientationMenu.Value} ' plane']);
+       updateImage(handles.figure1, [], handles);
+              function [matrix, roi] = rotateUsingIsotropic( handles, matrix, az, roi)
+                  
+                  % Bail out if zero rotation
+                  if az == 0
+                     return 
+                  end
+
+                  % Turn off angle textbox (created by rotate2d_jan.m)
+                  hManager = uigetmodemanager(handles.figure1);
+                  hManager.CurrentMode.ModeStateData.textBoxText.Visible = 'off';
+                  drawnow % Force update of textBoxText to non-visible
+                  
+                  dx = abs( handles.image.pixelSizeX ); % pixel size in mm
+                  dy = abs( handles.image.pixelSizeY );
+                  
+                  DX = abs( 0.5 * dx * size(matrix,1) - 0.5 * dx ); % Half image width in mm
+                  DY = abs( 0.5 * dy * size(matrix,2) - 0.5 * dy );
+                  
+                  halfSide = max(DX,DY); % Required squared image halfside
+                  
+                  pixels = 2* max( size(matrix,1), size(matrix,2) );
+                  step = 2*halfSide/pixels ; % Number of pixels required2
+                  
+                  
+                  % Define meshes
+                  [x,y]   = meshgrid(-DX : dx : DX , -DY : dy : DY);        % Old grid
+                  [xi,yi] = meshgrid(-halfSide:step:halfSide, -halfSide:step:halfSide);            % New grid, more steps but same x,y coordinate system
+                  
+                   
+                  %
+                  % Rotate ROI -- Loop slices
+                  %
+                  
+                  % Define interpolations
+                  method = 'linear';
+                  method = 'nearest';
+                  F = griddedInterpolant( x',y', zeros( size(matrix(:,:,1,1) )), method, 'none'); % 2D only, no extrapolation
+                  G = griddedInterpolant( xi',yi', zeros( length(xi), length(yi) ), method, 'none' ); % 2D only, no extrapolation
+                  
+                  % Rotate ROI (if ROI exists)
+                  if ( nnz(roi) > 0  ) % at least one non-zero ROI pixel 
+                      for i = 1 : size( roi,3)
+                          if ~mod(i,20)
+                              %disp([ num2str(i) ' of ' num2str( size(matrix,3)) ]);
+                              displayMessageRow([ 'Rotating ROIs slice  ' num2str(i) ' of ' num2str( size(roi,3))  ]);
+                              drawnow limitrate % Force update at max 20 fps
+                          end
+                          ROIslice = roi(:,:,i);
+                          % Save time -- only if ROI pixels in slice
+                          if sum(ROIslice(:)) > 0
+                              F.Values = single( ROIslice );
+                              newMatrix2D =  F(xi',yi') ;  % Make large matrix
+                              
+                              G.Values  = imrotate( newMatrix2D, az, 'nearest','crop'); % TODO: allow 'loose' if matrix should grow.  Next row does not work then.  Solve how?
+                              roi(:,:,i) = uint8( G(x',y')); %  Back to org size
+                          end
+                      end
+                  end
+                  
+                  %
+                  % Rotate image -- Loop frames and slices
+                  %
+                                    
+                  % Define interpolations
+                  method = 'linear';
+                  F = griddedInterpolant( x',y', zeros( size(matrix(:,:,1,1) )), method, 'none'); % 2D only, no extrapolation
+                  G = griddedInterpolant( xi',yi', zeros( length(xi), length(yi) ), method, 'none' ); % 2D only, no extrapolation
+                  
+                  for frame = 1 : size(matrix,4)
+                      for i = 1 : size( matrix,3)
+                          if ~mod(i,20)
+                              %disp([ num2str(i) ' of ' num2str( size(matrix,3)) ]);
+                              displayMessageRow([ 'Rotating frame ' num2str(frame) ' of ' num2str( size(matrix,4)) ' ( slice  ' num2str(i) ' of ' num2str( size(matrix,3)) ')' ]);
+                              drawnow limitrate % Force update at max 20 fps
+                          end
+                          F.Values = matrix(:,:,i,frame);
+                          newMatrix2D = F(xi',yi');  % Make large matrix
+                          
+                          G.Values  = imrotate( newMatrix2D, az, 'bilinear','crop'); % TODO: allow 'loose' if matrix should grow.  Next row does not work then.  Solve how?
+                          matrix(:,:,i,frame) = G(x',y'); %  Back to org size
+                      end
+                  end
+
+
+                  
+                  
+                  
+                  
+                  matrix( isnan(matrix) ) = min(handles.image.Cdata(:)); % Use lowest value in orginal matrix
+                  roi( isnan(roi) ) = 0; % Set to non-roi pixel
+                  
+                  displayMessageRow( 'Done!');
+                  pause(1)
                 
-                releasedToggleButton( hObject);
                 
    % Shading of Pressed Toolbar Buttons
        function pressedToggleButton( hObject)
@@ -2145,7 +2277,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              if DisplayHelp(hObject, eventdata, handles) 
                  return 
              end
-            setSlice( handles,round(get(hObject,'Value')) , handles.figure1)
+             setSlice( handles,round(get(hObject,'Value')) , handles.figure1)
         function setSliceWithoutUpdatingYokes(handles, slice, this_imlook4d_instance)
             highestSlice= size(handles.image.Cdata,3);
             newSlice=round(slice);
@@ -2184,14 +2316,17 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         function setSlicesInYokes(slice, this_imlook4d_instance)
             yokes=getappdata( this_imlook4d_instance, 'yokes');
             this_handles=guidata(this_imlook4d_instance);
-            for i=1:length(yokes) 
-                handles=guidata(yokes(i));
-                if this_imlook4d_instance~=yokes(i)
-                    if strcmp( handles.image.plane, this_handles.image.plane)
-                        set(handles.SliceNumEdit,'String', num2str(slice));
-                        set(handles.SliceNumSlider,'Value',slice);
-                        imlook4d('updateImage', handles.figure1,{}, handles);
-                        updateImage(yokes(i), [], handles);
+            for i=1:length(yokes)
+                
+                if isgraphics(yokes(i)) % Otherwise deleted figure handle
+                    handles=guidata(yokes(i));
+                    if this_imlook4d_instance~=yokes(i)
+                        if strcmp( handles.image.plane, this_handles.image.plane)
+                            set(handles.SliceNumEdit,'String', num2str(slice));
+                            set(handles.SliceNumSlider,'Value',slice);
+                            imlook4d('updateImage', handles.figure1,{}, handles);
+                            updateImage(yokes(i), [], handles);
+                        end
                     end
                 end
 
@@ -2233,7 +2368,6 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         
 
         set(handles.PC_high_edit,'String',num2str(NewVal));
-        %updateImage(hObject, eventdata, handles)                   
         
         
     % --------------------------------------------------------------------
@@ -2581,14 +2715,6 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
     % --------------------------------------------------------------------
     % BUTTONS
     % --------------------------------------------------------------------
-    function TACT_Callback(hObject, eventdata, handles)
-       % Display HELP and get out of callback
-             if DisplayHelp(hObject, eventdata, handles) 
-                 return 
-             end
-             
-        %TACT(hObject, eventdata, handles);
-        newTACT(hObject, eventdata, handles); 
     function clearROI_Callback2(hObject, eventdata, handles)
        % Display HELP and get out of callback
              if DisplayHelp(hObject, eventdata, handles) 
@@ -2606,12 +2732,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
          updateImage(hObject, eventdata, handles); 
          updateROIs(handles);
-   
          
     % --------------------------------------------------------------------
     % SELECTIONS
     % --------------------------------------------------------------------
-    function ROINumberMenu_Callback(hObject, eventdata, handles, name)
+    function handles = ROINumberMenu_Callback(hObject, eventdata, handles, name)
        % This function asks for a ROI name, and creates an empty ROI.
        % If input parameter name is given, this will be the ROI name, and no dialog will be displayed.  
        try
@@ -2674,46 +2799,64 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     disp('visible')
                     handles.HideROI.Checked = 'off';
                 end
+                
+                % Set context menu locked flag
+                if handles.image.LockedROIs(ROINumber)
+                    handles.Lock_ROI.Checked = 'on'; % Lock check mark
+                else
+                    handles.Lock_ROI.Checked = 'off'; % Unlock
+                end
 
                 % Find first slice of ROI
                 numberOfSlices=size(handles.image.Cdata,3);
 
                 currentSlice= str2num(get(handles.SliceNumEdit,'String' ));
+                currentFrame= str2num(get(handles.FrameNumEdit,'String' ));
 
                 %ROISlice=handles.image.ROI(:,:,1,1);
                 ROISlice=handles.image.ROI(:,:,currentSlice);
 
 
-                % If current slice not in ROI, start looking in first slice
-                % (otherwise look in current slice)
                 if (size(ROISlice(ROISlice==ROINumber),1)  ==0 )
-                    i=0; % Will be updated by 1 in while loop
-                else
-                    i=currentSlice;
-                end
-
-                %if (size(ROISlice(ROISlice==ROINumber),1)  ==0 )
-                    % Loop until first slice with a ROI
                     try
-                        while (i<=numberOfSlices)&&(  size(ROISlice(ROISlice==ROINumber),1)  ==0  )
-                            i=i+1;
-                            %ROISlice=handles.image.ROI(:,:,i,1);
-                            ROISlice=handles.image.ROI(:,:,i);
-                        end
-                        disp(['Found ROI ' num2str(ROINumber) ' in slice=' num2str(i)]);
+
+                        
+                        % Find slice with highest pixel in ROI
+                        
+                        frame = handles.image.Cdata(:,:,:,currentFrame);
+                        dims = size(handles.image.ROI);
+                        
+%                         valuesInROIPixels = frame .* ( handles.image.ROI == ROINumber);
+%                         highestInEachslice = max(  reshape( valuesInROIPixels, dims(1)*dims(2), [])); 
+%                         highestValue = max( highestInEachslice);
+%                         slicesWithHighestValue = find( highestInEachslice==highestValue);
+%                         sliceWithHighestValue = slicesWithHighestValue(1);
+ 
+                        indeces = find( handles.image.ROI== ROINumber); % ROI pixel indeces
+                        
+                        valuesInROIPixels = frame( indeces ); % Values in ROI pixels
+                        highestValue = max( valuesInROIPixels);
+                        indexToHighestSingleValueInROIPixels = find( valuesInROIPixels == highestValue);
+                        indexToHighest = indeces(indexToHighestSingleValueInROIPixels); % Index to highest in ROI matrix
+                        
+                        [I,J,sliceWithHighestValue] = ind2sub(dims,indexToHighest);
+                        disp(['Found ROI in slice number = ' num2str(sliceWithHighestValue) ]);
+                        
+                        
 
                         % Set SliceNumber in GUI
-
-                        setSlice(handles, i, handles.figure1);
+                        if not( isempty(sliceWithHighestValue) )
+                            setSlice(handles, sliceWithHighestValue, handles.figure1); %
+                        end
 
                         updateImage(handles, eventdata, handles);
-                        %updateROIs(handles);
+                        updateROIs(handles);
                     catch
                         % No ROI found, catch error because i>numberOfSlices in while
                         % loop
                         %disp(['imlook4d/ROINumberMenu_Callback ERROR: No ROI with number ' num2str(ROINumber) 'found in any slice']);
                     end
-                %end
+                end
             end
             
             % Set tooltip
@@ -2838,7 +2981,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             ROINumber=ROINumberMenu.Value;
             
             handles.image.LockedROIs(ROINumber)=0;
-            contents = regexprep(contents, '\(locked\) ', ''); % Remove (hidden) prefix
+            contents{ROINumber} = regexprep(contents{ROINumber}, '\(locked\) ', ''); % Remove (locked) prefix
+
             set(handles.ROINumberMenu,'String', contents)
         else
             handles.Lock_ROI.Checked = 'on'; % Lock
@@ -2860,84 +3004,69 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             return
         end
         
-        ROINumberMenu=get(handles.ROINumberMenu);
-        contents = ROINumberMenu.String; % Cell array
+         ROINumberMenu=get(handles.ROINumberMenu);
         ROINumber=ROINumberMenu.Value;
         
-        % Remove if not locked
-        if ( handles.image.LockedROIs(ROINumber) == 1 )
-            disp('LOCKED ROI - not allowed to remove');
-        else
-            
-            % Delete ROI pixels, and Shift down ROIs in ROI-matrix
-            handles.image.ROI( handles.image.ROI == ROINumber ) = 0; % Delete ROI pixels
-            handles.image.ROI( handles.image.ROI > ROINumber ) = handles.image.ROI( handles.image.ROI > ROINumber ) -1;
-            
-            % Shift down ROI names
-            contents = {contents{1:ROINumber-1} , contents{ROINumber+1:end}};
-            set(handles.ROINumberMenu,'String', contents)   
-            
-            % Shift down Visible and Locks
-            handles.image.VisibleROIs = [ handles.image.VisibleROIs(1:ROINumber-1) handles.image.VisibleROIs(ROINumber+1:end)   ];
-            handles.image.LockedROIs = [ handles.image.LockedROIs(1:ROINumber-1) handles.image.LockedROIs(ROINumber+1:end)   ];
 
-            %
-            % Handle Reference ROIs (stored ROI numbers)
-            %
-                % Find position in Reference ROIs list
-                indexToRemove = find( handles.model.common.ReferenceROINumbers== ROINumber); % index in list
+            handles = removeSingleRoi(handles, ROINumber);
+            set(handles.ROINumberMenu,'Value', 1 );
+            guidata(hObject,handles);% Save handles
+            updateROIs(handles);
+        function handles = removeSingleRoi(handles, ROINumber)
+            ROINumberMenu=get(handles.ROINumberMenu);
+            contents = ROINumberMenu.String; % Cell array
+            
+            if ( handles.image.LockedROIs(ROINumber) == 1 )
+                disp(['LOCKED ROI - not allowed to remove ROI = ' contents{ROINumber}] );
+            else
                 
-                % Subtract 1 from ROIs larger than current ROINumber
-                handles.model.common.ReferenceROINumbers( handles.model.common.ReferenceROINumbers > ROINumber ) = ...
-                     handles.model.common.ReferenceROINumbers( handles.model.common.ReferenceROINumbers > ROINumber ) - 1;
-                 
-                % Remove from Reference ROIs, if in list
-                if ~isempty(indexToRemove)
-                    handles.model.common.ReferenceROINumbers = [ ...
-                        handles.model.common.ReferenceROINumbers( 1:(indexToRemove-1) ), ...
-                        handles.model.common.ReferenceROINumbers( (indexToRemove+1):end ) ...
-                        ];
-                end               
-       
-            
-            % Selected ROI
-            if ( ROINumber >= length( contents ) ) % Selected ROI pointing to Add ROI, or outside
-                set(handles.ROINumberMenu,'Value', 1 );
+                % Delete ROI pixels, and Shift down ROIs in ROI-matrix
+                handles.image.ROI( handles.image.ROI == ROINumber ) = 0; % Delete ROI pixels
+                handles.image.ROI( handles.image.ROI > ROINumber ) = handles.image.ROI( handles.image.ROI > ROINumber ) -1;
+                
+                % Shift down ROI names
+                contents = {contents{1:ROINumber-1} , contents{ROINumber+1:end}};
+                set(handles.ROINumberMenu,'String', contents)
+                
+                % Shift down Visible and Locks
+                handles.image.VisibleROIs = [ handles.image.VisibleROIs(1:ROINumber-1) handles.image.VisibleROIs(ROINumber+1:end)   ];
+                handles.image.LockedROIs = [ handles.image.LockedROIs(1:ROINumber-1) handles.image.LockedROIs(ROINumber+1:end)   ];
+                
+                %
+                % Handle Reference ROIs (stored ROI numbers)
+                %
+                try
+                    % Find position in Reference ROIs list
+                    indexToRemove = find( handles.model.common.ReferenceROINumbers== ROINumber); % index in list
+                    
+                    % Subtract 1 from ROIs larger than current ROINumber
+                    handles.model.common.ReferenceROINumbers( handles.model.common.ReferenceROINumbers > ROINumber ) = ...
+                        handles.model.common.ReferenceROINumbers( handles.model.common.ReferenceROINumbers > ROINumber ) - 1;
+                    
+                    % Remove from Reference ROIs, if in list
+                    if ~isempty(indexToRemove)
+                        handles.model.common.ReferenceROINumbers = [ ...
+                            handles.model.common.ReferenceROINumbers( 1:(indexToRemove-1) ), ...
+                            handles.model.common.ReferenceROINumbers( (indexToRemove+1):end ) ...
+                            ];
+                    end
+                catch
+                end
             end
-            
-            %disp([ 'Visible = ' num2str(handles.image.VisibleROIs) ]);
-            %disp([ 'Locked  = ' num2str(handles.image.LockedROIs) ]);
-            guidata(hObject,handles);% Save handles
-            updateROIs(handles);
-        end
     function ROI_Remove_All_Callback(hObject, eventdata, handles, name)
-        if DisplayHelp(hObject, eventdata, handles)
-            return
-        end
-        ROINumberMenu=get(handles.ROINumberMenu);
-        contents= ROINumberMenu.String; % Cell array 
-        
-        % Remove if not locked
-        if ( sum( handles.image.LockedROIs) > 0 )
-            disp('ONE OR MORE LOCKED ROIs - not allowed to remove.  Unlock ROIs first.');
-        else
-            
-            contents = {contents{end}}; % Remove all but 'Add ROI'
-            set(handles.ROINumberMenu,'String', contents)
-            set(handles.ROINumberMenu,'Value', 1)
-            handles.image.ROI(:) = 0;
-            
-            handles.image.VisibleROIs = [];
-            handles.image.LockedROIs = [];
-            
-            handles.model.common.ReferenceROINumbers = []; % Reference ROI list
-            
-            %disp([ 'Visible = ' num2str(handles.image.VisibleROIs) ]);
-            %disp([ 'Locked  = ' num2str(handles.image.LockedROIs) ]);
-            
-            guidata(hObject,handles);% Save handles
-            updateROIs(handles);
-        end
+                if DisplayHelp(hObject, eventdata, handles)
+                    return
+                end
+                ROINumberMenu=get(handles.ROINumberMenu);
+                contents= ROINumberMenu.String; % Cell array
+                
+                for i = length(contents)-1 : -1: 1
+                    handles = removeSingleRoi(handles, i);
+                end
+
+                set(handles.ROINumberMenu,'Value', 1 );
+                guidata(hObject,handles);% Save handles
+                updateROIs(handles);
     function ResetROILevel_Callback(hObject, eventdata, handles, name)
         lowestValue = min( handles.image.Cdata(:));
         set(handles.ROILevelEdit,'String', num2str(lowestValue));
@@ -2953,6 +3082,53 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         end
         
         updateROIs(handles);
+        function ROI_Merge_Rois_Callback(hObject, eventdata, handles, name)
+
+            ROINames = handles.ROINumberMenu.String;
+            s = handles.ROINumberMenu.Value;
+            if length(ROINames) > 1
+                % Display list
+                [s,ok] = listdlg('PromptString','Select one or many ROIs as Reference Region',...
+                    'SelectionMode','multiple',...
+                    'ListSize', [700 400], ...
+                    'ListString',ROINames(1:end-1),...
+                    'InitialValue', s );
+                
+                % Bail out if cancelled dialog
+                if ~ok
+                    return
+                end
+            else
+                dispRed('Define one or more ROIs, and run this command again')
+                return
+            end
+            
+            % ROI name
+            prompt={'Enter ROI name:'};
+            name='Input ROI name';
+            numlines=1;
+            defaultanswer= 'Merged';
+            for i = 1 : length(s)
+                defaultanswer=[defaultanswer ' ' ROINames{s(i)} ] ;
+            end
+            answer=inputdlg(prompt,name,numlines,{defaultanswer});
+            name=answer{1};
+            
+            % Make new ROI at end of list
+            newROINumber = length(ROINames);
+            set(handles.ROINumberMenu,'Value',length(ROINames) ); % Add ROI is the last one
+            handles = ROINumberMenu_Callback(handles.ROINumberMenu, eventdata, handles, name);
+            
+            % Make compund ROI
+            for i = s
+                handles.image.ROI( handles.image.ROI == i) = newROINumber;
+            end
+            
+            % Set
+            guidata(handles.figure1,handles);% Save handles 
+            updateROIs(handles);
+
+            
 
     function orientationMenu_Callback(hObject, eventdata, handles, name)
         
@@ -2964,7 +3140,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
   
         % Set for foreground image
         handles = setOrientation(handles, orientationNumber);
-        guidata(handles.figure1, handles); 
+        guidata(handles.figure1, handles);
+        
 
         
         % Set for background image (call orientationMenu_Callback for background image)
@@ -2977,7 +3154,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             % backgroundimage itself is processed)
         end
         
-        updateImage(hObject,{},handles);
+        %updateImage(hObject,{},handles);
+        
+        % Move to same ROI in new orientation
+        if ~strcmp( handles.ROINumberMenu.String{ handles.ROINumberMenu.Value}, 'Add ROI')
+            ROINumberMenu_Callback( handles.ROINumberMenu, [], handles);
+        end
       function handles = setOrientation(handles, newNumericOrientation)
 
         % Numerical constants
@@ -3025,6 +3207,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 set(handles.axes1, 'YLim', [1 size( handles.image.Cdata,2)]) 
              % Set sliders
                 adjustSliderRanges(handles);
+                
              % Update image   
                 updateROIs(handles);
                 updateImage(handles.figure1, [], handles);
@@ -3047,7 +3230,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     voxelSize(2)=handles.image.pixelSizeY;
                     voxelSize(3)=handles.image.sliceSpacing;
                 catch
-                    disp('ERROR - pixelsizes undefined, setting them to 1');
+                    disp('Pixelsizes undefined, setting them to 1');
                     voxelSize(1)=1;
                     voxelSize(2)=1;
                     voxelSize(3)=1;
@@ -3117,8 +3300,6 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             set(handles.orientationMenu,'Value',1);
             handles = setOrientation(handles, 1);            
 
-
-     
     % --------------------------------------------------------------------
     % ROI drawing functions
     % --------------------------------------------------------------------
@@ -3130,7 +3311,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              if DisplayHelp(h, evd, handles) 
                  return 
              end
-          
+         %disp('wbd');
          activeROI=get(handles.ROINumberMenu,'Value');
 
          
@@ -3150,6 +3331,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              return
          end
 
+
          % get the values and store them in the figure's appdata
          props.WindowButtonMotionFcn = get(h,'WindowButtonMotionFcn');
          props.WindowButtonUpFcn = get(h,'WindowButtonUpFcn');
@@ -3163,7 +3345,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
          set(h,'WindowButtonUpFcn','imlook4d(''wbu'',gcbo,[],guidata(gcbo))');    
          
           % Record last mouse position for drawROI track interpolation
-         coordinates=get(gca,'currentpoint')
+         coordinates=get(gca,'currentpoint');
          
          x=round(coordinates(1,1) + 0.5);
          y=round(coordinates(1,2) + 0.5);
@@ -3174,11 +3356,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
     function wbm(h, evd, handles)
          % executes while the mouse moves and mouse button is pressed
         % tic;
+
         try
-            drawROI(h, evd, handles);
-            if strcmp(get(handles.markerToggleTool,'State'), 'on')
-                drawCursorInYokes2(handles)
-            end
+                drawROI(h, evd, handles);
+                if strcmp(get(handles.markerToggleTool,'State'), 'on')
+                    drawCursorInYokes2(handles)
+                end
         catch
         end
     function wbm2(h, evd, handles)
@@ -3340,6 +3523,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
          end
     function drawROI(hObject, eventdata, handles)
         
+                % Bail out if hand (such as in Measure Tape movement)
+                pointerIcon = get(handles.figure1, 'Pointer');
+                if strcmp(pointerIcon,'hand')
+                    return;
+                end
+        
                 contents = get(handles.ROINumberMenu,'String'); % Cell array  
                 numberOfROIs=size(contents,1)-1;
         
@@ -3497,9 +3686,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         UNDOSIZE = length(handles.image.UndoROI.ROI);
         handles = createUndoROI( handles, UNDOSIZE);       
     function handles = storeUndoROI(handles)
+        % Undo positions counted from recent (1) to last (UNDOSIZE)
+        % Current ROI is stored in position 1
         tic
         UNDOSIZE = length(handles.image.UndoROI.ROI);
         ROI3D = handles.image.ROI;
+        % Shift 
         try
             for i=(UNDOSIZE-1):-1:1
                 handles.image.UndoROI.ROI{i+1} = handles.image.UndoROI.ROI{i};
@@ -3509,6 +3701,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             handles.image.UndoROI.position = 1;
         end
 
+        % Store only slices (efficient for large matrices and smaller ROIs)
             activeROI = get(handles.ROINumberMenu,'Value');
             slice = round(get(handles.SliceNumSlider,'Value'));
             slicesWithRois = sum( sum(handles.image.ROI,1) >0 , 2);
@@ -3520,20 +3713,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             end
 
         % If drawing and position in Undo was different from 1, then
-        % the previous are crap
-        if (handles.image.UndoROI.position ~= 1)
-            numberOfRoisToDelete = handles.image.UndoROI.position - 1;
-            % Shift
-            for i = 1:(UNDOSIZE-numberOfRoisToDelete)
-                handles.image.UndoROI.ROI{i} = handles.image.UndoROI.ROI{i+numberOfRoisToDelete};
-            end
-            % zero
-            for i = (UNDOSIZE-numberOfRoisToDelete+1):UNDOSIZE
-                handles.image.UndoROI.ROI{i}.roiSlices = cell(1,size(handles.image.ROI,3));
-                handles.image.UndoROI.ROI{i}.nonzeroSlices = zeros( 1, size(handles.image.ROI,3));
-            end
+       % if (handles.image.UndoROI.position ~= 1)
             handles.image.UndoROI.position = 1; % Always set to 1 when drawing
-        end
+            %storeUndoROI(handles);
+     %   end
 
         % Print current Undo Level and number of pixels in all Undo-ROIs
         printUndoInfo(handles);
@@ -3721,13 +3904,16 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
             % General method to automatically open correct image type
             dispLine;
-
+            
+            % Make these state variables defined (in case try-catch error)
+            SelectedRaw3D = false;
+            SelectedRaw4D = false;
+            
             try % Catch if error or "Cancel" from GUI
-
                 if isempty(varargin)
                     try
                     % Select file
-                       [file,path] = uigetfile( ...
+                       [file,path,indx] = uigetfile( ...
                             {'*',  'All Files'; ...
                            '*.dcm',  'DICOM files (*.dcm)'; ...
                             '*.v','ECAT Files (*.v)'; ...
@@ -3737,10 +3923,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                            '*.mhd;*.mha',  'ITK files (*.mhd, *.mha)'; ...
                            '*.mgh;*.mgz',  'Freesurfer files (*.mgh, *.mgz)'; ...
                            '*.ima*','SHR files (*.ima)'; ...
+                           'SINO*','GE RAW (3D, sum ToF)'; ...
+                           'SINO*','GE RAW (4D, w ToF)'; ...
                            '*.mat','State files (*.mat)';...
                            '*.mat','m4 object (*.mat)'} ...
                            ,'Select one file to open');
                            
+                        SelectedRaw3D = (indx == 10); % 'GE RAW (3D, sum ToF)'
+                        SelectedRaw4D = (indx == 11); % 'GE RAW (4D, w ToF)'
                         fullPath=[path file];
                         cd(path);
                     catch
@@ -3762,7 +3952,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     FILETYPE='UNKNOWN';
                     [pathstr,name,ext] = fileparts(file);
 
-                    % Test if ECAT, MATLAB, SHR, ITK (mhd, mha)
+                    % Test if ECAT, MATLAB, SHR, ITK (mhd, mha), RDF
                         try
                             if strcmp(ext,'.v') FILETYPE='ECAT'; end
                             if strcmp(ext,'.mhd') FILETYPE='ITK'; end
@@ -3784,7 +3974,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                    file_in_cell  = gunzip(file); % gunzipped path => file
                                    file = file_in_cell{1};
                                end
-                            end 
+                            end
+                            
+                            % Test if RDF (HDF-format) GE Raw data
+                            try
+                                info_sino = h5info( file ,'/SegmentData/Segment2');
+                                FILETYPE='ModernRDF';
+                            catch
+                            end
                             
                             % Dynamic SHR
                             if size(ext,2)>3 
@@ -3825,11 +4022,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         end
 
                     % Test if DICOM
-                        if( strcmp(FILETYPE,'UNKNOWN'))
-                            dummy1=1;dummy3='l'; % Assume a stupidly small image
-                            [Data, headers, fileNames]=Dirty_Read_DICOM(path, dummy1,dummy3, file); % selected file
-                            if strcmp(char(headers{1}(129:132))', 'DICM')  FILETYPE='DICOM';end
-                        end
+                        fid = fopen( fullPath, 'r', 'l');
+                        tempHeader= fread(fid, 132);                     % Binary header in memory  
+                        fclose(fid);
+                        if strcmp(char(tempHeader(129:132))', 'DICM')  FILETYPE='DICOM';end
 
                     % Test if HERMES (taken from CD cache)
                         if( strcmp(FILETYPE,'UNKNOWN'))
@@ -3840,6 +4036,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                 disp([ 'Probably a Hermes DICOM-like image, trying to open it.  Bytes that should read DICM=' char(headers{1}(129:132))' ]);
                             end
                         end
+                        
+
                         
                     % Open if M4
                     if( strcmp(FILETYPE,'MATLAB'))
@@ -3909,6 +4107,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     if( strcmp(FILETYPE,'ITK'))     LocalOpenBinary(hObject, eventdata, handles, file,path,'ITK' );end                   
                     if( strcmp(FILETYPE,'MGH'))     LocalOpenMGH(hObject, eventdata, handles, file,path );end
                     if( strcmp(FILETYPE,'INTERFILE'))  LocalOpenBinary(hObject, eventdata, handles, file,path,'INTERFILE' );end
+                    if( strcmp(FILETYPE,'ModernRDF'))  LocalOpenModernRDF(hObject, eventdata, handles, file,path, SelectedRaw4D);end
                  
 % Own analyze and nifty reader                    
 %                     if( strcmp(FILETYPE,'ANALYZE'))  LocalOpenBinary(hObject, eventdata, handles, file,path,'ANALYZE' );end
@@ -3932,6 +4131,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     newHandles = guidata(newHandle);
                     newHandles.image.folder = path;
                     newHandles.image.file = file;
+                    newHandles.cd.TooltipString = [ 'Go to folder = ' handles.image.folder];
+                    
                     guidata(newHandle,newHandles);
 
 
@@ -3948,11 +4149,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 end
             end
             
-             % Set colorscale
-                    imlook4d_set_colorscale_from_modality(gcf, {}, guidata(gcf));
-                    imlook4d_set_ROIColor(gcf, {}, guidata(gcf));
-             % Print file path
-             dispOpenWithImlook4d( [path file] );
+            try
+                % Set colorscale
+                imlook4d_set_colorscale_from_modality(gcf, {}, guidata(gcf));
+                imlook4d_set_ROIColor(gcf, {}, guidata(gcf));
+                % Print file path
+                dispOpenWithImlook4d( [path file] );
+            catch
+            end
             function LocalOpenMGH(hObject, eventdata, handles, file,path)  
                 % Test if Freesurfer files exist
                     if strcmp('', which('MRIread'))
@@ -3964,14 +4168,16 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     end;       
                 
                 % Read files
-                    fullPath=[path file];                
+                    fullPath=[path file]; 
+                    [pathstr, name, ext] = fileparts(fullPath);               
                     disp([ 'Opening MGH/MGZ from path=' fullPath ]);
                     mri = MRIread(fullPath,0);    
-                    mri.vol = permute(mri.vol,[2 3 1]);  % Freesurfer direction
+                    if strcmp(ext,'.mgz')
+                        mri.vol = permute(mri.vol,[2 3 1]);  % Freesurfer direction
+                    end
 
                 % Operate on the new imlook4d instance
                     h=imlook4d(mri.vol);
-                    [pathstr, name, ext] = fileparts(fullPath);
                     set(h,'Name', [name]);
                     newhandles = guidata(h);
 
@@ -4068,7 +4274,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         fullPath=[path filesep name '.sif'];  % hdr file (img file was opened) 
                         fid=fopen(fullPath);
 
-                        C = textscan(fid, '%f %f %f %f', 'headerLines', 1);
+                        C = textscan(fid, '%f %f %f %f %f', 'headerLines', 1);
                         time=C{1}';
                         duration= (C{2}-C{1})';                           
                         [ 'time' 'duration'];
@@ -4537,7 +4743,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                          [newhandles.image.pixelSizeX newhandles.image.pixelSizeY newhandles.image.sliceSpacing]=pixel_dims;
                     catch
 
-                        disp('imlook4d/OpenMat_Callback:ERROR - Failded Importing pixel_dims');
+                        disp('imlook4d/OpenMat_Callback: Failed Importing pixel_dims');
                     end
                     
 
@@ -4555,7 +4761,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         size(dirstruct)
                     catch
 
-                        disp('imlook4d/OpenMat_Callback:ERROR - Failded Importing ECAT headers');
+                        disp('imlook4d/OpenMat_Callback: Failed Importing ECAT headers');
                     end
 
                     % Store DICOM headers
@@ -4566,7 +4772,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         newhandles.image.dirtyDICOMHeader=DICOMHeader;
                     catch
 
-                        disp('imlook4d/OpenMat_Callback:ERROR - Failded Importing DICOM headers');
+                        disp('imlook4d/OpenMat_Callback: Failed Importing DICOM headers');
                     end
 
                     % Store isotope half time
@@ -4576,7 +4782,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         %newhandles = guidata(h);
                         newhandles.image.halflife=halflife;
                     catch
-                        disp('imlook4d/OpenMat_Callback:ERROR  Failed Importing isotope halflife');
+                        disp('imlook4d/OpenMat_Callback: Failed Importing isotope halflife');
                     end           
 
                     % Store file type
@@ -4585,7 +4791,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         disp('Importing fileType');
                         newhandles.image.fileType=fileType;
                     catch
-                        disp('imlook4d/OpenMat_Callback:ERROR  Failed importing fileType');
+                        disp('imlook4d/OpenMat_Callback: Failed importing fileType');
                     end       
                     
                     
@@ -4598,7 +4804,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         newhandles.image.sliceSpacing=pixel_dims(3);
                             
                     catch
-                        disp('imlook4d/OpenMat_Callback:ERROR  Failed importing pixel_dims');
+                        disp('imlook4d/OpenMat_Callback: Failed importing pixel_dims');
                     end
 
 
@@ -4781,7 +4987,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     try
                         [outputMatrix, outputStruct]=dirtyDICOMsort( outputMatrix, outputStruct);  
                     catch
-                        disp('imlook4d ERROR: Failed sorting images');
+                        disp('imlook4d: Failed sorting images');
                     end
                     
                     sliceLocations=outputStruct.dirtyDICOMsortedIndexList(:,3);
@@ -4890,7 +5096,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         try
                             [outputMatrix, outputStruct]=dirtyDICOMsort( outputMatrix, outputStruct);  
                         catch
-                            disp('imlook4d ERROR: Failed sorting images');
+                            disp('imlook4d: Failed sorting images');
                         end
                         
                     end % End selection if more than one series
@@ -4952,7 +5158,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     try
                         [outputStruct]=dirtyDICOMTimeAndDuration( outputStruct);
                     catch
-                        disp('imlook4d ERROR: Failed reading time and duration');
+                        disp('Time and duration missing');
                     end
 
                     % If "File/Open and merge" is selected, the time is calculated
@@ -4972,6 +5178,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     % Get number of patient positions (column 3) that equals first patient position
                     % => number of frames /gates/ phases
                     numberOfFrames=sum( sortedIndexList(:,3)==sortedIndexList(1,3)); % Number of frames
+                    
+                    % numberOfFrames can be wrong in MR which is scanned Sagital in same position
+                    numberOfImages = size(sortedIndexList,1);
+                    if (numberOfImages == numberOfFrames)
+                        numberOfFrames = 1;
+                    end
 
                     % Get number of slices from total number of images, and number
                     % of frames
@@ -4993,58 +5205,100 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 
                     % if a single DICOM file had multiple images, then above method does not work.  
                     % Use that the filename is the same for all images, to determine that this is the case.
-                    % Correct above and put images in slices.
+                    % Correct above and follow the Frame increment pointer order
                     if sum(strcmp(outputStruct.dirtyDICOMFileNames(:),outputStruct.dirtyDICOMFileNames(1)))>1
                         numberOfImages=size(outputStruct.dirtyDICOMFileNames(:),1);
-                        numberOfSlices=numberOfImages;
-                        numberOfFrames=1;
-  
-                        % NM (0054,0028) Number of frames
-                         try 
-                             numberOfFramesInFile=dirtyDICOMHeaderData(outputStruct.dirtyDICOMHeader, 1,'0028', '0008',mode); 
-                             numberOfFrames=str2num( numberOfFramesInFile.string);
-                             numberOfSlices=numberOfImages/numberOfFrames;
-                         catch
-                             numberOfFrames=1; 
-                         end
-                         
-                         
-                         % NM (0054,0021) US #2 [2] Number of Detectors
-                         try 
-                             numberOfDetectorsInScan=dirtyDICOMHeaderData(outputStruct.dirtyDICOMHeader, 1,'0054', '0021',mode); 
-                             numberOfDetectors=numberOfDetectorsInScan.bytes(1)+256*numberOfDetectorsInScan.bytes(2);
-                             numberOfFrames=numberOfFrames/numberOfDetectors;
-                         catch
-                             numberOfDetectors=1; 
-                         end
+                        numberOfSlices = length( outputStruct.imagePosition )
                         
-                         % Make 5D matrix: x,y,slice,frame,detector
-                         outputMatrix = reshape(outputMatrix,size(outputMatrix,1),size(outputMatrix,2),numberOfSlices,numberOfFrames, numberOfDetectors); 
+                        % Find all Frame Increment Pointers
+                        out0=dirtyDICOMHeaderData(headers, 1, '0028', '0009',mode); % Frame increment pointer
+                        counter = 0;
+                        dim = [];
+                        for k = 1 : (out0.valueLength / 4)
+                            start = (k-1)*4 + 1;
+                            tagString = out0.bytes( start : (start+3) );
+                            tag = [ uint8_to_hex( tagString(2)) uint8_to_hex( tagString(1)) uint8_to_hex( tagString(4)) uint8_to_hex( tagString(3))];
+
+                            % Leave slices, and handle separately outside loop                            
+                            if ~strcmp(tag, '00540080')
+                                counter = counter + 1;
+                                frameIncrementPointers{counter} = tag;
+                                vectorTag = dirtyDICOMHeaderData(headers, 1, tag(1:4), tag(5:8),mode,2); % Second instance (since found in 00280009)
+                                vector = 256 * vectorTag.bytes(2:2:end) + vectorTag.bytes(1:2:end);
+                                dim(counter) = max(vector); % vector with number of elements in each dimension
+                            end
+                        end
+                        
+                        
+                        % Remove slices from dim, and handle separately (so
+                        % slices always in 3:d dimension
+                        numberOfSlices = 1;
+                        try
+                            out0=dirtyDICOMHeaderData(headers, 1, '0054', '0081',mode); % Number of slices
+                            numberOfSlices = 256 * out0.bytes(2) + out0.bytes(1);
+                        catch
+                            
+                        end
+                        
+                        
+                        % Reshape matrix
+                        nx = size(outputMatrix,1);
+                        ny = size(outputMatrix,2);
+                        %dims = [ nx ny numberOfSlices dim];
+                        %outputMatrix = reshape( outputMatrix, dims);
+                        
+                        outputMatrix = reshape( outputMatrix, nx, ny, numberOfSlices, []);
+                        
+                        
+                        
+%                         numberOfFrames=1;
+%   
+%                         % NM (0054,0028) Number of frames
+%                          try 
+%                              numberOfFramesInFile=dirtyDICOMHeaderData(outputStruct.dirtyDICOMHeader, 1,'0028', '0008',mode); 
+%                              numberOfFrames=str2num( numberOfFramesInFile.string);
+%                              numberOfSlices=numberOfImages/numberOfFrames;
+%                          catch
+%                              numberOfFrames=1; 
+%                          end
                          
-                         % If one slice, allow detectors to go into slice
-                         % position
-                         if (numberOfSlices == 1)
-                             % Exchange Detectors and Slices columns (so
-                             % that detectors will be in slice slider in
-                             % imlook4d)
-                             outputMatrix = permute( outputMatrix, [1 2 5 4 3]);
-                             numberOfSlices = numberOfDetectors;  % Treat detectors as slices in opening new imlook4d, below
-                         end
+                         
+%                          % NM (0054,0021) US #2 [2] Number of Detectors
+%                          try 
+%                              numberOfDetectorsInScan=dirtyDICOMHeaderData(outputStruct.dirtyDICOMHeader, 1,'0054', '0021',mode); 
+%                              numberOfDetectors=numberOfDetectorsInScan.bytes(1)+256*numberOfDetectorsInScan.bytes(2);
+%                              numberOfFrames=numberOfFrames/numberOfSlices/numberOfDetectors;
+%                          catch
+%                              numberOfDetectors=1; 
+%                          end
+%                         
+%                          % Make 5D matrix: x,y,slice,frame,detector
+%                          outputMatrix = reshape(outputMatrix,size(outputMatrix,1),size(outputMatrix,2),numberOfSlices,numberOfFrames, numberOfDetectors); 
+%                          
+%                          % If one slice, allow detectors to go into slice
+%                          % position
+%                          if (numberOfSlices == 1)
+%                              % Exchange Detectors and Slices columns (so
+%                              % that detectors will be in slice slider in
+%                              % imlook4d)
+%                              outputMatrix = permute( outputMatrix, [1 2 5 4 3]);
+%                              numberOfSlices = numberOfDetectors;  % Treat detectors as slices in opening new imlook4d, below
+%                          end
                          
                          
-                         % assume NM, calculate slice locations
-                         
-                         startLocation=sliceLocations(1);
-                         try
-                            out=dirtyDICOMHeaderData(outputStruct.dirtyDICOMHeader, 1, '0018', '0088',mode);  %Spacing Between Slices (can be negative number)
-                            sliceStep=str2num(out.string);
-                         catch
-                            sliceStep=outputStruct.sliceSpacing;  % This is not a negative number
-                         end
-                         
-                         for i=1:numberOfSlices
-                             sliceLocations(i)=startLocation+(i-1)*sliceStep;
-                         end
+%                          % assume NM, calculate slice locations
+%                          
+%                          startLocation=sliceLocations(1);
+%                          try
+%                             out=dirtyDICOMHeaderData(outputStruct.dirtyDICOMHeader, 1, '0018', '0088',mode);  %Spacing Between Slices (can be negative number)
+%                             sliceStep=str2num(out.string);
+%                          catch
+%                             sliceStep=outputStruct.sliceSpacing;  % This is not a negative number
+%                          end
+%                          
+%                          for i=1:numberOfSlices
+%                              sliceLocations(i)=startLocation+(i-1)*sliceStep;
+%                          end
                          
                          % Set time
                          
@@ -5204,6 +5458,23 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             catch
                                 disp([ '   [    ]' '  (' group ',' element ')   ' name(1:NAMELENGTH) '=' 'not defined' ]);
                             end
+            function LocalOpenModernRDF(hObject, eventdata, handles, file,path,ForcedRaw4D)
+                fullPath=[path file];
+                [path,name,ext] = fileparts(fullPath);
+                disp([ 'Opening Modern RDF (GE Raw data) from path=' fullPath ]);
+                if ForcedRaw4D
+                    [~, SINO4D] = jan_readNewRdf(fullPath); % Reads a 4D sinogram 
+                    h=imlook4d(SINO4D);
+                else
+                    SINO3D = jan_readNewRdf(fullPath); % Reads a 3D sinogram summing ToF Dimension
+                    h=imlook4d(SINO3D);
+                end
+                set(h,'Name', [file]);
+                Color_Callback(h, [],guidata(h), 'Sokolof'); % TODO Why does it make it gray after this ?
+                newHandles = guidata(h);
+                newHandles.image.fileType = 'ModernRDF';
+                guidata(h, newHandles);
+                
                             
             function OpenFromPacs_Callback(hObject, eventdata, handles)
                 
@@ -5255,6 +5526,26 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                      return 
                  end
                  
+            % Ask user : really want to save 
+            % (for PC-image, Residual-image, or PCA-filtered image)
+                if handles.PCImageRadioButton.Value && ...
+                   strcmp( 'Cancel', questdlg('PC images : Do you really want to save PC images','Warning','Save','Cancel','Cancel') ) 
+                        return
+                end
+                
+                if handles.ResidualRadiobutton.Value && ...
+                   strcmp( 'Cancel', questdlg('Residual Images : Do you really want to save residual images','Warning','Save','Cancel','Cancel') ) 
+                        return
+                end               
+ 
+                                
+                if handles.ImageRadioButton.Value && ...
+                   str2num( handles.PC_high_edit.String ) < size( handles.image.Cdata, 4) && ...
+                   strcmp( 'Cancel', questdlg('PCA-filtered images : Do you really want to save filtered images','Warning','Save','Cancel','Cancel') ) 
+                        return
+                end  
+
+ 
             % Make axial     
             handles = resetOrientation(handles);
 
@@ -5282,6 +5573,24 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 if( strcmp(FILETYPE,'NIFTY_ONEFILE'))  LocalSaveNifti(handles, tempData);end  % Single-file NIFTY
                 if( strcmp(FILETYPE,'Matrix4D')) localSaveM4(handles, tempData); end  % M4 Ume format
                 
+                if( strcmp(FILETYPE,'ModernRDF'))
+                    templateFile = [handles.image.folder filesep handles.image.file];
+                    name = handles.image.file;
+                    
+                    [file,path] = uiputfile('*.*', 're-save file as', handles.image.file);
+                    filepath_out = [path file];
+                    
+                    % Call function for 3D or 4D raw data
+                    s = size(handles.image.Cdata);
+                    if length(s) == 4
+                        jan_writeNewRdf4D( handles.image.Cdata, templateFile, filepath_out);
+                    end
+                    if length(s) == 3
+                        jan_writeNewRdf3D( handles.image.Cdata, templateFile, filepath_out);
+                    end
+                    
+                    
+                end
                 if( strcmp(FILETYPE,'BINARY'))  warndlg('Saving Binary is not supported');end
                 if( strcmp(FILETYPE,'UNKNOWN')) end    
 
@@ -5289,6 +5598,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 cd(oldPath);    % Restore path
                 try
                     displayMessageRow(['DONE writing file'   ]);
+                    handles.cd.TooltipString = [ 'Go to folder = ' handles.image.folder];
                 catch
                     % Fails if gcf not an imlook4d (for instance, after error dialog)
                 end
@@ -5403,6 +5713,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         % Save .sif file if time-data exists
                         try
                             [folder file extension] = fileparts(destination);
+                            cd(folder); % Make current directory 
                             sifFilePath = [ folder filesep file '.sif'];
                             write_sif( handles, sifFilePath);
                         catch
@@ -5802,10 +6113,48 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                         % Modify headers
 
-                            iNumberOfSelectedFiles = size(headers,2);
+                            iNumberOfHeaders = size(headers,2);
                             iNumberOfSelectedFiles=size(matrix,3);  % This definition allows for truncated matrices, as for instance from Patlak model
-
                             
+                            % Fill in headers, if more images than original 
+                                s = size( handles.image.Cdata);
+
+                                switch length(s)
+                                    case 2
+                                    numberOfImages = 1;    
+                                    case 3
+                                    numberOfImages = s(3);
+                                    case 4
+                                    numberOfImages = s(3)*s(4);    
+                                end 
+
+                                % Copy headers from template
+                               % if numberOfImages ~= iNumberOfHeaders
+                                    template = headers{1};
+                                    for i = 1:numberOfImages
+                                        newHeaders{i} = template;
+                                    end
+                                    headers = newHeaders;
+                              %  end
+
+                            % Build slice Locations
+                                slices = size( handles.image.Cdata,3);
+                                frames = size( handles.image.Cdata,4);
+                                corner = handles.image.imagePosition{1};
+                                for i = 1:frames
+                                    for j= 1:slices
+                                        x = corner(1);
+                                        y = corner(2);
+                                        z = corner(3) + (j-1) * handles.image.sliceSpacing ;
+                                        index = (i-1) * slices + j;
+                                        handles.image.imagePosition{ index } = [ x y z ];
+                                        
+                                        handles.image.sliceLocations(index) = z;
+                                    end
+                                end
+                            
+                            
+                                 
                             
                             
                             
@@ -5814,7 +6163,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                             seriesInstanceUID=generateUID();
                             interval = round( iNumberOfSelectedFiles/50);
-                             for i=1:iNumberOfSelectedFiles
+                            for j = 1:frames
+                               for k= 1:slices
+                               %for i=1:iNumberOfSelectedFiles
+                                 i = k + (j-1) * slices;
                                  %disp(i)
                                  if (mod(i, interval)==0) waitbar(i/iNumberOfSelectedFiles); end 
                                  
@@ -5837,8 +6189,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                         maxval = max(max(abs(matrix(:,:,i))));  %Maximum absolute value in image.
                                         scale_factor = maxval/32767;
                                         scale_factor=1.01*scale_factor;   % Play it safe
+                                        
+                                        if scale_factor == 0
+                                            scale_factor = 1;
+                                        end
 
-                                        %%%scale_factor=1;
 
                                         valueString=num2str(scale_factor);
 
@@ -5900,13 +6255,73 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                  % File names
                                     %newFileNames{i}=SOPInstanceUID;
                                     newFileNames{i}=num2str(i);
+                                    
+                                    
+                                 
+                                 % image position
+                                 
+ 
+                                    % 1) Image Position Patient
+                                    location = handles.image.imagePosition{i};
+                                    imagePositionString = [ num2str( location(1) ) '\' num2str( location(2) ) '\' num2str( location(3) )];
+                                    headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0020', '0032',mode, imagePositionString);
+
+                                    % 2) Slice Location
+                                    try
+                                        headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0020', '1041',mode, num2str(  handles.image.sliceLocations(i) ) );
+                                    catch
+                                        
+                                    end
+                                    
+
+                                    % 3) Slice Spacing
+                                    try
+                                        sliceSpacing = handles.image.sliceLocations(2) - handles.image.sliceLocations(1);  % Assume same spacing
+                                        headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0018', '0050',mode, num2str(  sliceSpacing ) );
+                                    catch
+                                        
+                                    end
+                                    
+                                    try
+                                        out2=dirtyDICOMHeaderData(header, i, '0018', '0088',mode); % Spacing Between Slices
+                                        headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0018', '0088',mode, num2str(  sliceSpacing ) );
+                                    catch
+                                        
+                                    end
+                                    
+                                    
+                                % Time and duration
+                                    try
+                                        time = handles.image.time(j);
+                                        duration = handles.image.duration(j);
+
+                                        % Frame Reference Time (in ms)
+                                        time_ms = time * 1000;
+                                        headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0054', '1300',mode, num2str(  time_ms ) );
+                                        
+                                        % Actual Frame Duration (in ms)
+                                        duration_ms = duration * 1000;
+                                        headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0018', '1242',mode, num2str(  duration_ms ) );
+                                        
+                                        % TODO: update acquisition time if
+                                        % possible (see
+                                        % dirtyDICOMTimeFromAcqTime.m)
+                                       
+                                    catch
+                                        disp('Error in making time and duration');
+                                    end
+
 
 
 
                                  % TO DO - 
                                  % number of images
+                                 
+                                 
                                  % instance number
-                                 % image position
+                                 headers{i} = dirtyDICOMModifyHeaderString( headers{i}, '0020', '0013',mode, num2str(  i ) ); % instance number
+                                 headers{i} = dirtyDICOMModifyHeaderUS( headers{i}, '0054', '1330',mode, i  ); % image index US
+
 
                                  % Make static
                                  if size(handles.image.Cdata,4)==1
@@ -5916,29 +6331,45 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                  end
 
                                  %
-                             end
+                               end
+                            end
                             close(waitBarHandle);
                             
                             
                         % If multiple images in one dicom file, reshape
-                            %if size(fileNames,2)~=size( unique(fileNames),2 )   % Multiple images in the same file is characterized by having the same file name for each slice
                             if size( unique(fileNames),2 )==1   % Multiple images in the same file is characterized by having the same file name for each slice
-                              %matrix=matrix(:);
                               
-                              % If Detectors column was opene into slice
-                              % column, then exchange back
-                              
-                                 % NM (0054,0021) US #2 [2] Number of Detectors
-                                 try 
-                                     numberOfDetectorsInScan=dirtyDICOMHeaderData(handles.image.dirtyDICOMHeader, 1,'0054', '0021',mode); 
-                                     numberOfDetectors=numberOfDetectorsInScan.bytes(1)+256*numberOfDetectorsInScan.bytes(2);
-                                 catch
-                                     numberOfDetectors=1; 
-                                 end   
-                                 if (numberOfDetectors == numberOfSlices) % Assume detectors in 3d column
-                                    matrix = reshape( matrix, rows, cols, [], numberOfFrames); 
-                                    matrix = permute( matrix, [1 2 5 4 3]);  % swap back to what is whas in original Dicom file
-                                 end
+%                               % If Detectors column was opene into slice
+%                               % column, then exchange back
+%                               
+%                                  % NM (0054,0021) US #2 [2] Number of Detectors
+%                                  try 
+%                                      numberOfDetectorsInScan=dirtyDICOMHeaderData(handles.image.dirtyDICOMHeader, 1,'0054', '0021',mode); 
+%                                      numberOfDetectors=numberOfDetectorsInScan.bytes(1)+256*numberOfDetectorsInScan.bytes(2);
+%                                  catch
+%                                      numberOfDetectors=1; 
+%                                  end   
+%                                  if (numberOfDetectors == numberOfSlices) % Assume detectors in 3d column
+%                                     matrix = reshape( matrix, rows, cols, [], numberOfFrames); 
+%                                     matrix = permute( matrix, [1 2 5 4 3]);  % swap back to what is whas in original Dicom file
+%                                  end
+
+                                % Assume same order as displayed
+                                % Allow only changing number of slices
+                                
+                                % Change Slices vector if exist
+                                numberOfSlices = size(matrix,3);
+                                try
+                                    out0=dirtyDICOMHeaderData(headers, 1, '0054', '0080',mode,2); % Slice vector
+                                    newString = out0.string( 1 : 2*numberOfSlices);
+                                    headers{1} = dirtyDICOMModifyHeaderString( headers{1}, '0054', '0080',mode, newString, 2); % Occurs first in '00280009' Frame increment pointer
+
+                                    headers{1} = dirtyDICOMModifyHeaderUS(headers{1}, '0054', '0081',mode, numberOfSlices)
+                                catch
+                                    disp('Error modifying slice vector');
+                                end
+                                
+                                
                                  
                                  matrix=matrix(:);
 
@@ -5956,6 +6387,15 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                % Set value length for image (7FE0,0010)
                                i=1;
                                headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '7FE0', '0010',mode, num2str(length(matrix)*2 )); % New valuelength for image
+                            end
+                            
+                        % Set Transfer Syntax UID
+                            out = dirtyDICOMHeaderData(headers, 1, '0002', '0010',2);
+                            Default_TSUID = '1.2.840.10008.1.2.1'; % Explicit Little Endian is imlook4d default
+                            if ~strcmp( Default_TSUID, out.string)
+                                for i = 1 : length(headers)
+                                    headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0002', '0010',mode, Default_TSUID); 
+                                end
                             end
 
 
@@ -5979,6 +6419,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
          % Flip and rotate, and swap head-feet are performed on Save according
          % to radio buttons
          %
+         
+            % Make axial     
+            handles = resetOrientation(handles);
+            
             try  
                 [file,path] = uiputfile(['filename' '.mat'] ,'Save as .mat file (only matrix, no header)');
                 fullPath=[path file];
@@ -6009,7 +6453,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     time=handles.image.time;
                     duration=handles.image.duration;
                 catch
-                    disp('imlook4d/Savemat_Callback:ERROR time or duration not available');
+                    disp('imlook4d/Savemat_Callback: time or duration not available');
                 end
 
                 % Save mat file
@@ -6021,12 +6465,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 try % 1)
                     save(fullPath, 'Data','time', 'duration');
                 catch 
-                    disp('imlook4d/Savemat_Callback:ERROR did not save duration (maybe was not available)');
+                    disp('imlook4d/Savemat_Callback: did not save duration (maybe was not available)');
                     try % 2) 
                         save(fullPath, 'Data','time');
                     catch % 3)
                         save(fullPath, 'Data');
-                        disp('imlook4d/Savemat_Callback:ERROR did not save time (maybe was not available)');
+                        disp('imlook4d/Savemat_Callback: did not save time (maybe was not available)');
                     end
                 end
 
@@ -6037,7 +6481,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     time2D=handles.image.time2D;
                     save(fullPath, '-append', 'time2D');
                 catch
-                    disp('imlook4d/Savemat_Callback:ERROR  Failed appending time2D');
+                    disp('imlook4d/Savemat_Callback: Failed appending time2D');
                 end
 
                 try
@@ -6045,7 +6489,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     time2D=handles.image.time2D;
                     save(fullPath, '-append', 'duration2D');
                 catch
-                    disp('imlook4d/Savemat_Callback:ERROR  Failed appending duration2D');
+                    disp('imlook4d/Savemat_Callback: Failed appending duration2D');
                 end
 
 
@@ -6064,7 +6508,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                     save(fullPath, '-append', 'subHeader', 'mainHeader', 'dirstruct');
                 catch
-                    disp('imlook4d/Savemat_Callback:ERROR  Failed appending ECAT headers');
+                    disp('imlook4d/Savemat_Callback: Failed appending ECAT headers');
                 end
 
 
@@ -6076,7 +6520,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                     save(fullPath, '-append', 'DICOMHeader');
                 catch
-                    disp('imlook4d/Savemat_Callback:ERROR  Failed appending DICOM headers');
+                    disp('imlook4d/Savemat_Callback: Failed appending DICOM headers');
                 end           
 
                 % Save isotope half time
@@ -6086,7 +6530,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     halflife=handles.image.halflife;
                     save(fullPath, '-append', 'halflife');
                 catch
-                    disp('imlook4d/Savemat_Callback:ERROR  Failed appending isotope halflife');
+                    disp('imlook4d/Savemat_Callback: Failed appending isotope halflife');
                 end
 
                 % Save file type
@@ -6096,14 +6540,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     fileType=handles.image.fileType;
                     save(fullPath, '-append', 'fileType');
                 catch
-                    disp('imlook4d/Savemat_Callback:ERROR  Failed appending fileType');
+                    disp('imlook4d/Savemat_Callback: Failed appending fileType');
                 end    
                 
                  try
                     pixel_dims=[handles.image.pixelSizeX handles.image.pixelSizeY handles.image.sliceSpacing];
                     save(fullPath, '-append', 'pixel_dims');
                  catch
-                    disp('imlook4d/Savemat_Callback:ERROR  Failed appending pixel_dims');
+                    disp('imlook4d/Savemat_Callback: Failed appending pixel_dims');
                  end 
                 
 %                 try
@@ -6124,7 +6568,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             end  
             
     % Load ROI
-       function LoadRoiPushbutton_Callback(hObject, eventdata, handles, fullPath)
+        function LoadRoiPushbutton_Callback(hObject, eventdata, handles, fullPath)
             % Display HELP and get out of callback
             if DisplayHelp(hObject, eventdata, handles) 
                 return 
@@ -6207,6 +6651,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 
                 %roiNames
                 pixelValues = unique(rois);
+                if length(pixelValues) > 255
+                    dispRed(['Cannot open.  Too many pixel values (' num2str(length(pixelValues)) ').  This is probably not a ROI file. ' ]);
+                    return
+                end
+                
                 pixelValues = pixelValues( ~isnan( pixelValues)); % Remove NaNs that are treated as unique
                 roiNames={};
                 roiValue = 1; % First ROI should have this value
@@ -6275,10 +6724,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 
             end
             
-            numberOfROIs = size(roiNames,2) -1 ;
+            %numberOfROIs = size(roiNames,2) -1 ;
+            numberOfROIs = length(roiNames) -1 ;
 
-            set(handles.ROINumberMenu,'String', roiNames);
-            set(handles.ROINumberMenu,'Value', 1 ); %Set to highest ROI number
 
             
             % VisibleROIs
@@ -6292,10 +6740,45 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             % LockedROIs
             if ( exist('LockedROIs') )
                 handles.image.LockedROIs = LockedROIs; % From .roi file
+                for i = 1: length(LockedROIs)
+                    if ~startsWith( roiNames{i}, '(locked)' )
+                        if LockedROIs(i)
+                            roiNames{i} = [ '(locked) ' roiNames{i}];
+                        end
+                    end
+                end
             else
-                handles.image.LockedROIs = zeros( [ 1 numberOfROIs ] );
+                LockedROIs = zeros( [ 1 numberOfROIs ] );
+                handles.image.LockedROIs = LockedROIs;
             end
             
+            % Set locked marker
+            if LockedROIs(1)
+                handles.Lock_ROI.Checked = 'on'; % Lock check mark
+            end
+            
+            % Read ROI names from file
+            roiNameFile = [pathstr filesep name '.txt'];
+            if exist( roiNameFile )
+                roiNames = readRoiNamesFromFile( roiNameFile, roiNames);
+            end
+            
+            % Set ROI names
+            set(handles.ROINumberMenu,'String', roiNames);
+            set(handles.ROINumberMenu,'Value', 1 ); 
+            
+            % Set reference ROIs
+            counter = 0;
+            handles.model.common.ReferenceROINumbers = [];
+            for i = 1 : numberOfROIs
+                try
+                    if strcmp( '*', roiNames{i}(1) )
+                        counter = counter + 1;
+                        handles.model.common.ReferenceROINumbers(counter) = i;
+                    end
+                catch
+                end
+            end
             
             guidata(handles.ROINumberMenu,handles);  % Save handles
 
@@ -6372,9 +6855,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             j=1;
             for i=1:size(g)
                 % Mark current window with a checkbox
-                if ( strcmp( get(g(i),'Tag'), 'imlook4d' ) || strcmp( get(g(i),'Tag'), '' )  || strcmp( get(g(i),'Tag'), 'modelWindow' ))
+                if ( strcmp( get(g(i),'Tag'), 'imlook4d' ) || ...
+                        strcmp( get(g(i),'Tag'), '' )  || ...
+                        strcmp( get(g(i),'Tag'), 'modelWindow' ) || ...
+                        strcmp( get(g(i),'Tag'), 'tactWindow' ) ...
+                        )
                      h(j,1) = g(i);
-                     get(h(j),'Tag')
+                     get(h(j),'Tag');
                      j = j+1;
                 end
             end      
@@ -6568,46 +7055,32 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             end    
 
     % Window-levels submenu   
-        % Generated at program start
         function EditScale_Callback(hObject, eventdata, thisHandles,varargin)
          % Display HELP and get out of callback
              if DisplayHelp(hObject, eventdata, thisHandles) 
                  return 
              end
              
-         try
-            h=thisHandles.ColorBar;  % Get handle to colorbar
-            CLim=get(h,'YLim');  % Read limits from current color bar
-            slice=round(get(thisHandles.SliceNumSlider,'Value'));
-            frame=round(get(thisHandles.FrameNumSlider,'Value'));
-            tempData=thisHandles.image.CachedImage;      % Read cached image, Image data (not flipped or rotated)
-            disp('drawCursorInYokes2 - Read CachedImage');
-            %CLim=[min(tempData(:)) max(tempData(:) )]; % Calculated min and max
-            %
-            % Dialog for Colorbar
-            %
-            
-            disp('ColorBar_ButtonDownFcn');
-
-            prompt={'Min','Max'};
-            title='Set color range';
-            numlines=1;
-            defaultanswer={...
-                num2str(CLim(1)),...
-                num2str(CLim(2))...
-                };
-            if nargin==3
-                answer=inputdlg(prompt,title,numlines,defaultanswer);
-            else
-                answer=varargin{1};
-            end
-
-            CLim=[str2num(answer{1})  str2num(answer{2})]; % Convert to numbers
-            setColorBar( thisHandles, CLim)
- 
-        catch
-         end
-        updateImage(hObject, eventdata, thisHandles)
+           if nargin == 5
+                setColorBar( thisHandles, [  varargin{1} , varargin{2}  ] );
+                updateImage(hObject, eventdata, thisHandles);
+                return
+           end
+             
+           % Try to get input from workspace INPUTS variable
+          try
+              % Try to get input from workspace INPUTS variable
+              INPUTS=getINPUTS();
+              evalin('base','clear INPUTS'); % Clear INPUTS from workspace
+              setColorBar( thisHandles, [ str2num( INPUTS{1} ), str2num( INPUTS{2} ) ] );
+              updateImage(hObject, eventdata, thisHandles);
+          catch
+              adjustLevel('adjustLevel',hObject,eventdata,guidata(hObject))
+          end
+             
+         
+         return
+        % Other submenues are generated at program start
          
     % Color submenu   
         function Color_Callback(hObject, eventdata, handles, functionName)
@@ -6693,7 +7166,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
            for i=1:size(hROIObjects)
                set(hROIObjects(i),'Checked','off')
            end
-           %set(hObject,'Checked','on')
+           set(hObject,'Checked','on')
            
            imlook4d_set_ROIColor(handles.figure1, eventdata, handles)
            
@@ -6872,132 +7345,6 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         % zoom(ratio)    
             zoom out                                           % Zoom to initial state
             zoom(eval(handles.image.zoomFactorFormula) );      % Zoom factor
-
-    % --------------------------------------------------------------------
-    % IMTOOLS 
-    % -------------------------------------------------------------------- 
-    function imHistogram_Callback(hObject, eventdata, handles)
-       % Display HELP and get out of callback
-             if DisplayHelp(hObject, eventdata, handles) 
-                 return 
-             end
-           
-        myhistogram(handles,1)
-    function imProfile_Callback(hObject, eventdata, handles)
-       % Display HELP and get out of callback
-             if DisplayHelp(hObject, eventdata, handles) 
-                 return 
-             end
-           
-        improfile;
-    function MontageFrames_Callback(hObject, eventdata, handles)
-       % Display HELP and get out of callback
-             if DisplayHelp(hObject, eventdata, handles) 
-                 return 
-             end
-           
-    % Graph images
-
-        % Initialize
-            slice=round(get(handles.SliceNumSlider,'Value'));
-            frame=round(get(handles.FrameNumSlider,'Value')); 
-            numberOfFrames=size(handles.image.Cdata,4);
-
-        % Figure
-            scrsz = get(0,'ScreenSize');    %screen coordinates, [left bottom width height]
-            figure('Name', ['Montage (slice=' num2str(slice) ')'],...
-                'Position',[150 40 scrsz(3)-180 scrsz(4)-100]);
-
-            NCols=5;NRows=ceil(numberOfFrames/NCols);
-            GI=1;
-                            
-                
-            for i=1:numberOfFrames  
-                subplot(NRows,NCols,GI), imagesc (handles.image.Cdata(:,:,slice,i)); title(['Frame ' num2str(i)],'fontsize',6);GI=GI+1;  
-                
-                pos = get(gca,'position');set(gca,'position',[pos(1) pos(2) pos(3)*1.2  pos(4)*1.2]); % Make width and height larger
-                
-                axis('off');
-                colormap(jet);
-            end
-    function MontageSlices_Callback(hObject, eventdata, handles)
-       % Display HELP and get out of callback
-             if DisplayHelp(hObject, eventdata, handles) 
-                 return 
-             end
-
-
-        % Initialize
-            slice=round(get(handles.SliceNumSlider,'Value'));
-            frame=round(get(handles.FrameNumSlider,'Value')); 
-            numberOfSlices=size(handles.image.Cdata,3);
-
-        % Figure
-            scrsz = get(0,'ScreenSize');    %screen coordinates, [left bottom width height]
-            figure('Name', ['Montage (frame=' num2str(frame) ')'],...
-                'Position',[150 40 scrsz(3)-180 scrsz(4)-100]);
-
-
-
-            NCols=8;NRows=ceil(numberOfSlices/NCols);
-            GI=1;     
-                
-            for i=1:numberOfSlices  
-                subplot(NRows,NCols,GI), imagesc (handles.image.Cdata(:,:,i,frame)); title(['Slice ' num2str(i)],'fontsize',6);GI=GI+1;  
-                
-                pos = get(gca,'position');set(gca,'position',[pos(1) pos(2) pos(3)*1.1  pos(4)*1.1]); % Make width and height larger
-                
-                axis('off');
-                colormap(jet);
-                
-            end
-            
-           
-            
-            
-            %
-            %TRIAL
-            %
-                rememberSlice=round(get(handles.SliceNumSlider,'Value'));
-
-%                 for i=1:numberOfSlices  % Flip through slices
-%                             set(handles.SliceNumSlider,'Value',i);
-%                             updateImage(hObject, eventdata, handles);
-%                 end
-%
-%                 set(handles.SliceNumSlider,'Value',rememberSlice);          % Restore
-
-
-                % Figure
-                scrsz = get(0,'ScreenSize');    %screen coordinates, [left bottom width height]
-                figure('Name', ['TEST Montage (frame=' num2str(frame) ')'],...
-                    'Position',[150 40 scrsz(3)-180 scrsz(4)-100]);
-
-
-
-                NCols=7;NRows=ceil(numberOfSlices/NCols);
-                GI=1;     
-
-                for i=1:numberOfSlices  
-                    set(handles.SliceNumSlider,'Value',i);
-                    updateImage(hObject, eventdata, handles);
-                    colorbar('fontsize',6);
-
-                    tempData=get(handles.ImgObject,'Cdata');
-
-                    subplot(NRows,NCols,GI), imagesc(tempData); title(['Slice ' num2str(i)],'fontsize',6);GI=GI+1;  
-
-                    pos = get(gca,'position');set(gca,'position',[pos(1) pos(2) pos(3)*1.1  pos(4)*1.1]); % Make width and height larger
-
-                    axis('off');
-                    %colormap(jet);
-                    
-                end
-                
-                colorbar('fontsize',6); %Needed to update last colorbar
-                drawnow;
-                
-                set(handles.SliceNumSlider,'Value',rememberSlice);          % Restore   
                 
     % --------------------------------------------------------------------
     % WORKSPACE 
@@ -7114,6 +7461,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         end;
   
     function handles = importUntouched_Callback(hObject, eventdata, handles,varargin)
+        % This function Imports data from workspace EXCLUDING imlook4d_Cdata
         % Imports everything where and letting imlook4d-variables override
         % imlook4d_current_handles
         
@@ -7206,14 +7554,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
          
          
          try
-            adjustSliderRanges(handles);
+            adjustSliderRanges(handles);             
             updateImage(hObject, eventdata, handles); 
          catch
          end
          guidata(hObject,handles); 
          a = whos('handles');disp([ 'Size = ' num2str( round( a.bytes/1e6 )) ' MB']);            
     function importFromWorkspace_Callback(hObject, eventdata, handles,varargin)
-        % This function Imports data from workspace INCLUDING Cdata
+        % This function Imports data from workspace INCLUDING imlook4d_Cdata
 
         handles = importUntouched_Callback(hObject, eventdata, handles,varargin);
 
@@ -7302,7 +7650,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                  % Submenu items
                     callback='imlook4d(''windowsSubMenu_Callback'',gcbo,[],guidata(gcbo))';
 
-                    htemp=uimenu(handles.windows,'Label', windowDescriptions{i},'Callback', callback, 'UserData', h(i));  % Store handle to window in 'UserData'
+                    htemp=uimenu(handles.windows,'Label',  windowDescriptions{i},'Callback', callback, 'UserData', h(i));  % Store handle to window in 'UserData'
                                     
                    
                         % Mark current window with a checkbox
@@ -7349,16 +7697,26 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                % Put imlook4d version into text place-holder
                text = strrep(text, 'VERSIONPLACEHOLDER', getImlook4dVersion() );
                
+%                text = [ text, ...
+%                   '<p><b>Bugs: </b>' ...
+%                   '<a href="mailto:axelsson.jan@gmail.com?subject=imlook4d&body='...
+%                     'Bug report'...
+%                     'Java:' version('-java') ...
+%                     'Matlab:' version() ...
+%                   '">' 'Bug report</a> ' ...
+%                   '</p>' ...
+%                   'Please report the following:' ...
+%                   ...
+%                    '<p><b>Imlook4d . version:</b> ' getImlook4dVersion() '</p>' ...
+%                    '<p><b>OS:</b> ' computer '</p>' ...
+%                    '<p><b>Java:</b> ' version('-java') '</p>' ...
+%                    '<p><b>Matlab:</b> ' version() '</p>' ...
+%                    ];
                text = [ text, ...
-                  '<p><b>Bugs: </b>' ...
-                  '<a href="mailto:axelsson.jan@gmail.com?subject=imlook4d&body='...
-                    'Bug report'...
-                    'Java:' version('-java') ...
-                    'Matlab:' version() ...
-                  '">' 'Bug report</a> ' ...
                   '</p>' ...
-                  'Please report the following:' ...
+                  'Bug reports are highly appreciated. Please report the following:' ...
                   ...
+                   '<p><b>Imlook4d version:</b> ' getImlook4dVersion() '</p>' ...
                    '<p><b>OS:</b> ' computer '</p>' ...
                    '<p><b>Java:</b> ' version('-java') '</p>' ...
                    '<p><b>Matlab:</b> ' version() '</p>' ...
@@ -7593,9 +7951,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                         colormap=get(handles.figure1,'Colormap');
                         faktor=(size(colormap,1)+1);
-                        tempData=ind2rgb(round( faktor*( tempData-minValue) /(maxValue -minValue) ),get(handles.figure1,'Colormap')); 
+                        tempDataRGB=ind2rgb(round( faktor*( tempData-minValue) /(maxValue -minValue) ),get(handles.figure1,'Colormap')); 
                         
-                        handles.image.CachedImage = tempData;
+                        handles.image.CachedImage = tempDataRGB;
                     
                 %
                 % Cache  background image
@@ -7655,7 +8013,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                     % First image
                     try
-                        set(handles.ImgObject,'CData',tempData);
+                        set(handles.ImgObject,'CData',tempDataRGB);
                         set(handles.ImgObject,'AlphaData',imAlphaData1);
                     catch
                         disp('First image drawing failed');
@@ -7667,6 +8025,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         % Foreground layer
                         set(handles.ImgObject2,'CData',tempData2);
                         set(handles.ImgObject2,'AlphaData',imAlphaData2);
+                        
+                        % Set transparent below color range
+                        if ~isempty(tempData2)
+                            imAlphaData1 = tempData > minValue;
+                            set(handles.ImgObject,'AlphaData',imAlphaData1);
+                        end
                     catch
                     end
                     
@@ -7699,7 +8063,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                            % set(handles.axes1,'XLim', XLim);
                            % set(handles.axes1,'YLim', YLim);
                             set(handles.axes1,'DataAspectRatio', [ 1 1 1]);
-                            set(handles.axes1,'DataAspectRatio', [ 1/mmX 1/mmY 1]);
+                            set(handles.axes1,'DataAspectRatio', abs( [ 1/mmX 1/mmY 1] ));
                             
                     catch
                         disp('caught error updateImage');
@@ -7826,30 +8190,43 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 % -------------------------------------------------
                 % PCA filter both single and multi-slice time-series
                 % -------------------------------------------------
+                
+                    IsNormalImage = get(handles.ImageRadioButton,'Value');
+                    IsPCAFilter = not( (get(handles.PC_low_slider, 'Value')==1) &&  (get(handles.PC_high_slider, 'Value')==numberOfFrames) ); % PCA-filter selected with sliders
+                    IsPCImage = get(handles.PCImageRadioButton,'Value');      % PC images radio button selected
+                    
+                    IsModel =  isa(handles.model.functionHandle, 'function_handle');
+                   
+                    IsDynamic = (numberOfFrames>1);
 
+                    % Default guess
+                    fullEigenValues=1;   % Must be defined so it can be stored.
+                    explainedFraction=1; % Must be defined so it can be stored.  
+                    
+                    % Shortcut if normal image (not PCA or Residual image)
+                    % AND NONE of Model or PCA-filtered
+                    if ( IsNormalImage && ~IsModel && ~IsPCAFilter)
+                        modelOutput=handles.image.Cdata(:,:,inputSliceRange,outputFrameRange);
+                        %disp('shortcut calculation - no model no PCA');
+                        return 
+                    end
+                       
                     % Define default size for output from PCA-filter
                     %filterOutput=zeros(size(handles.image.Cdata));  % THIS IS TOO BIG FOR MANY CASES
                     
-
-                    filterOutput=zeros( size(handles.image.Cdata,1), size(handles.image.Cdata,2), length(outputSliceRange), numberOfFrames, 'single');
-                    filterOutput(:,:,outputSliceRange,:)=handles.image.Cdata(:,:,inputSliceRange,:);
+                    
 
                     % Handles both theses scenarios:
                     % 1) outputSliceRange=1         => filteredOutput [:,:,1,:]
                     % 2) outputSliceRange=range     => filteredOutput [:,:,range,:]
-                       fullEigenValues=1;   % Must be defined so it can be stored.
-                       explainedFraction=1; % Must be defined so it can be stored.               
+                    filterOutput=zeros( size(handles.image.Cdata,1), size(handles.image.Cdata,2), length(outputSliceRange), numberOfFrames, 'single');
+                    filterOutput(:,:,outputSliceRange,:)=handles.image.Cdata(:,:,inputSliceRange,:);
+             
 
                     %
                     % Do PCA calculations if needed
                     %
 
-                    % Necessary:
-                    IsDynamic=(numberOfFrames>1);
-
-                    % One of the following must be true
-                    IsPCAFilter=not( (get(handles.PC_low_slider, 'Value')==1) &&  (get(handles.PC_high_slider, 'Value')==numberOfFrames) ); % PCA-filter selected with sliders
-                    IsPCImage=get(handles.PCImageRadioButton,'Value');      % PC images radio button selected
 
                     % Test if needs to calculate following (save time otherwise)
                     if ((IsPCAFilter || IsPCImage   ) && IsDynamic  )   % PC image or PCA-filtering   (AND, of course, dynamic scan)          
@@ -8107,7 +8484,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             
             % Loop through yoke'd images which have same folder and title
             yokes=getappdata( thisHandles.figure1, 'yokes');
-            folder = thisHandles.image.folder;
+            try
+                folder = thisHandles.image.folder;
+            catch
+                folder = ''; 
+            end
             title = get(thisHandles.figure1, 'Name');
             for i=1:length(yokes) 
                 handles=guidata(yokes(i));
@@ -8265,7 +8646,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                    % fileType variable non-existing
                    displayMessageRow('');
                end
-               
+
             function updateROIs(handles)
             % ------------------------------------------------------------------------------------------
             % This function draws ROIs on top of cached image (not flipped and
@@ -8293,6 +8674,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             %           This is the coordinate system used when clicking
             %           the mouse
             % 
+            
+                IMAGINGTOOLBOX = ~isempty( which('bwboundaries') );
+                if IMAGINGTOOLBOX
+                    updateROIsImagingToolbox(handles);
+                    return
+                end
+            
                 % -------------------------------------------------
                 % Initialize
                 % -------------------------------------------------
@@ -8486,7 +8874,216 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                               set(handles.ImgObject3,'Cdata', zeros(size(activeRoiPicture)));  
                               set(handles.ImgObject3,'AlphaData', 0.0);  
                         end % END DRAWING ROIS         
+                function updateROIsImagingToolbox(handles)
+            % ------------------------------------------------------------------------------------------
+            % This function draws ROIs on top of cached image (not flipped and
+            % rotated)
+            % Flip-and-rotate is performed on both ROI and image
+            %
+            % Interpolation of displayed image is performed here.
+            %    
+            % This routine is responsible for updating the screen display
+            % It is called two different ways:
+            % 1) wmb                (when drawing ROI with mouse)
+            %       drawROI         (draws ROI pixels in ROI matrix)
+            %           updateROI   (CachedImage is used here, so it does not need to be recalculated)
+            %
+            % 2) updateImage        (for instance when changing slice or frame.  CachedImage is generated here)
+            %       updateROI       (CachedImage is used here, so it does not need to be recalculated)
+            %
+            % THEORY:
+            %
+            % ImgObject data is plotted inside axes1
+            % axes1     -coordinate system is defined by XLim=[min max], YLim=[min max]
+            %           -DataAspectRatio defines how much space the plot takes in x,y direction 
+            %
+            % ImgObject (data) coordinates are defined by XData, YData
+            %           This is the coordinate system used when clicking
+            %           the mouse
+            % 
+                % -------------------------------------------------
+                % Initialize
+                % -------------------------------------------------
+                    axisHandle = handles.axes1;
+                
+                    numberOfSlices=size(handles.image.Cdata,3);
+                    numberOfPixelsX=size(handles.image.Cdata,1);
+                    numberOfPixelsY=size(handles.image.Cdata,2); %Y
 
+                    slice=round(get(handles.SliceNumSlider,'Value'));
+                    frame=round(get(handles.FrameNumSlider,'Value'));
+                    
+                    rois=handles.image.ROI(:,:,slice);                           % ROIs in this slice
+                    
+                    % Rotate and flip
+                    if get(handles.FlipAndRotateRadioButton,'Value')
+                        rois=orientImage(rois);
+                        tempAlphaData = get(handles.ImgObject3,'AlphaData');
+                        set(handles.ImgObject3,'CData', zeros( [size(rois) 3]), 'AlphaData', zeros(size(rois) ) );
+                    else
+                        tempAlphaData = get(handles.ImgObject3,'AlphaData');
+                        set(handles.ImgObject3,'CData', zeros( [size(rois) 3]), 'AlphaData', zeros(size(rois) ) );
+                    end
+                    
+                    % Work matrices
+
+                    activeRoiPicture=zeros(size(handles.image.Cdata,1), size(handles.image.Cdata,2),'single');
+                    activeRoiPicture=zeros(size(rois),'single');
+                    inActiveRoiPicture=zeros(size(activeRoiPicture),'single');
+                    
+                    % Clean line-contours
+                    s = findobj(handles.figure1,'Tag','contourROI'); % Only find ROIs
+                    delete(s); % Delete all
+
+                % -------------------------------------------------
+                % Create image and ROI pixel values
+                % -------------------------------------------------
+
+
+                    % ROI display things
+                       activeROI=get(handles.ROINumberMenu,'Value');             
+  
+                       
+                       % Remove non-visible ROIs from pixels
+                       numberOfROIs = length(handles.image.VisibleROIs);
+                       for i=1:numberOfROIs
+                           if (handles.image.VisibleROIs(i)==0)
+                               rois(rois==i)=0;       % All ROIs
+                           end
+                       end
+                       
+                       % Keep only reference ROIs, if checked in GUI
+                       if strcmp( handles.OnlyRefROIs.Checked, 'on')
+                           roisToCalculate = handles.model.common.ReferenceROINumbers;
+                           roisToHide = setdiff( 1:numberOfROIs , roisToCalculate);
+                           for i = roisToHide
+                               rois(rois==i)=0; 
+                           end
+                       end
+                       
+
+                       % Set pixels in active ROI                              set(handles.ImgObject3,'AlphaData', 0.5);  
+
+
+                       % Set pixels in all other ROIs
+                       logicalA=(rois==activeROI);          % Active ROI
+                       logicalB=(rois~=0);                  % All ROIs
+                       logicalC=xor(logicalA , logicalB);   % Removes Active ROI from All ROIs
+                       
+                       activeRoiPicture(logicalA)=1;    
+                       inActiveRoiPicture(logicalC) = 1;
+
+                       
+                % -------------------------------------------------
+                % Draw ROIs in image (SKIP THIS IF HIDE ROIS IS ON)
+                % -------------------------------------------------
+                        try
+                            ColorfulROI = strcmp( handles.image.ROIColor, 'Colored');
+                            GrayROI = strcmp( handles.image.ROIColor, 'Gray');
+                            MultiColoredROIs = strcmp( handles.image.ROIColor, 'MultiColoredROIs');
+                        catch
+                            handles.image.ROIColor = 'Colored';
+                            ColorfulROI = true;
+                            GrayROI = false;
+                            MultiColoredROIs = false;
+                        end
+                                        
+                        if ( get(handles.hideROIcheckbox,'Value')==0 )
+  
+                            % 1) ColorFul ROI  (Green for active, Red for inactive)
+                            
+                            if ColorfulROI
+
+                                % 1a) ColorFul ROI - contour
+                                if ( get(handles.ContourCheckBox,'Value')==1 )
+                                    contourRoi(axisHandle, logicalA, [ 0 1 0 ]);
+                                    contourRoi(axisHandle,  logicalC, [ 1 0 0 ]);
+                                    
+                                % 1b) ColorFul ROI - solid
+                                else
+                                    tempData = activeRoiPicture;
+                                    xSize = size(get(handles.ImgObject3,'CData'),1);
+                                    ySize = size(get(handles.ImgObject3,'CData'),2);
+                                    
+                                    act =  ( reshape( reshape(activeRoiPicture,1,[])' * [ 0 1 0 ] , xSize, ySize, []) > 0  );
+                                    inact =  ( reshape( reshape(inActiveRoiPicture,1,[])' * [ 1 0 0 ]*0.6 , xSize, ySize, []) > 0  );
+                                    set(handles.ImgObject3,'Cdata', act + inact  );
+                                    
+                                    set(handles.ImgObject3,'AlphaData', 0.5*(activeRoiPicture>0) + 0.3*(inActiveRoiPicture>0)  );
+                                end
+                                
+                            end
+                            
+                            % 2) Gray ROI
+                            
+                            if GrayROI
+                                
+                                set(handles.ImgObject3,'Cdata', zeros(size(activeRoiPicture) ) );
+                                
+                                % 2a) Gray ROI - contour
+                                if ( get(handles.ContourCheckBox,'Value')==1 )
+                                    contourRoi(axisHandle,  logicalA, [ 1 1 1 ]);
+                                    contourRoi(axisHandle,  logicalC, 0.7* [ 1 1 1 ]);
+                                    
+                                % 2b) Gray ROI - solid
+                                else
+                                    set(handles.ImgObject3,'AlphaData', 0.5*(activeRoiPicture>0) + 0.3*(inActiveRoiPicture>0)  );
+                                end
+                            end
+                              
+                              
+                            % 3) MultiColor ROI 
+                             
+                            if MultiColoredROIs
+                                roisInSlice = unique( rois( find( rois >0)));
+                                
+                                % 3a) MultiColor ROI - contour
+                                if ( get(handles.ContourCheckBox,'Value') == 1 )
+                                   
+                                   if length(roisInSlice) > 0
+                                       for i = roisInSlice'  % Set ROI colors only for ROIs in slice
+                                           color = getColor(i);
+                                            contourRoi(axisHandle,  rois == i, color );
+                                       end
+                                   end
+
+                                % 3b) MultiColor ROI - solid 
+                                else
+                                    xSize = size(get(handles.ImgObject3,'CData'),1);
+                                    ySize = size(get(handles.ImgObject3,'CData'),2);
+                                    
+                                    % Set colors for ROI layer
+                                    a  = zeros( [size(activeRoiPicture) 3 ]);
+                                    
+                                    if length(roisInSlice) > 0
+                                        for i = roisInSlice'  % Set ROI colors only for ROIs in slice
+                                            color = getColor(i);
+                                            a = a +  reshape( reshape( rois == i ,1,[])' * color , xSize, ySize, []) ;
+                                        end
+                                        set(handles.ImgObject3,'Cdata', a  );  % ROI RGB-matrix
+                                    end
+                                    
+                                    
+                                    set(handles.ImgObject3,'AlphaData', 0.3*(activeRoiPicture + inActiveRoiPicture)  );
+                                end
+                                
+                            end
+          
+                        else
+                              set(handles.ImgObject3,'Cdata', zeros(size(activeRoiPicture)));  
+                              set(handles.ImgObject3,'AlphaData', 0.0);  
+                        end % END DRAWING ROIS          
+                    function contourRoi( axisHandle, binaryMatrix, color)
+                    linestyle = '-';
+                    linewidth = 2;
+                    b = bwboundaries(binaryMatrix);
+                    
+                    hold(axisHandle, 'on')
+                    for k=1:numel(b)
+                        h = plot( b{k}(:,2) - 0.5, b{k}(:,1) - 0.5, 'color', color, 'linestyle', linestyle,'Tag','contourROI', 'Parent',axisHandle); % 0.5 to make nodes in middle of pixels
+                        h.LineWidth = linewidth;
+                    end
+                    hold(axisHandle, 'off')
     % --------------------------------------------------------------------
     % Help and HTML functions
     % --------------------------------------------------------------------
@@ -8905,7 +9502,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 table{i,3}='';
                 table{i,4}='';
                 table{i,5}='';
+                table{i,6}=1e8; % This is time when window opened
  
+                
                 
 
                 
@@ -8916,6 +9515,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     
                     % Here we have gui applications (i.e. imlook4d)
                     tempHandles=guidata(listOfWindows(i));
+                    
+                    % Window opened time
+                    try
+                        table{i,6} = tempHandles.image.windowOpenedTime;
+                    catch
+                        table{i,6} = 1e8; % Will be sorted at end (higher value than windowOpenedTime  
+                    end
                     
                     %
                     % Yoke
@@ -8994,7 +9600,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             %
 
                 % Sort rows
-                [table, index] = sortrows(table,[3,4,2,5]);
+                %[table, index] = sortrows(table,[3,4,2,5]);
+                [table, index] = sortrows(table,[6,3,4,2,5]); % Sort on window opened time (column 6)
 
                 % Set sorted handles
                 sortedListOfWindows=listOfWindows(index);
@@ -9008,183 +9615,6 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
            colors = get(0,'DefaultAxesColorOrder'); % Matrix with colors in rows 1-7
            colorIndex = mod(index, size(colors,1))+1;
            color = colors(colorIndex,:);
-        function activity=newTACT(hObject, eventdata, handles)
-            %
-            % Initialize
-            %
-                contents = get(handles.ROINumberMenu,'String'); % Cell array  
-                numberOfROIs=size(contents,1)-1;
-                numberOfFrames=size(handles.image.Cdata,4);
-                numberOfSlices=size(handles.image.Cdata,3);
-                
-                IsPCImage=get(handles.PCImageRadioButton,'Value');      % PC images radio button selected
-                IsResidualImage=get(handles.ResidualRadiobutton,'Value'); % Redisual image radio button selected
-
-            %
-            % Plot TACT curve
-            %  
-                try
-                    [activity, NPixels, stdev]=generateTACT(handles, handles.image.ROI);
-                catch
-                    % NEW version 
-                    [activity, NPixels, stdev]=generateTACT_new(handles, handles.image.ROI);
-                end
-                
-%                 % Use ExportROI script internally
-%                 imlook4d_current_handle=hObject;
-%                 imlook4d_current_handles=handles;
-%                 imlook4d_Cdata=handles.image.Cdata;
-%                 imlook4d_ROI=handles.image.ROI;
-%                 imlook4d_frame=round(get(handles.FrameNumSlider,'Value')); 
-%                 ExportROIs
-%                 % Data now in imlook4d_ROI_data
-
-%                 tic
-%                     [activity2, NPixels2, stdev2]=generateTACT(handles, handles.image.ROI);
-%                 toc;tic
-%                     % NEW version 
-%                     [activity, NPixels, stdev]=generateTACT_new(handles, handles.image.ROI);
-%                 toc  
-% 
-%                 disp([activity2', activity',stdev', stdev2' ]);
-%                 disp([NPixels2', NPixels']);
-
-
-                windowTitle=['TACT: ' get(handles.figure1, 'Name')];
-                h=figure('Name', windowTitle,'NumberTitle' ,'off');
-  
-
-                %%for i=1:numberOfROIs
-                for i=find(handles.image.VisibleROIs)   
-                    disp([num2str(i) '   ' contents{i}])
-
-                        if not(IsPCImage)
-                            try
-                                timeScale=handles.image.time;
-
-                                timeScale=timeScale(1,1:size(activity,2));  % Make as many x-axis items as there are activity items
-                                
-                                duration=handles.image.duration;
-
-                            catch
-                                timeScale=1:numberOfFrames;
-                                duration=zeros(size(timeScale));  % Set duration to zero if not known
-                            end
-                        end
-
-                    % Plot current ROI
-                       try
-                            plot( timeScale/60, activity(i,:) , '-o', 'MarkerSize',3);
-                            %plot( timeScale, stdev(i,:) , '-o', 'MarkerSize',3);
-                            hold all
-                            xlabel('Time [min]');
-                            ylabel('Intensity');
-                       catch
-                           plot( activity(i,:) , '-o', 'MarkerSize',3);
-                           hold all
-                           xlabel('Frame number');
-                           ylabel('Intensity');
-                       end
-
-                end
-
-            %
-            % Adjust labels
-            %
-                if IsPCImage
-                    xlabel('Principal component number');
-                end
-                                            
-            %
-            % Adjust axis
-            %
-            try
-                haxis=get(h,'CurrentAxes');
-                temp=get(haxis,'YLim');
-                
-                YLow=temp(1);
-                YHigh=temp(2);
-            catch
-            end
-                
-%                 if ~IsResidualImage      % NOT residual radio button selected
-%                     set(haxis,'YLim', [0 YHigh])
-%                 end
-                
-                if min(activity(:))<0      % If negative values, display whole range
-                    set(haxis,'YLim', [YLow YHigh])
-                end
-            %
-            % Add legend to TACT curve
-            %
-
-                % Number of pixels
-                %for i=1:numberOfROIs 
-                j=1;
-                for i=find(handles.image.VisibleROIs)  
-                    newContents{j}=[contents{i} ' (' num2str(NPixels(i)) ' pixels)' ]; % Add pixel count to legend
-                    j=j+1;
-                end
-
-                %Legend  (TeX formatting off)
-                legend(newContents(1:end),'Interpreter','none');  
-
-           %
-           % Output for different file formats
-           %
-                % Cover case where for instance a parametric image is
-                % displayed and the durations are kept for future reference
-                frameNumbers=1:size(activity,2);
-                if size( frameNumbers,2)==1
-                    duration=duration(1,1);
-                end
-
-                
-                %
-                % Make struct to export to button
-                % 
-                
-                contents = get(handles.ROINumberMenu,'String')'; % Cell array
-                contents={ contents{1:(end-1)}}; % Put "Add ROI" last
-               TACThandles = [];
-               
-               TACThandles.record = handles.record;
-               
-               TACThandles.TACT.roiNames = contents;
-               
-               
-               TACThandles.image = handles.image;
-                
-               TACThandles.TACT.frameNumber = frameNumbers';
-                try
-               TACThandles.TACT.startTime = timeScale';
-               TACThandles.TACT.midTime = (timeScale + duration / 2 )';
-               TACThandles.TACT.duration = duration';
-                catch
-                    disp('newTACT error -- time information missing?');
-                end
-               TACThandles.TACT.tact = activity';
-               TACThandles.TACT.std = stdev';
-               TACThandles.TACT.pixels = NPixels'; 
-                                
-                % Add save button to figure
-%                 btn = uicontrol('Style', 'pushbutton', 'String', 'TACT to file',...
-%                     'Position', [20 20 80 20],...
-%                     'Callback', {@SaveTactToFile,TACThandles}); 
-
-                guidata(h,TACThandles);  % Store struct in figure window (equivalent ot how handles is stored in imlook4d)
-                
-                btn = uicontrol('Style', 'pushbutton', 'String', 'TACT to file',...
-                    'Units', 'normalized', ...
-                    'Position', [0.80 0.01 0.15 0.05],...
-                    'BackgroundColor', 'yellow', ...
-                    'Callback', 'SaveTactToFile(gcf, {},guidata(gcf))' ); 
-                    %'Callback', {@SaveTactToFile,TACThandles} ); 
- 
-            %
-            % Move TACT plot to top
-            %
-                set(h,'Visible','on');   
         function save_cellarray(cellarr, filename, header, latex)
             % function save_cellarray(cellarr, filename, header, latex)
             %
@@ -9495,6 +9925,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 flag = true; 
               end
             disp(['isMultipleCall depth=' num2str(numel(s))]);       
+        function ok = startsWith( s1, s2)
+            % Replaces default startsWidh (allowing imlook4d prior to 2016b
+            % to work)
+            n = min( length(s1), length(s2));
+            ok = strncmpi(s1,s2,n);
             
 % Dummy function to override duration from timefun toolbox in Matlab 2014b
         function duration ()

@@ -1,4 +1,5 @@
-StoreVariables;
+StoreVariables; 
+ReferenceModel; % Makes sure Reference Region is defined
 
 % Inhibit model image (which is triggered by existence of functionHandle)
 keepFunctionHandle = imlook4d_current_handles.model.functionHandle;

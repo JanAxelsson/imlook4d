@@ -43,7 +43,7 @@ function answer = inputdlg(varargin)
       catch
           % Call default function instead
           shipped = getShaddowedFunction(this);
-          answer = shipped(varargin{:})
+          answer = shipped(varargin{:});
          % answer=inputdlg(prompt,title,numlines,defaultanswer);
          
          recordComment('Set field to ''-'', if you wish to keep value supplied by imlook4d'); % Insert text at caret

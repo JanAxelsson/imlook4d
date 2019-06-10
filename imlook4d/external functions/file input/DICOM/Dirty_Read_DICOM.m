@@ -116,7 +116,7 @@ function [matrix, header, outputFileName]=Dirty_Read_DICOM(directoryPath, pixels
                 end
                 
             catch % Error handling (too small files are not accepted)
-                disp([TAB 'ERROR Ignoring file=' tempFilename]);
+                disp([TAB 'Ignoring file=' tempFilename]);
             end
 %             try    
 %                 tempFilename= [directoryPath sTempFilenameStruct(nr).name];

@@ -1,5 +1,5 @@
 StoreVariables;
-Export;
+ExportUntouched;
 
 try
     s = imlook4d_current_handles.model.common.ReferenceROINumbers;
@@ -42,5 +42,5 @@ imlook4d_current_handles.model.common.ReferenceROINumbers = s;
 
 imlook4d_ROINames = temp;
 
-Import;
+ImportUntouched;
 ClearVariables;

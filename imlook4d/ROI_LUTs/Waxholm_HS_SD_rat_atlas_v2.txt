@@ -1,0 +1,81 @@
+0	Clear Label
+1	descending corticofugal pathways
+2	substantia nigra
+3	subthalamic nucleus
+4	molecular layer of the cerebellum
+5	granule cell level of the cerebellum
+6	alveus of the hippocampus
+7	inferior cerebellar peduncle
+10	cingulate cortex, area 2
+30	striatum
+31	globus pallidus
+32	entopeduncular nucleus
+33	ventricular system
+34	medial lemniscus
+35	facial nerve
+36	anterior commissure, anterior part
+37	anterior commissure, posterior part
+38	ventral hippocampal commissure
+39	thalamus
+40	septal region
+41	optic nerve
+42	optic tract and optic chiasm
+43	pineal gland
+44	inner ear
+45	spinal cord
+46	commissure of the superior colliculus
+47	brainstem
+48	hypothalamic region
+49	inferior colliculus
+50	superficial gray layer of the superior colliculus
+51	periaqueductal gray
+52	fornix
+53	mammillothalamic tract
+54	commissural stria terminalis
+55	deeper layers of the superior colliculus
+56	periventricular gray
+57	genu of the facial nerve
+58	pontine nuclei
+59	fimbria of the hippocampus
+60	fasciculus retroflexus
+61	stria medullaris of the thalamus
+62	stria terminalis
+63	posterior commissure
+64	glomerular layer of the accessory olfactory bulb
+65	glomerular layer of the olfactory bulb
+66	olfactory bulb
+67	corpus callosum and associated subcortical white matter
+68	brachium of the superior colliculus
+69	commissure of the inferior colliculus
+70	central canal
+71	interpeduncular nucleus
+72	ascending fibers of the facial nerve
+73	anterior commissure
+74	inferior olive
+75	spinal trigeminal nuclus
+76	spinal trigeminal tract
+77	frontal associiation cortex
+78	middle cerebellar peduncle
+79	transverse fibers of the pons
+80	habenular commissure
+81	nucleus of the stria medullaris
+82	basal forebrain region
+83	supraoptic decussation
+84	medial lemniscus decussation
+85	pyramidal decussation
+92	neocortex
+93	bed nucleus of the stria terminalis
+94	pretectal region
+95	cornu ammonis 1
+96	dentate gyrus
+97	cornu ammonis 2
+98	cornu ammonis 3
+99	fasciola cinereum
+100	subiculum
+108	postrhinal cortex
+109	presubiculum
+110	parasubiculum
+112	perirhinal area 35
+113	perirhinal area 36
+114	entorhinal cortex
+115	lateral entorhinal cortex
