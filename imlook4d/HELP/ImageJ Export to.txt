@@ -28,7 +28,11 @@
             Copy ij.jar (from ImageJ) to directory:  imlook4d\external functions\ImageJ
          </li>
         <li>    
-            Increase java heap memory to 1 GB (Matlab menu: Preferences > General >  Java Heap Memory )
+            Increase java heap memory to at least 1 GB, more if you get memory problems. (Matlab menu: Preferences > General >  Java Heap Memory )
+        </li>
+
+        <li>    
+            ImageJ plugins can be put into the folder in your home directory: MATLAB\plugins
         </li>
         </ol>
 

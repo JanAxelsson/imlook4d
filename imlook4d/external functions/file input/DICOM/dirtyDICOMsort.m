@@ -110,6 +110,9 @@
                         str=out.string;
                         temp=strfind(str,'\'); 
                         indexlist(i,3)=str2num( str(temp(2)+1:end));  %
+
+                          pos = DICOMStruct.imagePosition{i};
+                          indexlist(i,3) = pos(3); 
                         
                       catch
                         indexlist(i,3)=0;   

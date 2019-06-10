@@ -1,20 +1,22 @@
 TODO
 =====
 
+ERRORS
+[  ]   Image models missing check-mark for active model
+[  ]   Help on Buttons TACT, Clear.  Help on drop down "Clear ROI"
+[  ]   Command Button('TACT') does not work. Button('Clear') works.
+[  ]   Help now goes all the way up to "Image View Port".  Rewrite so it goes only to parent
+[  ]   Help on Record button missing
+
+
+
+
+
 DEVELOP
-<<<<<<< Updated upstream
-[  ]   Add Models for ratio, clearance
-[  ]   Way to mask image (except for ROI).  SRTM fails badly if not masked
-       1) Auto-mask  max(imlook4d_Cdata,[],4)
-[  ]   Logan 
-[  ]   Vectorize Zhou SRTM, SRTM2
-[  ]   HELP files for models 
-=======
 
 
-[  ]   Add Extended SRTM (doi:10.1016/j.neuroimage.2006.06.038)
 
-[  ]   Add Model for Retention index
+
 [  ]   Add Models for  clearance
 
 [  ]	Make reference Patlak -- or save ref region to variable
@@ -28,22 +30,32 @@ DEVELOP
 [  ]   Trim2D and Trim3D, change location
 [  ]   SPM, if DICOM, automatically make DICOM
 [  ]   SPM, "coregister to", allow to click and select other window (as well as file dialog which we have now)
->>>>>>> Stashed changes
 
 
 WISHLIST
-[  ]   ROI Table with histogram for marked ROI
-[  ]   TACT window as Model Window, but with histogram for marked ROI and Frame
+[  ]   Add inline model for TACTs. This could be GMT for PVE correction, etc.  generateTACTs and ExportROIs may need to be changed.
+       Also, generateReferenceTact should process tact-matrix instead of generating a new tact.
 
+[  ]   Fiducial Marker skript
+
+[  ]   Make Tissue probability map based ROI when doing "apply atlas" (see script SPM_Segmented_ROIs.m)
+       Copy LUT to current folder.  I have a copy in imlook4d LUT folder called TPM something
+
+[  ]   ask if wish to rotate linked images with same size, or background image when toggling rotating button off
+
+
+[  ]   modelWindow and tactWindow:  make column widths optimal to fit more.
 [  ]   modelWindow: show parameters
 [  ]   modelWindow: allow update of model
 
-[  ]   jpeg dicoms
-[  ]   Update menu, should it save the new downloaded path by default?
+
+
+[  ]   Tact window add Edit/copy menu
+
 
 
 IDEAS
-[   ]	Can I make robuster SRTM-like fixing BPs from Logan ?
+[   ]	Can I make robuster SRTM-like model by fixing BPs calculated from Logan ?
 
 
 PEARL-PD
@@ -53,3 +65,57 @@ PEARL-PD
 
 ISSUES  
 ======
+
+[  ]  Error using webread (line 122)
+		Could not establish a secure connection to "drive.google.com". The reason is "error:14090086:SSL
+		routines:ssl3_get_server_certificate:certificate verify failed". Check your certificate file (C:\Program
+		Files\MATLAB\R2018b\sys\certificates\ca\rootcerts.pem) for expired, missing or invalid certificates.
+		
+		Error in Update_imlook4d (line 7)
+		text = webread( latestFileListURL);
+		 
+		Error while evaluating Menu Callback.
+		
+		Possible workaround:  
+			o = weboptions('CertificateFilename','');
+			webread('https://self-signed.badssl.com/',o)
+
+
+
+DONE
+====
+
+[OK]   HELP files for models 
+[OK]   Perform unzip of nii file, if nii.gz exists but not nii (in Waxholm_segment_job.m )
+[OK]   Check if toolboxes exists for scripts. For instance Grow_ROI.m needing Imaging Toolbox (Solution : add script to requiredToolboxSatisfied.m)
+
+[OK]   User script -- make work in top folder, or force to make subfolder
+[ok]   TACT from nifti fails
+[ok]   Update menu, should it save the new downloaded path by default?  Dialog window asking to save?
+	   Fixed this way: 1) Downloads if not already on disk  2) Update gives link to make default version, without downloading if on disk.
+	   
+[ok]   Histogram of ROI
+[ok]   rotate lines in current axes, when toggling rotating button off -- solved by turning line off instead
+
+[ok]  Upgrade tar inte bort alla gamla ur path:en.  Även /../USER_SCRIPTS ligger kvar från andra versione
+[ok]   Warn if SPM saknas när man väljer meny
+[ok]   jpeg dicoms
+[ok]   Skript vrida vinkel -- kanske med dialogruta när man vrider ?
+[ok]  Patlak -- add with Cp 
+
+[ok]   SPM/select atlas, dialog (done), ask to show folder.
+
+[ok]   measure tool, make handles on line to adjust (unfortunately draws ROI while moving line, if ROI exists)
+[ok]  Saved ROI with locks does not display locks when opened.  
+[ok]   Cancel on threshold ROI and others crashes lots of things. Clear all resolves
+[ok]   interactive min and max level settings. 
+[ok]  View / Background image add -- fails on NM-CT.  CT is lost, or takes forever
+[ok]   Move new MODELS to MODELS menu
+[ok]   Save time-activity to different formats from tactWindow window (especially sif and pmod)
+[ok]   Move Time-activity from "Models on ROIs" to TACT button (after above)
+
+[ok]   PROBLEM -- short frames (GE water scans) have T and dT that does not add up.  How to solve?
+	   Maybe save Tstart and dT as well as midtimes for models?
+[ok]   Cancel on threshold ROI and others crashes lots of things. Clear all resolves
+
+	   

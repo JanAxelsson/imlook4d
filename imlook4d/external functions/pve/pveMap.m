@@ -55,7 +55,7 @@ function P = pveMap( ROIs, PSF)
         exp( -(z.^2)/(2*sigmaZ^2) );
     psf = psf / sum(psf(:)); % Normalize to sum 1
 
-    size(psf)
+    %size(psf)
 
 
 %

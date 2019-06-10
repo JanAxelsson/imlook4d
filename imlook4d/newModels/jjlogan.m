@@ -2,6 +2,7 @@
 function out =  jjlogan( matrix, t, dt, Cr, range, k2ref)
 
     % Reference Logan
+    % (https://doi.org/10.1016/S0969-8051(00)00137-2)
     %
     % Inputs:
     %   matrix = data with last dimension being frames (could be image matrix, or ROI values)
@@ -36,7 +37,9 @@ function out =  jjlogan( matrix, t, dt, Cr, range, k2ref)
     
     out.names = { 'BPND', 'DVR', 'intercept'};
     out.units = { '1','1','min'}; 
-        
+     
+    out.ylabel = '\int_{0}^{t} C_t dt / C_t';
+    
     if nargin == 0
         return
     end
@@ -87,8 +90,10 @@ function out =  jjlogan( matrix, t, dt, Cr, range, k2ref)
         % Handle two different models (with or without known k2 for reference area)
         if HAS_K2_REF
             newX = ( cumsum(Cr.*dt) + Cr/k2ref ) ./ Ct(i,:); % integeral{REF}/ROI(t) + REF/k2ref
+            out.xlabel = '( \int_{0}^{t} C_{ref} dt  + C_{ref} / k_2^{ref} ) / C_t';
         else
             newX = cumsum(Cr.*dt)./Ct(i,:); % integeral{REF}/ROI(t)
+            out.xlabel = '\int_{0}^{t} C_{ref} dt / C_t';
         end
         
         newY = cumsum(Ct(i,:).*dt)./Ct(i,:);    % integeral{ROI}/ROI(t)
@@ -98,9 +103,15 @@ function out =  jjlogan( matrix, t, dt, Cr, range, k2ref)
         tempY = newY(regressionRange)';  % Y-values in range
         
         % Two alternatives:
-        p = linortfit2(double(tempX), double(tempY)); % Orthogonal regression (Best alternative)
-        % p = [tempX ones(length(tempX),1) ] \ tempY;    % Normal regression (works badly, Rank deficient)
-        %p = lscov(double([tempX ones(length(tempX),1) ]), double(tempY)); % Normal regression (more stable)
+        if sum( ~isfinite(tempY) ) == 0
+
+            p = linortfit2(double(tempX), double(tempY)); % Orthogonal regression (Best alternative)
+            % p = [tempX ones(length(tempX),1) ] \ tempY;    % Normal regression (works badly, Rank deficient)
+            %p = lscov(double([tempX ones(length(tempX),1) ]), double(tempY)); % Normal regression (more stable)
+        else
+            p(1) = 0;
+            p(2) = 0;
+        end
       
         DVR(i) = p(1);
         BP(i) = DVR(i) - 1;
@@ -126,9 +137,7 @@ function out =  jjlogan( matrix, t, dt, Cr, range, k2ref)
     intercept = reshape(intercept, outsize);
     
     out.pars = {BP, DVR, intercept};
-    
-    out.xlabel = '\int_{0}^{t} C_{ref} dt /C_t';
-    out.ylabel = '\int_{0}^{t} C_t dt /C_t';
+
     
     if IS_ROI
         out.Xref = out.X{i};

@@ -24,8 +24,10 @@
 %      set( newHandle, 'Position', newPos);
 %      
      
+     
      % Copy handles.image
-     newHandles.image=imlook4d_current_handles.image;           
+     newHandles.image=imlook4d_current_handles.image;  
+     newHandles.image.windowOpenedTime = now(); % Set new 
      
      % Copy handles.record
      newHandles.record=imlook4d_current_handles.record;   
@@ -68,13 +70,18 @@
  %
         
     % Copy colorscale
+    try
     newHandles.image.ColormapName = imlook4d_current_handles.image.ColormapName;
     imlook4d('Color',newHandle, {}, newHandles,newHandles.image.ColormapName );
+    catch
+    end
      
     % Copy window levels 
-    limits = get(imlook4d_current_handles.ColorBar,'Limits');
-    INPUTS = Parameters( { num2str(limits(1)), num2str(limits(2))} );
-    Menu('Edit scale');
+    if get(imlook4d_current_handles.autoColorScaleRadioButton,'Value')==0 % auto color scale = off
+        limits = get(imlook4d_current_handles.ColorBar,'Limits');
+        %imlook4d('EditScale_Callback',imlook4d_current_handle, [], imlook4d_current_handles, limits(1), limits(2))
+        imlook4d('EditScale_Callback',newHandle, [], newHandles, limits(1), limits(2))
+    end
     
     % Copy radiobuttons
     style = 'radiobutton';
@@ -92,13 +99,19 @@
        set( HmatchNew(i), 'Value',  get( HmatchOld(i), 'Value') );
     end
     
-    % Copy checkboxes
+    % Copy edit fields
     style = 'edit';
     HmatchOld = findobj(imlook4d_current_handle,'Style',style);
     HmatchNew = findobj(newHandle,'Style',style);
     for i = 1: length(HmatchOld)
        set( HmatchNew(i), 'String',  get( HmatchOld(i), 'String') );
     end
+    
+    % Copy record-button status
+    tag = 'record_toolbar_button';
+    HmatchOld = findobj(imlook4d_current_handle,'Tag',tag);
+    HmatchNew = findobj(newHandle,'Tag',tag);
+    set( HmatchNew(1), 'State',  get( HmatchOld(1), 'State') );
 
 
  %   
@@ -109,4 +122,4 @@
      
      imlook4d('updateImage',newHandle, {}, newHandles);
     
-    clear tempHandle tempHandles
+    clear tempHandle tempHandles HmatchOld HmatchNew i style tag

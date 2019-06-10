@@ -1,0 +1,37 @@
+<h1>SPM Tissue probability map ROIs</h1>
+<HR></HR>
+<!------------------->
+	<P>
+		Finds the following region-of-interests (ROIs) from the tissue-probability maps for this file:
+<ol>
+<li> Gray Matter
+<li> White Matter
+<li> CSF
+<li> Bone
+<li> Soft Tissue
+
+
+</ol>
+	</P>
+
+	<P> 
+Nifti cannot store ROI names. ROI names may be loaded using the script "ROI/ROI naming from file", where "TPM_Based_ROIs.txt" should be selected.
+	</P>
+
+	<P> 
+
+ This script uses files named c1xxx to c5xxx that are created prior to this script, when the user executed "Apply atlas". 
+	</P>
+
+	<P> 
+        This script requires SPM packages to be added to the path.
+	</P>
+
+	<P> 
+        The SPM package can be found at <a href="http://www.fil.ion.ucl.ac.uk/spm/software/download.html">http://www.fil.ion.ucl.ac.uk/spm/software/download.html </a>
+	</P>
+
+
+	<P> 
+        See also SPM write
+	</P>

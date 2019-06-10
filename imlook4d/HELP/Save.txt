@@ -11,6 +11,7 @@ Saves medical images in the <B>same format</B> as it was opened (ECAT saved to E
 			<LI>  <B>Analyze </B> 
 			<LI>  <B>Nifti </B> 
 			<LI>  <B>Freesurfer (see requirements in Open help).  Freesurfer files can be saved as .mgz .mgh and .nii files (as selected by extension in save dialog)</B> 
+			<LI>  <B>GE PET raw data</B>. Time-of-flight (TOF) data must be explicitly opened in 4D mode (read help on Open), otherwise it cannot be saved.  Non-TOF data can be saved as is.
 		</UL>
 </P>
 
@@ -21,6 +22,9 @@ For instance, PCA-filter is applied before save.
 Display features, such as remove-negatives or invert, are not saved.
 </P>
 
+<P>
+DICOM JPEG-files are saved without JPEG compression".
+</P>
 
 <P>
 Files opened by other formats can be saved to an imlook4d state, using menu "File/Save state".

@@ -5,7 +5,7 @@
 
 % INITIALIZE
 StoreVariables
-Export
+ExportUntouched
 
     %  imlook4d_current_handles is updated whenever SCRIPTS menu in imlook4d is
     %  selected

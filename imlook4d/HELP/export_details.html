@@ -2,14 +2,14 @@
 <body> 
 <h1>Workspace Export - how it works</h1>
 
-	
+	Variables marked with "*" below are available for import.
 	<P>
 	<h3>The following variables are directly exposed (they are also available for import):</h3>
 		<UL>
 			<LI>  <B>imlook4d_Cdata *</B> <BR>
 				  This is the 4D image matrix with dimensions x,y,z,time or phase.  <BR>
-				  The displayed image is in x-y plane.
-				  The image is the original image, as used internally to derive the viewed image
+				  The displayed image is in x-y plane.<BR>
+				  imlook4d_Cdata contains the image as displayed when using "Export filtered", and contains raw data if using "Export (untouched)".
 			
 			<LI>  <B>imlook4d_ROI *</B> <BR>
 				  This is the ROIs (region-of-interests) represented as a 3D matrix with dimensions x,y,z.  

@@ -1,4 +1,4 @@
-function [activity, NPixels, stdev, maxActivity]=generateTACT(handles,ROI3D, roisToCalculate)
+function [activity, NPixels, stdev, maxActivity, roisToCalculate ]=generateTACT(handles,ROI3D, roisToCalculate)
 %function [activity, NPixels]=generateTACT(handles,image4D,ROI3D)
     %
     % This function generates a TACT curve.
@@ -17,13 +17,31 @@ function [activity, NPixels, stdev, maxActivity]=generateTACT(handles,ROI3D, roi
     %    NPixels        - number of pixels in roi [roi]
     %    stdev            - standard deviation of pixels in ROI [roi, frame]
     %    maxActivity    - max activity in ROI
+    %    roisToCalculate - report back one of: 
+    %       a) input argument roisToCalculate from the input argument
+    %       b) roi values that existed in ROI matrix
     %
     %disp('Entered generateTACT');
             % image4D = handles.image.Cdata
             numberOfSlices=size(handles.image.Cdata,3);
             numberOfFrames=size(handles.image.Cdata,4);
-            %numberOfROIs=max(ROI3D(:));
-            numberOfROIs=length( get(handles.ROINumberMenu,'String'))-1;
+            
+            try
+                numberOfROIs=length( get(handles.ROINumberMenu,'String'))-1;
+            catch
+                roinumbers =  unique(ROI3D(:));
+                roinumbers =  roinumbers( roinumbers ~= 0 ); % Exclude 0
+                numberOfROIs = length(roinumbers);
+            end
+            
+                        
+            if nargin < 3
+                roinumbers =  unique(ROI3D(:));
+                roinumbers =  roinumbers( roinumbers ~= 0 ); % Exclude 0
+                roisToCalculate = roinumbers;
+            end
+            
+            
             tempData=zeros(size(handles.image.Cdata),'single');
             
             % Determine what slices contain a ROI
@@ -32,40 +50,53 @@ function [activity, NPixels, stdev, maxActivity]=generateTACT(handles,ROI3D, roi
             indecesWithRoi=find(slicesWithRoi>0);
 
             
-            if nargin < 3
-                roisToCalculate = 1:numberOfROIs;
-            end
+            % Determine mode of operation
+                    IsNormalImage = get(handles.ImageRadioButton,'Value');
+                    IsPCAFilter = not( (get(handles.PC_low_slider, 'Value')==1) &&  (get(handles.PC_high_slider, 'Value')==numberOfFrames) ); % PCA-filter selected with sliders
+                    IsPCImage = get(handles.PCImageRadioButton,'Value');      % PC images radio button selected
+                    
+                    IsModel =  isa(handles.model.functionHandle, 'function_handle');
+                   
+                    IsDynamic = (numberOfFrames>1);
+
                         
             % Generate 4D image ONLY for slices with ROIs (zero for other slices)
             % This is to speed up calculations!
 
-             
-             % Generate 4D image only for slices containing ROI
-             %[tempData(:,:,indecesWithRoi,1:numberOfFrames), explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, indecesWithRoi, 1:numberOfFrames); 
-             %[tempData, explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, indecesWithRoi, 1:numberOfFrames);
+
+             % NEW Version
              
              % Fix that generateImage puts a single slice into a matrix of dimensions [:,:,1,:]
              % by putting generated image back into correct slice
-%              if (size(indecesWithRoi(:))==1)
-%                  % Single slice, put into slice 1 by generateImage
-%                  [tempData(:,:,indecesWithRoi,:), explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, indecesWithRoi, 1:numberOfFrames);
-%              else
-%                  % Multiple slices with ROI, correct dimensions of tempData
-%                  % matrix
-%                 %[tempData, explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, indecesWithRoi, 1:numberOfFrames);
-%                 
-%                 % Above was slow in imlook4d/generateImage -- this is faster for many ROIs
+             if ( IsNormalImage && ~IsModel && ~IsPCAFilter)
+                 % Quick
                 tempData = handles.image.Cdata;
-%              end
+             else
+                 % Slow, if PCA-filter or model
+                 if (size(indecesWithRoi(:))==1)
+                     % Single slice, put into slice 1 by generateImage
+                     [tempData(:,:,indecesWithRoi,:), explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, indecesWithRoi, 1:numberOfFrames);
+                     %[tempData, explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, indecesWithRoi, 1:numberOfFrames);
+                 else
+                     % Multiple slices with ROI, correct dimensions of tempData
+                     % matrix
+                     [tempData, explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, indecesWithRoi, 1:numberOfFrames);
+                     
+                     % Above was slow in imlook4d/generateImage -- this is faster for many ROIs
+                     %tempData = handles.image.Cdata;
+                     
+                 end
+              end
+
              numberOfFrames=size(tempData,4);
-
-
+             
 
             % Calculate TACT for each ROI
-             for i=roisToCalculate
+             for i= 1:length(roisToCalculate)
+                 roiValue = roisToCalculate(i);
                  %disp(i)
                     % Determine indeces to Cdata matrix for this ROI 
-                    indecesToROI=find(ROI3D==i);        % from ROI definition
+                    indecesToROI=find(ROI3D==roiValue);        % from ROI definition
                     NPixels(i)=size(indecesToROI,1);    % Number of pixels in ROI i
                     offset=size(ROI3D(:),1 );           % offset to next frame (number of pixels in volume)
                     allIndecesToROI=zeros(size(indecesToROI,1),numberOfFrames); % place for indeces in all frames

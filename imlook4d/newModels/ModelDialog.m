@@ -1,8 +1,11 @@
 function [answer, handles] = ModelDialog( handles, model_name, prompt, failedDefaultAnswers)
-
 %
 % Dialog
 %
+% Stores input variables in imlook4d instance, 
+% and global in workspace as fallback.
+%
+% 
 
 % Defaults from local instance if exists, otherwise second alternative
 try 
@@ -15,6 +18,9 @@ end
 title=[ model_name ' inputs'];
 numlines=1;
 answer=inputdlg(prompt,title,numlines,defaultanswer);
+if isempty(answer) % cancelled inputdlg
+    return
+end
 
 % Store answer as new global dialog default
 StoreValues(model_name, answer); 

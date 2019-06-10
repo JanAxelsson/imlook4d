@@ -51,6 +51,12 @@ StartScript;
             duration=ones(size(imlook4d_Cdata,4));
             time=duration;  % 
         end
+        
+        % If duration not set, set it to 1
+%         if sum(max(duration)) == 0
+%             duration=ones(size(imlook4d_Cdata,4));
+%             time=duration;  % 
+%         end
 
 %         try                     
 %            %  Integrate decay-corrected data 

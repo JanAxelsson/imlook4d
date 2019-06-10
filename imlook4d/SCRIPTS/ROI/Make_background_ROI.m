@@ -31,15 +31,24 @@ StartScript;
     % Add new ROI
     temp=get(imlook4d_current_handles.ROINumberMenu,'String');
     newROIName=[ 'Background' temp{imlook4d_ROI_number} ]
-    newROINumber=MakeROI(newROIName);
+    newROINumber = MakeROI(newROIName);
+    
+    % Make matrix with locked pixels
+    ROILock = zeros( size(imlook4d_ROI) ,'uint8');
+    numberOfROIs = max( imlook4d_ROI(:));
+    for i=1:numberOfROIs
+        ROILock(imlook4d_ROI == i ) =  imlook4d_current_handles.image.LockedROIs(i) ; % Set to 1 if Locked ROI
+    end
 
     
     % Draw ROI
     for i=-dx:dx
         for j=-dy:dy
             for k=-dz:dz
-                if ( ( i*i/dx^2 +j*j/dy^2 +k*k/dz^2 ) <= 1 ) & ( imlook4d_ROI(x+i,y+j,z+k)~=imlook4d_ROI_number )
-                        imlook4d_ROI(x+i,y+j,z+k)=newROINumber;
+                if ( ( i*i/dx^2 +j*j/dy^2 +k*k/dz^2 ) <= 1 ) ...
+                        & ( imlook4d_ROI(x+i,y+j,z+k) ~= imlook4d_ROI_number ) ...
+                        & ROILock(x+i,y+j,z+k) == 0 
+                        imlook4d_ROI(x+i,y+j,z+k) = newROINumber;
                 end
             end
         end

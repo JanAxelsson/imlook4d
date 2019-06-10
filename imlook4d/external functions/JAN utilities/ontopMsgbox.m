@@ -4,7 +4,7 @@ function handle=ontopMsgbox(parentWindowHandle, message, title)
 %
 % Returns handle to selected window
 
-        h = msgbox(message,title)
+        h = msgbox(message,title);
         while ishandle(h)
             pause(3)
             if gcf~=parentWindowHandle

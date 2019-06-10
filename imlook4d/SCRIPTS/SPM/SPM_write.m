@@ -1,3 +1,7 @@
+if ~verifySpmExists()
+    return
+end
+
 StoreVariables;
 Export;
 

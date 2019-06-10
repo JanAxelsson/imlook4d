@@ -31,17 +31,26 @@
 %
 % RUN
 %
+    defaultanswer = RetriveEarlierValues('plotDicomTagDialog', {'0054', '1300' } ); % Read default if exists, or apply these as default
+
     prompt={'Group','Tag'};
             title='DICOM tag';
             numlines=1;
-            defaultanswer={'0054', '1300' };
-            answer=inputdlg(prompt,title,numlines,defaultanswer);
+            %defaultanswer={'0054', '1300' };
+    answer=inputdlg(prompt,title,numlines,defaultanswer);
+          
+    if isempty(answer) % cancelled inputdlg
+        return
+    end
+    StoreValues('plotDicomTagDialog', answer ); % Store answer as new dialog default
+
 
     for i=1:numberOfSlices
          out=dirtyDICOMHeaderData(sortedHeaders, i+numberOfSlices*(currentFrame-1), answer{1}, answer{2},mode);  
-         val(i)=str2num(out.string)
+        % val(i)=str2num(out.string)
          
          %out.bytes(1)+256*out.bytes(2)
+         val(i) = DicomBytesToDouble( out.valueRepresentation, out.bytes);
     end
 
     figure;

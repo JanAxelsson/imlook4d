@@ -7,5 +7,7 @@ This script is used to resize an image slice by slice into a new matrix size.
 </p>
 
 
-
+<p> 
+Note: DICOM cannot be saved if Resize 2D is performed in Sagital or Coronal plane, when the number of slices is changed.  Changing the radial direction should work fine.  
+</p>
 

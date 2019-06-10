@@ -7,7 +7,7 @@
 	</P>
 	
 	<P>
-	Selecting a ROI name from the drop-down list, displays the lowest slice number where this ROI is drawn.
+	Selecting a ROI name from the drop-down list, displays the slice with the highest pixel within the selected ROI.
 	</P>
 	
 	<P>

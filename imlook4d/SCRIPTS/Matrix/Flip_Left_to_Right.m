@@ -1,3 +1,4 @@
+
 % Flip_Left_to_Right.m
 %
 % SCRIPT for imlook4d
@@ -5,7 +6,7 @@
 
 % INITIALIZE
 StoreVariables
-Export
+ExportUntouched
 
     %  imlook4d_current_handles is updated whenever SCRIPTS menu in imlook4d is
     %  selected
@@ -16,8 +17,11 @@ Export
     %imlook4d('exportToWorkspace_Callback', imlook4d_current_handle,{},imlook4d_current_handles);  % Export to workspace
     
     % Flip
-    imlook4d_Cdata=flipdim(imlook4d_Cdata,1);
-    imlook4d_ROI=flipdim(imlook4d_ROI,1);
+     imlook4d_Cdata=flipdim(imlook4d_Cdata,1);
+     imlook4d_ROI=flipdim(imlook4d_ROI,1);
+    
+%     imlook4d_current_handles.image.Cdata = flipdim( imlook4d_current_handles.image.Cdata,1);
+%     imlook4d_current_handles.image.ROI = flipdim( imlook4d_current_handles.image.ROI,1);
         
     % Import into imlook4d
    % imlook4d('importFromWorkspace_Callback', imlook4d_current_handle,{},imlook4d_current_handles); % Import from workspace to current imlook4d instance

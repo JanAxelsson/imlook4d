@@ -17,7 +17,7 @@ Export
         fullPath=[path filesep file];  % hdr file (img file was opened) 
         fid=fopen(fullPath);
 
-        C = textscan(fid, '%f %f %f %f', 'headerLines', 1)
+        C = textscan(fid, '%f %f %f %f %f', 'headerLines', 1)
         imlook4d_time=C{1}';
         imlook4d_duration= (C{2}-C{1})';                           
         [ 'time' 'duration'];

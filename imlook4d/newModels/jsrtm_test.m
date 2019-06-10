@@ -75,7 +75,7 @@ size(a.pars{1})
 toc;tic;
 
 % One slice
-a = jjsrtm( imlook4d_Cdat a(:,:,20,:), imlook4d_time, imlook4d_duration, ref);
+a = jjsrtm( imlook4d_Cdata(:,:,20,:), imlook4d_time, imlook4d_duration, ref);
 size(a.pars{1})
 toc;tic;
 

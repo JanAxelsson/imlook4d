@@ -7,7 +7,7 @@ function trueTACT = gtm( measTACT, ROIs, P)
 % INPUT:
 %   measTACT measured ROI values [frame, roi].  1D if static scan.  2D if dynamic scan.
 %   ROIs    3D matrix with ROI indeces
-%   P       Recovery map, pixel by pixle.  Create by pveMap command
+%   P       Recovery map, pixel by pixel.  Create by pveMap command
 %
 % OUTPUT:
 %   trueTACT   PVE-corrected true TACT values
@@ -76,7 +76,7 @@ function trueTACT = gtm( measTACT, ROIs, P)
             % Find signal from each ROI that goes into static ROI
             for j=roiNumbers
                 PP = P(:,:,:,j); % 3D pve map of this ROI
-                indeces = find(ROIs==i);        % Pixel indeces to static ROI
+                indeces = find(ROIs==i);        % Pixel indeces to static ROI 
                 W(i,j) = mean( PP(indeces) );   % Cross talk (from ROI j to ROI i)
             end
             

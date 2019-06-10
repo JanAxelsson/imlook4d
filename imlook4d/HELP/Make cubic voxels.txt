@@ -1,0 +1,16 @@
+
+<h1>Make cubic voxels</h1>
+<HR></HR>
+<!------------------->
+<p> 
+This script converts voxels to cubic voxels. The dimension may be edited by user, where the suggested default is matching the smallest side of original voxels.  
+</p>
+
+
+
+
+<p> 
+Note: DICOM cannot be saved if this script changes the number of slices.  If the voxel size matches that in the scanner z-direction,  the number of slices should be fine.
+</p>
+
+
