@@ -2,12 +2,33 @@ TODO
 =====
 
 DEVELOP
+<<<<<<< Updated upstream
 [  ]   Add Models for ratio, clearance
 [  ]   Way to mask image (except for ROI).  SRTM fails badly if not masked
        1) Auto-mask  max(imlook4d_Cdata,[],4)
 [  ]   Logan 
 [  ]   Vectorize Zhou SRTM, SRTM2
 [  ]   HELP files for models 
+=======
+
+
+[  ]   Add Extended SRTM (doi:10.1016/j.neuroimage.2006.06.038)
+
+[  ]   Add Model for Retention index
+[  ]   Add Models for  clearance
+
+[  ]	Make reference Patlak -- or save ref region to variable
+
+[  ]   Vectorize SRTM, SRTM2 (possible?)
+
+[  ]   Make mask, allowing models on images to work better
+
+[  ]   Script rotate button
+
+[  ]   Trim2D and Trim3D, change location
+[  ]   SPM, if DICOM, automatically make DICOM
+[  ]   SPM, "coregister to", allow to click and select other window (as well as file dialog which we have now)
+>>>>>>> Stashed changes
 
 
 WISHLIST
