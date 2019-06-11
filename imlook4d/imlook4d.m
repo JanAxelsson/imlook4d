@@ -6590,7 +6590,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             { '*.roi;*.nii;*.nii.gz', 'ROI file' ; ...
                             '*.mat;*.roi','imlook4d ROI'; ...
                              '*.nii', 'ROI from Nifti';   ...
-                            '*.nii.gz','Nifti Files (*.nii.gz)'} ...
+                            '*.nii.gz','Nifti Files (*.nii.gz)'; ...
+                            '*.*', 'RTSTRUCT'; ...
+                            '*.*', 'Any file' } ...
                            ,'ROI Open file name');
                 
                 fullPath=[path file];
@@ -6682,6 +6684,24 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             end 
             
             
+            if ~exist('rois')
+                disp('Maybe RTSTRUCT?');
+                rtssfile = fullPath;
+                imagedir = handles.image.folder;
+                [rois, roiNames] = readRTSTRUCT( rtssfile, imagedir); 
+                roiNames{end + 1}='Add ROI';
+                
+                roiSize = size(rois);
+                
+                % Reverse z-order
+                INSTANCE_NR_COL = 8;
+                if handles.image.DICOMsortedIndexList(1,INSTANCE_NR_COL) > 1
+                    rois = flip(rois,3);
+                end
+                
+                % Flip y-axis
+                rois = flip(rois,2); 
+            end
 
             handles.image.ROI= reshape(uint8(full(rois)), roiSize); % Make (sparse double 1D) matrix to (int 8 4D) matrix 
             %UNDOSIZE = length(handles.image.UndoROI.ROI);
