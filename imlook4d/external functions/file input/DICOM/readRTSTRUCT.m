@@ -1,4 +1,4 @@
-function ROI = readRTSTRUCT( rtssfile, imagedir)
+function [ROI, ROINames] = readRTSTRUCT( rtssfile, imagedir)
 
     % Files from https://github.com/ulrikls/dicomrt2matlab
 
@@ -20,8 +20,14 @@ function ROI = readRTSTRUCT( rtssfile, imagedir)
         contours = readRTstructures(rtssheader, imageheaders); % #ok<NASGU>
         %contours = convexPoints2bin(contours, imageheaders); %#ok<NASGU>
         
-        % TODO: Loop through contours to get all ROIs
-        %       ROI name is within contours
+        ROI = zeros( size(contours(1).Segmentation), 'uint8');
+        for i=1:length(contours)
+            ROI( contours(i).Segmentation(:) ) = uint8(i);
+            ROINames{i} = contours(i).ROIName;
+        end
+        
+        ROINames = ROINames';
 
-    ROI = uint8( contours.Segmentation );
+        
+
 

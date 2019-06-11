@@ -1,5 +1,13 @@
 <h1>Load ROI </h1>
 <HR></HR>
 <!------------------->
-Loads a ROI definition file.
+Loads a ROI definition file.  
+
+Allowed formats are 
+<ul>
+<li> imlook4d ROI format
+<li> Nifti nii
+<li> Compressed Nifti nii.gz
+<li> DICOM RTSTRUCT
+</ul>
 
