@@ -18,7 +18,7 @@ folder = fileparts(which('FreeSurferColorLUT.txt') );  % Identify folder by file
 cd(folder);
 
 if nargin==1
-    [pathstr,name,ext] = fileparts(filePath);
+    [path,name,ext] = fileparts(filePath);
     file = [name ext];  
 end
 if nargin==0
