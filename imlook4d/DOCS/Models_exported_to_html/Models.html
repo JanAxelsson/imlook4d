@@ -7,7 +7,7 @@
 	<meta name="author" content="Jan Axelsson"/>
 	<meta name="created" content="2013-03-11T09:25:25"/>
 	<meta name="changedby" content="JA"/>
-	<meta name="changed" content="2019-05-08T17:32:34.705881500"/>
+	<meta name="changed" content="2019-06-25T15:44:23.200436082"/>
 	<style type="text/css">
 		@page { margin: 2.01cm }
 		p { margin-bottom: 0.2cm }
@@ -100,10 +100,9 @@ binding)</h2>
 and for making model images (parametric images). The models calculate
 non-displaceable Binding Potential, <i>BP</i><sub><i>ND</i></sub> ,
 which is a combined measure of available receptor density <i>B</i><sub><i>avail</i></sub><i>
-</i>and affinity <i><span style="text-decoration: none">1/K</span></i><sub><i><span style="text-decoration: none">D</span></i></sub>.
- <i>BP</i><sub><i>ND </i></sub>=  <i>B</i><sub><i>avail</i></sub><i>
-/ K</i><sub><i>D</i></sub>.<sub><i>  </i></sub><span style="font-style: normal">Many
-of the model</span><span style="font-style: normal">s</span><span style="font-style: normal">
+</i>and affinity <i><u>1/K</u></i><sub><i><u>D</u></i></sub>.  <i>BP</i><sub><i>ND
+</i></sub>=  <i>B</i><sub><i>avail</i></sub><i> / K</i><sub><i>D</i></sub>.<sub><i>
+ </i></sub><span style="font-style: normal">Many of the model</span><span style="font-style: normal">s</span><span style="font-style: normal">
 gives additional parameters, at the cost of robustness especially for
 model images. Therefore, the choice of model is dependent on data
 quality and what parameters are of interest.</span></p>
@@ -123,9 +122,9 @@ Input parameters are:<br/>
 - end frame<br/>
 - <i>k</i><sub><i>2</i></sub><sub><i>p</i></sub>
 	transport from free to plasma, which for some tracers (for instance
-	raclopride) can be ignored by leaving this field <span style="text-decoration: none">blank
-	</span><span style="text-decoration: none">(</span><span style="text-decoration: none">value
-	</span><span style="text-decoration: none">0  is not allowed</span><span style="text-decoration: none">).</span></p>
+	raclopride) can be ignored by leaving this field <u>blank</u><span style="text-decoration: none">
+	</span><u>(</u><u>value </u><u>0 </u><span style="text-decoration: none">
+	is not allowed</span><span style="text-decoration: none">).</span></p>
 	<p align="left"><br/>
 See
 	<a href="https://doi.org/10.1016/S0969-8051(00)00137-2">https://doi.org/10.1016/S0969-8051(00)00137-2</a><font color="#228b22"><font face="courier, serif"><font size="2" style="font-size: 10pt"><br/>
@@ -206,6 +205,7 @@ Input parameter:<br/>
 <br/>
 SRTM2 is preferred over SRTM for model images,
 	since it is more robust.<br/>
+<br/>
 See
 	<a href="https://doi.org/10.1097/01.WCB.0000033967.83623.34">https://doi.org/10.1097/01.WCB.0000033967.83623.34</a><font color="#228b22"><font face="courier, serif"><font size="2" style="font-size: 10pt"><br/>
 </font></font></font><font color="#000000"><font face="Times New Roman, serif"><font size="2" style="font-size: 11pt">This
@@ -219,7 +219,75 @@ See
 2. Fix k2</font></font></font><font color="#000000"><font face="Times New Roman, serif"><font size="2" style="font-size: 11pt">p</font></font></font><font color="#000000"><font face="Times New Roman, serif"><font size="2" style="font-size: 11pt">
 	to the global value and calculate functional images of BP and R1
 	</font></font></font><font color="#000000"><font face="Times New Roman, serif"><font size="2" style="font-size: 11pt">(using
-	the SRTM2 function in imlook4d – my comment)</font></font></font></p>
+	the SRTM2 function in imlook4d – my comment)<br/>
+</font></font></font><br/>
+<br/>
+
+	</p>
+	<li/>
+<p><font size="3" style="font-size: 12pt"><b><font color="#000000"><font face="Times New Roman, serif">Extended
+	SRTM – </font></font><font color="#000000"><font face="Times New Roman, serif">change
+	of condition at a time point </font></font><font color="#000000"><font face="Times New Roman, serif"><i>T</i></font></font><font color="#000000"><sub><font face="Times New Roman, serif"><i>0</i></font></sub></font><font color="#000000"><font face="Times New Roman, serif">.
+	</font></font></b><font color="#000000"><font face="Times New Roman, serif"><span style="font-weight: normal">The
+	conditions may be a pharmacological challenge, or a task  switch at
+	time </span></font></font><font color="#000000"><font face="Times New Roman, serif"><i><span style="font-weight: normal">T</span></i></font></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">0</span></i></font></sub></font><font color="#000000"><font face="Times New Roman, serif"><i><span style="font-weight: normal">
+	</span></i></font></font><font color="#000000"><font face="Times New Roman, serif"><span style="font-weight: normal">within
+	the same scan.  Assumes that all parameters except BP are constant
+	over the whole scan, and that BP changes from constant level </span></font></font><font color="#000000"><font face="Times New Roman, serif"><i><span style="font-weight: normal">BP</span></i></font></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">ND</span></i></font></sub></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">0</span></i></font></sub></font><font color="#000000"><font face="Times New Roman, serif"><span style="font-weight: normal">
+	to </span></font></font><font color="#000000"><font face="Times New Roman, serif"><i><span style="font-weight: normal">BP</span></i></font></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">ND</span></i></font></sub></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">1</span></i></font></sub></font><font color="#000000"><font face="Times New Roman, serif"><span style="font-weight: normal">
+	 at time </span></font></font><font color="#000000"><font face="Times New Roman, serif"><i><span style="font-weight: normal">T</span></i></font></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">0</span></i></font></sub></font><font color="#000000"><font face="Times New Roman, serif"><i><span style="font-weight: normal">.</span></i></font></font><b><font color="#000000"><font face="Times New Roman, serif"><i><br/>
+</i></font></font></b><font color="#000000"><font face="Times New Roman, serif"><i><span style="font-weight: normal">-
+	</span></i></font></font><font color="#000000"><font face="Times New Roman, serif"><i><span style="font-weight: normal">d</span></i></font></font><font color="#000000"><font face="Times New Roman, serif"><i><span style="font-weight: normal">BP</span></i></font></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">
+	  </span></i></font></sub></font><font color="#000000"><font face="Times New Roman, serif"><span style="font-style: normal"><span style="font-weight: normal">Binding
+	potential </span></span></font></font><font color="#000000"><font face="Times New Roman, serif"><span style="font-style: normal"><span style="font-weight: normal">difference
+	 = </span></span></font></font><font color="#000000"><font face="Times New Roman, serif"><i><span style="font-weight: normal">BP</span></i></font></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">ND</span></i></font></sub></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">1
+	</span></i></font></sub></font><font color="#000000"><font face="Times New Roman, serif"><i><span style="font-weight: normal">-</span></i></font></font><font color="#000000"><font face="Times New Roman, serif"><span style="font-style: normal"><span style="font-weight: normal">
+	 </span></span></font></font><font color="#000000"><font face="Times New Roman, serif"><i><span style="font-weight: normal">BP</span></i></font></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">ND</span></i></font></sub></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">0
+	</span></i></font></sub></font><b><font color="#000000"><font face="Times New Roman, serif"><br/>
+</font></font></b><font color="#000000"><font face="Times New Roman, serif"><span style="font-weight: normal">-
+	</span></font></font><font color="#000000"><font face="Times New Roman, serif"><i><span style="font-weight: normal">BP</span></i></font></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">ND</span></i></font></sub></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">0
+	  </span></i></font></sub></font><font color="#000000"><font face="Times New Roman, serif"><span style="font-style: normal"><span style="font-weight: normal">Binding
+	potential before </span></span></font></font><font color="#000000"><font face="Times New Roman, serif"><i><span style="font-weight: normal">T</span></i></font></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">0</span></i></font></sub></font><font color="#000000"><font face="Times New Roman, serif"><span style="font-weight: normal"><br/>
+-
+	</span></font></font><font color="#000000"><font face="Times New Roman, serif"><i><span style="font-weight: normal">BP</span></i></font></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">ND</span></i></font></sub></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">1
+	  </span></i></font></sub></font><font color="#000000"><font face="Times New Roman, serif"><span style="font-style: normal"><span style="font-weight: normal">Binding
+	potential after </span></span></font></font><font color="#000000"><font face="Times New Roman, serif"><i><span style="font-weight: normal">T</span></i></font></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">0</span></i></font></sub></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal"><br/>
+</span></i></font></sub></font><font color="#000000"><font face="Times New Roman, serif"><span style="font-weight: normal">-
+	</span></font></font><font color="#000000"><font face="Times New Roman, serif"><i><span style="font-weight: normal">R</span></i></font></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">1</span></i></font></sub></font><font color="#000000"><font face="Times New Roman, serif"><i><span style="font-weight: normal">
+	= K</span></i></font></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">1</span></i></font></sub></font><font color="#000000"><font face="Times New Roman, serif"><i><span style="font-weight: normal">/K</span></i></font></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">1ref</span></i></font></sub></font><font color="#000000"><font face="Times New Roman, serif"><span style="font-weight: normal">
+	accounting for difference in delivery for region and reference
+	region<br/>
+- </span></font></font><font color="#000000"><font face="Times New Roman, serif"><i><span style="font-weight: normal">k</span></i></font></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">2</span></i></font></sub></font><font color="#000000"><font face="Times New Roman, serif"><span style="font-weight: normal">
+	transport from free to plasma in region of interest<br/>
+- </span></font></font><font color="#000000"><font face="Times New Roman, serif"><i><span style="font-weight: normal">k</span></i></font></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">2p</span></i></font></sub></font><font color="#000000"><font face="Times New Roman, serif"><span style="font-weight: normal">
+	transport from free to plasma from reference region<br/>
+<br/>
+Input
+	parameter:<br/>
+- </span></font></font><font color="#000000"><font face="Times New Roman, serif"><span style="font-weight: normal">Frame
+	number, at which the change in condition occurs.  An experiment is
+	ideally designed so that the change occurs exactly between two
+	frames, so the frame number is the first frame starting at time
+	</span></font></font><font color="#000000"><font face="Times New Roman, serif"><i><span style="font-weight: normal">T</span></i></font></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">0</span></i></font></sub></font><font color="#000000"><font face="Times New Roman, serif"><i><span style="font-weight: normal">.</span></i></font></font><font color="#000000"><font face="Times New Roman, serif"><span style="font-weight: normal"><br/>
+<br/>
+in
+	addition the following parameter, used in the calculation, </span></font></font><font color="#000000"><font face="Times New Roman, serif"><span style="font-weight: normal">are</span></font></font><font color="#000000"><font face="Times New Roman, serif"><span style="font-weight: normal">
+	reported:<br/>
+- </span></font></font><font color="#000000"><font face="Times New Roman, serif"><i><span style="font-weight: normal">k</span></i></font></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">2a</span></i></font></sub></font><font color="#000000"><font face="Times New Roman, serif"><i><span style="font-weight: normal">,
+	k</span></i></font></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">2</span></i></font></sub></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">b</span></i></font></sub></font><font color="#000000"><font face="Times New Roman, serif"><span style="font-weight: normal">
+	apparent (overall) rate constant for transfer from specific
+	compartment to plasma </span></font></font><font color="#000000"><font face="Times New Roman, serif"><span style="font-weight: normal">
+	before </span></font></font><font color="#000000"><font face="Times New Roman, serif"><i><span style="font-weight: normal">T</span></i></font></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">0
+	</span></i></font></sub></font><font color="#000000"><font face="Times New Roman, serif"><span style="font-weight: normal">(</span></font></font><font color="#000000"><font face="Times New Roman, serif"><i><span style="font-weight: normal">k</span></i></font></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">2a</span></i></font></sub></font><font color="#000000"><font face="Times New Roman, serif"><span style="font-weight: normal">)
+	and after </span></font></font><font color="#000000"><font face="Times New Roman, serif"><i><span style="font-weight: normal">T</span></i></font></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">0
+	</span></i></font></sub></font><font color="#000000"><font face="Times New Roman, serif"><span style="font-weight: normal">(</span></font></font><font color="#000000"><font face="Times New Roman, serif"><i><span style="font-weight: normal">k</span></i></font></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">2</span></i></font></sub></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">b</span></i></font></sub></font><font color="#000000"><font face="Times New Roman, serif"><span style="font-weight: normal">)</span></font></font><font color="#000000"><font face="Times New Roman, serif"><span style="font-weight: normal">.
+	This comes from the assumption of kinetics being hard to distinguish
+	between reference region and region of interest.<br/>
+<br/>
+See
+	</span></font></font><font color="#000000"><font face="Times New Roman, serif"><span style="font-weight: normal"><a href="https://doi.org/10.1016/j.neuroimage.2006.06.038">https://doi.org/10.1016/j.neuroimage.2006.06.038</a>
+	</span></font></font></font>
+	</p>
 	<p align="left" style="margin-bottom: 0cm"></p>
 </ul>
 <p align="left"><font face="Arial, sans-serif"><font size="4" style="font-size: 14pt"><i><b>Irreversible
@@ -299,7 +367,7 @@ No
 	input parameters asked for.</span></span></span></span><span style="font-variant: normal"><span style="text-decoration: none"><span style="letter-spacing: normal"><span style="font-weight: normal"><br/>
 <br/>
 </span></span></span></span><span style="font-variant: normal"><span style="text-decoration: none"><span style="letter-spacing: normal"><span style="font-weight: normal">See
-	</span></span></span></span><a href="https://doi.org/10.1177/0271678X17730654"><span style="font-weight: normal">https://doi.org/10.1177/0271678X17730654</span></a><span style="font-variant: normal"><span style="text-decoration: none"><span style="letter-spacing: normal"><span style="font-weight: normal"><br/>
+	</span></span></span></span><b><a href="https://doi.org/10.1177/0271678X17730654">https://doi.org/10.1177/0271678X17730654</a></b><span style="font-variant: normal"><span style="text-decoration: none"><span style="letter-spacing: normal"><span style="font-weight: normal"><br/>
 
 	</span></span></span></span></font></font></font><br/>
 
