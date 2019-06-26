@@ -2732,7 +2732,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
          updateImage(hObject, eventdata, handles); 
          updateROIs(handles);
-         
+    function TactButtonCallback(hObject, eventdata, handles)
+      % Display HELP and get out of callback
+         if DisplayHelp(hObject, eventdata, handles) 
+             return 
+         end     
+        imlook4d('ScriptsMenu_Callback',get(gcbo,'Parent'),[],guidata(gcf));Time_activity_curve
+            
     % --------------------------------------------------------------------
     % SELECTIONS
     % --------------------------------------------------------------------
@@ -2747,7 +2753,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                  % menu will not be drawn.
                  ROINumber=get(hObject,'Value');
                  if DisplayHelp(hObject, eventdata, handles) 
-                     set(hObject,'Value', ROINumber)
+                     set(hObject,'Value', ROINumber); % Reset value to when clicked
                      return 
                  end
 
@@ -9108,12 +9114,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
     % Help and HTML functions
     % --------------------------------------------------------------------
        function trueIfChecked = DisplayHelp(hObject, eventdata, handles)
+           % HELP, and SCRIPT RECORDING
            %
            % Note: To make a new Help text work:
-           % 1) Make a text file in HELP directory named after the element Tag, or Name
+           % 1) Make a text file in HELP directory named after the element Tag, Name, or String
            % 2) Modify helpToggleTool_OnCallback, and helpToggleTool_OffCallback functions above
             
-               %ScriptFlag=true;  % Turn scripting ON (true)  or  OFF (false)
+                % Turn scripting ON (true)  or  OFF (false)
                ScriptFlag = handles.record.enabled;
                HelpFlag=strcmp( get(handles.helpToggleTool, 'State'), 'on') ;
 
@@ -9126,7 +9133,6 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                callbackString=['imlook4d(''' callBackFunctionName ''', imlook4d_current_handles.' get(hObject,'Tag') ',{} ,imlook4d_current_handles)'];
                
 
-                   
                    % Notes:buttonsSameNameAsPressed
                    % SCRIPT, MODEL, COLOR, WINDOW LEVEL  submenu - called directly from callback, must be intercepted directly in script
                    % See commented example in SCRIPTS menu defintions, on
@@ -9134,208 +9140,121 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                    
 
                title= 'imlook4d help';
+               
+               % --------------------------------------
+               %     HELP
+               % --------------------------------------
 
 
                %
                % If toolbar Help button is pressed, display html-help
                %
                    %if strcmp(get(handles.helpToggleTool, 'State'), 'on') || strcmp(callBackFunctionName, 'Help_Callback')
-                    if HelpFlag
-                       %disp('imlook4d/DisplayHelp entered');
+                   if HelpFlag                    
 
-                       % Get path to help directory
-                       [pathstr1,name,ext] = fileparts(which('imlook4d'));
-
-                       % Get path to help file
-                       try
-                            %helpFilePath=[pathstr1 filesep 'HELP' filesep get(hObject,'Label') '.txt' ];
-                            helpFilePath=[get(hObject,'Label') '.txt' ];
-                       catch
-                            % Toolbar buttons don't have 'Label', use 'Tag' instead
-                            %helpFilePath=[pathstr1 filesep 'HELP' filesep get(hObject,'Tag') '.txt' ];
-                            helpFilePath=[get(hObject,'Tag') '.txt' ];
-                       end
-                       
-                       % If html-string in Label
-                       try
-                           labelString = get(hObject,'Label');
-                           if strcmp( labelString(1:6),'<html>')
-                               helpFilePath=[get(hObject,'Tag') '.txt' ];
-                           end
-                       catch
-                       end
-                       
-                       intendedhelpFilePath = helpFilePath;
-                       
-                       %disp(['Help file path=' helpFilePath]); 
-
-                       % Read text and footer
-                       try
-                           % Replace spaces with underscores in file name
-                           % (as in SCRIPT file naming rules)
-                            [pathstr,name,ext] = fileparts(helpFilePath);
-                            name1=strrep(name,' ','_');
-                            name=strrep(name,'_',' ');
-                            %helpFilePath=[ pathstr filesep name ext];
-                            text =  fileread(helpFilePath);
-                       catch
-                           % Read from parent object instead (useful for
-                           % submenues that do not have any help
-                           % file.
-                           disp([ 'Missing help file - could not find file=' helpFilePath]);
-                           helpFilePath=[pathstr1 filesep 'HELP' filesep get(hObject,'Label') '.txt' ];
+                         % Get path to help directory
+                           [imlook4dFolder,name,ext] = fileparts(which('imlook4d'));
+                           helpFolder = [ imlook4dFolder filesep 'HELP'];
                            
-                           matlabCommand = ['copyfile(''' [ pathstr1 filesep 'HELP' filesep 'helpTemplate.txt'] ''' ,''' [ pathstr1 filesep 'HELP' filesep get(hObject,'Label') '.txt'] ''');' ];
-                           matlabCommand = [ matlabCommand 'edit(''' [ pathstr1 filesep 'HELP' filesep get(hObject,'Label') '.txt'] ''');']
-                               
-                           disp( [ 'Help file did not exist. Create file here: <a href="matlab:' matlabCommand '">' helpFilePath '</a>' ]);
-
                            
+                        % Get name from Object Label, Tag, String
+                            try
+                                objectName = get(hObject,'Label');
+                                if strcmp( objectName(1:2),'<h') % <html> starts with <h
+                                    objectName=get(hObject,'Tag'); % For html labels, I use tag as name
+                                end
+                                objectName0=strrep(objectName,' ','_');
+                                objectName=strrep(objectName0,'_',' ');
+                            catch
+                                objectName = '';
+                            end
+                            
+                            try
+                                altObjectName=get(hObject,'Tag');
+                                altObjectName0=strrep(altObjectName,' ','_');
+                                altObjectName=strrep(altObjectName0,'_',' ');
+                            catch
+                                altObjectName = '';
+                            end
+                            
+                         
+                            try
+                                alt2ObjectName=get(hObject,'String');
+                                if iscellstr(alt2ObjectName)
+                                    alt2ObjectName=alt2ObjectName{1}; % For instance, ROI number menu can be cell array of Strings
+                                end
+                                
+                                alt2ObjectName0=strrep(alt2ObjectName,' ','_');
+                                alt2ObjectName=strrep(alt2ObjectName0,'_',' ');
+                            catch
+                                alt2ObjectName = '';
+                            end
+
+                       % Read help text
                            try
-                                parentObject=get(hObject,'Parent');
-                                helpFilePath=[pathstr1 'HELP' get(parentObject,'Label') '.txt' ];
-                                text =  fileread(helpFilePath);
+                               % Get possible file names
+                                helpFileName = [ helpFolder filesep objectName '.txt' ];
+                                altHelpFileName = [ helpFolder filesep altObjectName '.txt' ];
+                                altHelpFileName2 = [ helpFolder filesep alt2ObjectName '.txt' ];
+                                
+                                % Select correct file name
+                                if isfile(helpFileName)
+                                    correctFileName = helpFileName;
+                                end
+                                
+                                if isfile(altHelpFileName)
+                                    correctFileName = altHelpFileName;
+                                end                               
+                                
+                                if isfile(altHelpFileName2)
+                                    correctFileName = altHelpFileName2;
+                                end          
+                                
+                                % Read help text
+                                text =  fileread(correctFileName );
                            catch
-                               % Read from Parent object again
-                                parentObject=get(parentObject,'Parent');
-                                try
-                                    helpFilePath=[ get(parentObject,'Label') '.txt' ];
-                                    text =  fileread(helpFilePath);
-                                catch  
-                                    try
-                                        helpFilePath=[ get(parentObject,'Tag') '.txt' ];
-                                        text =  fileread(helpFilePath);   
-                                    catch
-                                        return;
-                                    end
-                                end
+                               text = ['WARNING - could not find help file = ' helpFileName ];
+                               disp(text);
                            end
-                       end
-                       footerFilePath=[ 'Footer.txt' ];
-                       footer =  fileread(footerFilePath);
 
-                       % Developers reference 
-                       %        (as defined in /HELP/About.txt)
-                       %        info about: callback function, help file, etc
-                       %if strcmp(getImlook4dVersion(),'DEVELOP')
-                       if true % Always show developers reference
-                            % Title
-                                %developersText=[  '<HR><BR><BR><BR><BR>' '<h3><U>Developers reference:</U></h3>' EOL];  
-                                
-                                
-                                % The footer.txt has javascripts common to all help files.  
-                                % This allows to toggle Developers reference on/off
-                                displayStyle='font-size: 9px;';
-                                %displayStyle='none';
-                                developersText=[  '<div id="test" style="display:block;' displayStyle ' ">' '<HR>' '<h3><U>Developers reference:</U></h3>' EOL];
-                            % Start table
-                                developersText=[ developersText '<table style="display:block;' displayStyle ' ">' EOL];
-                                 
-                            % Link to edit help file
-                                developersText=[ developersText  parseHTMLTableRow(  ...
-                                    '<B>Help file=</B>',...
-                                     ['<a href="matlab:edit ''' helpFilePath '''">'   helpFilePath '</a>']) ...
-                                     ];  
-                               
-                                 
-                                [basepath,name,ext] = fileparts(which('A.txt'));
-                                developersText=[ developersText  parseHTMLTableRow(  ...
-                                    '<B>Intended help file=</B>',...
-                                     ['<a href="matlab:edit ''' [ basepath filesep intendedhelpFilePath ] '''">'  intendedhelpFilePath  '</a>']) ...
-                                     ];    
-                                 
-                                 
-                            % Object tag
-                               developersText=[ developersText  parseHTMLTableRow(  ...
-                                    '<B>Object tag=</B>',...
-                                    get(hObject,'Tag') )...
-                                    ];             
-                                
-                            % Label tag
-                                try
-                                    developersText=[ developersText  parseHTMLTableRow(  ...
-                                    '<B>Object Label=</B>',...
-                                    get(hObject,'Label') )...
-                                    ];  
-                                catch
-                                    developersText=[ developersText  parseHTMLTableRow(  ...
-                                    '<B>Object Label=</B>',...
-                                    ' ' ) ...
-                                    ];  
-                                end
-                                
-                            % Callback function
-                                developersText=[ developersText  parseHTMLTableRow(  ...
-                                    '<B>Callback=</B>',...
-                                    callBackFunctionName)...
-                                    ];  
-
-                                developersText=[ developersText  parseHTMLTableRow(  ...
-                                    '<B>Callback from script=</B>',...
-                                    ['   ' ...
-                                        callbackString...
-                                    '   '] ...
-                                    )...
-                                    ];  
-                                
-%                             % Handle to object
-%                                 try
-%                                     hObjectHandle = num2str(hObject);
-%                                     figureHandle = num2str(handles.figure1);
-%                                 catch
-%                                     % Newer Matlabs from cirka 2014
-%                                     hObjectHandle = 'only in earlier versions of Matlab';
-%                                     figureHandle = 'only in earlier versions of Matlab';
-%                                 end
-%                                 
-%                                 developersText=[ developersText  parseHTMLTableRow(  ...
-%                                     '<B>Handle to object=</B>', ...
-%                                     [ hObjectHandle '  (' get(hObject,'Type') ')']) ...
-%                                     ];  
-%                             % Imlook4d-instance handle
-%                                 developersText=[ developersText  parseHTMLTableRow(  ...
-%                                     '<B>Handle to imlook4d instance (handles.figure1)=</B>',...
-%                                     figureHandle )...
-%                                     ]; 
-                            % Link to Matlab code
+                       % Read foother
+                           footerFilePath=[ 'Footer.txt' ];
+                           footer =  fileread(footerFilePath);
+                           
+                        % Developers info 
+                            [~, name,ext] = fileparts(correctFileName);
+                            
+                            displayStyle='font-size: 9px;';
+                            developersText=[  '<div id="test" style="display:block;' displayStyle ' ">' '<HR>' '<h3><U>Developers reference:</U></h3>' EOL];
                             try
                                 developersText=[ developersText  parseHTMLTableRow(  ...
-                                    '<B>Matlab code=</B>',...
-                                     ['<a href="matlab:edit(''' which(name1) ''')">'   which(name1) '</a>']) ...
+                                     ['Callback = '  callBackFunctionName '</a> &nbsp;&nbsp;' ...
+                                     'Help file = <a href="matlab:edit(''' correctFileName ''')">'   name ext '</a>']) ...
                                      ];
                             catch
                             end
-                            % End table
-                                developersText=[ developersText '</table>' EOL];
+                            developersText=[ developersText '</div>' EOL];
 
-                       else
-                            developersText=''; % No text
-                       end
-                       
-                       developersText=[ developersText '</div>' EOL];
-
-
-                           % Show HELP
-                           
-                           % Create and display html file
-                                webhandle=displayHTML(pathstr1, title, text,footer,developersText);  % Display html, adding footer and developers reference
-                                % Action on Web-window close button 
-                                set(webhandle, 'AncestorRemovedCallback', @closeWebRequest);  % OK
+                        % Display help in  browser
+                           webhandle = displayHTML(helpFolder, title, text,footer,developersText);  % Display html, adding footer and developers reference
+                            
+                           % Action on Web-window close button 
+                           set(webhandle, 'AncestorRemovedCallback', @closeWebRequest);  
 
                            % Store handle to web browser
+                           handles.webbrowser=webhandle;
+                           guidata(hObject,handles);
 
-                                handles.webbrowser=webhandle;
-                                guidata(hObject,handles);
+                        % Return value true (which is used to stop callback function from being further executed
+                           trueIfChecked=true;
 
-
-                           % Return value true (which is used to stop callback function from being further executed
-                                trueIfChecked=true;
 
                     end
+ 
                    
-               %
-               % SCRIPTING
-               %
+               % --------------------------------------
+               %    SCRIPTING
+               % --------------------------------------
                    if ScriptFlag
                        EOL = sprintf('\n');
 

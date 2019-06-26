@@ -2,13 +2,12 @@
 <I>
 <P>
 <a href="matlab:handles=guidata(gcf);set(handles.helpToggleTool,'State','off')">Close help window</a>
-( or click toolbar icon <img src="Images\Button_questionmark.jpg" alt="[?]" align="middle" > </img> in imlook4d window)
-<BR>
+
+<!--- <BR>
 <a href="javascript:toggle()">Show/hide developers text</a>
 </P>
 
 </I>
-
 <script type="text/javascript">
 function toggle()
 {	
@@ -16,7 +15,7 @@ var obj = document.getElementById("test");
 if(obj.style.display == "none") obj.style.display = "block";
 else obj.style.display = "none";
 }
-</script>
+</script> --->
 
 
 
