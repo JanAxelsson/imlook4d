@@ -8089,8 +8089,17 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                            % set(handles.axes1,'XLim', XLim);
                            % set(handles.axes1,'YLim', YLim);
                             set(handles.axes1,'DataAspectRatio', [ 1 1 1]);
-                            set(handles.axes1,'DataAspectRatio', abs( [ 1/mmX 1/mmY 1] ));
                             
+                            
+                            if get(handles.FlipAndRotateRadioButton,'Value') 
+                                set(handles.axes1,'DataAspectRatio', abs( [ 1/mmX 1/mmY 1] ));
+                            else
+                                set(handles.axes1,'DataAspectRatio', abs( [ 1/mmY 1/mmX 1] ));
+                            end
+
+                           % Set axes1 size 
+                           handles.axes1.XLim(2) = size(tempData,2) +0.5;
+                           handles.axes1.YLim(2) = size(tempData,1) +0.5;
                     catch
                         disp('caught error updateImage');
                     end
