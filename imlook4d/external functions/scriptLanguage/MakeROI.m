@@ -24,12 +24,12 @@ addROI = -1;
  end;
  
  
-%  try  
-%      imlook4d_current_handles=evalin('base', 'imlook4d_current_handles');
-%  catch
-%      disp('failed importing imlook4d_current_handles');
-%  end;
-%  
+ try  
+     imlook4d_current_handles=evalin('base', 'imlook4d_current_handles');
+ catch
+     disp('failed importing imlook4d_current_handles');
+ end;
+ 
   
  imlook4d_current_handles = guidata(imlook4d_current_handle); % Read updated handles from imlook4d window
  

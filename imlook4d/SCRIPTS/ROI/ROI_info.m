@@ -7,7 +7,8 @@
 %
     StoreVariables  % Remember variables
     Export
-    ROI_data_to_workspace;
+    %ROI_data_to_workspace;
+    ExportROIs(imlook4d_ROI_number)
     
     TAB=sprintf('\t');
 

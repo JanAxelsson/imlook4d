@@ -1,6 +1,12 @@
-% ROI_data_to_workspace.m
+function  ExportROIs( roiNumbers)
+
+% Used by ROI_data_to_workspace.m
+%
+% This script assumes that imlook4d_current_handle is set in base workspace
 %
 % This script generates a cell of columnvectors, with the pixel values in each ROI:
+% If called without argument roiNumbers, all ROIs are calculated.
+% If called by roiNumbers the column 1 up to first roiNumber are set to zero.  
 %
 % SCRIPT for imlook4d
 % Jan Axelsson
@@ -19,8 +25,27 @@
     
     imlook4d_ROI_data=[];
     
-    StoreVariables
-    Export
+    % Import from workspace
+    try
+        imlook4d_current_handle=evalin('base', 'imlook4d_current_handle');
+        imlook4d_current_handles = evalin('base', 'guidata(imlook4d_current_handle)' ); % Read updated handles from imlook4d window
+
+    catch
+        disp('failed importing imlook4d_current_handles from base workspace');
+    end 
+    
+%     StoreVariables
+%     Export
+    try
+        evalin('base', 'Menu(''Export (untouched)'')');    
+        imlook4d_Cdata=evalin('base', 'imlook4d_Cdata');
+        imlook4d_ROI=evalin('base', 'imlook4d_ROI');
+        imlook4d_frame=evalin('base', 'imlook4d_frame');
+    catch
+        disp('failed importing variables from base workspace');
+    end  
+       
+    
     
    % lastROI=max(imlook4d_ROI(:));  % 
     names=get(imlook4d_current_handles.ROINumberMenu,'String');
@@ -70,7 +95,12 @@
 %
 % LOOP ROIs
 %
-    for i=1:lastROI
+
+if (nargin == 0)
+   roiNumbers=1:lastROI;
+end
+    %for i=1:lastROI
+    for i=roiNumbers
         disp([num2str(i) ') Evaluating ROI=' names{i}]);
         roiPixels=[]; % All pixel values in current ROI
 
@@ -91,7 +121,7 @@
         allIndecesToROI=zeros(size(indecesToROI,1),numberOfFrames); % place for indeces in all frames
         
         % Get all indeces
-        for j=1:numberOfFrames
+        for j=1:numberOfFrames 
             allIndecesToROI(:,j)=indecesToROI+(j-1)*offset;
         end
         
@@ -252,11 +282,13 @@
                 data = [ data imlook4d_ROI_data.uniformity(frame,:)' imlook4d_ROI_data.entropy(frame,:)' ];   
             end
            
-            for i=1:size(data,1)
+            %for i=1:size(data,1)
+            for i=roiNumbers
                 disp(sprintf('%s\t%9.5f\t%9.5f\t%9d\t%9.5f\t%9.5f\t',names{i},data(i,:)));
             end  
             
             disp(['Pixel dimensions=(' num2str(dX) ', ' num2str(dY) ', ' num2str(dZ) ') [mm]']);
     
     
-    ClearVariables
+    %ClearVariables
+   assignin('base', 'imlook4d_ROI_data', imlook4d_ROI_data);
