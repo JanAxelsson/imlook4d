@@ -8002,8 +8002,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             end
                             
                         % Store original size
-                            XLim = [ 0 size(tempData2,2)];
-                            YLim = [ 0 size(tempData2,1)];
+%                         XLim = [ 0 size(tempData2,2)];
+%                         YLim = [ 0 size(tempData2,1)];
                             
                         % interpolate
 
@@ -8098,8 +8098,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             end
 
                            % Set axes1 size 
-                           handles.axes1.XLim(2) = size(tempData,2) +0.5;
-                           handles.axes1.YLim(2) = size(tempData,1) +0.5;
+
+                            handles.axes1.XLim = XLim;
+                            handles.axes1.YLim = YLim;
+                           
                     catch
                         disp('caught error updateImage');
                     end

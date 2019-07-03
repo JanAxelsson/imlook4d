@@ -43,7 +43,7 @@ end
 %     end
 % end
 
-imlook4d_ROINames = readRoiNamesFromFile([path file], imlook4d_ROINames);
+imlook4d_ROINames = readRoiNamesFromFile([path filesep file], imlook4d_ROINames);
 
 
 
