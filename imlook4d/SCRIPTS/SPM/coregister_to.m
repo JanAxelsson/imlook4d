@@ -1,6 +1,6 @@
 % SPM_coregister
 % ---------------------
-% This script uses SPM coregistration for Dynamic PET.
+% This script uses SPM coregistration and handles Dynamic PET by making a mean image.
 % Input : mean image of the dynamic PET, acting as source
 %         T1 MR image, acting as REF
 %         Dynamic PET, acting as OTHER
