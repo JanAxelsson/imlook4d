@@ -19,13 +19,42 @@ run(atlas.atlasDefinitionFile);
 file = [imlook4d_current_handles.image.folder imlook4d_current_handles.image.file];
 [folder,name,ext] = fileparts(file);
 
+% Setup file to use (handle dynamic)
+ISDYNAMIC = ( length( size(imlook4d_current_handles.image.Cdata) ) >3 ); % More than 3 dimensions
+if ISDYNAMIC
+   % Will create a mean image (sum image, actually), which will be used for registration.
+   % Later, the transforms (y_ and iy_ files) are copied so that
+   % registration files with original file names (without "mean" in the name) will exist
+    
+    % SPM routines
+    V = spm_vol(file);
+    Y = spm_read_vols(V);
+    
+    % Mean image
+    Y = mean(Y,4);
+    Vnew = V(1);
+    
+    meanImagePath = [ folder filesep 'mean' name ext];
+    
+    Vnew.dim = size(Y);
+    Vnew.fname = meanImagePath;
+    spm_write_vol(Vnew, Y);
+
+    matlabbatch{1}.spm.spatial.preproc.channel.vols = { meanImagePath }; 
+else
+    matlabbatch{1}.spm.spatial.preproc.channel.vols = { file }; 
+end
+
+
 % Setup segment job
 run( atlas.segmentationScript); % Setup segmentation and match
-matlabbatch{1}.spm.spatial.preproc.channel.vols = { file };
 matlabbatch{1}.spm.spatial.preproc.warp.fwhm = 5; % Smoothing FWHM (about 5 for PET and SPECT, 0 for fMRI)
 
 mniToNativeTransform = [ folder filesep 'iy_' name ext]; % Output deformation file MNI -> Native
 nativeToMniTransform = [ folder filesep 'y_' name ext]; % Output deformation file MNI -> Native
+
+actuallyUsedMniToNativeTransform = [ folder filesep 'iy_mean' name ext]; % Output deformation file MNI -> Native
+actuallyUsedNativeToMniTransform = [ folder filesep 'y_mean' name ext]; % Output deformation file MNI -> Native
 
 % List files involved
 disp( 'Generate transforms MNI <-> Native :' );
@@ -51,6 +80,18 @@ else
     disp('This will take a number of minutes!')
     
     spm_jobman('run',matlabbatch);
+end
+
+% Rename files (so that Dyn have original file names instead of "mean", which it was registered with)
+try
+    copyfile(actuallyUsedMniToNativeTransform, mniToNativeTransform)
+catch
+    disp( [ 'Failed moving files from : ' actuallyUsedMniToNativeTransform '  to  ' mniToNativeTransform]);
+end
+try
+    copyfile(actuallyUsedNativeToMniTransform, nativeToMniTransform)
+catch
+    disp( [ 'Failed moving files from : ' actuallyUsedNativeToMniTransform '  to  ' nativeToMniTransform]);
 end
 
 %% Deform atlas to original space
