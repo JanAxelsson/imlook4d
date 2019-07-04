@@ -7,27 +7,66 @@
 	<meta name="author" content="Jan Axelsson"/>
 	<meta name="created" content="2013-03-11T09:25:25"/>
 	<meta name="changedby" content="JA"/>
-	<meta name="changed" content="2019-06-25T15:44:23.200436082"/>
+	<meta name="changed" content="2019-07-04T15:58:55.233722273"/>
 	<style type="text/css">
 		@page { margin: 2.01cm }
 		p { margin-bottom: 0.2cm }
-		h1 { margin-bottom: 0.2cm }
-		h1.western { font-family: "Arial", sans-serif; font-size: 16pt }
-		h1.cjk { font-family: "SimSun"; font-size: 16pt }
-		h1.ctl { font-family: "Mangal"; font-size: 16pt }
 		h2 { margin-top: 0.42cm; margin-bottom: 0.2cm }
 		h2.western { font-family: "Arial", sans-serif; font-size: 14pt; font-style: italic }
 		h2.cjk { font-family: "SimSun"; font-size: 14pt; font-style: italic }
 		h2.ctl { font-family: "Mangal"; font-size: 14pt; font-style: italic }
+		h3 { margin-top: 0.42cm; margin-bottom: 0.2cm }
+		h3.western { font-family: "Arial", sans-serif }
+		h3.cjk { font-family: "SimSun" }
+		h3.ctl { font-family: "Mangal" }
 		a:link { so-language: zxx }
 	</style>
 </head>
 <body lang="en-GB" dir="ltr">
-<h1 class="western" align="left">Pharmaco-kinetic models</h1>
+<p align="center" style="margin-top: 0.42cm; margin-bottom: 0.5cm; page-break-after: avoid">
+<font face="Albany, sans-serif"><font size="6" style="font-size: 28pt"><b>Pharmaco-kinetic
+models</b></font></font></p>
 <p align="left">Jan Axelsson 2019-FEB-14</p>
-<h2 class="western" align="left">Background</h2>
-<p align="left">Imlook4d handles a number of ph&shy;armaco-kinetic
-models for dynamic PET scans. 
+<div id="Table of Contents1" dir="ltr">
+	<div id="Table of Contents1_Head" dir="ltr">
+		<p style="margin-top: 0.42cm; margin-bottom: 0.5cm; page-break-after: avoid">
+		<font face="Albany, sans-serif"><font size="4" style="font-size: 16pt"><b>Table
+		of Contents</b></font></font></p>
+	</div>
+	<p style="margin-left: 0.5cm; margin-bottom: 0cm"><a href="#__RefHeading___Toc713_731585586">Background</a></p>
+	<p style="margin-left: 1cm; margin-bottom: 0cm"><a href="#__RefHeading___Toc715_731585586">Reference
+	Regions</a></p>
+	<p style="margin-left: 1cm; margin-bottom: 0cm"><a href="#__RefHeading___Toc717_731585586">Ratio</a></p>
+	<p style="margin-left: 1cm; margin-bottom: 0cm"><a href="#__RefHeading___Toc719_731585586">No
+	Image model</a></p>
+	<p style="margin-left: 0.5cm; margin-bottom: 0cm"><a href="#__RefHeading___Toc721_731585586">Multiple
+	Time Graphical Analysis</a></p>
+	<p style="margin-left: 0.5cm; margin-bottom: 0cm"><a href="#__RefHeading___Toc723_731585586">Receptor
+	models (= reversible binding)</a></p>
+	<p style="margin-left: 1cm; margin-bottom: 0cm"><a href="#__RefHeading___Toc725_731585586">Reference
+	Logan</a></p>
+	<p style="margin-left: 1cm; margin-bottom: 0cm"><a href="#__RefHeading___Toc727_731585586">Zhou
+	Logan-model</a></p>
+	<p style="margin-left: 1cm; margin-bottom: 0cm"><a href="#__RefHeading___Toc729_731585586">SRTM
+	– Simplified Reference Tissue Model</a></p>
+	<p style="margin-left: 1cm; margin-bottom: 0cm"><a href="#__RefHeading___Toc731_731585586">SRTM2
+	– Two-step Simplified Reference Tissue Model</a></p>
+	<p style="margin-left: 1cm; margin-bottom: 0cm"><a href="#__RefHeading___Toc733_731585586">Extended
+	SRTM – change of condition at a time point <i>T</i><sub><i>0</i></sub></a></p>
+	<p style="margin-left: 0.5cm; margin-bottom: 0cm"><a href="#__RefHeading___Toc3932_731585586">Irreversible
+	models</a></p>
+	<p style="margin-left: 1cm; margin-bottom: 0cm"><a href="#__RefHeading___Toc735_731585586">Patlak
+	Model</a></p>
+	<p style="margin-left: 1cm; margin-bottom: 0cm"><a href="#__RefHeading___Toc737_731585586">Reference
+	Patlak Model</a></p>
+	<p style="margin-left: 0.5cm; margin-bottom: 0cm"><a href="#__RefHeading___Toc3934_731585586">Perfusion
+	models</a></p>
+	<p style="margin-left: 1cm; margin-bottom: 0cm"><a href="#__RefHeading___Toc739_731585586">Water
+	double-integral model</a></p>
+</div>
+<h2 class="western"><a name="__RefHeading___Toc713_731585586"></a>Background</h2>
+<p align="left">Imlook4d handles a number of pharmaco-kinetic models
+for dynamic PET scans. 
 </p>
 <p align="left">Most of the models described can be calculated for a
 region-of-interest, or as parametric images (in which each pixel is
@@ -38,7 +77,8 @@ pixel, depending what you wish to calculate.</p>
 on ROIs” menu.</p>
 <p align="left">Models on images are started from the “MODELS”
 menu.</p>
-<h2 class="western" align="left">Reference Regions</h2>
+<h3 class="western"><a name="__RefHeading___Toc715_731585586"></a>Reference
+Regions</h3>
 <p align="left">Most of the models are based on reference regions.
 The assumption is that a reference region very similar to the regions
 you want to study exists, with the only difference that an uptake
@@ -54,15 +94,17 @@ can be selected from either the “SCRIPTS/Model on ROIs/Select
 Reference region” menu, or from “MODELS/ Select Reference region”
 menu.  Trying to invoke a model without a defined reference region,
 will directly open the reference region selection dialog.</p>
-<h2 class="western" align="left">Ratio 
-</h2>
+<h3 class="western"><a name="__RefHeading___Toc717_731585586"></a>Ratio
+</h3>
 <p align="left">This is strictly speaking not a model, but just the
 ROI, or image, divided by the reference region value.</p>
-<h2 class="western" align="left">No Image model</h2>
+<h3 class="western"><a name="__RefHeading___Toc719_731585586"></a>No
+Image model</h3>
 <p align="left">In the MODEL menu, the selection “No Model”
 resets the image to show the normal uptake.  This is how you get out
 of displaying parametric images.</p>
-<h2 class="western" align="left">Multiple Time Graphical Analysis 
+<h2 class="western"><a name="__RefHeading___Toc721_731585586"></a>Multiple
+Time Graphical Analysis 
 </h2>
 <p align="left">Sometimes referred to as graphical methods. Turku PET
 centre describes this class of methods this way: In these methods,
@@ -94,8 +136,8 @@ Left), Logan plot for one reference (ROI2) inidicated with
 Right) the same
 graph zoomed in to see that the line fits the linear phase of the
 curve of the region of interest.</i></font></p>
-<h2 class="western" align="left">Receptor models (= reversible
-binding)</h2>
+<h2 class="western"><a name="__RefHeading___Toc723_731585586"></a>Receptor
+models (= reversible binding)</h2>
 <p align="left">The following models are implemented both for ROIs,
 and for making model images (parametric images). The models calculate
 non-displaceable Binding Potential, <i>BP</i><sub><i>ND</i></sub> ,
@@ -106,10 +148,13 @@ which is a combined measure of available receptor density <i>B</i><sub><i>avail<
 gives additional parameters, at the cost of robustness especially for
 model images. Therefore, the choice of model is dependent on data
 quality and what parameters are of interest.</span></p>
+<h3 class="western"><a name="__RefHeading___Toc725_731585586"></a><b>Reference
+Logan</b> 
+</h3>
 <ul>
 	<li/>
-<p align="left"><b>Reference Logan</b>.  This model calculates
-	the so called non-displaceable Binding Potential, <i>BP</i><sub><i>ND</i></sub>,
+<p align="left">This model calculates the so called
+	non-displaceable Binding Potential, <i>BP</i><sub><i>ND</i></sub>,
 	using a reference region.  For most tracers, cerebellum is devoid of
 	receptors and used as a reference region. Calculates: <br/>
 -
@@ -132,31 +177,37 @@ See
 <br/>
 
 	</p>
+</ul>
+<h3 class="western"><a name="__RefHeading___Toc727_731585586"></a>Zhou
+Logan-model</h3>
+<ul>
 	<li/>
-<p align="left"><b>Zhou Logan-model</b>.  This is another
-	implementation of reference Logan, which is more robust to noise. 
-	Calculates:   <br/>
-- <i>BP</i><sub><i>ND</i></sub><br/>
+<p align="left">This is another implementation of reference
+	Logan, which is more robust to noise.  Calculates:   <br/>
+-
+	<i>BP</i><sub><i>ND</i></sub><br/>
 <br/>
-Input
-	parameters are:<br/>
-- start frame  (see Multiple Time Graphical
-	Analysis above, on how to determine start frame)<br/>
-- end
-	frame<br/>
+Input parameters are:<br/>
+-
+	start frame  (see Multiple Time Graphical Analysis above, on how to
+	determine start frame)<br/>
+- end frame<br/>
 <br/>
-Zhou is preferred over Logan for model images,
-	since it is more robust on noisy data. <br/>
+Zhou is preferred
+	over Logan for model images, since it is more robust on noisy data.
+	<br/>
 <br/>
-See
-	<a href="https://doi.org/10.1016/j.neuroimage.2008.09.021">https://doi.org/10.1016/j.neuroimage.2008.09.021</a><font color="#228b22"><font face="courier, serif"><font size="2" style="font-size: 10pt"><br/>
+See <a href="https://doi.org/10.1016/j.neuroimage.2008.09.021">https://doi.org/10.1016/j.neuroimage.2008.09.021</a><font color="#228b22"><font face="courier, serif"><font size="2" style="font-size: 10pt"><br/>
 </font></font></font><br/>
 <br/>
 
 	</p>
+</ul>
+<h3 class="western"><a name="__RefHeading___Toc729_731585586"></a><b>SRTM</b><b>
+– </b><b>Simplified Reference Tissue Model</b></h3>
+<ul>
 	<li/>
-<p align="left" style="margin-bottom: 0cm"><b>SRTM</b><b> –
-	</b><b>Simplified Reference Tissue Model</b>, assumes, that
+<p align="left" style="margin-bottom: 0cm">assumes, that
 	mathematically, the kinetics of the receptor region and the region
 	of interest is described by the same equation (kinetics not
 	distinguishable).  SRTM model calculates the following parameters:
@@ -186,16 +237,19 @@ See <a href="https://doi.org/10.1006/nimg.1996.0066">https://doi.org/10.1006/nim
 
 	</p>
 	<p align="left" style="margin-bottom: 0cm"></p>
+</ul>
+<h3 class="western"><a name="__RefHeading___Toc731_731585586"></a><b>SRTM2</b><b>
+– </b><b>Two-step Simplified Reference Tissue Model</b></h3>
+<ul>
 	<li/>
-<p><b>SRTM2</b><b> – </b><b>Two-step Simplified Reference
-	Tissue Model</b>. Same assumptions as in SRTM, with addition that
-	k2p is set  constant in whole brain.  This model calculates the
-	following parameters: <br/>
+<p>Same assumptions as in SRTM, with addition that k2p is set 
+	constant in whole brain.  This model calculates the following
+	parameters: <br/>
 - <i>BP</i><sub><i>ND</i></sub><br/>
--
-	<i>R</i><sub><i>1</i></sub><i> = K</i><sub><i>1</i></sub><i>/K</i><sub><i>1ref</i></sub>
-	accounting for difference in delivery to region and reference region
-	or pixel<br/>
+- <i>R</i><sub><i>1</i></sub><i>
+	= K</i><sub><i>1</i></sub><i>/K</i><sub><i>1ref</i></sub> accounting
+	for difference in delivery to region and reference region or
+	pixel<br/>
 <br/>
 Input parameter:<br/>
 - <i>k2</i><sub><i>p</i></sub>
@@ -224,11 +278,13 @@ See
 <br/>
 
 	</p>
+</ul>
+<h3 class="western"><a name="__RefHeading___Toc733_731585586"></a><font color="#000000"><font face="Times New Roman, serif">Extended
+SRTM – </font></font><font color="#000000"><font face="Times New Roman, serif">change
+of condition at a time point </font></font><font color="#000000"><font face="Times New Roman, serif"><i>T</i></font></font><font color="#000000"><sub><font face="Times New Roman, serif"><i>0</i></font></sub></font></h3>
+<ul>
 	<li/>
-<p><font size="3" style="font-size: 12pt"><b><font color="#000000"><font face="Times New Roman, serif">Extended
-	SRTM – </font></font><font color="#000000"><font face="Times New Roman, serif">change
-	of condition at a time point </font></font><font color="#000000"><font face="Times New Roman, serif"><i>T</i></font></font><font color="#000000"><sub><font face="Times New Roman, serif"><i>0</i></font></sub></font><font color="#000000"><font face="Times New Roman, serif">.
-	</font></font></b><font color="#000000"><font face="Times New Roman, serif"><span style="font-weight: normal">The
+<p><font size="3" style="font-size: 12pt"><font color="#000000"><font face="Times New Roman, serif"><span style="font-weight: normal">The
 	conditions may be a pharmacological challenge, or a task  switch at
 	time </span></font></font><font color="#000000"><font face="Times New Roman, serif"><i><span style="font-weight: normal">T</span></i></font></font><font color="#000000"><sub><font face="Times New Roman, serif"><i><span style="font-weight: normal">0</span></i></font></sub></font><font color="#000000"><font face="Times New Roman, serif"><i><span style="font-weight: normal">
 	</span></i></font></font><font color="#000000"><font face="Times New Roman, serif"><span style="font-weight: normal">within
@@ -285,33 +341,36 @@ in
 	between reference region and region of interest.<br/>
 <br/>
 See
-	</span></font></font><font color="#000000"><font face="Times New Roman, serif"><span style="font-weight: normal"><a href="https://doi.org/10.1016/j.neuroimage.2006.06.038">https://doi.org/10.1016/j.neuroimage.2006.06.038</a>
+	</span></font></font><b><a href="https://doi.org/10.1016/j.neuroimage.2006.06.038">https://doi.org/10.1016/j.neuroimage.2006.06.038</a></b><font color="#000000"><font face="Times New Roman, serif"><span style="font-weight: normal">
 	</span></font></font></font>
 	</p>
 	<p align="left" style="margin-bottom: 0cm"></p>
 </ul>
-<p align="left"><font face="Arial, sans-serif"><font size="4" style="font-size: 14pt"><i><b>Irreversible
-models</b></i></font></font></p>
+<h2 class="western"><a name="__RefHeading___Toc3932_731585586"></a>Irreversible
+models</h2>
+<h3 class="western"><a name="__RefHeading___Toc735_731585586"></a><b>Patlak</b><b>
+Model</b></h3>
 <ul>
 	<li/>
-<p align="left" style="margin-bottom: 0cm"><b>Patlak</b><b>
-	Model</b>, builds on the notion that after a while the blood plasma
-	activity changes slowly, and an almost “stable state”
-	(equilibrium) between the reversible compartments and plasma exists.
-	The only compartment that changes is the irreversible compartment,
-	which is constantly accumulating activity. The Patlak model
-	calculates: <br/>
-- <i>K</i><sub><i>i  </i></sub>the net transfer
-	rate (or influx constant) <br/>
+<p align="left" style="margin-bottom: 0cm">builds on the
+	notion that after a while the blood plasma activity changes slowly,
+	and the reversible compartments have reached a steady-state
+	equilibrium with plasma (reversible compartments activity will be
+	proportional to the plasma activity). This way the blood and the
+	irreversible compartments can be viewed as an input function, with a
+	single irreversible compartment constantly accumulating activity.
+	The Patlak model calculates: <br/>
+- <i>K</i><sub><i>i  </i></sub>the
+	net transfer rate (or influx constant) to bound state<br/>
 <br/>
-Input parameter:<br/>
--
-	Variable name,  containing the time-activity curve of the intact
-	tracer molecule sampled from blood plasma.  <br/>
+Input
+	parameter:<br/>
+- Variable name,  containing the time-activity curve
+	of the intact tracer molecule sampled from blood plasma.  <br/>
 <br/>
-Note 1:  The
-	time-points for the plasma time-activity curve should be the same as
-	the time frames in the PET data.  <br/>
+Note
+	1:  The time-points for the plasma time-activity curve should be the
+	same as the time frames in the PET data.  <br/>
 Note 2:  The plasma
 	time-activity curve should be of intact tracer molecules. This means
 	that if the tracer is metabolized, <br/>
@@ -320,22 +379,28 @@ Note 2:  The plasma
 	have to be performed.<br/>
 <br/>
 See
-	<a href="https://doi.org/10.1038%2Fjcbfm.1985.87">https://doi.org/10.1038%2Fjcbfm.1985.87</a><br/>
+	<a href="https://doi.org/10.1038%2Fjcbfm.1985.87">https://doi.org/10.1038%2Fjcbfm.1985.87</a>,
+	<a href="http://www.turkupetcentre.net/petanalysis/model_patlak_interpretation.html">http://www.turkupetcentre.net/petanalysis/model_patlak_interpretation.html</a>
+	<br/>
 <br/>
 
 	</p>
+</ul>
+<h3 class="western"><a name="__RefHeading___Toc737_731585586"></a><b>Reference
+</b><b>Patlak</b><b> Model</b></h3>
+<ul>
 	<li/>
-<p align="left" style="margin-bottom: 0cm"><b>Reference </b><b>Patlak</b><b>
-	Model</b>, uses exactly the same principle as Patlak model above,
-	but requires a reference tissue that does not display irreversible
-	trapping.  The most common tracer, FDG does not fulfil this
-	requirement.<br/>
-The Reference Patlak model calculates: <br/>
-- <i>K</i><sub><i>i
-	 </i></sub>the net transfer rate (or influx constant) <br/>
+<p align="left" style="margin-bottom: 0cm">uses exactly the
+	same principle as Patlak model above, but requires a reference
+	tissue that does not display irreversible trapping.  The most common
+	tracer, FDG does not fulfil this requirement.<br/>
+The Reference
+	Patlak model calculates: <br/>
+- <i>K</i><sub><i>i  </i></sub>the
+	net transfer rate (or influx constant) <br/>
 <br/>
-No
-	input parameters asked for.<br/>
+No input
+	parameters asked for.<br/>
 <br/>
 See <span style="font-variant: normal"><font color="#000080"><span style="text-decoration: none"><font face="Times New Roman, serif"><font size="3" style="font-size: 12pt"><span style="letter-spacing: normal"><span lang="zxx"><span style="font-style: normal"><u><span style="font-weight: normal">
 	<a href="https://doi.org/10.1038%2Fjcbfm.1985.87">https://doi.org/10.1038%2Fjcbfm.1985.87</a></span></u></span></span></span></font></font></span></font></span></p>
@@ -345,16 +410,17 @@ See <span style="font-variant: normal"><font color="#000080"><span style="text-d
 
 	</p>
 </ul>
-<p align="left" style="margin-bottom: 0cm"><font color="#000000"><font face="Arial, sans-serif"><font size="4" style="font-size: 14pt"><i><b><span style="font-variant: normal"><span style="text-decoration: none"><span style="letter-spacing: normal">Perfusion</span></span></span><span style="font-variant: normal"><span style="text-decoration: none"><span style="letter-spacing: normal">
-models</span></span></span></b></i></font></font></font></p>
+<h2 class="western"><a name="__RefHeading___Toc3934_731585586"></a><span style="font-variant: normal"><span style="text-decoration: none"><span style="letter-spacing: normal">Perfusion</span></span></span><span style="font-variant: normal"><span style="text-decoration: none"><span style="letter-spacing: normal">
+models</span></span></span></h2>
 <p align="left" style="margin-bottom: 0cm"><br/>
 
 </p>
+<h3 class="western"><a name="__RefHeading___Toc739_731585586"></a>Water
+double-integral model</h3>
 <ul>
 	<li/>
 <p align="left" style="margin-bottom: 0cm; font-style: normal">
-	<font color="#000000"><font face="Times New Roman, serif"><font size="3" style="font-size: 12pt"><b><span style="font-variant: normal"><span style="text-decoration: none"><span style="letter-spacing: normal">Water
-	double-integral model, </span></span></span></b><span style="font-variant: normal"><span style="text-decoration: none"><span style="letter-spacing: normal"><span style="font-weight: normal">is
+	<font color="#000000"><font face="Times New Roman, serif"><font size="3" style="font-size: 12pt"><span style="font-variant: normal"><span style="text-decoration: none"><span style="letter-spacing: normal"><span style="font-weight: normal">is
 	not an absolute tissue-perfusion model, but </span></span></span></span><span style="font-variant: normal"><span style="text-decoration: none"><span style="letter-spacing: normal"><span style="font-weight: normal">calculates</span></span></span></span><span style="font-variant: normal"><span style="text-decoration: none"><span style="letter-spacing: normal"><span style="font-weight: normal">
 	values relative </span></span></span></span><span style="font-variant: normal"><span style="text-decoration: none"><span style="letter-spacing: normal"><span style="font-weight: normal">the</span></span></span></span><span style="font-variant: normal"><span style="text-decoration: none"><span style="letter-spacing: normal"><span style="font-weight: normal">
 	whole brain </span></span></span></span><span style="font-variant: normal"><span style="text-decoration: none"><span style="letter-spacing: normal"><span style="font-weight: normal">(which
