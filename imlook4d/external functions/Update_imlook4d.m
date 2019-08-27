@@ -63,8 +63,8 @@ end
     [parentFolder,name,ext] = fileparts(unzipFolderPath);
     newFolderName = [ parentFolder filesep  'imlook4d_' ver  ];
     
-if ~isfolder(newFolderName)
-    
+%if ~isfolder(newFolderName)  % isfolder only from 2017bm replace with :
+if ~exist(newFolderName, 'dir')    
     % Get file
     options = weboptions('RequestMethod','get');
     options = weboptions('Timeout',Inf);
