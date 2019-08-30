@@ -3164,11 +3164,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             set( backgroundHandles.orientationMenu,'Value', get(handles.orientationMenu,'Value'));
             orientationMenu_Callback(backgroundHandles.orientationMenu, {}, backgroundHandles);
         catch
-            % if not backgroundimage (this will happen when the
-            % backgroundimage itself is processed)
+            % if not backgroundimage (this will happen when the backgroundimage itself is processed)
         end
         
-        %updateImage(hObject,{},handles);
+        updateImage(hObject,{},handles);
         
         % Move to same ROI in new orientation
         if ~strcmp( handles.ROINumberMenu.String{ handles.ROINumberMenu.Value}, 'Add ROI')
@@ -6595,7 +6594,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 return 
             end
             
-            % Make axial     
+            % Make axial 
+                initialOrientation = handles.orientationMenu.Value;
                 handles = resetOrientation(handles);
                 
             % GUI input            
@@ -6820,10 +6820,15 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 catch
                 end
             end
+
             
             guidata(handles.ROINumberMenu,handles);  % Save handles
-
-            updateImage(hObject, eventdata, handles);                  
+            
+            % Return to orientation 
+            handles.orientationMenu.Value = initialOrientation;
+            orientationMenu_Callback(handles.orientationMenu, [], handles);
+            
+            %updateImage(hObject, eventdata, handles);                  
     % Save ROI
         function SaveRoiPushbutton_Callback(hObject, eventdata, handles)
                  % Display HELP and get out of callback
@@ -6832,6 +6837,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                      end
                      
                 % Make axial     
+                initialOrientation = handles.orientationMenu.Value;
                 handles = resetOrientation(handles);
 
                 [file,path] = uiputfile('ROIs.roi','ROI Save file name');
@@ -6863,6 +6869,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 save(fullPath, 'rois', 'roiNames', 'roiSize','VisibleROIs','LockedROIs', 'version' );
                 
                 guidata(handles.figure1, handles);
+                
+                            
+                % Return to orientation
+                handles.orientationMenu.Value = initialOrientation;
+                orientationMenu_Callback(handles.orientationMenu, [], handles);
                              
     % Print image
         function Print_Image_Callback(hObject, eventdata, handles)
