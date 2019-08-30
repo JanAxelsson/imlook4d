@@ -2736,8 +2736,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
       % Display HELP and get out of callback
          if DisplayHelp(hObject, eventdata, handles) 
              return 
-         end     
-        imlook4d('ScriptsMenu_Callback',get(gcbo,'Parent'),[],guidata(gcf));Time_activity_curve
+         end 
+         
+        % Run  script Time_activity_curve in base workspace
+        imlook4d('ScriptsMenu_Callback',get(gcbo,'Parent'),[],guidata(gcf));
+        evalin('base', 'Time_activity_curve')
             
     % --------------------------------------------------------------------
     % SELECTIONS
