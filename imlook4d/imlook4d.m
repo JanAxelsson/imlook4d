@@ -2132,6 +2132,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         plotboxAspectRatio = handles.axes1.PlotBoxAspectRatio; 
         ratio = plotboxAspectRatio(1) /plotboxAspectRatio(2);
         az = 180*atan( ratio*tan(pi*az/180))/pi;
+        
+        % Reverse angle if Flip + rotate is off
+        if ( handles.FlipAndRotateRadioButton.Value == 0)
+            az = -az;
+        end
 
        % rotate
        [handles.image.Cdata, handles.image.ROI]  = rotateUsingIsotropic( handles, handles.image.Cdata, -az, handles.image.ROI);   
@@ -4005,15 +4010,19 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             fid = fopen(file, 'r');
                             tempHeader= fread(fid, 348,'char');                     % Binary header in memory 
                             fclose(fid);
-                            
+
                             %"n+1" means that the image data is stored in the same file as the header information (.nii)
-                            if strcmp(char(tempHeader(345:347))', 'n+1')  FILETYPE='NIFTY_ONEFILE';end
+                            if strfind( char(tempHeader)', 'n+1')  FILETYPE='NIFTY_ONEFILE';end
                             
                             %"ni1" means that the image data is stored in the ".img" file corresponding to the header file (starting at file offset 0).
-                            if strcmp(char(tempHeader(345:347))', 'ni1')  FILETYPE='NIFTY_TWOFILES';end
+                            if strfind( char(tempHeader)', 'ni1')  FILETYPE='NIFTY_TWOFILES';end
+                            
                             
                             % Assume Single-file NIFTI if did not match NIFTY_ONEFILE or NIFTY_TWOFILES
-                            if( strcmp(FILETYPE,'NIFTI'))  LocalOpenNifti(hObject, eventdata, handles, file,path,FILETYPE );end 
+                            if( strcmp(FILETYPE,'NIFTI'))  
+                                FILETYPE='NIFTY_ONEFILE';
+                                LocalOpenNifti(hObject, eventdata, handles, file,path,FILETYPE );
+                            end 
 
                         end
                         
@@ -5700,6 +5709,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         nii.hdr.dime.dim(3)=size(tempData,2);
                         nii.hdr.dime.dim(4)=size(tempData,3);
                         nii.hdr.dime.dim(5)=size(tempData,4);
+                        
+                        % Pixel size
+                        nii.hdr.dime.pixdim(1:3) = [ handles.image.pixelSizeX, handles.image.pixelSizeY, handles.image.sliceSpacing ];
 
                         % Make 3D if required
                         if (nii.hdr.dime.dim(5)==1) nii.hdr.dime.dim(1)=3;end
@@ -8102,8 +8114,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                            % Set axes1 size 
 
-                            handles.axes1.XLim = XLim;
-                            handles.axes1.YLim = YLim;
+                            %handles.axes1.XLim = XLim;
+                            %handles.axes1.YLim = YLim;
                            
                     catch
                         disp('caught error updateImage');
