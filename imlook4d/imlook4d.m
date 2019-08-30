@@ -2132,6 +2132,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         plotboxAspectRatio = handles.axes1.PlotBoxAspectRatio; 
         ratio = plotboxAspectRatio(1) /plotboxAspectRatio(2);
         az = 180*atan( ratio*tan(pi*az/180))/pi;
+        
+        % Reverse angle if Flip + rotate is off
+        if ( handles.FlipAndRotateRadioButton.Value == 0)
+            az = -az;
+        end
 
        % rotate
        [handles.image.Cdata, handles.image.ROI]  = rotateUsingIsotropic( handles, handles.image.Cdata, -az, handles.image.ROI);   
@@ -8109,8 +8114,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                            % Set axes1 size 
 
-                            handles.axes1.XLim = XLim;
-                            handles.axes1.YLim = YLim;
+                            %handles.axes1.XLim = XLim;
+                            %handles.axes1.YLim = YLim;
                            
                     catch
                         disp('caught error updateImage');
