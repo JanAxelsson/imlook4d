@@ -72,8 +72,11 @@ function modelWindow_OpeningFcn(hObject, ~, handles, datastruct, roinames, title
 
     % UIWAIT makes modelWindow wait for user response (see UIRESUME)
     % uiwait(handles.modelWindow);
+    
+    % Don't show hidden rois
+    [roinames, datastruct] = removeHiddenRoisFromStruct( roinames, datastruct);
 
-    % Store in handles
+    % Store in handles 
     handles.datastruct = datastruct;
     handles.roinames = roinames;
     handles.title = title;
@@ -81,6 +84,7 @@ function modelWindow_OpeningFcn(hObject, ~, handles, datastruct, roinames, title
     % Set figure name
     set(handles.modelWindow, 'Name', title);
     
+
     %
     % Populate table
     %

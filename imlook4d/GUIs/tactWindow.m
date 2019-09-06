@@ -75,6 +75,9 @@
         % Store in handles
         roinames = ROI_data_struct.names;
 
+        %
+        % Continue without hidden rois
+        %
         datastruct.names = {'mean', 'volume', 'pixels','max', 'min', 'std'};
         datastruct.units = {'', '', '', '', '', ''};
             datastruct.pars = { ROI_data_struct.mean', ...
@@ -120,7 +123,10 @@
                 };
         end
     
-    
+            
+        % Don't show hidden rois
+        [roinames, datastruct] = removeHiddenRoisFromStruct( roinames, datastruct);
+
     
         handles.datastruct = datastruct;
         handles.ROI_data_struct = ROI_data_struct;
