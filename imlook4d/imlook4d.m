@@ -8795,6 +8795,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                        if strcmp( handles.OnlyRefROIs.Checked, 'on')
                            roisToCalculate = handles.model.common.ReferenceROINumbers;
                            roisToHide = setdiff( 1:numberOfROIs , roisToCalculate);
+                           rois=handles.image.ROI(:,:,slice); % Ignore above
+                           rois=orientImage(rois);
                            for i = roisToHide
                                rois(rois==i)=0; 
                            end
@@ -9019,6 +9021,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                        if strcmp( handles.OnlyRefROIs.Checked, 'on')
                            roisToCalculate = handles.model.common.ReferenceROINumbers;
                            roisToHide = setdiff( 1:numberOfROIs , roisToCalculate);
+                           rois=handles.image.ROI(:,:,slice); % Ignore above
+                           rois=orientImage(rois);
                            for i = roisToHide
                                rois(rois==i)=0; 
                            end
