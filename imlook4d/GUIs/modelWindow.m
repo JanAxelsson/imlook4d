@@ -23,7 +23,7 @@ function varargout = modelWindow(varargin)
 
     % Edit the above text to modify the response to help modelWindow
 
-    % Last Modified by GUIDE v2.5 20-Mar-2019 17:46:06
+    % Last Modified by GUIDE v2.5 06-Sep-2019 22:41:26
 
     % Begin initialization code - DO NOT EDIT
 gui_Singleton = 0;
@@ -441,7 +441,6 @@ function copy_all_curves_Callback(hObject, eventdata, handles)
         allroinumbers = 1 : numberOfRois;
         s = selectedTACTs(handles, allroinumbers);
         clipboard('copy',s)
-    % utility functions
     function s = selectedTACTs(handles,roinumbers)
         % Initiate
             TAB=sprintf('\t');
@@ -513,5 +512,34 @@ function copy_all_curves_Callback(hObject, eventdata, handles)
             TACThandles.image.unit = datastruct.extras.unit;
         catch
             TACThandles.image.unit = ' ';
+        end    
+function copy_table_Callback(hObject, eventdata, handles)
+    TAB=sprintf('\t');
+    EOL=sprintf('\n');
+    
+    header = handles.uitable.ColumnName';
+    data = handles.uitable.Data;
+    
+    numberOfRois = length( handles.roinames );
+    numberOfColumns = length(header);
+    
+    % Build header
+    s = [];
+    for i = 1 : numberOfColumns - 1
+        s=[ s header{i} TAB ];
+    end
+    s=[ s header{numberOfColumns} EOL ];
+    
+    % Replace '|' which is new row, with '/' for units
+    s = strrep(s, '|', ' / ');
+    
+    % Build data
+    for j = 1 : numberOfRois
+
+        for i = 1 : numberOfColumns - 1
+            s=[ s num2str( data{j,i}) TAB ];
         end
+        s=[ s num2str( data{j,numberOfColumns}) EOL ];
+    end
  
+    clipboard('copy',s)   
