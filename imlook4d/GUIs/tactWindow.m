@@ -23,7 +23,7 @@
 
         % Edit the above text to modify the response to help tactWindow
 
-        % Last Modified by GUIDE v2.5 16-Sep-2018 22:39:33
+        % Last Modified by GUIDE v2.5 06-Sep-2019 23:19:48
 
         % Begin initialization code - DO NOT EDIT
     gui_Singleton = 0;
@@ -130,7 +130,7 @@
     
         handles.datastruct = datastruct;
         handles.ROI_data_struct = ROI_data_struct;
-        handles.roinames = ROI_data_struct.names;
+        handles.roinames = roinames;
         handles.title = title;    
 
         % Set figure name
@@ -146,9 +146,9 @@
             % If no parameters, write row names in table cells
             if length(datastruct.names) > 0
                 handles.uitable.Data = [num2cell( cell2mat(datastruct.pars) )];
-                for i = 1:length(datastruct.names)
-                    datastruct.names{i} = [datastruct.names{i} '|' datastruct.units{i} ];
-                end;
+%                 for i = 1:length(datastruct.names)
+%                     datastruct.names{i} = [datastruct.names{i} '|' datastruct.units{i} ];
+%                 end;
                 handles.uitable.ColumnName =  datastruct.names;
                 handles.uitable.RowName = roinames ;
             else
@@ -298,3 +298,42 @@ function lockedXradiobutton_Callback(~, ~, handles)
     roinumber = handles.selectedRow;
     setappdata(handles.tactWindow, 'previousMainXLim',handles.mainAxes.XLim);
     drawPlots( handles,roinumber)
+
+function copy_table_Callback(hObject, eventdata, handles)
+    TAB=sprintf('\t');
+    EOL=sprintf('\n');
+    
+    header = handles.uitable.ColumnName';
+    data = handles.uitable.Data;
+    
+    numberOfRois = length( handles.roinames );
+    numberOfColumns = length(header);
+    
+    % Build header
+    s = [ 'ROI' TAB ];
+    for i = 1 : numberOfColumns - 1
+        s=[ s header{i} TAB ];
+    end
+    s=[ s header{numberOfColumns} EOL ];
+    
+    % Replace '|' which is new row, with '/' for units
+    s = strrep(s, '|', ' / ');
+    
+    % Build data
+    
+    for j = 1 : numberOfRois
+        s=[ s handles.uitable.RowName{j} TAB ];
+        for i = 1 : numberOfColumns - 1
+            s=[ s num2str( data{j,i}) TAB ];
+        end
+        s=[ s num2str( data{j,numberOfColumns}) EOL ];
+    end
+ 
+    clipboard('copy',s)   
+
+
+% --------------------------------------------------------------------
+function edit_menu_Callback(hObject, eventdata, handles)
+% hObject    handle to edit_menu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
