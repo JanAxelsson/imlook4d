@@ -8,9 +8,6 @@
             if not( contains( roinames{roi},'(hidden)' ) )
                 counter = counter + 1;
                 keepIndex(counter) = roi;
-                for cols = 1 : length(datastruct.names)
-                    
-                end
             end
         end
         
