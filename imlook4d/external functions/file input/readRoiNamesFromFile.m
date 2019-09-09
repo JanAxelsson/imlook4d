@@ -17,8 +17,23 @@ function imlook4d_ROINames = readRoiNamesFromFile( filePath, imlook4d_ROINames)
     stop = length(imlook4d_ROINames)-1; % Exclude 'Add ROI'
     for i=1:stop
         currentName = imlook4d_ROINames{i};
-        row = find(strcmp(newNames(:,OLDCOLUMN),currentName ));
+        start = [];
+        
+        % Ref ROI
+        if startsWith(currentName, '*')
+            currentName = currentName(3:end);
+            start = '* ';
+        end
+        
+        % Hidden
+        if contains(currentName, '(hidden) ')
+            currentName = currentName(10:end);
+            start = [start '(hidden) '];
+        end 
+        
+        % Set name
+        row = find(strcmp(newNames(:,OLDCOLUMN),currentName ));  
         if ~isempty(row) 
-            imlook4d_ROINames{i} = newNames{ row, NEWCOLUMN};
+            imlook4d_ROINames{i} = [ start newNames{ row, NEWCOLUMN} ];
         end
     end
