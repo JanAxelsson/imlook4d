@@ -2806,7 +2806,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             if ~strcmp( contents{ROINumber},'Add ROI' )
 
                 % Set context menu hidden flag
-                if startsWith( contents{ROINumber}, '(hidden)' ) 
+                if contains( contents{ROINumber}, '(hidden)' ) 
                     disp('hidden')
                     handles.HideROI.Checked = 'on';
                 else
@@ -2930,7 +2930,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             ROINumber=ROINumberMenu.Value;
             
             handles.image.VisibleROIs(ROINumber)=0;
-            contents{ROINumber}=['(hidden) ' contents{ROINumber}];   % Set (hidden) prefix
+            
+            if startsWith(contents{ROINumber},'*')
+                contents{ROINumber}=['* (hidden) ' contents{ROINumber}(3:end)];   % Set (hidden) prefix
+            else
+                contents{ROINumber}=['(hidden) ' contents{ROINumber}];   % Set (hidden) prefix
+            end
+            
             set(handles.ROINumberMenu,'String', contents)
         end
 
@@ -2946,8 +2952,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         handles.image.VisibleROIs(1:size(ROINumberMenu.String,1)-1)=0;       
 
         for i=1:(size(ROINumberMenu.String,1)-1)
-            if ~strcmp(  contents{i}(1:1), '(' )  % If not starting with "("
-                contents{i}=['(hidden) ' contents{i}];   % Set (hidden) prefix
+            if not( contains( contents{i}, '(hidden)' ) ) % If not containing "(hidden)"
+                
+                if startsWith(contents{i},'*')
+                    contents{i}=['* (hidden) ' contents{i}(3:end)];   % Set (hidden) prefix
+                else
+                    contents{i}=['(hidden) ' contents{i}];   % Set (hidden) prefix
+                end
             end
         end 
     
@@ -8795,6 +8806,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                        if strcmp( handles.OnlyRefROIs.Checked, 'on')
                            roisToCalculate = handles.model.common.ReferenceROINumbers;
                            roisToHide = setdiff( 1:numberOfROIs , roisToCalculate);
+                           rois=handles.image.ROI(:,:,slice); % Ignore above
+                           rois=orientImage(rois);
                            for i = roisToHide
                                rois(rois==i)=0; 
                            end
@@ -9019,6 +9032,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                        if strcmp( handles.OnlyRefROIs.Checked, 'on')
                            roisToCalculate = handles.model.common.ReferenceROINumbers;
                            roisToHide = setdiff( 1:numberOfROIs , roisToCalculate);
+                           rois=handles.image.ROI(:,:,slice); % Ignore above
+                           rois=orientImage(rois);
                            for i = roisToHide
                                rois(rois==i)=0; 
                            end

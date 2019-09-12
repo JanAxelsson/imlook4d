@@ -96,11 +96,20 @@ function  ExportROIs( roiNumbers)
 % LOOP ROIs
 %
 
-if (nargin == 0)
-   roiNumbers=1:lastROI;
-end
+    
+    % Remove hidden ROIs from calculation
+     counter = 0;
+     for i=1:lastROI
+            if  not( contains( imlook4d_ROI_data.names{i},'(hidden)' ) )
+                counter = counter + 1;
+                roiNumbers(counter) = i;
+            end    
+     end
+    
+    
     %for i=1:lastROI
     for i=roiNumbers
+        
         disp([num2str(i) ') Evaluating ROI=' names{i}]);
         roiPixels=[]; % All pixel values in current ROI
 
