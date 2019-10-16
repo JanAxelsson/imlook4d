@@ -1,3 +1,4 @@
+#!/usr/local/bin/python3
 from pydrive.auth import GoogleAuth
 
 gauth = GoogleAuth()

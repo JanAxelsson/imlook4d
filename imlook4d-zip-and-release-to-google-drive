@@ -49,7 +49,7 @@ cd '/Users/jan/Documents/Projects/imlook4d/imlook4d_DEVELOP/release to google dr
 
 echo "------------------------------------------------------------------------------------ "
 echo "SEND TO GOOGLE DRIVE : "
-./send_to_google_api.py '1A_3nhoQsr4_djNum_yiFcO4dm3Ctbxkx' "$ZIPFILE" # imlook4d-site/downloads/Current release
+./send_to_google_api_folder.py '1A_3nhoQsr4_djNum_yiFcO4dm3Ctbxkx' "$ZIPFILE" # imlook4d-site/downloads/Current release
 echo "------------------------------------------------------------------------------------ "
 
 
@@ -57,10 +57,11 @@ echo "--------------------------------------------------------------------------
 echo "Update latest_releases.txt : "
 fileID=$(cat '/tmp/gdrive_id.txt')
 echo REV=$rev
-echo "$rev    		https://drive.google.com/uc?export=download&id=$fileID" > '/tmp/gdrive_id.txt'
-cat '/tmp/gdrive_id.txt' '/Users/jan/Google Drive/imlook4d-site/downloads/latest_releases.txt' > '/tmp/latest_releases.txt'
+echo "$rev    https://drive.google.com/uc?export=download&id=$fileID" > '/tmp/gdrive_id.txt'  
+# Relies on local version of  '/Users/jan/Google Drive/imlook4d-site/downloads/latest_releases.txt'  being up to date
+cat '/tmp/gdrive_id.txt' '/Users/jan/Google Drive/imlook4d-site/downloads/latest_releases.txt' > '/tmp/latest_releases.txt' 
 mv '/tmp/latest_releases.txt' '/Users/jan/Google Drive/imlook4d-site/downloads/latest_releases.txt'
-./send_to_google_api.py '12O9104muddmrLC7_ytN5AL8eeREcNwbL' '/Users/jan/Google Drive/imlook4d-site/downloads/latest_releases.txt'  # imlook4d-site/downloads
+./send_to_google_api_file.py '13mGVhbnZYUyr6BWq4mXTTo12PvM7gykJ' '/Users/jan/Google Drive/imlook4d-site/downloads/latest_releases.txt'  # imlook4d-site/downloads
 echo "------------------------------------------------------------------------------------ "
 
 
