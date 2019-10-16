@@ -23,7 +23,7 @@ IsDynamic = (numberOfFrames>1);
 
 model_name = 'Time-activity curve';
 
-a.ylabel = 'C_t';
+aaa.ylabel = 'C_t';
 
 % Normal
 try
@@ -34,10 +34,10 @@ try
     %dt = [tmid(1), tmid(2:length(tmid))-tmid(1:length(tmid)-1)];
     
     
-    a.xlabel = 'time';
+    aaa.xlabel = 'time';
 catch
     tmid = 1 : size( imlook4d_Cdata,4);
-    a.xlabel = 'frame';
+    aaa.xlabel = 'frame';
 end
 
 % Special for PC image
@@ -49,8 +49,8 @@ if IsPCImage
         
         tmid = 1:numberOfFrames;        
         
-        a.xlabel = 'frame';
-        a.ylabel = 'Eigen values';
+        aaa.xlabel = 'frame';
+        aaa.ylabel = 'Eigen values';
     catch
     end
     
@@ -70,41 +70,41 @@ disp('Calculating time-activity curves ...');
 
 if IsDynamic
     [tact, NPixels, stdev, maxActivity, roisToCalculate ] = generateTACT(imlook4d_current_handles,imlook4d_ROI);  % ROIs
-    a.names = {};
-    a.units = {};
-    a.pars = {};
+    aaa.names = {};
+    aaa.units = {};
+    aaa.pars = {};
     
     % Store for use in SaveTact, when called from modelWindow
-    a.extras.N = NPixels;
-    a.extras.stdev = stdev;
+    aaa.extras.N = NPixels;
+    aaa.extras.stdev = stdev;
     try
-        a.extras.unit = imlook4d_current_handles.image.unit;
+        aaa.extras.unit = imlook4d_current_handles.image.unit;
     catch
-        a.extras.unit = '';
+        aaa.extras.unit = '';
     end
     try
-        a.extras.frameStartTime = imlook4d_time / 60;
+        aaa.extras.frameStartTime = imlook4d_time / 60;
     catch
-        a.extras.frameStartTime =  1 : size( imlook4d_Cdata,4);
+        aaa.extras.frameStartTime =  1 : size( imlook4d_Cdata,4);
     end
     try
-        a.extras.frameDuration = imlook4d_duration / 60;
+        aaa.extras.frameDuration = imlook4d_duration / 60;
     catch
-        a.extras.frameDuration = ones( size( a.extras.frameStartTime));
+        aaa.extras.frameDuration = ones( size( aaa.extras.frameStartTime));
     end
       
     n = size(tact,1);
     for i = 1:n
-        a.X{i} = tmid;
-        a.Y{i} = tact(i,:);
+        aaa.X{i} = tmid;
+        aaa.Y{i} = tact(i,:);
         if IsPCImage
-            a.Y{i} = abs(a.Y{i} ); % PCA arbitrary direction
+            aaa.Y{i} = abs(aaa.Y{i} ); % PCA arbitrary direction
         end
     end
     
     % Store same data points in model (will be drawn as a line)
-    a.Xmodel = a.X;
-    a.Ymodel = a.Y;
+    aaa.Xmodel = aaa.X;
+    aaa.Ymodel = aaa.Y;
     
     
     % PVE-correction (if weights exist)
@@ -116,7 +116,7 @@ if IsDynamic
         end
         
         for i = 1 : n % Number of ROIs
-            a.Y{i} = pvc_tact(i,:);
+            aaa.Y{i} = pvc_tact(i,:);
         end
     end
     
@@ -126,8 +126,8 @@ if IsDynamic
         REF_EXISTS = length(imlook4d_current_handles.model.common.ReferenceROINumbers) > 0;
         if REF_EXISTS
             ref = generateReferenceTACT( imlook4d_current_handles);
-            a.Xref = a.X{1};
-            a.Yref = ref;
+            aaa.Xref = aaa.X{1};
+            aaa.Yref = ref;
         end
     catch
         REF_EXISTS = false;
@@ -135,7 +135,7 @@ if IsDynamic
     
     % Plot
     imlook4d_curve_window = modelWindow( ...
-        a , ...
+        aaa , ...
         imlook4d_ROINames(1:end-1), ...
         model_name ...
         );
@@ -170,8 +170,8 @@ end
 
 % Special for PC image
 if IsPCImage
-    for i = 1 : length(a.Y)
-        a.Y{i} = abs(a.Y{i});
+    for i = 1 : length(aaa.Y)
+        aaa.Y{i} = abs(aaa.Y{i});
     end
 end
 

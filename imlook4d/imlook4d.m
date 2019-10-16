@@ -2611,31 +2611,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
        if DisplayHelp(hObject, eventdata, handles)
            return
        end
-%        
-%        try
-%            XLim0 = get(handles.axes1,'XLim');
-%            YLim0 = get(handles.axes1,'YLim');
-%            set(handles.axes1,'XLim', YLim0 );
-%            set(handles.axes1,'YLim', XLim0 );
-%            
-%            
-%            if get(handles.FlipAndRotateRadioButton,'Value')              
-%                mmX=handles.image.pixelSizeX; % X pixel size (mm)
-%                mmY=handles.image.pixelSizeY; % Y pixel size (mm)
-%                
-%                set(handles.axes1,'DataAspectRatio', [ 1  mmY/mmX  1]);
-%            else
-%                mmX=handles.image.pixelSizeX; % X pixel size (mm)
-%                mmY=handles.image.pixelSizeY; % Y pixel size (mm)
-%                set(handles.axes1,'DataAspectRatio', [ mmY/mmX  1  1]);
-%            end
-%            
-%        catch
-%            mmX=1;
-%            mmY=1;
-%            set(handles.axes1,'DataAspectRatio', [  mmY mmX  1]);
-%            disp('imlook4d/updateROI:  Error calculating DataAspectRatio');
-%        end
+       
+       % Flip axes settings, so that rectangular dimensions remains
+       XLim = get(handles.axes1, 'XLim');
+       YLim = get(handles.axes1, 'YLim');
+       set(handles.axes1, 'XLim', YLim);
+       set(handles.axes1, 'YLim', XLim);
+
            guidata(handles.figure1,handles);  
          updateImage(hObject, eventdata, handles);
     function SwapHeadFeetRadioButton_Callback(hObject, eventdata, handles)
