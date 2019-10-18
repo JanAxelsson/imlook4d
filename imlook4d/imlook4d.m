@@ -7962,6 +7962,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                       catch
                           %disp('Error in imlook4d updateImage');
                       end
+                      
+                      
+                      
+                    
                     
                 %
                 % Cache foreground image
@@ -8115,11 +8119,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             else
                                 set(handles.axes1,'DataAspectRatio', abs( [ 1/mmY 1/mmX 1] ));
                             end
+                          
 
                            % Set axes1 size 
-
-                            %handles.axes1.XLim = XLim;
-                            %handles.axes1.YLim = YLim;
+                            handles.axes1.XLim = XLim;
+                            handles.axes1.YLim = YLim;
                            
                     catch
                         disp('caught error updateImage');
