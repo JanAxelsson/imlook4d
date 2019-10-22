@@ -3211,6 +3211,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              % Set scale in new X and Y direction
                 set(handles.axes1, 'XLim', [1 size( handles.image.Cdata,1)])
                 set(handles.axes1, 'YLim', [1 size( handles.image.Cdata,2)]) 
+                
+                guidata(handles.figure1, handles);
              % Set sliders
                 adjustSliderRanges(handles);
                 
@@ -8122,8 +8124,15 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                           
 
                            % Set axes1 size 
-                            handles.axes1.XLim = XLim;
-                            handles.axes1.YLim = YLim;
+                           %
+                           % NOTE to remember: 
+                           % This causing zoomed image to go up to unzoomed.  If I comment out,
+                           % the zoom remains, but then changing between Ax, Cor, Sag gives wrong view-port.
+                           %
+                           % Now I try to set these in orientationMenu_callback instead
+                           
+                            %handles.axes1.XLim = XLim;
+                            %handles.axes1.YLim = YLim;
                            
                     catch
                         disp('caught error updateImage');
