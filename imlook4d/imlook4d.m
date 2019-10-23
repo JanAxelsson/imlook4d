@@ -3209,8 +3209,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         
         % Finish   
              % Set scale in new X and Y direction
+             if handles.FlipAndRotateRadioButton.Value
                 set(handles.axes1, 'XLim', [1 size( handles.image.Cdata,1)])
                 set(handles.axes1, 'YLim', [1 size( handles.image.Cdata,2)]) 
+             else
+                set(handles.axes1, 'XLim', [1 size( handles.image.Cdata,2)])
+                set(handles.axes1, 'YLim', [1 size( handles.image.Cdata,1)]) 
+             end
                 
                 guidata(handles.figure1, handles);
              % Set sliders
