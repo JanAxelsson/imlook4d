@@ -21,7 +21,7 @@
                     
                     if ~isequal(get(handles.infoText1, 'String'), s')
                         set(handles.infoText1, 'String', s);
-                        %drawnow
+                        drawnow
                     end
                  catch
                     disp('displayMessageRow exception');

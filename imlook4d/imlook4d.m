@@ -6843,13 +6843,16 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 [file,path] = uiputfile('ROIs.roi','ROI Save file name');
                 fullPath=[path file];
                 cd(path);
-                rois=sparse(double(handles.image.ROI(:)));
+ 
+                displayMessageRow('Saving rois ...');               
 
                 % Always save ROIs
                 % in state without flipping of head-feet direction
                 if( get(handles.SwapHeadFeetRadioButton, 'Value')==1)
                     rois=flipdim(handles.image.ROI,3);
                     rois=sparse(double(rois(:)));
+                else
+                    rois=sparse(double(handles.image.ROI(:)));
                 end
 
                 roiNames=get(handles.ROINumberMenu,'String'); % Cell array
@@ -6863,10 +6866,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 catch
                    version = [];
                 end
-                    
-                
 
-                save(fullPath, 'rois', 'roiNames', 'roiSize','VisibleROIs','LockedROIs', 'version' );
+
+                save(fullPath, 'rois', 'roiNames', 'roiSize','VisibleROIs','LockedROIs', 'version', '-v7.3');
+                
+                
+                displayMessageRow('Done!');
                 
                 guidata(handles.figure1, handles);
                 
