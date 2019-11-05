@@ -3674,6 +3674,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             end
                             
                             ROIslice( (ixx):(ixx+rx-1),(iyy):(iyy+ry-1)) = subMatrix;
+                            
+                            
+                            
                         end
                     end
                     handles.image.ROI( :,:, slice) = ROIslice;
@@ -3732,7 +3735,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
      %   end
 
         % Print current Undo Level and number of pixels in all Undo-ROIs
-        printUndoInfo(handles);
+        %printUndoInfo(handles);
     function handles = retrieveUndoROI(handles, steps)
       % Call with steps = +1 to undo, steps = -1 to redo
       % 
@@ -3766,7 +3769,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         guidata(handles.figure1,handles);
 
         % Print current Undo Level and number of pixels in all Undo-ROIs
-        printUndoInfo(handles);
+        %printUndoInfo(handles);
     function handles = createUndoROI( handles, UNDOSIZE)
             handles.image.UndoROI.ROI = cell(1,UNDOSIZE);
             handles.image.UndoROI.ROI{1}.roiSlices = cell(1,size(handles.image.ROI,3));
@@ -3835,7 +3838,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 end
                 
                 %disp([ '(' num2str(handles.image.UndoROI.position) ') ' R]);
-                disp([ 'ROI: ' num2str( sum(handles.image.ROI(:)>0)) '    Undo: ' R]);
+                %disp([ 'ROI: ' num2str( sum(handles.image.ROI(:)>0)) '    Undo: ' R]);
+                disp([ 'ROI: ' nnz( sum(handles.image.ROI(:)>0)) '    Undo: ' R]);
             catch
                 disp('Error in printUndoInfo');
             end

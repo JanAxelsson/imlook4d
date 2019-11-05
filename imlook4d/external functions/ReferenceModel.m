@@ -2,14 +2,17 @@
 
 % Find out if undefined ref region
 
-RefRegionUndefined = true; % Guess
+RefRegionDefined = false; % Guess
 if isfield(imlook4d_current_handles.model, 'common')
     if isfield(imlook4d_current_handles.model.common, 'ReferenceROINumbers')
-        RefRegionUndefined = false;
+        RefRegionDefined = true;
+    end
+    if isempty( imlook4d_current_handles.model.common.ReferenceROINumbers)
+        RefRegionDefined = false;
     end
 end
 
 % Set Reference region if not defined
-if RefRegionUndefined
+if ~RefRegionDefined
    Select_Reference_ROIs
 end
