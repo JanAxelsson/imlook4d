@@ -7032,7 +7032,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             %print(h1,'-dbitmap')
             
             try
-                print(h1,'-clipboard','-dbitmap')
+                set(h1, 'InvertHardCopy', 'off');   % off = Use the same colors as the colors on the display. 
+                h1.Color = [ 1 1 1];                % Make background of figure white
+                print(h1,'-clipboard','-dbitmap'); 
             catch
                 print(h1,'-dmeta')
             end
