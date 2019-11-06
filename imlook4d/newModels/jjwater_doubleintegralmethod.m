@@ -116,7 +116,6 @@ function out =  jjwater_doubleintegralmethod( matrix, t, dt_in, Ct1)
         f(:,i) = alpha ./ (beta + gamma - kappa);
 
         
-        
         % For modelWindow compatibility: 
         if IS_ROI 
             out.X{i} = tmid;
@@ -130,6 +129,10 @@ function out =  jjwater_doubleintegralmethod( matrix, t, dt_in, Ct1)
         end
 
     end
+    
+    % Set if outside range
+    f( f>2) = NaN;
+    f(f<0) = 0;
           
     % --------
     %  Output

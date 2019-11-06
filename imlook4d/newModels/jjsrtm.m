@@ -111,9 +111,13 @@ function out =  jjsrtm( matrix, t, dt, Cr)
             %X = A\Ct(i,:)';  % Faster!
         
         % Faster!
-        if ( rank(A) == 3)
-            X = A\Ct(i,:)';  
-        else
+        try
+            if ( rank(A) == 3)
+                X = A\Ct(i,:)';
+            else
+                X = [0; 0; 0];
+            end
+        catch
             X = [0; 0; 0];
         end
         
