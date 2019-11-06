@@ -458,6 +458,12 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
             %
             % Setup image, colorbar and ROI 
             %
+            
+                % Set color order for ROI
+                colors = get(0,'DefaultAxesColorOrder');
+                tempColors = repmat(colors,37, 1);  % R
+                handles.roiColors = tempColors( 1:256, :);
+            
 
                 %handles.image.ROI=zeros(size(inpargs),'int8'); % Matrix for ROIs
                 handles.image.ROI=zeros(size(inpargs,1),size(inpargs,2),size(inpargs,3),'uint8'); % 3D Matrix for ROIs
@@ -3039,6 +3045,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 handles.image.VisibleROIs = [ handles.image.VisibleROIs(1:ROINumber-1) handles.image.VisibleROIs(ROINumber+1:end)   ];
                 handles.image.LockedROIs = [ handles.image.LockedROIs(1:ROINumber-1) handles.image.LockedROIs(ROINumber+1:end)   ];
                 
+                % Shift down ROI colors
+                handles.roiColors =[ handles.roiColors(1:ROINumber-1,:); ...
+                    handles.roiColors(ROINumber+1:end,:); ...
+                    handles.roiColors(ROINumber,:) ]; % Shift ROI colors, and put current at end of color list
+                
                 %
                 % Handle Reference ROIs (stored ROI numbers)
                 %
@@ -3134,8 +3145,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             % Set
             guidata(handles.figure1,handles);% Save handles 
             updateROIs(handles);
-
-            
+    function Edit_ROI_Color_Callback(hObject, eventdata, handles, name)
+        ROINumberMenu=get(handles.ROINumberMenu);
+        contents = ROINumberMenu.String; % Cell array
+        ROINumber=ROINumberMenu.Value;
+        handles.roiColors(ROINumber,:) = uisetcolor( handles.roiColors( ROINumber,:) ); % Open, current RGB as input 
+        
+        guidata(handles.figure1,handles);% Save handles 
+        updateROIs(handles); 
 
     function orientationMenu_Callback(hObject, eventdata, handles, name)
         
@@ -7015,7 +7032,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             %print(h1,'-dbitmap')
             
             try
-                print(h1,'-clipboard','-dbitmap')
+                set(h1, 'InvertHardCopy', 'off');   % off = Use the same colors as the colors on the display. 
+                h1.Color = [ 1 1 1];                % Make background of figure white
+                print(h1,'-clipboard','-dbitmap'); 
             catch
                 print(h1,'-dmeta')
             end
@@ -8937,7 +8956,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                 roisInSlice = unique( rois( find( rois >0)));
                                 if length(roisInSlice) > 0
                                     for i = roisInSlice'  % Set ROI colors only for ROIs in slice
-                                        color = getColor(i);
+                                        color = getColor(handles, i);
                                         a = a +  reshape( reshape( rois == i ,1,[])' * color , xSize, ySize, []) ;
                                     end
                                     set(handles.ImgObject3,'Cdata', a  );  % ROI RGB-matrix
@@ -9129,7 +9148,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                    
                                    if length(roisInSlice) > 0
                                        for i = roisInSlice'  % Set ROI colors only for ROIs in slice
-                                           color = getColor(i);
+                                           color = getColor(handles, i);
                                             contourRoi(axisHandle,  rois == i, color );
                                        end
                                    end
@@ -9144,7 +9163,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                     
                                     if length(roisInSlice) > 0
                                         for i = roisInSlice'  % Set ROI colors only for ROIs in slice
-                                            color = getColor(i);
+                                            color = getColor(handles, i);
                                             a = a +  reshape( reshape( rois == i ,1,[])' * color , xSize, ySize, []) ;
                                         end
                                         set(handles.ImgObject3,'Cdata', a  );  % ROI RGB-matrix
@@ -9610,11 +9629,16 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
     % --------------------------------------------------------------------
     % Other functions
     % --------------------------------------------------------------------
-        function color = getColor(index)
+        function color = getColor(handles, index)
            % Different colors
            colors = get(0,'DefaultAxesColorOrder'); % Matrix with colors in rows 1-7
            colorIndex = mod(index, size(colors,1))+1;
            color = colors(colorIndex,:);
+           
+           color = handles.roiColors( index, :);  
+           
+           % Override default
+           
         function save_cellarray(cellarr, filename, header, latex)
             % function save_cellarray(cellarr, filename, header, latex)
             %

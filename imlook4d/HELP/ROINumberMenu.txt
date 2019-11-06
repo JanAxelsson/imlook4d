@@ -17,6 +17,7 @@
 
 			<LI> <B>Clear ROI</B>, which clears the currently selected ROI, to remove all defined ROI pixels in selected ROI.
 			<LI> <B>Rename</B>, which renames the currently selected ROI
+			<LI> <B>Edit Color</B>, change color of currently selected ROI
 
 
 			<LI>  <B>Hide </B>, which hides the currently selected ROI from ROI analysis
