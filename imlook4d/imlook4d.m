@@ -908,7 +908,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 
 
  set(handles.ColorBar, 'Position',initpos','Location', 'EastOutside')
- 
+ updateImage(handles.figure1, [], handles)
  % Set HitTest (Matlab 2016b is sensitive to this, see my support issue to MathWorks #0235001)
  h=handles.figure1;h.HitTest='on';
     function handles = makeSubMenues( handles, parentMenuHandle, subMenuFolder)
@@ -8590,12 +8590,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 folder = thisHandles.image.folder;
             catch
                 folder = ''; 
+                thisHandles.image.folder = '';
             end
+            
             title = get(thisHandles.figure1, 'Name');
             for i=1:length(yokes) 
                 handles=guidata(yokes(i));
                 
-                if strcmp( get(handles.figure1, 'Name'), title) && strcmp( handles.image.folder, folder)
+                if strcmp( get(handles.figure1, 'Name'), title) && strcmp( thisHandles.image.folder, folder)
                     colorBarHandle=handles.ColorBar;                    % Get handle to colorbar
                     set(handles.autoColorScaleRadioButton,'Value', 0);  % Set autoscale to off
                     
