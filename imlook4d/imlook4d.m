@@ -885,7 +885,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 
                 clear varargin;
                 figure1_ResizeFcn(hObject, eventdata, handles)
-                imlook4d_set_defaults(hObject, eventdata, handles);            
+                %imlook4d_set_defaults(hObject, eventdata, handles);            
                         
                 % Set windows position offset to current imlook4d handle
                 try
@@ -906,11 +906,12 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
            
            initfontsize = get(handles.ColorBar,'FontSize');
 
-
- set(handles.ColorBar, 'Position',initpos','Location', 'EastOutside')
- updateImage(handles.figure1, [], handles)
- % Set HitTest (Matlab 2016b is sensitive to this, see my support issue to MathWorks #0235001)
- h=handles.figure1;h.HitTest='on';
+           
+           set(handles.ColorBar, 'Position',initpos','Location', 'EastOutside')
+           updateImage(handles.figure1, [], handles)
+           % Set HitTest (Matlab 2016b is sensitive to this, see my support issue to MathWorks #0235001)
+           h=handles.figure1;h.HitTest='on';
+           imlook4d_set_defaults(hObject, eventdata, handles);
     function handles = makeSubMenues( handles, parentMenuHandle, subMenuFolder)
         if strcmp( subMenuFolder(end), '.') % Ignore '.' and '..'
             return
