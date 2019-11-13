@@ -23,7 +23,7 @@ function varargout = modelWindow(varargin)
 
     % Edit the above text to modify the response to help modelWindow
 
-    % Last Modified by GUIDE v2.5 06-Sep-2019 22:41:26
+    % Last Modified by GUIDE v2.5 13-Nov-2019 17:42:00
 
     % Begin initialization code - DO NOT EDIT
 gui_Singleton = 0;
@@ -543,3 +543,77 @@ function copy_table_Callback(hObject, eventdata, handles)
     end
  
     clipboard('copy',s)   
+function copy_plot_Callback(hObject, eventdata, handles)
+    disp('Copy Plot Callback');
+    GenerateScreenDump(hObject,{},handles);% Call function
+function GenerateScreenDump(hObject, eventdata, handles,DISPLAY_ON_SCREEN)
+            
+            % Display clipboard on screen?
+              DISPLAY_ON_SCREEN=false;
+              DISPLAY_ON_SCREEN=true;
+
+ 
+            % New figure
+            h1=figure('Visible','off','NumberTitle','off','Name', 'Clipboard');         % New HIDDEN figure
+            if DISPLAY_ON_SCREEN
+                set(h1,'Visible','on');
+            end
+            
+            % Copy Axis and Legend
+            copyobj([handles.mainAxes, handles.mainAxes.Legend ],h1); 
+
+            
+            % Set aspect ratio
+            objects=get(h1,'Children');
+            c = objects(2); % Axes
+            c.PlotBoxAspectRatioMode = handles.mainAxes.PlotBoxAspectRatioMode
+            c.PlotBoxAspectRatio = handles.mainAxes.PlotBoxAspectRatio
+
+            % Figures
+            origUnitsModelWindow = handles.modelWindow.Units;
+            handles.modelWindow.Units = 'centimeters';
+            h1.Units = 'centimeters';
+            
+            % Axes
+            origUnitsModelWindowAxis = handles.mainAxes.Units;
+            handles.mainAxes.Units = 'centimeters';
+            c.Units = 'centimeters';
+
+            % Legends
+            origUnitsModelWindowLegend = handles.mainAxes.Legend.Units;
+            handles.mainAxes.Legend.Units = 'centimeters';
+            c.Legend.Units = 'centimeters';            
+            
+            c.Position(3:4) = handles.mainAxes.Position(3:4); % Copy Axes widths and height
+            h1.Position(3:4) = c.Position(3:4) + [3 3]; % Set figure widths and heights 3 cm larger
+            
+            axisOffset = [2 2];
+            
+            c.Position(1) =  axisOffset(1); % Set axis position 2 cm
+            c.Position(2) =  axisOffset(2); % Set axis position 2 cm
+        
+            pause(0.5) % Give time to settle, before moving legend
+            c.Legend.Position(1) = axisOffset(1) + handles.mainAxes.Legend.Position(1) - handles.mainAxes.Position(1);
+            c.Legend.Position(2) = axisOffset(2) + handles.mainAxes.Legend.Position(2) - handles.mainAxes.Position(2);
+           
+            % Restore Units in ModelWindow (from my centimeters, to what was from beginning)
+            handles.modelWindow.Units = origUnitsModelWindow;
+            handles.mainAxes.Units = origUnitsModelWindowAxis;
+            handles.mainAxes.Legend.Units = origUnitsModelWindowLegend;
+            
+            
+
+           % set(h1,'PaperPositionMode','auto')
+            %print(h1,'-dbitmap')
+            
+            try
+                set(h1, 'InvertHardCopy', 'off');   % off = Use the same colors as the colors on the display. 
+                h1.Color = [ 1 1 1];                % Make background of figure white
+                print(h1,'-clipboard','-dbitmap'); 
+            catch
+                print(h1,'-dmeta')
+            end
+            
+            if ~DISPLAY_ON_SCREEN
+                close(h1)
+            end   
