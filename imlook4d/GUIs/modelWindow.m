@@ -550,7 +550,7 @@ function GenerateScreenDump(hObject, eventdata, handles,DISPLAY_ON_SCREEN)
             
             % Display clipboard on screen?
               DISPLAY_ON_SCREEN=false;
-              DISPLAY_ON_SCREEN=true;
+              %DISPLAY_ON_SCREEN=true;
 
  
             % New figure
@@ -592,7 +592,8 @@ function GenerateScreenDump(hObject, eventdata, handles,DISPLAY_ON_SCREEN)
             c.Position(1) =  axisOffset(1); % Set axis position 2 cm
             c.Position(2) =  axisOffset(2); % Set axis position 2 cm
         
-            pause(0.5) % Give time to settle, before moving legend
+            %pause(0.5) % Give time to settle, before moving legend
+            drawnow
             c.Legend.Position(1) = axisOffset(1) + handles.mainAxes.Legend.Position(1) - handles.mainAxes.Position(1);
             c.Legend.Position(2) = axisOffset(2) + handles.mainAxes.Legend.Position(2) - handles.mainAxes.Position(2);
            
