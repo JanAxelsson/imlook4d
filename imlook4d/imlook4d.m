@@ -9105,8 +9105,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                                 % 1a) ColorFul ROI - contour
                                 if ( get(handles.ContourCheckBox,'Value')==1 )
-                                    contourRoi(axisHandle, logicalA, [ 0 1 0 ]);
                                     contourRoi(axisHandle,  logicalC, [ 1 0 0 ]);
+                                    contourRoi(axisHandle, logicalA, [ 0 1 0 ]); % Draw green on top
                                     
                                 % 1b) ColorFul ROI - solid
                                 else
