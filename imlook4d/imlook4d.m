@@ -7035,9 +7035,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             try
                 set(h1, 'InvertHardCopy', 'off');   % off = Use the same colors as the colors on the display. 
                 h1.Color = [ 1 1 1];                % Make background of figure white
-                print(h1,'-clipboard','-dbitmap'); 
+                try
+                    print(h1,'-clipboard','-dpdf');  % TODO : Does pdf clipboard work on Linux ?
+                catch
+                    print(h1,'-clipboard','-dmeta'); 
+                end
             catch
-                print(h1,'-dmeta')
+                print(h1,'-dbitmap')
             end
             
             if ~DISPLAY_ON_SCREEN
