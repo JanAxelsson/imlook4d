@@ -24,7 +24,7 @@ function varargout = adjustLevel(varargin)
 
 % Edit the above text to modify the response to help adjustLevel
 
-% Last Modified by GUIDE v2.5 28-Sep-2018 12:13:50
+% Last Modified by GUIDE v2.5 10-Nov-2019 19:47:58
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -127,8 +127,8 @@ function adjustLevel_OpeningFcn(hObject, eventdata, handles, varargin)
 %
 function update_imlook4d( handles)
 
-    CLim=[ handles.minSlider.Value, ...
-        handles.maxSlider.Value ...
+    CLim=[ handles.minSlider.Value - 1e-12, ...
+        handles.maxSlider.Value +  1e-12 ...
         ]; 
     imlook4d( 'setColorBar',  handles.imlook4d_handles, CLim);
     imlook4d('updateImage',handles.imlook4d_handles.figure1, [], handles.imlook4d_handles);
@@ -145,7 +145,7 @@ function minSlider_Callback(hObject, eventdata, handles)
 function maxSlider_Callback(hObject, eventdata, handles)
     handles.maxEdit.String = num2str( handles.maxSlider.Value);
     if handles.maxSlider.Value < handles.minSlider.Value  
-        handles.minSlider.Value = handles.maxSlider.Value - 1e-12; % Make slightly less than max value
+        handles.minSlider.Value = handles.maxSlider.Value ; % Make slightly less than max value
     end
     update_imlook4d(handles);
 function minEdit_Callback(hObject, eventdata, handles)
@@ -183,9 +183,15 @@ function ResetPushButton_Callback(hObject, eventdata, handles)
     
     minEdit_Callback(hObject, eventdata, handles)
     maxEdit_Callback(hObject, eventdata, handles)
-
+function SetMinMax_button_Callback(hObject, eventdata, handles)
+    handles.maxSlider.Max = handles.maxSlider.Value;
+    handles.minSlider.Max = handles.maxSlider.Max;
+    
+    handles.maxSlider.Min = handles.minSlider.Value;
+    handles.minSlider.Min = handles.maxSlider.Min;
 function closereq_Callback(hObject, eventdata, handles)
     if handles.imlook4d_handles.record.enabled % Script recording on
         recordInputsText(handles.imlook4d_handles,{ handles.minEdit.String, handles.maxEdit.String});  % Insert text at caret
     end
     closereq
+

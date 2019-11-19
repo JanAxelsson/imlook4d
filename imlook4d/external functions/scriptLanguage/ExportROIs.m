@@ -24,6 +24,7 @@ function  ExportROIs( roiNumbers)
     STAT_TOOLBOX = 1; % assume existing
     
     imlook4d_ROI_data=[];
+
     
     % Import from workspace
     try
@@ -58,6 +59,11 @@ function  ExportROIs( roiNumbers)
     if ( lastROI < 1 )
         displayMessageRowError('No ROIs defined')
         return
+    end
+    
+        
+    if nargin == 0
+        roiNumbers = 1 : lastROI;
     end
     
     numberOfFrames=size(imlook4d_Cdata,4);
@@ -99,13 +105,13 @@ function  ExportROIs( roiNumbers)
     
     % Remove hidden ROIs from calculation
      counter = 0;
-     for i=1:lastROI
+     for i=roiNumbers
             if  not( contains( imlook4d_ROI_data.names{i},'(hidden)' ) )
                 counter = counter + 1;
-                roiNumbers(counter) = i;
+                newRoiNumbers(counter) = i;
             end    
      end
-    
+    roiNumbers = newRoiNumbers;
     
     %for i=1:lastROI
     for i=roiNumbers

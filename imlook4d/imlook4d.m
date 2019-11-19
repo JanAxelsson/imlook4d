@@ -458,6 +458,12 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
             %
             % Setup image, colorbar and ROI 
             %
+            
+                % Set color order for ROI
+                colors = get(0,'DefaultAxesColorOrder');
+                tempColors = repmat(colors,37, 1);  % R
+                handles.roiColors = tempColors( 1:256, :);
+            
 
                 %handles.image.ROI=zeros(size(inpargs),'int8'); % Matrix for ROIs
                 handles.image.ROI=zeros(size(inpargs,1),size(inpargs,2),size(inpargs,3),'uint8'); % 3D Matrix for ROIs
@@ -879,7 +885,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 
                 clear varargin;
                 figure1_ResizeFcn(hObject, eventdata, handles)
-                imlook4d_set_defaults(hObject, eventdata, handles);            
+                %imlook4d_set_defaults(hObject, eventdata, handles);            
                         
                 % Set windows position offset to current imlook4d handle
                 try
@@ -900,11 +906,12 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
            
            initfontsize = get(handles.ColorBar,'FontSize');
 
-
- set(handles.ColorBar, 'Position',initpos','Location', 'EastOutside')
- 
- % Set HitTest (Matlab 2016b is sensitive to this, see my support issue to MathWorks #0235001)
- h=handles.figure1;h.HitTest='on';
+           
+           set(handles.ColorBar, 'Position',initpos','Location', 'EastOutside')
+           updateImage(handles.figure1, [], handles)
+           % Set HitTest (Matlab 2016b is sensitive to this, see my support issue to MathWorks #0235001)
+           h=handles.figure1;h.HitTest='on';
+           imlook4d_set_defaults(hObject, eventdata, handles);
     function handles = makeSubMenues( handles, parentMenuHandle, subMenuFolder)
         if strcmp( subMenuFolder(end), '.') % Ignore '.' and '..'
             return
@@ -3039,6 +3046,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 handles.image.VisibleROIs = [ handles.image.VisibleROIs(1:ROINumber-1) handles.image.VisibleROIs(ROINumber+1:end)   ];
                 handles.image.LockedROIs = [ handles.image.LockedROIs(1:ROINumber-1) handles.image.LockedROIs(ROINumber+1:end)   ];
                 
+                % Shift down ROI colors
+                handles.roiColors =[ handles.roiColors(1:ROINumber-1,:); ...
+                    handles.roiColors(ROINumber+1:end,:); ...
+                    handles.roiColors(ROINumber,:) ]; % Shift ROI colors, and put current at end of color list
+                
                 %
                 % Handle Reference ROIs (stored ROI numbers)
                 %
@@ -3134,8 +3146,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             % Set
             guidata(handles.figure1,handles);% Save handles 
             updateROIs(handles);
-
-            
+    function Edit_ROI_Color_Callback(hObject, eventdata, handles, name)
+        ROINumberMenu=get(handles.ROINumberMenu);
+        contents = ROINumberMenu.String; % Cell array
+        ROINumber=ROINumberMenu.Value;
+        handles.roiColors(ROINumber,:) = uisetcolor( handles.roiColors( ROINumber,:) ); % Open, current RGB as input 
+        
+        guidata(handles.figure1,handles);% Save handles 
+        updateROIs(handles); 
 
     function orientationMenu_Callback(hObject, eventdata, handles, name)
         
@@ -3209,8 +3227,15 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         
         % Finish   
              % Set scale in new X and Y direction
+             if handles.FlipAndRotateRadioButton.Value
                 set(handles.axes1, 'XLim', [1 size( handles.image.Cdata,1)])
                 set(handles.axes1, 'YLim', [1 size( handles.image.Cdata,2)]) 
+             else
+                set(handles.axes1, 'XLim', [1 size( handles.image.Cdata,2)])
+                set(handles.axes1, 'YLim', [1 size( handles.image.Cdata,1)]) 
+             end
+                
+                guidata(handles.figure1, handles);
              % Set sliders
                 adjustSliderRanges(handles);
                 
@@ -3667,6 +3692,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             end
                             
                             ROIslice( (ixx):(ixx+rx-1),(iyy):(iyy+ry-1)) = subMatrix;
+                            
+                            
+                            
                         end
                     end
                     handles.image.ROI( :,:, slice) = ROIslice;
@@ -3725,7 +3753,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
      %   end
 
         % Print current Undo Level and number of pixels in all Undo-ROIs
-        printUndoInfo(handles);
+        %printUndoInfo(handles);
     function handles = retrieveUndoROI(handles, steps)
       % Call with steps = +1 to undo, steps = -1 to redo
       % 
@@ -3759,7 +3787,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         guidata(handles.figure1,handles);
 
         % Print current Undo Level and number of pixels in all Undo-ROIs
-        printUndoInfo(handles);
+        %printUndoInfo(handles);
     function handles = createUndoROI( handles, UNDOSIZE)
             handles.image.UndoROI.ROI = cell(1,UNDOSIZE);
             handles.image.UndoROI.ROI{1}.roiSlices = cell(1,size(handles.image.ROI,3));
@@ -3828,7 +3856,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 end
                 
                 %disp([ '(' num2str(handles.image.UndoROI.position) ') ' R]);
-                disp([ 'ROI: ' num2str( sum(handles.image.ROI(:)>0)) '    Undo: ' R]);
+                %disp([ 'ROI: ' num2str( sum(handles.image.ROI(:)>0)) '    Undo: ' R]);
+                disp([ 'ROI: ' nnz( sum(handles.image.ROI(:)>0)) '    Undo: ' R]);
             catch
                 disp('Error in printUndoInfo');
             end
@@ -6836,13 +6865,16 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 [file,path] = uiputfile('ROIs.roi','ROI Save file name');
                 fullPath=[path file];
                 cd(path);
-                rois=sparse(double(handles.image.ROI(:)));
+ 
+                displayMessageRow('Saving rois ...');               
 
                 % Always save ROIs
                 % in state without flipping of head-feet direction
                 if( get(handles.SwapHeadFeetRadioButton, 'Value')==1)
                     rois=flipdim(handles.image.ROI,3);
                     rois=sparse(double(rois(:)));
+                else
+                    rois=sparse(double(handles.image.ROI(:)));
                 end
 
                 roiNames=get(handles.ROINumberMenu,'String'); % Cell array
@@ -6856,10 +6888,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 catch
                    version = [];
                 end
-                    
-                
 
-                save(fullPath, 'rois', 'roiNames', 'roiSize','VisibleROIs','LockedROIs', 'version' );
+
+                save(fullPath, 'rois', 'roiNames', 'roiSize','VisibleROIs','LockedROIs', 'version', '-v7.3');
+                
+                
+                displayMessageRow('Done!');
                 
                 guidata(handles.figure1, handles);
                 
@@ -6999,9 +7033,28 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             %print(h1,'-dbitmap')
             
             try
-                print(h1,'-clipboard','-dbitmap')
+                set(h1, 'InvertHardCopy', 'off');   % off = Use the same colors as the colors on the display. 
+                h1.Color = [ 1 1 1];                % Make background of figure white
+                
+                if ismac
+                    disp('Mac OS, copying as PDF');
+                    print(h1,'-clipboard','-dpdf');
+                elseif isunix
+                    %disp('Linux OS, copying as PDF');
+                    %print(h1,'-clipboard','-dpdf');  % Does not work into Excel, but works into inkscape (with Poppler option selected)
+                    disp('Linux OS, , copying as bitmap');
+                    print(h1,'-clipboard','-dbitmap');
+                elseif ispc
+                    disp('Windows OS, copying as Enhanced metafile');
+                    print(h1,'-clipboard','-dmeta');
+                else
+                    disp('Could not determine OS, copying as bitmap');
+                    print(h1,'-clipboard','-dbitmap');
+                end
+
             catch
-                print(h1,'-dmeta')
+                disp('Error, fallback copying  bitmap');
+                print(h1,'-dbitmap')
             end
             
             if ~DISPLAY_ON_SCREEN
@@ -7962,6 +8015,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                       catch
                           %disp('Error in imlook4d updateImage');
                       end
+                      
+                      
+                      
+                    
                     
                 %
                 % Cache foreground image
@@ -8115,9 +8172,16 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             else
                                 set(handles.axes1,'DataAspectRatio', abs( [ 1/mmY 1/mmX 1] ));
                             end
+                          
 
                            % Set axes1 size 
-
+                           %
+                           % NOTE to remember: 
+                           % This causing zoomed image to go up to unzoomed.  If I comment out,
+                           % the zoom remains, but then changing between Ax, Cor, Sag gives wrong view-port.
+                           %
+                           % Now I try to set these in orientationMenu_callback instead
+                           
                             %handles.axes1.XLim = XLim;
                             %handles.axes1.YLim = YLim;
                            
@@ -8544,12 +8608,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 folder = thisHandles.image.folder;
             catch
                 folder = ''; 
+                thisHandles.image.folder = '';
             end
+            
             title = get(thisHandles.figure1, 'Name');
             for i=1:length(yokes) 
                 handles=guidata(yokes(i));
                 
-                if strcmp( get(handles.figure1, 'Name'), title) && strcmp( handles.image.folder, folder)
+                if strcmp( get(handles.figure1, 'Name'), title) && strcmp( thisHandles.image.folder, folder)
                     colorBarHandle=handles.ColorBar;                    % Get handle to colorbar
                     set(handles.autoColorScaleRadioButton,'Value', 0);  % Set autoscale to off
                     
@@ -8910,7 +8976,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                 roisInSlice = unique( rois( find( rois >0)));
                                 if length(roisInSlice) > 0
                                     for i = roisInSlice'  % Set ROI colors only for ROIs in slice
-                                        color = getColor(i);
+                                        color = getColor(handles, i);
                                         a = a +  reshape( reshape( rois == i ,1,[])' * color , xSize, ySize, []) ;
                                     end
                                     set(handles.ImgObject3,'Cdata', a  );  % ROI RGB-matrix
@@ -9056,8 +9122,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                                 % 1a) ColorFul ROI - contour
                                 if ( get(handles.ContourCheckBox,'Value')==1 )
-                                    contourRoi(axisHandle, logicalA, [ 0 1 0 ]);
                                     contourRoi(axisHandle,  logicalC, [ 1 0 0 ]);
+                                    contourRoi(axisHandle, logicalA, [ 0 1 0 ]); % Draw green on top
                                     
                                 % 1b) ColorFul ROI - solid
                                 else
@@ -9102,7 +9168,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                    
                                    if length(roisInSlice) > 0
                                        for i = roisInSlice'  % Set ROI colors only for ROIs in slice
-                                           color = getColor(i);
+                                           color = getColor(handles, i);
                                             contourRoi(axisHandle,  rois == i, color );
                                        end
                                    end
@@ -9117,7 +9183,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                     
                                     if length(roisInSlice) > 0
                                         for i = roisInSlice'  % Set ROI colors only for ROIs in slice
-                                            color = getColor(i);
+                                            color = getColor(handles, i);
                                             a = a +  reshape( reshape( rois == i ,1,[])' * color , xSize, ySize, []) ;
                                         end
                                         set(handles.ImgObject3,'Cdata', a  );  % ROI RGB-matrix
@@ -9583,11 +9649,16 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
     % --------------------------------------------------------------------
     % Other functions
     % --------------------------------------------------------------------
-        function color = getColor(index)
+        function color = getColor(handles, index)
            % Different colors
            colors = get(0,'DefaultAxesColorOrder'); % Matrix with colors in rows 1-7
            colorIndex = mod(index, size(colors,1))+1;
            color = colors(colorIndex,:);
+           
+           color = handles.roiColors( index, :);  
+           
+           % Override default
+           
         function save_cellarray(cellarr, filename, header, latex)
             % function save_cellarray(cellarr, filename, header, latex)
             %

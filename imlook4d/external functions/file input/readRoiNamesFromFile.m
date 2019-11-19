@@ -14,7 +14,13 @@ function imlook4d_ROINames = readRoiNamesFromFile( filePath, imlook4d_ROINames)
     NEWCOLUMN = 2;
 
 
-    stop = length(imlook4d_ROINames)-1; % Exclude 'Add ROI'
+    stop = length(imlook4d_ROINames);  % All 
+    % Exclude 'Add ROI' if exists (makes this function more generally applicable)
+    if strcmp(imlook4d_ROINames{stop},'Add ROI')
+       stop = stop -1; 
+    end
+    
+    
     for i=1:stop
         currentName = imlook4d_ROINames{i};
         start = [];

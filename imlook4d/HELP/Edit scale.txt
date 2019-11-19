@@ -2,10 +2,24 @@
 <HR></HR>
 <!------------------->
 	<P>
-	Sets the low and high value to colorbar scale.  
-	Suggested values are based on the mininum and maximum values in currently displayed image.  
-	<P>
-	</P>
-	The "Auto colorscale" and "Remove negatives" radio-buttons are cleared.   
+	Interactively modifieds the low and high value of the image colorbar.  
+	The slider range is based on the mininum and maximum values in currently displayed image.  
 	</P>
 
+	<P>
+	If slider range is not sufficient, type a new value into the min- or max textbox.  
+	</P>
+
+	<P>
+	The slider range can be made smaller, which may be useful if small changes are needed in an image with large span of pixel values.
+    The range is zoomed in from the currently set min and max values, by pressing the button "Set min-max".    
+	</P>
+
+	<P>
+	The default range can be reset by pressing the "Reset" button.  
+	</P>
+
+
+	<P>
+	The "Auto colorscale" and "Remove negatives" radio-buttons in the imlook4d are cleared.   
+	</P>
