@@ -7035,12 +7035,25 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             try
                 set(h1, 'InvertHardCopy', 'off');   % off = Use the same colors as the colors on the display. 
                 h1.Color = [ 1 1 1];                % Make background of figure white
-                try
-                    print(h1,'-clipboard','-dpdf');  % TODO : Does pdf clipboard work on Linux ?
-                catch
-                    print(h1,'-clipboard','-dmeta'); 
+                
+                if ismac
+                    disp('Mac OS, copying as PDF');
+                    print(h1,'-clipboard','-dpdf');
+                elseif isunix
+                    %disp('Linux OS, copying as PDF');
+                    %print(h1,'-clipboard','-dpdf');  % Does not work into Excel, but works into inkscape (with Poppler option selected)
+                    disp('Linux OS, , copying as bitmap');
+                    print(h1,'-clipboard','-dbitmap');
+                elseif ispc
+                    disp('Windows OS, copying as Enhanced metafile');
+                    print(h1,'-clipboard','-dmeta');
+                else
+                    disp('Could not determine OS, copying as bitmap');
+                    print(h1,'-clipboard','-dbitmap');
                 end
+
             catch
+                disp('Error, fallback copying  bitmap');
                 print(h1,'-dbitmap')
             end
             
