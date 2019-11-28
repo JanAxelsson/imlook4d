@@ -1,5 +1,13 @@
 <h1>Save ROI </h1>
 <HR></HR>
 <!------------------->
-Saves a ROI definition file.  This file is saved as a sparse MATLAB matrix with dimensions (x,y,z).
+Saves a ROI definition file.  
+Allowed formats are 
+<ul>
+<li> imlook4d ROI format (.roi), which saves as a sparse MATLAB matrix with dimensions (x,y,z).
+<li> Nifti file format (.nii)
+</ul>
+
+
+
 

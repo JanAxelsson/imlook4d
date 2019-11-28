@@ -5,9 +5,9 @@ Loads a ROI definition file.
 
 Allowed formats are 
 <ul>
-<li> imlook4d ROI format
-<li> Nifti nii
-<li> Compressed Nifti nii.gz
+<li> imlook4d ROI format (.roi)
+<li> Nifti format (.nii)
+<li> Compressed Nifti (.nii.gz)
 <li> DICOM RTSTRUCT
 </ul>
 
