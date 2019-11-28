@@ -6862,35 +6862,75 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 initialOrientation = handles.orientationMenu.Value;
                 handles = resetOrientation(handles);
 
-                [file,path] = uiputfile('ROIs.roi','ROI Save file name');
+                %[file,path] = uiputfile('ROIs.roi','ROI Save file name');
+                [file,path] = uiputfile({'*.roi'; '*.nii'},'ROI Save file name','ROIs.roi');
                 fullPath=[path file];
-                cd(path);
+                [~,~,ext] = fileparts(file);
+                cd(path);  
  
-                displayMessageRow('Saving rois ...');               
+                if strcmp(ext,'.roi')
+                    displayMessageRow('Saving rois imlook4d format ...');
+                    
+                    % Always save ROIs
+                    % in state without flipping of head-feet direction
+                    if( get(handles.SwapHeadFeetRadioButton, 'Value')==1)
+                        rois=flipdim(handles.image.ROI,3);
+                        rois=sparse(double(rois(:)));
+                    else
+                        rois=sparse(double(handles.image.ROI(:)));
+                    end
+                    
+                    roiNames=get(handles.ROINumberMenu,'String'); % Cell array
+                    roiSize=size(handles.image.ROI); % Array
+                    
+                    VisibleROIs=handles.image.VisibleROIs;
+                    LockedROIs=handles.image.LockedROIs;
+                    
+                    try
+                        version = getImlook4dVersion();
+                    catch
+                        version = [];
+                    end
 
-                % Always save ROIs
-                % in state without flipping of head-feet direction
-                if( get(handles.SwapHeadFeetRadioButton, 'Value')==1)
-                    rois=flipdim(handles.image.ROI,3);
-                    rois=sparse(double(rois(:)));
-                else
-                    rois=sparse(double(handles.image.ROI(:)));
+                    save(fullPath, 'rois', 'roiNames', 'roiSize','VisibleROIs','LockedROIs', 'version', '-v7.3');
                 end
-
-                roiNames=get(handles.ROINumberMenu,'String'); % Cell array
-                roiSize=size(handles.image.ROI); % Array
+ 
                 
-                VisibleROIs=handles.image.VisibleROIs;
-                LockedROIs=handles.image.LockedROIs;
+                if strcmp(ext,'.nii')
+                    displayMessageRow('Saving rois in Nifti format ...');
+                    nii = handles.image.nii;
+
+                    UINT8 = 2;
+                    nii.hdr.dime.datatype = UINT8;
+                    nii.hdr.dime.bitpix = UINT8;
+                    
+                    % Always save ROIs
+                    % in state without flipping of head-feet direction
+                    if( get(handles.SwapHeadFeetRadioButton, 'Value')==1)
+                        nii.img=flipdim(handles.image.ROI,3);
+                    else
+                        nii.img=handles.image.ROI;
+                    end
+
+                    
+                    % If opening mode is known, save with correct mode
+                    if isfield(handles.image,'openingMode')
+                        IS_PROPER_NII = strcmp(handles.image.openingMode, 'load_nii');
+                        if IS_PROPER_NII
+                            save_nii( nii, fullPath);
+                        end
+                        
+                        IS_UNTOUCH_NII = strcmp(handles.image.openingMode, 'load_untouch_nii');
+                        if IS_UNTOUCH_NII
+                            save_untouch_nii( nii, fullPath);
+                        end
+                    else
+                        % Unknown opening mode
+                        save_untouch_nii( nii, fullPath);
+                    end
+
+                end                
                 
-                try
-                   version = getImlook4dVersion(); 
-                catch
-                   version = [];
-                end
-
-
-                save(fullPath, 'rois', 'roiNames', 'roiSize','VisibleROIs','LockedROIs', 'version', '-v7.3');
                 
                 
                 displayMessageRow('Done!');
