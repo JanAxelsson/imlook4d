@@ -7066,11 +7066,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             set(c(2),'Unit','normalized')
             set(c(2),'Position', [ (0.05-0.05) 0.05 0.9 0.9] ) % Subtract 0.05 for approximate width of color bar
             
-            %pos1=get(c(1),'Position'); % Colorbar
-            %pos2=get(c(2),'Position'); % Image
+            
+            h1.Units='centimeters'
+            h1.PaperSize(1) = h1.OuterPosition(3)+0.5;
+            h1.PaperSize(2) = h1.OuterPosition(4)+0.5;
+            set(h1,'PaperPositionMode','auto')
+            
 
-           % set(h1,'PaperPositionMode','auto')
-            %print(h1,'-dbitmap')
             
             try
                 set(h1, 'InvertHardCopy', 'off');   % off = Use the same colors as the colors on the display. 
