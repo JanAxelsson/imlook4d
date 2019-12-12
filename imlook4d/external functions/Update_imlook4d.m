@@ -1,3 +1,5 @@
+StoreVariables  % Remember variables
+
 disp( [ 'Determining latest available version ']);
 
 
@@ -125,3 +127,5 @@ savepath
 disp(' ');
 disp( [ 'Installation DONE!  Old version remains on disk']);
 disp( [ ' ']);
+
+ClearVariables  % Clear remembered variables
