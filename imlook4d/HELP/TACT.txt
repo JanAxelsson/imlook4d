@@ -1,27 +1,58 @@
 <h1>TACT (Time-activity curve)</h1>
 <HR></HR>
 <!------------------->
-	<P>
-	Plots a time-activity curve (TACT) in a separate window. 
-	The number of pixels are shown in the figure legend. 
-	</P>
-	
-	<P>
-    In the figure window, a button [TACT to file] is shown.
-	Clicking the button opens a file-dialog, that gives the option to save TACT data.  
-    One of the following formats can be selected using the file format dropbox:
-	<ul>
-	<li><b>imlook4d original format </b>, giving start time and duration, ROI values and standard deviations for each frame in units Bq/ml.
-	<li><b>Pmod format</b>, giving frame start and stop time, and ROI values for each frame in kBq/cc
-	<li><b>Sif format</b>, giving frame start and stop time.  The intention with this format is only to save time information, and possibly blood data, and is limited to two ROIs. 
-            imlook4d does not fill in time, study ID or isotope, but marks these with characters xxxx.  The saved sif file is useful for importing time information into dynamic Nifti data, where the time information is not present (see also help on File/Open menu).
-	</ul>
-	<P>
-	The assumption is that original data is in units of Bq/ml, which is typical for DICOM.  Both these formats are compatible with Excel import
-	</P>
-	Press "Cancel" button in the file dialog if you wish not to save TACT data.
-	</P>
-	
-	
+<P>
+Plots a time-activity curve (TACT) in a separate window. 
+</P>
+
+<P>
+Menus in this  window, have different functions :
+
+<ul style="list-style-type:none;">
+    <li><B>File</B>
+
+    <ul style="list-style-type:circle;"> 
+        <li><B>Export Curves</B><BR>
+        One of the following formats can be selected using the file format dropbox:
+        <ul>
+        <li><b>imlook4d original format </b>, giving start time and duration, ROI values and standard deviations for each frame in units Bq/ml.
+        <li><b>Pmod format</b>, giving frame start and stop time, and ROI values for each frame in kBq/cc
+        <li><b>Sif format</b>, giving frame start and stop time.  The intention with this format is only to save time information, and possibly blood data, and is limited to two ROIs. 
+                imlook4d does not fill in time, study ID or isotope, but marks these with characters xxxx.  The saved sif file is useful for importing time information into dynamic Nifti data, where the time information is not present (see also help on File/Open menu).
+        </ul>
+    </ul><BR>
+
+    <li><B>Edit</B>
+
+    <ul style="list-style-type:circle;"> 
+        <li><B>Copy Curves</B><BR>
+        Copy marked curves to clipboard
+ 
+        <li><B>Copy All Curves</B><BR>
+        Copy all curves to clipboard
+ 
+        <li><B>Copy Table</B><BR>
+        Copy the table to clipboard
+ 
+        <li><B>Copy Plot</B><BR>
+        Copy the plot to clipboard
+
+    </ul><BR>
+
+
+    <li><B>Workspace</B><BR>
+
+    <ul style="list-style-type:circle;"> 
+ 
+        <li><B>Save to Variable</B><BR>
+        Saves the time-activity curve to variable "StoredTACT"
+ 
+        <li><B>Save as input function (Cinp)</B><BR>
+        Saves the marked time-activity curve to variable "Cinp".  
+        This variable can be used as an image-derived input function for non-reference tissue models, such as "Water" and "Patlak"
+
+</ul> 
+</ul> 
+
 
 

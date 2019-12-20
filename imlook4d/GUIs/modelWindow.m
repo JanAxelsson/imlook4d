@@ -23,7 +23,7 @@ function varargout = modelWindow(varargin)
 
     % Edit the above text to modify the response to help modelWindow
 
-    % Last Modified by GUIDE v2.5 13-Nov-2019 17:42:00
+    % Last Modified by GUIDE v2.5 20-Dec-2019 16:31:11
 
     % Begin initialization code - DO NOT EDIT
 gui_Singleton = 0;
@@ -618,3 +618,18 @@ function GenerateScreenDump(hObject, eventdata, handles,DISPLAY_ON_SCREEN)
             if ~DISPLAY_ON_SCREEN
                 close(h1)
             end   
+function workspaceMenu_Callback(hObject, eventdata, handles)
+    if (handles.selectedRow ==1)
+        handles.SaveAsInputFunction.Enable = 'on';
+    else
+        handles.SaveAsInputFunction.Enable = 'off';
+    end
+    
+function SaveVariableToWorkspace_Callback(hObject, eventdata, handles)
+    selectedRoinumbers = handles.selectedRow;
+    temp = cell2mat(handles.datastruct.Y')';
+    assignin('base', 'StoredTACT', temp(:, selectedRoinumbers));
+    
+function SaveAsInputFunction_Callback(hObject, eventdata, handles)
+    selectedRoinumbers = handles.selectedRow; 
+    assignin('base', 'Cinp', handles.datastruct.Y{selectedRoinumbers});
