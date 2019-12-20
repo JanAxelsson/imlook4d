@@ -17,4 +17,4 @@ function webhandle=displayHTML(basePath,title,varargin)
 %                                 '</html>' ];
                             
                        % Display in web browser, and store handles
-                       [stat, webhandle] =web(allText, '-notoolbar','-noaddressbox');    
+                       [stat, webhandle] =web(allText,'-noaddressbox');    
