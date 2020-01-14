@@ -2,6 +2,8 @@ function out =  jjwater( matrix, t, dt_in, Cinp)
 
     % PET Water - perfusion
     %
+    % Typical value for Cerebral blod flow should be around 50 ml/(100 g * min)
+    %
     % Reference:
     % 
     %
@@ -16,9 +18,9 @@ function out =  jjwater( matrix, t, dt_in, Cinp)
     %   this function
     %
     % Outputs:
-    %   out.pars  = cell array with matrices { BPND, DVR, intercept}; 
-    %   out.names = { 'BPND', 'DVR', 'intercept'};
-    %   out.units = { '1','1','min'};
+    %   out.pars  = cell array with matrices { F, F, k2}; 
+    %   out.names = { 'F(K1)','F(K1)','k2'};
+    %   out.units = { 'mL/(cm3*min)','mL/(100cm3*min)','min-1'};
     %  
     %   Cell array with cells for each ROI:
     %     out.X = X-axis 
@@ -26,13 +28,14 @@ function out =  jjwater( matrix, t, dt_in, Cinp)
     %     out.Xref = Ct1 x-axis (same times, most often)
     %     out.Yref = Cinp
     %
+    %
 
     
     warning('off','MATLAB:lscov:RankDefDesignMat')
     warning('off','MATLAB:nearlySingularMatrix')
         
-    out.names = { 'F(K1)','k2'};
-    out.units = { 'mL/cm3/min','min-1'};
+    out.names = { 'F(K1)','F(K1)','k2'};
+    out.units = { 'mL/(cm3*min)','mL/(100cm3*min)','min-1'};
     
     % Keep frame start time and duration (in seconds)
     out.extras.frameStartTime = t;
@@ -92,7 +95,7 @@ function out =  jjwater( matrix, t, dt_in, Cinp)
     % C = roi curve ( one time-activity curve in each column)  
     % CR= ref curve
     %
-    % A = [ CR(t) int(CR(t)) -int(C(t)) ]   (columns) called  ASRTM below
+    % A = [ CR(t) int(CR(t)) -int(C(t)) ]   (columns) 
     %
     %     | K1  |
     % X = |     |
@@ -129,6 +132,8 @@ function out =  jjwater( matrix, t, dt_in, Cinp)
     for i = 1:n
 
         A(:,2) = -cumsum( Ct(i,:) .* dt); % -int(C(t))
+        
+        A(:,2) = A(:,2) + 1e-9; 
 
         %LSQ-estimation using, solving for X = lscov(A,C)
             %[X se mse]   = lscov(A,Ct(i,:)'); 
@@ -137,7 +142,8 @@ function out =  jjwater( matrix, t, dt_in, Cinp)
         % Faster!
         try
             if ( rank(A) == 2)
-                X = A\Ct(i,:)';
+                %X = A\Ct(i,:)';
+                [X se mse]   = lscov(A,Ct(i,:)');
             else
                 X = [0; 0];
             end
@@ -145,9 +151,8 @@ function out =  jjwater( matrix, t, dt_in, Cinp)
             X = [0; 0];
         end
 
-        % modfit_srtm = A * X;
         K1(i)  = X(1); 
-        k2(i)  = X(2); 
+        k2(i)  = X(2);
 
         
         % For modelWindow compatibility: 
@@ -170,8 +175,9 @@ function out =  jjwater( matrix, t, dt_in, Cinp)
     %  Output
      % --------  
     f = reshape(f, outsize);
+    k2 = reshape(k2, outsize);
 
-    out.pars = {f, k2};
+    out.pars = {f, 100 * f, k2};
     
     out.xlabel = 'time';
     out.ylabel = 'C_t';
