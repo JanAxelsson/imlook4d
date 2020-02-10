@@ -6765,7 +6765,6 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             
             % Bail out if ROI doesn't match image
             imageVolumeSize = size(handles.image.Cdata(:,:,:,1) );
-            numberOfPixels = imageVolumeSize(1) * imageVolumeSize(2) * imageVolumeSize(3);
             
             if ( ~isequal( roiSize, imageVolumeSize ) )
                 warndlg({'ROI size does not match image matrix.', 'This ROI was made a different image volume'});
