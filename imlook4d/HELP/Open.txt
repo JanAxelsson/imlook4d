@@ -6,6 +6,7 @@
 		Loads medical images in one of the formats:
 
 		<UL>
+			<LI> <B><a href="javascript:;" onclick="document.location.hash='ROI';">ROI file + image </a> </B> (.roi)
 			<LI> <B><a href="javascript:;" onclick="document.location.hash='DICOM';">DICOM</a> </B>
 			<LI>  <B><a href="javascript:;" onclick="document.location.hash='Nifti';">Nifti</a> </B> (.nii, .hdr, .img)
 
@@ -18,7 +19,7 @@
 			<LI>  <B>Imlook4d state </B> (.mat) 
 				 (as saved from menu "File/Save state" )
 			<LI>  <B><a href="javascript:;" onclick="document.location.hash='Binary';">Binary</a> </B>
-			<LI>  <B><a href="javascript:;" onclick="document.location.hash='Hermes';">Hermes</a>(as taken from CD cache) </B>
+			<LI>  <B><a href="javascript:;" onclick="document.location.hash='Hermes';">Hermes</a> (as taken from CD cache) </B>
 			<LI>  <B><a href="javascript:;" onclick="document.location.hash='Interfile';">Interfile</a></B>
 		</UL>
 
@@ -26,6 +27,14 @@
 		If neither of these match, the file is assumed to be binary.
 	</P>
 
+<h2><a id="ROI">ROI file opening</a></h2>
+<!-------------------------------------->
+	<P>
+		Selecting  a .roi file opens the images that was used creating the ROI. The ROIs are loaded automatically into this image.  
+	</P><P>
+        The ROI file has to be created with imlook4d (version later than 5.0.17).  
+        The image file must be on the same file path as when the ROI file was created. 
+	</P>
 
 <h2><a id="DICOM">DICOM file opening</a></h2>
 <!-------------------------------------->

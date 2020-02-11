@@ -3950,6 +3950,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     % Select file
                        [file,path,indx] = uigetfile( ...
                             {'*',  'All Files'; ...
+                           '*.roi',  'ROI files (*.roi)'; ...
                            '*.dcm',  'DICOM files (*.dcm)'; ...
                             '*.v','ECAT Files (*.v)'; ...
                             '*.img;*.hdr','Analyze Files (*.img, *.hdr)'; ...
@@ -3999,6 +4000,21 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             if strcmp(ext,'.img') FILETYPE='ANALYZE'; end % Assume Analyze format (modify below if Nifti)
                             if strcmp(ext,'.hdr') FILETYPE='ANALYZE'; end % Assume Analyze format (modify below if Nifti)
                             if strcmp(ext,'.nii') FILETYPE='NIFTI'; end  
+                            
+                            % If ROI then open linked file and load ROI afterwards
+                            if strcmp(ext,'.roi') 
+                                load(file,'parentVolume','-mat'); % Read ROI file to get parentVolume
+                                
+                                disp([ 'parentVolume = ' parentVolume]);
+                                OpenFile_Callback(hObject, [], handles, parentVolume);
+                                disp( 'Done opening parentVolume ');
+                                
+                                disp([ 'Loading ROI = ' fullPath]);
+                                LoadRoiPushbutton_Callback(gcf, [], guidata(gcf), fullPath);
+                                disp( 'Done loading ROI ');
+                                
+                                return
+                            end
                             
                             % if .nii.gz   gunzip
                             if strcmp(ext,'.gz') 
@@ -6890,8 +6906,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     catch
                         version = [];
                     end
+                    
+                    try
+                        parentVolume = [handles.image.folder handles.image.file];
+                    catch
+                        
+                    end
 
-                    save(fullPath, 'rois', 'roiNames', 'roiSize','VisibleROIs','LockedROIs', 'version', '-v7.3');
+                    save(fullPath, 'rois', 'roiNames', 'parentVolume', 'roiSize','VisibleROIs','LockedROIs', 'version', '-v7.3');
                 end
  
                 
