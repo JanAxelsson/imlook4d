@@ -4003,16 +4003,33 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             
                             % If ROI then open linked file and load ROI afterwards
                             if strcmp(ext,'.roi') 
-                                load(file,'parentVolume','-mat'); % Read ROI file to get parentVolume
-                                
-                                disp([ 'parentVolume = ' parentVolume]);
-                                OpenFile_Callback(hObject, [], handles, parentVolume);
-                                disp( 'Done opening parentVolume ');
-                                
-                                disp([ 'Loading ROI = ' fullPath]);
-                                LoadRoiPushbutton_Callback(gcf, [], guidata(gcf), fullPath);
-                                disp( 'Done loading ROI ');
-                                
+                                %load(file,'parentVolume','-mat'); % Read ROI file to get parentVolume
+                                try
+                                    load(file,'-mat'); % Read ROI file to get parentVolume
+
+
+                                    disp([ 'parentVolume = ' parentVolume]);
+                                    OpenFile_Callback(hObject, [], handles, parentVolume);
+                                    disp( 'Done opening parentVolume ');
+                                    
+                                    newHandles = guidata(gcf);
+
+                                    disp([ 'Loading ROI = ' fullPath]);
+                                    LoadRoiPushbutton_Callback(gcf, [], newHandles, fullPath);
+                                    disp( 'Done loading ROI ');
+
+                                    % Get settings
+                                    set(newHandles.SliceNumSlider,'Value',GuiSettings.slice);
+                                    set(newHandles.SliceNumEdit,'String',num2str(GuiSettings.slice) );
+                                    
+                                    set(newHandles.FrameNumSlider,'Value',GuiSettings.frame);
+                                    set(newHandles.FrameNumEdit,'String',num2str(GuiSettings.frame) );
+                                    
+                                    set(newHandles.ROINumberMenu,'Value',GuiSettings.selectedROI);
+
+                                catch
+                                    dispRed('Failed Open on .roi file -- try using Load ROI instead');
+                                end
                                 return
                             end
                             
@@ -6910,10 +6927,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     try
                         parentVolume = [handles.image.folder handles.image.file];
                     catch
-                        
                     end
-
-                    save(fullPath, 'rois', 'roiNames', 'parentVolume', 'roiSize','VisibleROIs','LockedROIs', 'version', '-v7.3');
+                    
+                    % Save settings
+                    GuiSettings.slice=round(get(handles.SliceNumSlider,'Value'));
+                    GuiSettings.frame=round(get(handles.FrameNumSlider,'Value'));
+                    GuiSettings.selectedROI=get(handles.ROINumberMenu,'Value');
+                    
+                    save(fullPath, 'rois', 'roiNames', 'parentVolume', 'GuiSettings', 'roiSize','VisibleROIs','LockedROIs', 'version', '-v7.3');
                 end
  
                 
