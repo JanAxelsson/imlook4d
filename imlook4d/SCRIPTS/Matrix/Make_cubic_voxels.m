@@ -67,6 +67,8 @@ StartScript
     % Fix ROI dimensions
     %imlook4d_ROI = zeros( xPixels, yPixels, zPixels);
     imlook4d_ROI = interpn(X1, Y1, Z1, imlook4d_ROI, X2, Y2, Z2, 'nearest');
+    
+    imlook4d_Cdata( isnan(imlook4d_Cdata)) = 0;
 
 
 EndScript
