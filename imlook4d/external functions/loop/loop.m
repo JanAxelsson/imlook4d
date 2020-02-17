@@ -160,7 +160,10 @@ function T =  loop( myFunction, xlsFileList, sheet, columns )
             toc
             T = [T;T2];
             successCount(i) =1;
-        catch
+        catch ME   
+            msgText = getReport(ME);
+            disp(msgText);
+            
             errCount(i) =1;
             f = functions(myFunction); % Name
             dispRed( [ '?? ERROR in your function = ' f.function ] ); % RED
