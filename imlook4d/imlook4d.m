@@ -5765,10 +5765,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         nii.hdr.dime.dim(5)=size(tempData,4);
                         
                         % Pixel size
-                        nii.hdr.dime.pixdim(1:3) = [ handles.image.pixelSizeX, handles.image.pixelSizeY, handles.image.sliceSpacing ];
+                        nii.hdr.dime.pixdim(2:4) = [ handles.image.pixelSizeX, handles.image.pixelSizeY, handles.image.sliceSpacing ];
 
                         % Make 3D if required
-                        if (nii.hdr.dime.dim(5)==1) nii.hdr.dime.dim(1)=3;end
+                        if (nii.hdr.dime.dim(5)==1) 
+                            nii.hdr.dime.dim(1)=3;
+                        end
 
                         % Set output format to float
                         nii.hdr.dime.datatype=16;
