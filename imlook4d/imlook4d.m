@@ -4006,19 +4006,29 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                 %load(file,'parentVolume','-mat'); % Read ROI file to get parentVolume
                                 try
                                     load(file,'-mat'); % Read ROI file to get parentVolume
+                                    
+                                    % If absolute path fails (moved parentVolume file)
+                                    % then try to derive relative path
+                                    if ~isfile(parentVolume)
+                                        disp('Looking for relative path for Parent Volume');
+                                        parentVolume = lookForRoiParentFilePath( path, parentVolume)
+                                        disp(['Identified probable parentVolume = ' parentVolume]);
+                                    end
 
 
+                                    % Open image file
                                     disp([ 'parentVolume = ' parentVolume]);
                                     OpenFile_Callback(hObject, [], handles, parentVolume);
                                     disp( 'Done opening parentVolume ');
                                     
                                     newHandles = guidata(gcf);
 
+                                    % Load ROI
                                     disp([ 'Loading ROI = ' fullPath]);
                                     LoadRoiPushbutton_Callback(gcf, [], newHandles, fullPath);
                                     disp( 'Done loading ROI ');
 
-                                    % Get settings
+                                    % Apply settings stored in ROI file
                                     set(newHandles.SliceNumSlider,'Value',GuiSettings.slice);
                                     set(newHandles.SliceNumEdit,'String',num2str(GuiSettings.slice) );
                                     

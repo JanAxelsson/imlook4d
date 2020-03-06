@@ -33,7 +33,11 @@
 		Selecting  a .roi file opens the images that was used creating the ROI. The ROIs are loaded automatically into this image.  
 	</P><P>
         The ROI file has to be created with imlook4d (version later than 5.0.17).  
-        The image file must be on the same file path as when the ROI file was created. 
+        The image file should be on the same file path as when the ROI file was created. 
+   </P><P>
+        If the data has been moved, the image file has changed location. If it has not moved relative the .roi file, imlook4d tries to identify a common folder from the .roi file path,
+        and derive the file from that. This may succeed if the relative paths has not changed, or if the .roi and the image file 
+        is in the same folder hierarchy. 
 	</P>
 
 <h2><a id="DICOM">DICOM file opening</a></h2>
