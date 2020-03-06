@@ -1070,7 +1070,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 [ satisfied, missing ] = requiredToolboxSatisfied( name, 'requiredToolboxesForSCRIPTS');
                 if ~satisfied
                     set( handles.scriptsMenuSubItemHandle(j), 'Enable', 'off' );
-                    newLabel = [ label ' (missing toolbox)'];
+                    newLabel = [ label ' (missing ' missing{1} ')'];
                     set( handles.scriptsMenuSubItemHandle(j), 'Label', newLabel );
                     for k = 1 : length(missing)
                         disp([ missing{k} ' is required for script "' name '"' ]);
@@ -9387,6 +9387,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                 altHelpFileName2 = [ helpFolder filesep alt2ObjectName '.txt' ];
                                 
                                 % Select correct file name
+                                correctFileName = helpFileName; % Initial guess -- fallback if fails
                                 if isfile(helpFileName)
                                     correctFileName = helpFileName;
                                 end
@@ -9411,6 +9412,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                 
                                 % Read help text
                                 text =  fileread(correctFileName );
+
                            catch
                                text = ['WARNING - could not find help file = ' helpFileName ];
                                disp(text);

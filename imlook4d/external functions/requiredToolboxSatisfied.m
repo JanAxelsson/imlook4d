@@ -26,9 +26,10 @@ function [ satisfied, missing ] = requiredToolboxSatisfied( scriptName, definiti
             missing = {};
 
             for i = 1 : length( listOfRequiredToolboxes )
-                % Tests for each toolbox defined here. Checks for function name
+                % Tests for each toolbox defined here, by looking for the name of a known function
                 [ satisfied, missing ] = testToolBox( listOfRequiredToolboxes{i}, 'imagingToolbox', 'bwboundaries', satisfied, missing);
                 [ satisfied, missing ] = testToolBox( listOfRequiredToolboxes{i}, 'statisticalToolbox', 'kurtosis', satisfied, missing);
+                [ satisfied, missing ] = testToolBox( listOfRequiredToolboxes{i}, 'dummyToolbox', 'silly_non_existing_name', satisfied, missing); % Use for testing
             end
 
             % Check for single required toolbox

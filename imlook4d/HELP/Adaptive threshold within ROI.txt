@@ -1,0 +1,45 @@
+<h1>Adaptive Threshold within ROI</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	This creates an adaptively thresholded ROI witin the boundaries of the currently selected ROI.  
+	</P>
+
+	<P>
+	It uses the currently selected ROI as a search volume.  Adaptive thresholding is calculated globally, but applied 
+    only within the pixels in the current ROI. Thus, the new ROI will be smaller than the current ROI.
+	</P>
+
+
+<P>
+The inputs in the dialog are:
+	
+		<TABLE>
+			<TR>
+			<TD> <B> Sensitivity &nbsp;</B></TD>
+			<TD> A value between 0 and 1.  Lower value gives a smaller volume  </TD>
+			</TR>
+			
+			<TR>
+			<TD> <B> Background </B></TD>
+			<TD> A background level which is subtracted from the pixel values, prior to adaptive thresholding.  This value may be zero if the contrast is high between signal and background </TD>
+			</TR>
+
+		</TABLE>
+</P>
+
+<P>
+The adaptive threshold uses the Bradley method on the global image, which is preprocessed as follows: 
+<OL>
+<LI> Background level is subracted
+<LI> Pixel values are normalized to 1 for highest pixel within ROI
+</OL>
+
+The Bradley method is then applied globally to the preprocessed image, and pixels that satisfied the Bradley sensitivity setting are marked as valid.  Finally,
+the ROI is updated so that only pixels within the original ROI are kept.
+
+</P>
+
+<P>
+NOTE: Requires Matlab Imaging Toolbox
+</P>

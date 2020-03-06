@@ -7,9 +7,10 @@ Move_ROI.m
 ROI_naming_from_file.m
 ---
 #Make_:
-Threshold_within_ROI.m
 Threshold_ROI.m
+Threshold_within_ROI.m
 Highest_pixels_within_ROI.m
+Adaptive_threshold_within_ROI.m
 ---
 Flood_Fill_ROI.m
 Flood_Fill_within_ROI.m
