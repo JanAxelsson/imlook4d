@@ -33,9 +33,10 @@ The adaptive threshold uses the Bradley method on the global image, which is pre
 <OL>
 <LI> Background level is subracted
 <LI> Pixel values are normalized to 1 for highest pixel within ROI
+<LI> My modification to this method : set everything outside current ROI to the median value of the ROI, to lessen the impact of high values outside ROI.
 </OL>
 
-The Bradley method is then applied globally to the preprocessed image, and pixels that satisfied the Bradley sensitivity setting are marked as valid.  Finally,
+The method is then applied globally to the preprocessed image, and pixels that satisfied the Bradley sensitivity setting are marked as valid.  Finally,
 the ROI is updated so that only pixels within the original ROI are kept.
 
 </P>

@@ -6,11 +6,11 @@ Export;
 %
     prompt={'Sensitivity (between 0 and 1)', ...
         'Background level'};
-    title='Adaptive threshold sensitivity';
+    myTitle='Adaptive threshold sensitivity';
     numlines=1;
 
     defaultanswer = RetriveEarlierValues('AdaptiveThreshold', {'0.1', '0'} ); % Read default if exists, or apply these as default
-    answer=inputdlg(prompt,title,numlines,defaultanswer);
+    answer=inputdlg(prompt,myTitle,numlines,defaultanswer);
     if isempty(answer) % cancelled inputdlg
         return
     end
@@ -28,9 +28,23 @@ Export;
     % Normalize to max in ROI
     searchArea = (imlook4d_ROI == imlook4d_ROI_number); 
     valuesInSearchArea = I(searchArea);
-    I = I / max( valuesInSearchArea(:));
+    
+    maxInROI = max( valuesInSearchArea(:));
+    I = I / maxInROI;
+    valuesInSearchArea = valuesInSearchArea(:) / maxInROI;
+    background = background / maxInROI;
+    
+    % NOTE : From here on, work on normalized intensities
+    
 
-    % Adaptive thresholding
+    % TEST : set outside of ROI to median of ROI
+    medianInROI = median( valuesInSearchArea ) ;
+
+    I = medianInROI * ones(size(I));    % Set background outside searchArea
+    I(searchArea) = valuesInSearchArea; % Retrieve values from searchArea
+
+    
+    % Adaptive thresholding on whole image
     T = adaptthresh(I, sensitivity); 
     adaptiveWholeImage = imbinarize(I,T); % adaptive threshold whole 3D volume
 
