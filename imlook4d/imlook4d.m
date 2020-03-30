@@ -7141,8 +7141,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     disp('Linux OS, , copying as bitmap');
                     print(h1,'-clipboard','-dbitmap');
                 elseif ispc
-                    disp('Windows OS, copying as Enhanced metafile');
-                    print(h1,'-clipboard','-dmeta');
+                    %disp('Windows OS, copying as Enhanced metafile');
+                    %print(h1,'-clipboard','-dmeta'); % Does not work on Windows 10
+                    disp('Linux OS, , copying as bitmap');
+                    print(h1,'-clipboard','-dbitmap');
                 else
                     disp('Could not determine OS, copying as bitmap');
                     print(h1,'-clipboard','-dbitmap');
