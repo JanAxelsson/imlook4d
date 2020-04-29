@@ -6670,6 +6670,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 file = fullPath;
             end
             
+            % Test
             
             if nargin==3
             % Dialog option
