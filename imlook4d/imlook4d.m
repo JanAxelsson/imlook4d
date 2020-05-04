@@ -6785,8 +6785,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 
                 % Reverse z-order
                 INSTANCE_NR_COL = 8;
-                if handles.image.DICOMsortedIndexList(1,INSTANCE_NR_COL) > 1
-                    rois = flip(rois,3);
+                try % Fails if not DICOM
+                    if handles.image.DICOMsortedIndexList(1,INSTANCE_NR_COL) > 1
+                        rois = flip(rois,3);
+                    end
+                catch
                 end
                 
                 % Flip y-axis
