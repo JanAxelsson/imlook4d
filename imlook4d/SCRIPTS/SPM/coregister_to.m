@@ -90,30 +90,73 @@ RefPath=[pathRef fileRef];
 
 spm('defaults','pet');
 spm_jobman('initcfg');
+% 
+% matlabbatch{1}.spm.util.exp_frames.files = { [realingedPath ',1']};
+% %matlabbatch{1}.spm.util.exp_frames.files = {'/Users/jan/Desktop/IMAGES/DAD-tests/D34/native/Sharp.nii,1'};
+% matlabbatch{1}.spm.util.exp_frames.frames = [1 : numberOfFrames];
+% %matlabbatch{1}.spm.util.exp_frames.frames = [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18];
+% 
+% 
+% matlabbatch{2}.spm.spatial.coreg.estwrite.ref = {RefPath};
+% %matlabbatch{2}.spm.spatial.coreg.estwrite.ref = {'/Users/jan/Desktop/IMAGES/DAD-tests/D34/native/T1w.nii,1'};
+% 
+% %matlabbatch{2}.spm.spatial.coreg.estwrite.source(1) = cfg_dep('Expand image frames: Expanded filename list.', substruct('.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1}), substruct('.','files'));
+% matlabbatch{2}.spm.spatial.coreg.estwrite.source = { [ meanImagePath ',1'] };
+% 
+% matlabbatch{2}.spm.spatial.coreg.estwrite.other = cfg_dep('Expand image frames: Expanded filename list.', substruct('.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1}), substruct('.','files'));
+% %matlabbatch{2}.spm.spatial.coreg.estwrite.other = {'/Users/jan/Desktop/IMAGES/DAD-tests/D34/native/atlas_D34.nii,1'};
+% 
+% matlabbatch{2}.spm.spatial.coreg.estwrite.eoptions.cost_fun = 'nmi';
+% matlabbatch{2}.spm.spatial.coreg.estwrite.eoptions.sep = [4 2];
+% matlabbatch{2}.spm.spatial.coreg.estwrite.eoptions.tol = [0.02 0.02 0.02 0.001 0.001 0.001 0.01 0.01 0.01 0.001 0.001 0.001];
+% matlabbatch{2}.spm.spatial.coreg.estwrite.eoptions.fwhm = [7 7];
+% matlabbatch{2}.spm.spatial.coreg.estwrite.roptions.interp = 1;
+% matlabbatch{2}.spm.spatial.coreg.estwrite.roptions.wrap = [0 0 0];
+% matlabbatch{2}.spm.spatial.coreg.estwrite.roptions.mask = 0;
+% matlabbatch{2}.spm.spatial.coreg.estwrite.roptions.prefix = newFilePrefix;
 
-matlabbatch{1}.spm.util.exp_frames.files = { [realingedPath ',1']};
-%matlabbatch{1}.spm.util.exp_frames.files = {'/Users/jan/Desktop/IMAGES/DAD-tests/D34/native/Sharp.nii,1'};
-matlabbatch{1}.spm.util.exp_frames.frames = [1 : numberOfFrames];
-%matlabbatch{1}.spm.util.exp_frames.frames = [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18];
+
+% NEW
 
 
-matlabbatch{2}.spm.spatial.coreg.estwrite.ref = {RefPath};
-%matlabbatch{2}.spm.spatial.coreg.estwrite.ref = {'/Users/jan/Desktop/IMAGES/DAD-tests/D34/native/T1w.nii,1'};
+% Save temporary ROI file as nifti
+roiTempFile = [tempdir filesep 'test.nii'];
+INPUTS = Parameters( { roiTempFile} );
+Menu('Save ROI')
 
-%matlabbatch{2}.spm.spatial.coreg.estwrite.source(1) = cfg_dep('Expand image frames: Expanded filename list.', substruct('.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1}), substruct('.','files'));
-matlabbatch{2}.spm.spatial.coreg.estwrite.source = { [ meanImagePath ',1'] };
+% Setup job
 
-matlabbatch{2}.spm.spatial.coreg.estwrite.other = cfg_dep('Expand image frames: Expanded filename list.', substruct('.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1}), substruct('.','files'));
-%matlabbatch{2}.spm.spatial.coreg.estwrite.other = {'/Users/jan/Desktop/IMAGES/DAD-tests/D34/native/atlas_D34.nii,1'};
+%matlabbatch{1}.spm.spatial.coreg.estimate.ref = {'/Users/jan/Downloads/ID-2-NOT-IN-STUDY (2007-MAR-03) - 255029/ID-50 (2019-JUN-16) - 175921 PETMR/[MR] T1 ax 2 mm+GD dosplan - serie1601/[MR]_T1_ax_2_mm+GD_dosplan_-_serie1601.nii,1'};
+matlabbatch{1}.spm.spatial.coreg.estimate.ref = { [realingedPath ',1']};
+%matlabbatch{1}.spm.spatial.coreg.estimate.source = {'/Users/jan/Downloads/ID-2-NOT-IN-STUDY (2007-MAR-03) - 255029/ID-50 (2019-JUN-16) - 257443 CT for RT-struct/[CT] O-MAR - serie2/[CT]_O-MAR_-_serie2.nii,1'};
+matlabbatch{1}.spm.spatial.coreg.estimate.source ={ [ meanImagePath ',1'] };
+matlabbatch{1}.spm.spatial.coreg.estimate.other = {''};
+matlabbatch{1}.spm.spatial.coreg.estimate.eoptions.cost_fun = 'nmi';
+matlabbatch{1}.spm.spatial.coreg.estimate.eoptions.sep = [4 2];
+matlabbatch{1}.spm.spatial.coreg.estimate.eoptions.tol = [0.02 0.02 0.02 0.001 0.001 0.001 0.01 0.01 0.01 0.001 0.001 0.001];
+matlabbatch{1}.spm.spatial.coreg.estimate.eoptions.fwhm = [7 7];
 
-matlabbatch{2}.spm.spatial.coreg.estwrite.eoptions.cost_fun = 'nmi';
-matlabbatch{2}.spm.spatial.coreg.estwrite.eoptions.sep = [4 2];
-matlabbatch{2}.spm.spatial.coreg.estwrite.eoptions.tol = [0.02 0.02 0.02 0.001 0.001 0.001 0.01 0.01 0.01 0.001 0.001 0.001];
-matlabbatch{2}.spm.spatial.coreg.estwrite.eoptions.fwhm = [7 7];
-matlabbatch{2}.spm.spatial.coreg.estwrite.roptions.interp = 1;
-matlabbatch{2}.spm.spatial.coreg.estwrite.roptions.wrap = [0 0 0];
-matlabbatch{2}.spm.spatial.coreg.estwrite.roptions.mask = 0;
-matlabbatch{2}.spm.spatial.coreg.estwrite.roptions.prefix = newFilePrefix;
+matlabbatch{2}.spm.spatial.coreg.write.ref(1) = matlabbatch{1}.spm.spatial.coreg.estimate.ref;
+%matlabbatch{2}.spm.spatial.coreg.write.source = {'/Users/jan/Downloads/ID-2-NOT-IN-STUDY (2007-MAR-03) - 255029/ID-50 (2019-JUN-16) - 257443 CT for RT-struct/[CT] O-MAR - serie2/[CT]_O-MAR_-_serie2.nii,1'};
+matlabbatch{2}.spm.spatial.coreg.write.source = matlabbatch{1}.spm.spatial.coreg.estimate.source; % Same as source above
+matlabbatch{2}.spm.spatial.coreg.write.roptions.interp = 4;
+matlabbatch{2}.spm.spatial.coreg.write.roptions.wrap = [0 0 0];
+matlabbatch{2}.spm.spatial.coreg.write.roptions.mask = 0;
+matlabbatch{2}.spm.spatial.coreg.write.roptions.prefix = 'r';
+
+matlabbatch{3}.spm.spatial.coreg.write.ref(1) = matlabbatch{1}.spm.spatial.coreg.estimate.ref;
+%matlabbatch{3}.spm.spatial.coreg.write.source = {'/Users/jan/Downloads/ID-2-NOT-IN-STUDY (2007-MAR-03) - 255029/ID-50 (2019-JUN-16) - 257443 CT for RT-struct/[CT] O-MAR - serie2/ROIs.nii,1'};
+matlabbatch{2}.spm.spatial.coreg.write.source =  { [ '' roiTempFile ',1'''] }; % Temporary roi file
+matlabbatch{3}.spm.spatial.coreg.write.roptions.interp = 0; % Nearest neighbor
+matlabbatch{3}.spm.spatial.coreg.write.roptions.wrap = [0 0 0];
+matlabbatch{3}.spm.spatial.coreg.write.roptions.mask = 0;
+matlabbatch{3}.spm.spatial.coreg.write.roptions.prefix = newFilePrefix;
+
+
+
+
+
+
 
 spm_jobman('run',matlabbatch);
 
