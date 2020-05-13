@@ -1,6 +1,15 @@
 <h1>Measure Tool </h1>
 <HR></HR>
 <!------------------->
+		
+	<P>
+    <B> NOTE: </B> This function works best if the Matlab Imaging Toolbox is installed. If not, a simplified version is used, which does not allow editing, and closes when clicking on.
+	</P>
+
+	<P>
+    <B> With Imaging toolbox: </B> 
+	</P>
+
 	<P>
 	This tools measures lengths and angle of the line to the horizontal axis. 
  The drawing of the measurement line is activated by pressing the measure button, and you then click the start and end position, 
@@ -16,4 +25,10 @@ The measured data is shown at the bottom of the imlook4d window, and also in the
 	<P>
 The line may be removed by Right-clicking on the line and selecting delete.
 	</P>
-	
+
+	<P>
+    <B> Without Imaging toolbox: </B> 
+	</P>
+	<P>
+    A simplified version is used, which does not allow editing, and which removes the line when clicked on.
+	</P>

@@ -2042,7 +2042,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     
                 catch
                     % If imaging toolbox missing, or other faults
-                    line( x,y,'ButtonDownFcn','delete(gcbo)','LineWidth',3);
+                    line( x,y,'ButtonDownFcn','delete(gcbo)','LineWidth',1);
                     pos(:,1) = x;
                     pos(:,2) = y;
                     displayLineCoordinates( pos);
