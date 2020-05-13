@@ -2036,20 +2036,41 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 [x,y]= ginput(2);
    
                 try
+                    htext = text(x(1),y(1),'String','Color','red','ButtonDownFcn','delete(gcbo)','FontSize',14);
+                    
                     h = imline( gca,x,y); % Imaging tool box
-                    addNewPositionCallback(h, @(p) displayLineCoordinates( p) );
-                    displayLineCoordinates( h.getPosition);
+                    addNewPositionCallback(h, @(p) displayLineCoordinates(h, p) );
+                    displayLineCoordinates( h, h.getPosition);
+                    
+                    % Add to contextual menu of imline
+                    f = gcf; % Contextual menu belongs to this image
+                    contextMenu = f.Children(1); % Get latest contextual menu (is index 1)
+                    
+                    % Submenu displaying name of measurement
+                    contextMenuItem = uimenu(contextMenu,'Text','My measure','ForegroundColor', [0   0.4510  0.7412] );
+                    contextMenuItem.MenuSelectedFcn = 'disp(''hej'')';
+                    
+                    % Submenu for changing name of measurement
+                    contextMenuItem = uimenu(contextMenu,'Text','Rename');
+                    contextMenuItem.MenuSelectedFcn = 'disp(''rename entered'')';
+                    
+                    % Move my new submenus to top
+                    contextMenu.Children = circshift(contextMenu.Children,-2)
+
+
+
                     
                 catch
                     % If imaging toolbox missing, or other faults
-                    line( x,y,'ButtonDownFcn','delete(gcbo)','LineWidth',1);
+                    disp('Imaging toolbox missing -- fallback ');
+                    h = line( x,y,'ButtonDownFcn','delete(gcbo)','LineWidth',1);
                     pos(:,1) = x;
                     pos(:,2) = y;
-                    displayLineCoordinates( pos);
+                    displayLineCoordinates( h, pos);
                 end
 
                 releasedToggleButton( hObject);
-        function displayLineCoordinates( pos)
+        function displayLineCoordinates(h, pos)
             disp('displayLineCoordinates');
             
             handles = guidata(gcf);
@@ -2079,6 +2100,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 msg = [ 'Length = ' num2str( length) ' mm (' num2str( pixels) ' pixels long).  Angle = ' num2str(angle_degrees) ' degrees'];
                 disp( msg);
                 displayMessageRow(msg)
+                
                 
     function rotateToggleButtonOn_ClickedCallback(hObject, eventdata, handles)
        % NOTE: 
