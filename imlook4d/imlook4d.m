@@ -2034,9 +2034,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 
                 pressedToggleButton( hObject);
                 [x,y]= ginput(2);
-   
+
                 try
-                    htext = text(x(1),y(1),'String','Color','red','ButtonDownFcn','delete(gcbo)','FontSize',14);
+                    % Text label
+                    %htext = text(x(1),y(1),'String','Color','red','ButtonDownFcn','delete(gcbo)','FontSize',14);
+                    htext = text(x(1),y(1),'String','Color','red','FontSize',14);
                     
                     h = imline( gca,x,y); % Imaging tool box
                     addNewPositionCallback(h, @(p) displayLineCoordinates(h, p) );
@@ -2052,10 +2054,18 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     
                     % Submenu for changing name of measurement
                     contextMenuItem = uimenu(contextMenu,'Text','Rename');
-                    contextMenuItem.MenuSelectedFcn = 'disp(''rename entered'')';
+
                     
+                    contextMenuItem.MenuSelectedFcn = @(hObject,eventdata) imlook4d( 'measureTape_Rename', hObject, eventdata, guidata(hObject));
+
                     % Move my new submenus to top
                     contextMenu.Children = circshift(contextMenu.Children,-2)
+                    
+                    
+                    % Store data in struct within contextMenu.UserData 
+                    % (because Line object cannot store UserData)
+                    data.textHandle = htext;
+                    contextMenu.UserData = data;
 
 
 
@@ -2100,7 +2110,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 msg = [ 'Length = ' num2str( length) ' mm (' num2str( pixels) ' pixels long).  Angle = ' num2str(angle_degrees) ' degrees'];
                 disp( msg);
                 displayMessageRow(msg)
+        function measureTape_Rename(renameContextMenuItem,eventdata,handles)
+                contextMenu = renameContextMenuItem.Parent;
+                labelHandle = contextMenu.UserData.textHandle;
                 
+                defaultAnswer = {labelHandle.String};
+                answer = inputdlg('Name','Edit name',1,defaultAnswer);
+                labelHandle.String = answer{1};
                 
     function rotateToggleButtonOn_ClickedCallback(hObject, eventdata, handles)
        % NOTE: 
