@@ -3,11 +3,10 @@
 <!------------------->
 		
 	<P>
-    <B> NOTE: </B> This function works best if the Matlab Imaging Toolbox is installed. If not, a simplified version is used, which does not allow editing, and closes when clicking on.
-	</P>
+    <B> NOTE: </B> This function works best if the Matlab Imaging Toolbox is installed. If not, a simplified version is used
 
 	<P>
-    <B> With Imaging toolbox: </B> 
+    <h2> With Imaging toolbox: </h2> 
 	</P>
 
 	<P>
@@ -26,9 +25,30 @@ The measured data is shown at the bottom of the imlook4d window, and also in the
 The line may be removed by Right-clicking on the line and selecting delete.
 	</P>
 
+	
 	<P>
-    <B> Without Imaging toolbox: </B> 
+Right-clicking on the line gives the following options 
+
+		<UL>
+			<LI> <B>The first row</B> Displays a name, describing the measurement
+			<LI> <B>Rename </B> Renames the first row
+			<LI> <B>Copy values </B> Copies the values to clipboard
+			<LI> <B>Set color </B> Changes the color of the line, and the text label
+			<LI> <B>Delete </B> Deletes the measurement
+		</UL>
+	</P>
+
+
+
+
+	<P>
+    <h2> Without Imaging toolbox: </h2> 
 	</P>
 	<P>
-    A simplified version is used, which does not allow editing, and which removes the line when clicked on.
+    A simplified version is used, which does not allow editing. The following right-click menu exists then:
+
+		<UL>
+			<LI> <B>Copy values </B> Copies the values to clipboard
+			<LI> <B>Delete </B> Deletes the measurement
+		</UL>
 	</P>

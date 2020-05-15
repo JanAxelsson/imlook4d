@@ -2036,87 +2036,180 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 [x,y]= ginput(2);
 
                 try
+                    %throw( MException('MyComponent:Testing',' ')); % TEST - fall into non-image toolbox version
+                    
                     % Text label
-                    %htext = text(x(1),y(1),'String','Color','red','ButtonDownFcn','delete(gcbo)','FontSize',14);
-                    htext = text(x(1),y(1),'String','Color','red','FontSize',14);
+                    name = 'My measure';
+                    htext = text(x(1),y(1),name,'Color','red','FontSize',14);
                     
                     h = imline( gca,x,y); % Imaging tool box
+                    pos = h.getPosition;
                     addNewPositionCallback(h, @(p) displayLineCoordinates(h, p) );
-                    displayLineCoordinates( h, h.getPosition);
                     
+                    %
                     % Add to contextual menu of imline
+                    %
                     f = gcf; % Contextual menu belongs to this image
-                    contextMenu = f.Children(1); % Get latest contextual menu (is index 1)
+                    contextMenu = f.Children(1); % Get latest created contextual menu (is index 1)
+                    contextMenu.Tag = 'measureLineContextMenu';
+                    
+                    % Delete context menu Show Position
+                    delete(contextMenu.Children(end));
+                    
+                    % Set divider line 
+                    contextMenu.Children(end).Separator = 'on';
                     
                     % Submenu displaying name of measurement
-                    contextMenuItem = uimenu(contextMenu,'Text','My measure','ForegroundColor', [0   0.4510  0.7412] );
-                    contextMenuItem.MenuSelectedFcn = 'disp(''hej'')';
+                    contextMenuItem = uimenu(contextMenu,'Text',name,'Tag','nameContextMenuItem','ForegroundColor', [0   0.4510  0.7412] );
                     
                     % Submenu for changing name of measurement
                     contextMenuItem = uimenu(contextMenu,'Text','Rename');
-
-                    
                     contextMenuItem.MenuSelectedFcn = @(hObject,eventdata) imlook4d( 'measureTape_Rename', hObject, eventdata, guidata(hObject));
-
-                    % Move my new submenus to top
-                    contextMenu.Children = circshift(contextMenu.Children,-2)
                     
                     
+                    contextMenuItem = uimenu(contextMenu,'Text','Copy values');
+                    contextMenuItem.MenuSelectedFcn = @(hObject,eventdata) imlook4d( 'measureTape_CopyValues', hObject, eventdata, guidata(hObject));
+                    
+                    displayLineCoordinates( contextMenuItem, pos);
+                    
+                    % Modify existing "delete" contextual menu to remove both label + imline
+                    % (dirty hack, calling multiple functions --
+                    % https://www.mathworks.com/matlabcentral/answers/10664-multiple-callback-functions=
+                    deleteSubMenu = findobj(contextMenu,'Text','Delete');
+                    deleteSubMenu.MenuSelectedFcn =  @(h,e)(cellfun( @(x)feval(x,h,e), {...
+                            @(h,e)delete(h.Parent.UserData.textHandle), ...
+                            @(~,~)delete(h.Parent.UserData.imline) ...
+                         })); 
+                    
+               
                     % Store data in struct within contextMenu.UserData 
                     % (because Line object cannot store UserData)
+                    % (used above when deleting imline object and text label together)
                     data.textHandle = htext;
+                    data.imline = h;
                     contextMenu.UserData = data;
-
-
-
                     
+                    % Move my new submenus to top
+                    contextMenu.Children = circshift(contextMenu.Children,-3);
+                    
+            
                 catch
                     % If imaging toolbox missing, or other faults
                     disp('Imaging toolbox missing -- fallback ');
-                    h = line( x,y,'ButtonDownFcn','delete(gcbo)','LineWidth',1);
+                    lineObject = line( x,y,'LineWidth',1, 'Tag','imlook4d_measure');
+                    
+                    % Make contextual menu
+                    contextMenu = uicontextmenu(gcf);
+                    lineObject.UIContextMenu = contextMenu;
+                    
+                    contextMenuItem = uimenu(contextMenu,'Text','Copy values');
+                    contextMenuItem.MenuSelectedFcn = @(hObject,eventdata) imlook4d( 'measureTape_CopyValues', hObject, eventdata, guidata(hObject));
+                    
+                    contextMenuItem = uimenu(contextMenu,'Text','delete');
+                    contextMenuItem.MenuSelectedFcn = 'o=gcbo;delete(o.Parent.UserData.lineHandle)'; % Finds and deletes the line object stored in contextMenu.UserData (= gcbo.Parent.UserData) 
+
+                    % Store data in struct within contextMenu.UserData 
+                    % (because Line object cannot store UserData)
+                    data.lineHandle = lineObject;
+                    contextMenu.UserData = data;
+
+                    
                     pos(:,1) = x;
                     pos(:,2) = y;
-                    displayLineCoordinates( h, pos);
+                    displayLineCoordinates( lineObject, pos);
                 end
 
                 releasedToggleButton( hObject);
-        function displayLineCoordinates(h, pos)
-            disp('displayLineCoordinates');
+        function [ measureLength, pixels, angle_degrees ] = displayLineCoordinates(contextMenuItem, pos)
+            
+            try
+                % Fails if no imaging toolbox
+                contextMenu = contextMenuItem.Parent;
+                labelHandle = contextMenu.UserData.textHandle;
+                name = labelHandle.String;
+            catch 
+                name = 'measure';
+            end
+            
             
             handles = guidata(gcf);
-            disp(mat2str(pos,3))
+            %disp(mat2str(pos,3));
             
             dx = pos(2,1) - pos(1,1) ;
             dy = pos(2,2) - pos(1,2) ;
             
-                pixels  = sqrt( dx^2 + dy^2 ); % length in pixels
-                
-                % side in mm
-                try
-                    dx_mm = dx * handles.image.pixelSizeX;
-                    dy_mm = dy * handles.image.pixelSizeY;
-                catch
-                    dx_mm = dx;
-                    dy_mm = dy;
-                end
-                length = sqrt( dx_mm^2 + dy_mm^2 ); % length in pixels
-                
-                % angle in degrees
-                plotboxAspectRatio = handles.axes1.PlotBoxAspectRatio; 
-                ratio = plotboxAspectRatio(1) /plotboxAspectRatio(2);
-                angle_degrees = atan2d(  dy / plotboxAspectRatio(2) ,dx / plotboxAspectRatio(1)   )
-                angle_degrees = atan2d(  dy_mm ,dx_mm   )
-
-                msg = [ 'Length = ' num2str( length) ' mm (' num2str( pixels) ' pixels long).  Angle = ' num2str(angle_degrees) ' degrees'];
-                disp( msg);
-                displayMessageRow(msg)
+            pixels  = sqrt( dx^2 + dy^2 ); % length in pixels
+            
+            % side in mm
+            try
+                dx_mm = dx * handles.image.pixelSizeX;
+                dy_mm = dy * handles.image.pixelSizeY;
+            catch
+                dx_mm = dx;
+                dy_mm = dy;
+            end
+            measureLength = sqrt( dx_mm^2 + dy_mm^2 ); % length in pixels
+            
+            % angle in degrees
+            plotboxAspectRatio = handles.axes1.PlotBoxAspectRatio;
+            ratio = plotboxAspectRatio(1) /plotboxAspectRatio(2);
+            angle_degrees = atan2d(  dy / plotboxAspectRatio(2) ,dx / plotboxAspectRatio(1)   );
+            angle_degrees = atan2d(  dy_mm ,dx_mm   );
+            
+            
+            msg = [ 'Name = ' name '   Length = ' num2str( measureLength) ' mm (' num2str( pixels) ' pixels long).  Angle = ' num2str(angle_degrees) ' degrees'];
+            displayMessageRow(msg);
         function measureTape_Rename(renameContextMenuItem,eventdata,handles)
-                contextMenu = renameContextMenuItem.Parent;
-                labelHandle = contextMenu.UserData.textHandle;
+            % Edits the measurement's name
+            
+            contextMenu = renameContextMenuItem.Parent;
+            labelHandle = contextMenu.UserData.textHandle;
                 
-                defaultAnswer = {labelHandle.String};
-                answer = inputdlg('Name','Edit name',1,defaultAnswer);
-                labelHandle.String = answer{1};
+            % Dialog new name
+            defaultAnswer = {labelHandle.String};
+            answer = inputdlg('Name','Edit name',1,defaultAnswer);
+
+            % Text label
+            labelHandle.String = answer{1};
+
+            % Name in contextual menu
+            nameContextMenuItem = contextMenu.Children(end);
+            nameContextMenuItem.Text = labelHandle.String; 
+        function measureTape_CopyValues(copyValuesContextMenuItem,eventdata,handles)
+            % Copy values to clipboard
+            
+            TAB=sprintf('\t');
+            EOL=sprintf('\n');
+            
+            contextMenu = copyValuesContextMenuItem.Parent;
+                
+            % Get values
+            bottomLines1 = findobj('Type','Line', 'Tag','bottom line'); % These are done with imlines, using imaging toolbox
+            
+            bottomLines = [ bottomLines1; findobj('Type','Line', 'Tag','imlook4d_measure') ];
+            
+            s = [ 'name' TAB 'length [mm]' TAB 'length [pixels]' TAB 'Angle [degrees]' EOL];
+            for i = 1:length(bottomLines)
+                line = bottomLines(i);
+                pos = [ line.XData ; line.YData];
+                try
+                    lineContextMenuItem = line.UIContextMenu.Children(end); % Last one is the top contextual menu, which contains the name (if imaging toolbox imline function existed)
+                    if strcmp( lineContextMenuItem.Tag, 'nameContextMenuItem')
+                        name = lineContextMenuItem.Text;
+                    else
+                        name = 'measure'; % set default name, if not imaging toolbox
+                    end
+                catch
+                    name = 'measure'; % set default name, if crashes
+                end
+                [ measureLength, pixels, angle_degrees ] = displayLineCoordinates(lineContextMenuItem, pos);
+
+                s=[ s name TAB num2str(measureLength) TAB num2str(pixels) TAB num2str(angle_degrees) EOL];
+            end
+            disp(s);
+            clipboard('copy',s)  
+            disp('Measures copied to system clipboard');
+            
                 
     function rotateToggleButtonOn_ClickedCallback(hObject, eventdata, handles)
        % NOTE: 
