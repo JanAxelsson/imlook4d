@@ -2189,9 +2189,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             contextMenu = copyValuesContextMenuItem.Parent;
                 
             % Get values
-            bottomLines1 = findobj('Type','Line', 'Tag','bottom line'); % These are done with imlines, using imaging toolbox
+            bottomLines1 = findobj(gcf, 'Type','Line', 'Tag','bottom line'); % These are done with imlines, using imaging toolbox
             
-            bottomLines = [ bottomLines1; findobj('Type','Line', 'Tag','imlook4d_measure') ];
+            bottomLines = [ bottomLines1; findobj(gcf, 'Type','Line', 'Tag','imlook4d_measure') ];
             
             s = [ 'name' TAB 'length [mm]' TAB 'length [pixels]' TAB 'Angle [degrees]' EOL];
             for i = 1:length(bottomLines)
