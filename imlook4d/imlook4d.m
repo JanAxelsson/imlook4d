@@ -2032,8 +2032,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     return
                 end
                 
+                
                 pressedToggleButton( hObject);
                 [x,y]= ginput(2);
+                
+                slice=round(get(handles.SliceNumSlider,'Value'));
+                orientation = handles.image.plane; % 'Axial' / 'Sagital' / 'Coronal'
 
                 try
                     %throw( MException('MyComponent:Testing',' ')); % TEST - fall into non-image toolbox version
@@ -2090,8 +2094,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     contextMenu.UserData = data;
                     
                     % Move my new submenus to top
-                    contextMenu.Children = circshift(contextMenu.Children,-3);
-                    
+                    contextMenu.Children = circshift(contextMenu.Children,-3);                  
             
                 catch
                     % If imaging toolbox missing, or other faults
@@ -2117,7 +2120,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     pos(:,1) = x;
                     pos(:,2) = y;
                     displayLineCoordinates( lineObject, pos);
+
                 end
+                
 
                 releasedToggleButton( hObject);
         function [ measureLength, pixels, angle_degrees ] = displayLineCoordinates(contextMenuItem, pos)
@@ -2191,7 +2196,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             s = [ 'name' TAB 'length [mm]' TAB 'length [pixels]' TAB 'Angle [degrees]' EOL];
             for i = 1:length(bottomLines)
                 line = bottomLines(i);
-                pos = [ line.XData ; line.YData];
+                pos = [ line.XData ; line.YData]';
+                %disp(mat2str(pos,3));
                 try
                     lineContextMenuItem = line.UIContextMenu.Children(end); % Last one is the top contextual menu, which contains the name (if imaging toolbox imline function existed)
                     if strcmp( lineContextMenuItem.Tag, 'nameContextMenuItem')
@@ -4370,6 +4376,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 dispOpenWithImlook4d( [path file] );
             catch
             end
+
             function LocalOpenMGH(hObject, eventdata, handles, file,path)  
                 % Test if Freesurfer files exist
                     if strcmp('', which('MRIread'))
