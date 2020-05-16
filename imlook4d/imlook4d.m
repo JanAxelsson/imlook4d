@@ -2032,9 +2032,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     return
                 end
                 
-                
                 pressedToggleButton( hObject);
-                [x,y]= ginput(2);
+                
+
                 
                 slice=round(get(handles.SliceNumSlider,'Value'));
                 orientation = handles.image.plane; % 'Axial' / 'Sagital' / 'Coronal'
@@ -2042,26 +2042,29 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 try
                     %throw( MException('MyComponent:Testing',' ')); % TEST - fall into non-image toolbox version
                     
+                    % Draw Line
+                    h = drawline(gca);
+                    addlistener(h,'MovingROI',@(src,evnt) displayLineCoordinates(h, h.Position));
+                    
+                    x = h.Position(1,1);
+                    y = h.Position(1,2);
+                    
+                    d = 2;
+                    
                     % Text label
                     name = 'My measure';
-                    htext = text(x(1),y(1),name,'Color','red','FontSize',14);
+                    htext = text(x(1)+d,y(1)+d,name,'Color','red','FontSize',14);
                     
-                    h = imline( gca,x,y); % Imaging tool box
-                    pos = h.getPosition;
-                    addNewPositionCallback(h, @(p) displayLineCoordinates(h, p) );
+
+                    
                     
                     %
-                    % Add to contextual menu of imline
+                    % Add to contextual menu of roi.line
                     %
-                    f = gcf; % Contextual menu belongs to this image
-                    contextMenu = f.Children(1); % Get latest created contextual menu (is index 1)
+                
+                    contextMenu = h.UIContextMenu;
                     contextMenu.Tag = 'measureLineContextMenu';
-                    
-                    % Delete context menu Show Position
-                    delete(contextMenu.Children(end));
-                    
-                    % Set divider line 
-                    contextMenu.Children(end).Separator = 'on';
+
                     
                     % Submenu displaying name of measurement
                     contextMenuItem = uimenu(contextMenu,'Text',name,'Tag','nameContextMenuItem','ForegroundColor', [0   0.4510  0.7412] );
@@ -2074,15 +2077,18 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     contextMenuItem = uimenu(contextMenu,'Text','Copy values');
                     contextMenuItem.MenuSelectedFcn = @(hObject,eventdata) imlook4d( 'measureTape_CopyValues', hObject, eventdata, guidata(hObject));
                     
-                    displayLineCoordinates( contextMenuItem, pos);
+                    contextMenuItem = uimenu(contextMenu,'Text','Delete all lines');
+                    contextMenuItem.MenuSelectedFcn = @(hObject,eventdata) imlook4d( 'measureTape_Delete_All', hObject, eventdata, guidata(hObject));
+                    contextMenuItem.Separator = 'on';
+
                     
                     % Modify existing "delete" contextual menu to remove both label + imline
                     % (dirty hack, calling multiple functions --
                     % https://www.mathworks.com/matlabcentral/answers/10664-multiple-callback-functions=
-                    deleteSubMenu = findobj(contextMenu,'Text','Delete');
+                    deleteSubMenu = findobj(contextMenu,'Text','Delete Line');
                     deleteSubMenu.MenuSelectedFcn =  @(h,e)(cellfun( @(x)feval(x,h,e), {...
-                            @(h,e)delete(h.Parent.UserData.textHandle), ...
-                            @(~,~)delete(h.Parent.UserData.imline) ...
+                            @(h,e)delete(contextMenu.UserData.textHandle), ...
+                            @(~,~)delete(contextMenu.UserData.imline) ...
                          })); 
                     
                
@@ -2091,13 +2097,23 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     % (used above when deleting imline object and text label together)
                     data.textHandle = htext;
                     data.imline = h;
+                    data.orientation = orientation;
+                    data.slice = slice;
                     contextMenu.UserData = data;
                     
                     % Move my new submenus to top
-                    contextMenu.Children = circshift(contextMenu.Children,-3);                  
+                    contextMenu.Children = circshift(contextMenu.Children,1); 
+                    
+                    % Display measure
+                    lineContextMenuItem = h.UIContextMenu;
+                    [ measureLength, pixels, angle_degrees ] = displayLineCoordinates(lineContextMenuItem, h.Position);
             
                 catch
-                    % If imaging toolbox missing, or other faults
+                    % If imaging toolbox missing, or other faults -- make a
+                    % simpler line with less functionality
+                    
+                    [x,y]= ginput(2); 
+                    
                     disp('Imaging toolbox missing -- fallback ');
                     lineObject = line( x,y,'LineWidth',1, 'Tag','imlook4d_measure');
                     
@@ -2114,9 +2130,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     % Store data in struct within contextMenu.UserData 
                     % (because Line object cannot store UserData)
                     data.lineHandle = lineObject;
+                    data.orientation = orientation;
+                    data.slice = slice;
                     contextMenu.UserData = data;
 
-                    
                     pos(:,1) = x;
                     pos(:,2) = y;
                     displayLineCoordinates( lineObject, pos);
@@ -2133,7 +2150,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 labelHandle = contextMenu.UserData.textHandle;
                 name = labelHandle.String;
             catch 
-                name = 'measure';
+                name = 'unnamed';
             end
             
             
@@ -2180,41 +2197,82 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             % Name in contextual menu
             nameContextMenuItem = contextMenu.Children(end);
             nameContextMenuItem.Text = labelHandle.String; 
+        function measureTape_Delete_All(contextMenuItem,eventdata,handles)
+
+            % Verify deletion
+            answer = questdlg('Really want to delete all measurements ?','Verify deletion','Yes','No', 'No');
+            if strcmp( answer, 'No')
+                return;
+            end
+
+            % With imaging toolbox
+            lobj = findobj(gcf, 'Type','images.roi.line');
+            for i = 1 : length(lobj)
+               delete( lobj(i).UIContextMenu.UserData.textHandle );
+               delete( lobj(i).UIContextMenu.UserData.imline);
+            end
+            
+            % Without imaging toolbox
+            lobj2 = findobj(gcf, 'Type','line');
+            for i = 1 : length(lobj2)
+               delete( lobj2(i).UIContextMenu.UserData.lineHandle);
+            end  
         function measureTape_CopyValues(copyValuesContextMenuItem,eventdata,handles)
             % Copy values to clipboard
             
             TAB=sprintf('\t');
             EOL=sprintf('\n');
-            
-            contextMenu = copyValuesContextMenuItem.Parent;
-                
-            % Get values
-            bottomLines1 = findobj(gcf, 'Type','Line', 'Tag','bottom line'); % These are done with imlines, using imaging toolbox
-            
-            bottomLines = [ bottomLines1; findobj(gcf, 'Type','Line', 'Tag','imlook4d_measure') ];
-            
-            s = [ 'name' TAB 'length [mm]' TAB 'length [pixels]' TAB 'Angle [degrees]' EOL];
-            for i = 1:length(bottomLines)
-                line = bottomLines(i);
-                pos = [ line.XData ; line.YData]';
-                %disp(mat2str(pos,3));
-                try
-                    lineContextMenuItem = line.UIContextMenu.Children(end); % Last one is the top contextual menu, which contains the name (if imaging toolbox imline function existed)
-                    if strcmp( lineContextMenuItem.Tag, 'nameContextMenuItem')
-                        name = lineContextMenuItem.Text;
-                    else
-                        name = 'measure'; % set default name, if not imaging toolbox
-                    end
-                catch
-                    name = 'measure'; % set default name, if crashes
-                end
-                [ measureLength, pixels, angle_degrees ] = displayLineCoordinates(lineContextMenuItem, pos);
 
-                s=[ s name TAB num2str(measureLength) TAB num2str(pixels) TAB num2str(angle_degrees) EOL];
-            end
-            disp(s);
-            clipboard('copy',s)  
-            disp('Measures copied to system clipboard');
+            s = [ 'name' TAB 'length [mm]' TAB 'length [pixels]' TAB 'Angle [degrees]' EOL];
+            
+            
+            %
+            % With imaging toolbox
+            %
+                lobj = findobj(gcf, 'Type','images.roi.line');
+                for i = 1:length(lobj)
+                    pos = lobj(i).Position;
+                    
+                    name = lobj(i).UIContextMenu.UserData.textHandle.String;
+                    lineContextMenuItem = lobj(i).UIContextMenu;
+                    
+                    [ measureLength, pixels, angle_degrees ] = displayLineCoordinates(lineContextMenuItem, pos);
+                    s=[ s name TAB num2str(measureLength) TAB num2str(pixels) TAB num2str(angle_degrees) EOL];
+
+                end
+            
+            %
+            % Without imaging toolbox
+            % 
+                contextMenu = copyValuesContextMenuItem.Parent;
+                bottomLines = findobj(gcf, 'Type','Line', 'Tag','imlook4d_measure');
+
+                for i = 1:length(bottomLines)
+                    line = bottomLines(i);
+                    pos = [ line.XData ; line.YData]';
+                    %disp(mat2str(pos,3));
+                    try
+                        lineContextMenuItem = line.UIContextMenu.Children(end); % Last one is the top contextual menu, which contains the name (if imaging toolbox imline function existed)
+                        if strcmp( lineContextMenuItem.Tag, 'nameContextMenuItem')
+                            name = lineContextMenuItem.Text;
+                        else
+                            name = 'measure'; % set default name, if not imaging toolbox
+                        end
+                    catch
+                        name = 'measure'; % set default name, if crashes
+                    end
+                    [ measureLength, pixels, angle_degrees ] = displayLineCoordinates(lineContextMenuItem, pos);
+
+                    s=[ s name TAB num2str(measureLength) TAB num2str(pixels) TAB num2str(angle_degrees) EOL];
+                end
+            
+            %
+            % To clipboard and command window
+            %
+                disp(s);
+                clipboard('copy',s)  
+                disp('Measures copied to system clipboard');
+                disp(' ');
             
                 
     function rotateToggleButtonOn_ClickedCallback(hObject, eventdata, handles)
@@ -2461,6 +2519,31 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 setSlicesInYokes(slice, handles.figure1);
                 drawCursorInYokes2(handles) 
             end
+            
+            %
+            % Turn on or off measurement lines
+            %
+            lobj = findobj(gcf, 'Type','images.roi.line');
+            for i = 1 : length(lobj)
+               if ( lobj(i).UIContextMenu.UserData.slice == newSlice) 
+                   lobj(i).Visible = 'on';
+                   lobj(i).UIContextMenu.UserData.textHandle.Visible = 'on';
+               else
+                   lobj(i).Visible = 'off';
+                   lobj(i).UIContextMenu.UserData.textHandle.Visible = 'off';
+               end
+            end
+            
+            % Without imaging toolbox
+            lobj2 = findobj(gcf, 'Type','line');
+            for i = 1 : length(lobj2)
+               if ( lobj2(i).UIContextMenu.UserData.slice == newSlice) 
+                   lobj2(i).Visible = 'on';
+               else
+                   lobj2(i).Visible = 'off';
+               end
+            end           
+            
             
         function setSlicesInYokes(slice, this_imlook4d_instance)
             yokes=getappdata( this_imlook4d_instance, 'yokes');

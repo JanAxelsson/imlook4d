@@ -10,24 +10,19 @@
 	</P>
 
 	<P>
-	This tools measures lengths and angle of the line to the horizontal axis. 
- The drawing of the measurement line is activated by pressing the measure button, and you then click the start and end position, 
-starting drawing from left to right is the best practice.
+	This tools measures lengths and angle of the line. 
+ The drawing of the measurement line is activated by pressing the measure button. You then click-and-hold the mouse at the start position and release at the end position.
 The length is displayed in the image format's unit, which often is in millimeters.  The angle is displayed relative the horizontal axis.
- The line representing the measurement is shown in the image.
+ The line representing the measurement is shown in the image. The line can be edited by dragging the circular handles.
 	</P>
 
 	<P>
 The measured data is shown at the bottom of the imlook4d window, and also in the Matlab workspace.
 	</P>
-	
-	<P>
-The line may be removed by Right-clicking on the line and selecting delete.
-	</P>
 
 	
 	<P>
-Right-clicking on the line gives the following options 
+Right-clicking on the line gives the following options :
 
 		<UL>
 			<LI> <B>The first row</B> Displays a name, describing the measurement
@@ -45,10 +40,14 @@ Right-clicking on the line gives the following options
     <h2> Without Imaging toolbox: </h2> 
 	</P>
 	<P>
-    A simplified version is used, which does not allow editing. The following right-click menu exists then:
+    A simplified version is used, which does not allow editing. The following right-click menu exists then :
 
 		<UL>
 			<LI> <B>Copy values </B> Copies the values to clipboard
 			<LI> <B>Delete </B> Deletes the measurement
 		</UL>
 	</P>
+
+The drawing is performed slightly differently from above (when imaging toolbox exists).  
+ The drawing of the measurement line is activated by pressing the measure button, and you then click the start and end position, 
+starting drawing from left to right is the best practice.  This line can not be modified after it is drawn, but can be deleted with right-click.
