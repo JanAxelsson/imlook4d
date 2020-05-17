@@ -2026,81 +2026,313 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             end
             
     function measureTapeToggleButton_ClickedCallback(hObject, eventdata, handles)
-                % Display HELP and get out of callback
-                if DisplayHelp(hObject, eventdata, handles)
-                    %set(hObject,'State', 'off')
-                    return
-                end
+            % Display HELP and get out of callback
+            if DisplayHelp(hObject, eventdata, handles)
+                %set(hObject,'State', 'off')
+                return
+            end
+
+            pressedToggleButton( hObject);
+
+            % Name of measurement
+            lobj = findobj(gcf, 'Type','images.roi.line');
+            simpleLines = findobj(gcf, 'Type','Line', 'Tag','imlook4d_measure');
+            n = length(lobj) + length(simpleLines) + 1;
+            answer=inputdlg({'Enter ROI name:'},'Input ROI name',1,{['Measure ' num2str(n)]});
+            name=answer{1};
+
+
+            %
+            % Make measurement and contextual menus 
+            % 
+            slice=round(get(handles.SliceNumSlider,'Value'));
+            orientation = handles.image.plane; % 'Axial' / 'Sagital' / 'Coronal'
+
+            try
+                % If imaging toolbox missing
+                %throw( MException('MyComponent:Testing',' ')); % TEST - fall into non-image toolbox version
+                h = drawline(gca );  % Manually calling this : h = drawline(gca, 'Position', h.Position )
+                measureTapeContextualMenusImageToolbox( h, name, slice, orientation);
+
+            catch
+                % If imaging toolbox missing, or other faults -- make a ?simpler line with less functionality
+                [x,y]= ginput(2); 
+                h = line( x,y,'LineWidth',1, 'Tag','imlook4d_measure');
+                measureTapeContextualMenusNoToolbox( h, name, slice, orientation);
+            end
+
+
+            releasedToggleButton( hObject)
+        function measureTapeContextualMenusImageToolbox( h, name, slice, orientation)
+
+                    addlistener(h,'MovingROI',@(src,evnt) displayLineCoordinates(h, h.Position));
+
+                    
+                    % Text label
+                    x = h.Position(1,1);
+                    y = h.Position(1,2);
+                    d = 2;
+                    htext = text(x(1)+d,y(1)+d,name,'Color','red','FontSize',14);
+                    
+                    
+                    %
+                    % Add to contextual menu of roi.line
+                    %
                 
-                pressedToggleButton( hObject);
-                [x,y]= ginput(2);
-   
-                try
-                    htext = text(x(1),y(1),'String','Color','red','ButtonDownFcn','delete(gcbo)','FontSize',14);
-                    
-                    h = imline( gca,x,y); % Imaging tool box
-                    addNewPositionCallback(h, @(p) displayLineCoordinates(h, p) );
-                    displayLineCoordinates( h, h.getPosition);
-                    
-                    % Add to contextual menu of imline
-                    f = gcf; % Contextual menu belongs to this image
-                    contextMenu = f.Children(1); % Get latest contextual menu (is index 1)
+                    contextMenu = h.UIContextMenu;
+                    contextMenu.Tag = 'measureLineContextMenu';
+
                     
                     % Submenu displaying name of measurement
-                    contextMenuItem = uimenu(contextMenu,'Text','My measure','ForegroundColor', [0   0.4510  0.7412] );
-                    contextMenuItem.MenuSelectedFcn = 'disp(''hej'')';
+                    contextMenuItem = uimenu(contextMenu,'Text',name,'Tag','nameContextMenuItem','ForegroundColor', [0   0.4510  0.7412] );
                     
                     % Submenu for changing name of measurement
                     contextMenuItem = uimenu(contextMenu,'Text','Rename');
-                    contextMenuItem.MenuSelectedFcn = 'disp(''rename entered'')';
+                    contextMenuItem.MenuSelectedFcn = @(hObject,eventdata) imlook4d( 'measureTape_Rename', hObject, eventdata, guidata(hObject));
+                    
+                    
+                    contextMenuItem = uimenu(contextMenu,'Text','Copy values');
+                    contextMenuItem.MenuSelectedFcn = @(hObject,eventdata) imlook4d( 'measureTape_CopyValues', hObject, eventdata, guidata(hObject));
+                    
+                    contextMenuItem = uimenu(contextMenu,'Text','Delete all lines');
+                    contextMenuItem.MenuSelectedFcn = @(hObject,eventdata) imlook4d( 'measureTape_Delete_All', hObject, eventdata, guidata(hObject));
+                    contextMenuItem.Separator = 'on';
+
+                    
+                    % Modify existing "delete" contextual menu to remove both label + imline
+                    % (dirty hack, calling multiple functions --
+                    % https://www.mathworks.com/matlabcentral/answers/10664-multiple-callback-functions=
+                    deleteSubMenu = findobj(contextMenu,'Text','Delete Line');
+                    deleteSubMenu.MenuSelectedFcn =  @(h,e)(cellfun( @(x)feval(x,h,e), {...
+                            @(h,e)delete(contextMenu.UserData.textHandle), ...
+                            @(~,~)delete(contextMenu.UserData.imline) ...
+                         })); 
+                    
+               
+                    % Store data in struct within contextMenu.UserData 
+                    % (because Line object cannot store UserData)
+                    % (used above when deleting imline object and text label together)
+                    data.textHandle = htext;
+                    data.imline = h;
+                    data.orientation = orientation;
+                    data.slice = slice;
+                    contextMenu.UserData = data;
                     
                     % Move my new submenus to top
-                    contextMenu.Children = circshift(contextMenu.Children,-2)
-
-
-
+                    contextMenu.Children = circshift(contextMenu.Children,1); 
                     
-                catch
-                    % If imaging toolbox missing, or other faults
+                    % Display measure
+                    lineContextMenuItem = h.UIContextMenu;
+                    [ measureLength, pixels, angle_degrees ] = displayLineCoordinates(lineContextMenuItem, h.Position);
+        function measureTapeContextualMenusNoToolbox( h, name, slice, orientation)
+            
+                    % Text label
+                    d = 2;
+                    
+                    x = h.XData';
+                    y = h.YData';
+                    htext = text(x(1)+d,y(1)+d,name,'Color','red','FontSize',14);
+                    
                     disp('Imaging toolbox missing -- fallback ');
-                    h = line( x,y,'ButtonDownFcn','delete(gcbo)','LineWidth',1);
+                    
+                    
+                    % Make contextual menu
+                    contextMenu = uicontextmenu(gcf);
+                    h.UIContextMenu = contextMenu;
+                    
+                    contextMenuItem = uimenu(contextMenu,'Text',name,'Tag','nameContextMenuItem','ForegroundColor', [0   0.4510  0.7412] );
+                    
+                    
+                    contextMenuItem = uimenu(contextMenu,'Text','Rename');
+                    contextMenuItem.MenuSelectedFcn = @(hObject,eventdata) imlook4d( 'measureTape_Rename', hObject, eventdata, guidata(hObject));
+                    
+                    contextMenuItem = uimenu(contextMenu,'Text','Copy values');
+                    contextMenuItem.MenuSelectedFcn = @(hObject,eventdata) imlook4d( 'measureTape_CopyValues', hObject, eventdata, guidata(hObject));
+                    
+                    deleteSubMenu = uimenu(contextMenu,'Text','delete');
+                    deleteSubMenu.MenuSelectedFcn = 'o=gcbo;delete(o.Parent.UserData.lineHandle)'; % Finds and deletes the line object stored in contextMenu.UserData (= gcbo.Parent.UserData) 
+                    deleteSubMenu.Separator = 'on';
+                    deleteSubMenu.MenuSelectedFcn =  @(h,e)(cellfun( @(x)feval(x,h,e), {...
+                            @(h,e)delete(contextMenu.UserData.textHandle), ...
+                            @(~,~)delete(contextMenu.UserData.lineHandle) ...
+                         })); 
+                                        
+                    contextMenuItem = uimenu(contextMenu,'Text','delete all lines');
+                    contextMenuItem.MenuSelectedFcn = @(hObject,eventdata) imlook4d( 'measureTape_Delete_All', hObject, eventdata, guidata(hObject));
+                    
+                    % Store data in struct within contextMenu.UserData 
+                    % (because Line object cannot store UserData)
+                    data.textHandle = htext;
+                    data.lineHandle = h;
+                    data.orientation = orientation;
+                    data.slice = slice;
+                    contextMenu.UserData = data;
+
                     pos(:,1) = x;
                     pos(:,2) = y;
                     displayLineCoordinates( h, pos);
-                end
-
-                releasedToggleButton( hObject);
-        function displayLineCoordinates(h, pos)
-            disp('displayLineCoordinates');
+        % Create contextual menus for measure :            
+        function [ measureLength, pixels, angle_degrees ] = displayLineCoordinates(contextMenuItem, pos)
+            
+            try
+                % Fails if no imaging toolbox
+                contextMenu = contextMenuItem.Parent;
+                labelHandle = contextMenu.UserData.textHandle;
+                name = labelHandle.String;
+            catch 
+                name = 'unnamed';
+            end
+            
             
             handles = guidata(gcf);
-            disp(mat2str(pos,3))
+            %disp(mat2str(pos,3));
             
             dx = pos(2,1) - pos(1,1) ;
             dy = pos(2,2) - pos(1,2) ;
             
-                pixels  = sqrt( dx^2 + dy^2 ); % length in pixels
+            pixels  = sqrt( dx^2 + dy^2 ); % length in pixels
+            
+            % side in mm
+            try
+                dx_mm = dx * handles.image.pixelSizeX;
+                dy_mm = dy * handles.image.pixelSizeY;
+            catch
+                dx_mm = dx;
+                dy_mm = dy;
+            end
+            measureLength = sqrt( dx_mm^2 + dy_mm^2 ); % length in pixels
+            
+            % angle in degrees
+            plotboxAspectRatio = handles.axes1.PlotBoxAspectRatio;
+            ratio = plotboxAspectRatio(1) /plotboxAspectRatio(2);
+            angle_degrees = atan2d(  dy / plotboxAspectRatio(2) ,dx / plotboxAspectRatio(1)   );
+            angle_degrees = atan2d(  dy_mm ,dx_mm   );
+            
+            
+            msg = [ 'Name = ' name '   Length = ' num2str( measureLength) ' mm (' num2str( pixels) ' pixels long).  Angle = ' num2str(angle_degrees) ' degrees'];
+            displayMessageRow(msg);
+        function measureTape_Rename(renameContextMenuItem,eventdata,handles)
+            % Edits the measurement's name
+            
+            contextMenu = renameContextMenuItem.Parent;
+            labelHandle = contextMenu.UserData.textHandle;
                 
-                % side in mm
-                try
-                    dx_mm = dx * handles.image.pixelSizeX;
-                    dy_mm = dy * handles.image.pixelSizeY;
-                catch
-                    dx_mm = dx;
-                    dy_mm = dy;
-                end
-                length = sqrt( dx_mm^2 + dy_mm^2 ); % length in pixels
-                
-                % angle in degrees
-                plotboxAspectRatio = handles.axes1.PlotBoxAspectRatio; 
-                ratio = plotboxAspectRatio(1) /plotboxAspectRatio(2);
-                angle_degrees = atan2d(  dy / plotboxAspectRatio(2) ,dx / plotboxAspectRatio(1)   )
-                angle_degrees = atan2d(  dy_mm ,dx_mm   )
+            % Dialog new name
+            defaultAnswer = {labelHandle.String};
+            answer = inputdlg('Name','Edit name',1,defaultAnswer);
 
-                msg = [ 'Length = ' num2str( length) ' mm (' num2str( pixels) ' pixels long).  Angle = ' num2str(angle_degrees) ' degrees'];
-                disp( msg);
-                displayMessageRow(msg)
+            % Text label
+            labelHandle.String = answer{1};
+
+            % Name in contextual menu
+            nameContextMenuItem = contextMenu.Children(end);
+            nameContextMenuItem.Text = labelHandle.String; 
+        function measureTape_Delete_All(contextMenuItem,eventdata,handles)
+
+            % Verify deletion
+            answer = questdlg('Really want to delete all measurements ?','Verify deletion','Yes','No', 'No');
+            if strcmp( answer, 'No')
+                return;
+            end
+
+            % With imaging toolbox
+            lobj = findobj(gcf, 'Type','images.roi.line');
+            for i = 1 : length(lobj)
+               delete( lobj(i).UIContextMenu.UserData.textHandle );
+               delete( lobj(i).UIContextMenu.UserData.imline);
+            end
+            
+            % Without imaging toolbox
+            lobj2 = findobj(gcf, 'Type','line');
+            for i = 1 : length(lobj2)
+               delete( lobj2(i).UIContextMenu.UserData.textHandle );
+               delete( lobj2(i).UIContextMenu.UserData.lineHandle);
+            end  
+        function measureTape_CopyValues(copyValuesContextMenuItem,eventdata,handles)
+            % Copy values to clipboard
+            
+            TAB=sprintf('\t');
+            EOL=sprintf('\n');
+
+            s = [ 'name' TAB 'length [mm]' TAB 'length [pixels]' TAB 'Angle [degrees]' EOL];
+            s = [ 'placement' TAB 'name' TAB 'length [mm]' TAB 'length [pixels]' TAB 'Angle [degrees]' EOL];
+            
+            
+            %
+            % With imaging toolbox
+            %
+                lobj = findobj(gcf, 'Type','images.roi.line');
+                for i = 1:length(lobj)
+                    pos = lobj(i).Position;
+                    
+                    name = lobj(i).UIContextMenu.UserData.textHandle.String;
+                    lineContextMenuItem = lobj(i).UIContextMenu;
+                    
+                    switch lobj(i).UIContextMenu.UserData.orientation
+                        case 'Axial'
+                            shortOrientation = 'Ax';
+                        case 'Coronal'
+                            shortOrientation = 'Cor';
+                        case 'Sagital'
+                            shortOrientation = 'Sag';
+                    end
+                    
+                    placement = [ 'Slice=' num2str( lobj(i).UIContextMenu.UserData.slice) ' (' shortOrientation ')' ];
+                    
+                    [ measureLength, pixels, angle_degrees ] = displayLineCoordinates(lineContextMenuItem, pos);
+                    s = [ s placement TAB name TAB num2str(measureLength) TAB num2str(pixels) TAB num2str(angle_degrees) EOL];
+
+                end
+            
+            %
+            % Without imaging toolbox
+            % 
+                contextMenu = copyValuesContextMenuItem.Parent;
+                bottomLines = findobj(gcf, 'Type','Line', 'Tag','imlook4d_measure');
+
+                for i = 1:length(bottomLines)
+                    line = bottomLines(i);
+                    pos = [ line.XData ; line.YData]';
+                    %disp(mat2str(pos,3));
+                    try
+                        lineContextMenuItem = line.UIContextMenu.Children(end); % Last one is the top contextual menu, which contains the name (if imaging toolbox imline function existed)
+                        if strcmp( lineContextMenuItem.Tag, 'nameContextMenuItem')
+                            name = lineContextMenuItem.Text;
+                        else
+                            name = 'measure'; % set default name, if not imaging toolbox
+                        end
+                    catch
+                        name = 'measure'; % set default name, if crashes
+                    end
+                    
+                                        
+                    switch bottomLines(i).UIContextMenu.UserData.orientation
+                        case 'Axial'
+                            shortOrientation = 'Ax';
+                        case 'Coronal'
+                            shortOrientation = 'Cor';
+                        case 'Sagital'
+                            shortOrientation = 'Sag';
+                    end
+                    
+                    placement = [ 'Slice=' num2str( bottomLines(i).UIContextMenu.UserData.slice) ' (' shortOrientation ')' ];
+                    
+                    [ measureLength, pixels, angle_degrees ] = displayLineCoordinates(lineContextMenuItem, pos);
+
+                    s = [ s placement TAB name TAB num2str(measureLength) TAB num2str(pixels) TAB num2str(angle_degrees) EOL];
+                end
+            
+            %
+            % To clipboard and command window
+            %
+            
+                disp(' ');
+                disp('Measures copied to system clipboard :');
+                disp(' ');
                 
+                disp(s);
+                clipboard('copy',s)  
+            
                 
     function rotateToggleButtonOn_ClickedCallback(hObject, eventdata, handles)
        % NOTE: 
@@ -2345,6 +2577,39 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                 setSlicesInYokes(slice, handles.figure1);
                 drawCursorInYokes2(handles) 
+            end
+            
+            %
+            % Turn on or off measurement lines
+            %
+            
+            % With imaging toolbox
+            lobj = findobj(gcf, 'Type','images.roi.line');  
+            for i = 1 : length(lobj)
+                if ( strcmp(handles.image.plane, lobj(i).UIContextMenu.UserData.orientation) ) && ...
+                        ( lobj(i).UIContextMenu.UserData.slice == newSlice)
+                    % Only turn on if both same slice AND same orientation
+                    lobj(i).Visible = 'on';
+                    lobj(i).UIContextMenu.UserData.textHandle.Visible = 'on';
+                else
+                    lobj(i).Visible = 'off';
+                    lobj(i).UIContextMenu.UserData.textHandle.Visible = 'off';
+                end
+            end
+            
+            
+            % Without imaging toolbox
+            lobj2 = findobj(gcf, 'Type','line');  
+            for i = 1 : length(lobj2)
+                if ( strcmp(handles.image.plane, lobj2(i).UIContextMenu.UserData.orientation) ) && ...
+                        ( lobj2(i).UIContextMenu.UserData.slice == newSlice)
+                    % Only turn on if both same slice AND same orientation
+                    lobj2(i).Visible = 'on';
+                    lobj2(i).UIContextMenu.UserData.textHandle.Visible = 'on';
+                else
+                    lobj2(i).Visible = 'off';
+                    lobj2(i).UIContextMenu.UserData.textHandle.Visible = 'off';
+                end
             end
             
         function setSlicesInYokes(slice, this_imlook4d_instance)
@@ -3206,6 +3471,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         if ~strcmp( handles.ROINumberMenu.String{ handles.ROINumberMenu.Value}, 'Add ROI')
             ROINumberMenu_Callback( handles.ROINumberMenu, [], handles);
         end
+        
+        % Redraw measures by updating slice
+        slice=round(get(handles.SliceNumSlider,'Value'));
+        setSlice(handles, slice, handles.figure1)
       function handles = setOrientation(handles, newNumericOrientation)
 
         % Numerical constants
@@ -3579,6 +3848,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 % Bail out if hand (such as in Measure Tape movement)
                 pointerIcon = get(handles.figure1, 'Pointer');
                 if strcmp(pointerIcon,'hand')
+                    return;
+                end
+                
+                % For instance when dragging measurement-line
+                if strcmp(pointerIcon,'custom')
                     return;
                 end
         
@@ -4261,6 +4535,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 dispOpenWithImlook4d( [path file] );
             catch
             end
+
             function LocalOpenMGH(hObject, eventdata, handles, file,path)  
                 % Test if Freesurfer files exist
                     if strcmp('', which('MRIread'))
@@ -6887,8 +7162,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             end
             
             % Set locked marker
-            if LockedROIs(1)
-                handles.Lock_ROI.Checked = 'on'; % Lock check mark
+            try
+                if LockedROIs(1)
+                    handles.Lock_ROI.Checked = 'on'; % Lock check mark
+                end
+            catch
             end
             
             % Read ROI names from file
@@ -6913,8 +7191,24 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 catch
                 end
             end
-
             
+            %
+            % Re-create measures
+            %
+            try
+                for i = 1 : length(measure)
+                    try
+                        h = drawline(gca, 'Position',measure(i).pos )
+                        measureTapeContextualMenusImageToolbox( h, measure(i).name, measure(i).slice, measure(i).orientation);
+                    catch
+                        dispred(['Failed recreating measure = ' measure(i).name]);
+                    end
+                end
+
+            catch
+                    
+            end
+
             guidata(handles.ROINumberMenu,handles);  % Save handles
             
             % Return to orientation 
@@ -6973,7 +7267,22 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     GuiSettings.frame=round(get(handles.FrameNumSlider,'Value'));
                     GuiSettings.selectedROI=get(handles.ROINumberMenu,'Value');
                     
-                    save(fullPath, 'rois', 'roiNames', 'parentVolume', 'GuiSettings', 'roiSize','VisibleROIs','LockedROIs', 'version', '-v7.3');
+                    
+                    % Save Measures
+                    lobj = findobj(gcf, 'Type','images.roi.line');
+                    measure = [];
+                    for i = 1:length(lobj)
+                        measure(i).pos = lobj(i).Position;
+                        
+                        measure(i).name = lobj(i).UIContextMenu.UserData.textHandle.String;
+                        measure(i).slice = lobj(i).UIContextMenu.UserData.slice;
+                        measure(i).orientation = lobj(i).UIContextMenu.UserData.orientation;
+
+                    end
+                    
+                    
+                    
+                    save(fullPath, 'rois', 'roiNames', 'measure', 'parentVolume', 'GuiSettings', 'roiSize','VisibleROIs','LockedROIs', 'version', '-v7.3');
                 end
  
                 

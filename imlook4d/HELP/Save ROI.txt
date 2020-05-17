@@ -4,7 +4,7 @@
 Saves a ROI definition file.  
 Allowed formats are 
 <ul>
-<li> imlook4d ROI format (.roi), which saves as a sparse MATLAB matrix with dimensions (x,y,z).
+<li> imlook4d ROI format (.roi), which saves ROI data. ROI matris is saved as a sparse MATLAB matrix. It also stores length measurements within the ROI file
 <li> Nifti file format (.nii)
 </ul>
 
