@@ -32,8 +32,13 @@ Right-clicking on the line gives the following options :
 			<LI> <B>Delete </B> Deletes the measurement
 		</UL>
 	</P>
+	<P>
+The right-click menu "Copy values" can be used on the image window, as well. Information regarding slice and orientation (Ax, Cor, Sag) will be displayed, helping to find the line in the image volume
+	</P>
 
-
+	<P>
+The measurement lines can be stored in a ROI file with "File/Save ROI" (together with any ROIs), and retrieved with "File/Load ROI"
+	</P>
 
 
 	<P>

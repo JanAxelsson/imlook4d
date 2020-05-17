@@ -63,8 +63,25 @@
         
       % Set y-direction as in original
       set(newHandles.axes1, 'YDir', get( imlook4d_current_handles.axes1,'YDir'));   
-    
+      
+      % Copy measures
+          lobj = findobj(imlook4d_current_handle, 'Type','images.roi.line');
+          measure = [];
+          % Read mesures
+          for i = 1:length(lobj)
+              measure(i).pos = lobj(i).Position;
 
+              measure(i).name = lobj(i).UIContextMenu.UserData.textHandle.String;
+              measure(i).slice = lobj(i).UIContextMenu.UserData.slice;
+              measure(i).orientation = lobj(i).UIContextMenu.UserData.orientation;      
+          end
+
+          % Write in opposite order (preserves order of objects when calling findobj)
+          for i = length(lobj):-1:1    
+              h = drawline(newHandles.axes1, 'Position',measure(i).pos )
+              imlook4d('measureTapeContextualMenusImageToolbox', h, measure(i).name, measure(i).slice, measure(i).orientation ) ;    
+          end  
+            
  %   
  % Set GUI-component same as original
  %

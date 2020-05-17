@@ -7162,8 +7162,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             end
             
             % Set locked marker
-            if LockedROIs(1)
-                handles.Lock_ROI.Checked = 'on'; % Lock check mark
+            try
+                if LockedROIs(1)
+                    handles.Lock_ROI.Checked = 'on'; % Lock check mark
+                end
+            catch
             end
             
             % Read ROI names from file
@@ -7190,7 +7193,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             end
             
             %
-            % Recreate measures
+            % Re-create measures
             %
             try
                 for i = 1 : length(measure)

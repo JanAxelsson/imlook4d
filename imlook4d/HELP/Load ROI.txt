@@ -11,3 +11,5 @@ Allowed formats are
 <li> DICOM RTSTRUCT
 </ul>
 
+imlook4d ROI format can also be used to store  lines used to define measurements. See "Save ROI", and Measurement button
+
