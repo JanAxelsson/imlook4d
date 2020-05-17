@@ -7164,8 +7164,24 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 catch
                 end
             end
-
             
+            %
+            % Recreate measures
+            %
+            try
+                for i = 1 : length(measure)
+                    try
+                        h = drawline(gca, 'Position',measure(i).pos )
+                        measureTapeContextualMenusImageToolbox( h, measure(i).name, measure(i).slice, measure(i).orientation);
+                    catch
+                        dispred(['Failed recreating measure = ' measure(i).name]);
+                    end
+                end
+
+            catch
+                    
+            end
+
             guidata(handles.ROINumberMenu,handles);  % Save handles
             
             % Return to orientation 
@@ -7225,7 +7241,20 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     GuiSettings.selectedROI=get(handles.ROINumberMenu,'Value');
                     
                     
-                    save(fullPath, 'rois', 'roiNames', 'parentVolume', 'GuiSettings', 'roiSize','VisibleROIs','LockedROIs', 'version', '-v7.3');
+                    % Save Measures
+                    lobj = findobj(gcf, 'Type','images.roi.line');
+                    for i = 1:length(lobj)
+                        measure(i).pos = lobj(i).Position;
+                        
+                        measure(i).name = lobj(i).UIContextMenu.UserData.textHandle.String;
+                        measure(i).slice = lobj(i).UIContextMenu.UserData.slice;
+                        measure(i).orientation = lobj(i).UIContextMenu.UserData.orientation;
+
+                    end
+                    
+                    
+                    
+                    save(fullPath, 'rois', 'roiNames', 'measure', 'parentVolume', 'GuiSettings', 'roiSize','VisibleROIs','LockedROIs', 'version', '-v7.3');
                 end
  
                 
