@@ -2043,29 +2043,37 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
             
             %
-            % Make contextual menus and measurement
+            % Make measurement and contextual menus 
             % 
-
-                
                 slice=round(get(handles.SliceNumSlider,'Value'));
                 orientation = handles.image.plane; % 'Axial' / 'Sagital' / 'Coronal'
 
                 try
+                    % If imaging toolbox missing
                     %throw( MException('MyComponent:Testing',' ')); % TEST - fall into non-image toolbox version
+                    h = drawline(gca );  % Manually calling this : h = drawline(gca, 'Position', h.Position )
+                    measureTapeContextualMenusImageToolbox( h, name, slice, orientation);
                     
-                    % Draw Line
-                    h = drawline(gca);
+                catch
+                    % If imaging toolbox missing, or other faults -- make a ?simpler line with less functionality
+                    [x,y]= ginput(2); 
+                    h = line( x,y,'LineWidth',1, 'Tag','imlook4d_measure');
+                    measureTapeContextualMenusNoToolbox( h, name, slice, orientation);
+                end
+                
+
+                releasedToggleButton( hObject)
+        % Make contextual menus
+        function measureTapeContextualMenusImageToolbox( h, name, slice, orientation)
+
                     addlistener(h,'MovingROI',@(src,evnt) displayLineCoordinates(h, h.Position));
-                    
-                    x = h.Position(1,1);
-                    y = h.Position(1,2);
-                    
-                    d = 2;
+
                     
                     % Text label
+                    x = h.Position(1,1);
+                    y = h.Position(1,2);
+                    d = 2;
                     htext = text(x(1)+d,y(1)+d,name,'Color','red','FontSize',14);
-                    
-
                     
                     
                     %
@@ -2117,23 +2125,21 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     % Display measure
                     lineContextMenuItem = h.UIContextMenu;
                     [ measureLength, pixels, angle_degrees ] = displayLineCoordinates(lineContextMenuItem, h.Position);
+        function measureTapeContextualMenusNoToolbox( h, name, slice, orientation)
             
-                catch
-                    % If imaging toolbox missing, or other faults -- make a
-                    % simpler line with less functionality
-                    
-                    [x,y]= ginput(2); 
-
                     % Text label
                     d = 2;
+                    
+                    x = h.XData';
+                    y = h.YData';
                     htext = text(x(1)+d,y(1)+d,name,'Color','red','FontSize',14);
                     
                     disp('Imaging toolbox missing -- fallback ');
-                    lineObject = line( x,y,'LineWidth',1, 'Tag','imlook4d_measure');
+                    
                     
                     % Make contextual menu
                     contextMenu = uicontextmenu(gcf);
-                    lineObject.UIContextMenu = contextMenu;
+                    h.UIContextMenu = contextMenu;
                     
                     contextMenuItem = uimenu(contextMenu,'Text',name,'Tag','nameContextMenuItem','ForegroundColor', [0   0.4510  0.7412] );
                     
@@ -2158,19 +2164,15 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     % Store data in struct within contextMenu.UserData 
                     % (because Line object cannot store UserData)
                     data.textHandle = htext;
-                    data.lineHandle = lineObject;
+                    data.lineHandle = h;
                     data.orientation = orientation;
                     data.slice = slice;
                     contextMenu.UserData = data;
 
                     pos(:,1) = x;
                     pos(:,2) = y;
-                    displayLineCoordinates( lineObject, pos);
-
-                end
-                
-
-                releasedToggleButton( hObject);
+                    displayLineCoordinates( h, pos);
+        % Create contextual menus for measure :            
         function [ measureLength, pixels, angle_degrees ] = displayLineCoordinates(contextMenuItem, pos)
             
             try
@@ -7221,6 +7223,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     GuiSettings.slice=round(get(handles.SliceNumSlider,'Value'));
                     GuiSettings.frame=round(get(handles.FrameNumSlider,'Value'));
                     GuiSettings.selectedROI=get(handles.ROINumberMenu,'Value');
+                    
                     
                     save(fullPath, 'rois', 'roiNames', 'parentVolume', 'GuiSettings', 'roiSize','VisibleROIs','LockedROIs', 'version', '-v7.3');
                 end
