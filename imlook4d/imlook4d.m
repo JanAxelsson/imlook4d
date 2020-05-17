@@ -2034,6 +2034,17 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 
                 pressedToggleButton( hObject);
                 
+                % Name of measurement
+                lobj = findobj(gcf, 'Type','images.roi.line');
+                simpleLines = findobj(gcf, 'Type','Line', 'Tag','imlook4d_measure');
+                n = length(lobj) + length(simpleLines) + 1;
+                answer=inputdlg({'Enter ROI name:'},'Input ROI name',1,{['Measure ' num2str(n)]});
+                name=answer{1};
+
+            
+            %
+            % Make contextual menus and measurement
+            % 
 
                 
                 slice=round(get(handles.SliceNumSlider,'Value'));
@@ -2052,7 +2063,6 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     d = 2;
                     
                     % Text label
-                    name = 'My measure';
                     htext = text(x(1)+d,y(1)+d,name,'Color','red','FontSize',14);
                     
 
@@ -2113,6 +2123,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     % simpler line with less functionality
                     
                     [x,y]= ginput(2); 
+
+                    % Text label
+                    d = 2;
+                    htext = text(x(1)+d,y(1)+d,name,'Color','red','FontSize',14);
                     
                     disp('Imaging toolbox missing -- fallback ');
                     lineObject = line( x,y,'LineWidth',1, 'Tag','imlook4d_measure');
@@ -2121,14 +2135,29 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     contextMenu = uicontextmenu(gcf);
                     lineObject.UIContextMenu = contextMenu;
                     
+                    contextMenuItem = uimenu(contextMenu,'Text',name,'Tag','nameContextMenuItem','ForegroundColor', [0   0.4510  0.7412] );
+                    
+                    
+                    contextMenuItem = uimenu(contextMenu,'Text','Rename');
+                    contextMenuItem.MenuSelectedFcn = @(hObject,eventdata) imlook4d( 'measureTape_Rename', hObject, eventdata, guidata(hObject));
+                    
                     contextMenuItem = uimenu(contextMenu,'Text','Copy values');
                     contextMenuItem.MenuSelectedFcn = @(hObject,eventdata) imlook4d( 'measureTape_CopyValues', hObject, eventdata, guidata(hObject));
                     
-                    contextMenuItem = uimenu(contextMenu,'Text','delete');
-                    contextMenuItem.MenuSelectedFcn = 'o=gcbo;delete(o.Parent.UserData.lineHandle)'; % Finds and deletes the line object stored in contextMenu.UserData (= gcbo.Parent.UserData) 
-
+                    deleteSubMenu = uimenu(contextMenu,'Text','delete');
+                    deleteSubMenu.MenuSelectedFcn = 'o=gcbo;delete(o.Parent.UserData.lineHandle)'; % Finds and deletes the line object stored in contextMenu.UserData (= gcbo.Parent.UserData) 
+                    deleteSubMenu.Separator = 'on';
+                    deleteSubMenu.MenuSelectedFcn =  @(h,e)(cellfun( @(x)feval(x,h,e), {...
+                            @(h,e)delete(contextMenu.UserData.textHandle), ...
+                            @(~,~)delete(contextMenu.UserData.lineHandle) ...
+                         })); 
+                                        
+                    contextMenuItem = uimenu(contextMenu,'Text','delete all lines');
+                    contextMenuItem.MenuSelectedFcn = @(hObject,eventdata) imlook4d( 'measureTape_Delete_All', hObject, eventdata, guidata(hObject));
+                    
                     % Store data in struct within contextMenu.UserData 
                     % (because Line object cannot store UserData)
+                    data.textHandle = htext;
                     data.lineHandle = lineObject;
                     data.orientation = orientation;
                     data.slice = slice;
@@ -2215,6 +2244,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             % Without imaging toolbox
             lobj2 = findobj(gcf, 'Type','line');
             for i = 1 : length(lobj2)
+               delete( lobj2(i).UIContextMenu.UserData.textHandle );
                delete( lobj2(i).UIContextMenu.UserData.lineHandle);
             end  
         function measureTape_CopyValues(copyValuesContextMenuItem,eventdata,handles)
@@ -2269,10 +2299,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             %
             % To clipboard and command window
             %
+            
+                disp(' ');
+                disp('Measures copied to system clipboard :');
+                disp(' ');
+                
                 disp(s);
                 clipboard('copy',s)  
-                disp('Measures copied to system clipboard');
-                disp(' ');
             
                 
     function rotateToggleButtonOn_ClickedCallback(hObject, eventdata, handles)
@@ -2523,27 +2556,35 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             %
             % Turn on or off measurement lines
             %
-            lobj = findobj(gcf, 'Type','images.roi.line');
+            
+            % With imaging toolbox
+            lobj = findobj(gcf, 'Type','images.roi.line');  
             for i = 1 : length(lobj)
-               if ( lobj(i).UIContextMenu.UserData.slice == newSlice) 
-                   lobj(i).Visible = 'on';
-                   lobj(i).UIContextMenu.UserData.textHandle.Visible = 'on';
-               else
-                   lobj(i).Visible = 'off';
-                   lobj(i).UIContextMenu.UserData.textHandle.Visible = 'off';
-               end
+                if ( strcmp(handles.image.plane, lobj(i).UIContextMenu.UserData.orientation) ) && ...
+                        ( lobj(i).UIContextMenu.UserData.slice == newSlice)
+                    % Only turn on if both same slice AND same orientation
+                    lobj(i).Visible = 'on';
+                    lobj(i).UIContextMenu.UserData.textHandle.Visible = 'on';
+                else
+                    lobj(i).Visible = 'off';
+                    lobj(i).UIContextMenu.UserData.textHandle.Visible = 'off';
+                end
             end
             
-            % Without imaging toolbox
-            lobj2 = findobj(gcf, 'Type','line');
-            for i = 1 : length(lobj2)
-               if ( lobj2(i).UIContextMenu.UserData.slice == newSlice) 
-                   lobj2(i).Visible = 'on';
-               else
-                   lobj2(i).Visible = 'off';
-               end
-            end           
             
+            % Without imaging toolbox
+            lobj2 = findobj(gcf, 'Type','line');  
+            for i = 1 : length(lobj2)
+                if ( strcmp(handles.image.plane, lobj2(i).UIContextMenu.UserData.orientation) ) && ...
+                        ( lobj2(i).UIContextMenu.UserData.slice == newSlice)
+                    % Only turn on if both same slice AND same orientation
+                    lobj2(i).Visible = 'on';
+                    lobj2(i).UIContextMenu.UserData.textHandle.Visible = 'on';
+                else
+                    lobj2(i).Visible = 'off';
+                    lobj2(i).UIContextMenu.UserData.textHandle.Visible = 'off';
+                end
+            end
             
         function setSlicesInYokes(slice, this_imlook4d_instance)
             yokes=getappdata( this_imlook4d_instance, 'yokes');
@@ -3404,6 +3445,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         if ~strcmp( handles.ROINumberMenu.String{ handles.ROINumberMenu.Value}, 'Add ROI')
             ROINumberMenu_Callback( handles.ROINumberMenu, [], handles);
         end
+        
+        % Redraw measures by updating slice
+        slice=round(get(handles.SliceNumSlider,'Value'));
+        setSlice(handles, slice, handles.figure1)
       function handles = setOrientation(handles, newNumericOrientation)
 
         % Numerical constants
@@ -3777,6 +3822,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 % Bail out if hand (such as in Measure Tape movement)
                 pointerIcon = get(handles.figure1, 'Pointer');
                 if strcmp(pointerIcon,'hand')
+                    return;
+                end
+                
+                % For instance when dragging measurement-line
+                if strcmp(pointerIcon,'custom')
                     return;
                 end
         
