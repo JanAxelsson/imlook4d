@@ -2026,44 +2026,43 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             end
             
     function measureTapeToggleButton_ClickedCallback(hObject, eventdata, handles)
-                % Display HELP and get out of callback
-                if DisplayHelp(hObject, eventdata, handles)
-                    %set(hObject,'State', 'off')
-                    return
-                end
-                
-                pressedToggleButton( hObject);
-                
-                % Name of measurement
-                lobj = findobj(gcf, 'Type','images.roi.line');
-                simpleLines = findobj(gcf, 'Type','Line', 'Tag','imlook4d_measure');
-                n = length(lobj) + length(simpleLines) + 1;
-                answer=inputdlg({'Enter ROI name:'},'Input ROI name',1,{['Measure ' num2str(n)]});
-                name=answer{1};
+            % Display HELP and get out of callback
+            if DisplayHelp(hObject, eventdata, handles)
+                %set(hObject,'State', 'off')
+                return
+            end
 
-            
+            pressedToggleButton( hObject);
+
+            % Name of measurement
+            lobj = findobj(gcf, 'Type','images.roi.line');
+            simpleLines = findobj(gcf, 'Type','Line', 'Tag','imlook4d_measure');
+            n = length(lobj) + length(simpleLines) + 1;
+            answer=inputdlg({'Enter ROI name:'},'Input ROI name',1,{['Measure ' num2str(n)]});
+            name=answer{1};
+
+
             %
             % Make measurement and contextual menus 
             % 
-                slice=round(get(handles.SliceNumSlider,'Value'));
-                orientation = handles.image.plane; % 'Axial' / 'Sagital' / 'Coronal'
+            slice=round(get(handles.SliceNumSlider,'Value'));
+            orientation = handles.image.plane; % 'Axial' / 'Sagital' / 'Coronal'
 
-                try
-                    % If imaging toolbox missing
-                    %throw( MException('MyComponent:Testing',' ')); % TEST - fall into non-image toolbox version
-                    h = drawline(gca );  % Manually calling this : h = drawline(gca, 'Position', h.Position )
-                    measureTapeContextualMenusImageToolbox( h, name, slice, orientation);
-                    
-                catch
-                    % If imaging toolbox missing, or other faults -- make a ?simpler line with less functionality
-                    [x,y]= ginput(2); 
-                    h = line( x,y,'LineWidth',1, 'Tag','imlook4d_measure');
-                    measureTapeContextualMenusNoToolbox( h, name, slice, orientation);
-                end
-                
+            try
+                % If imaging toolbox missing
+                %throw( MException('MyComponent:Testing',' ')); % TEST - fall into non-image toolbox version
+                h = drawline(gca );  % Manually calling this : h = drawline(gca, 'Position', h.Position )
+                measureTapeContextualMenusImageToolbox( h, name, slice, orientation);
 
-                releasedToggleButton( hObject)
-        % Make contextual menus
+            catch
+                % If imaging toolbox missing, or other faults -- make a ?simpler line with less functionality
+                [x,y]= ginput(2); 
+                h = line( x,y,'LineWidth',1, 'Tag','imlook4d_measure');
+                measureTapeContextualMenusNoToolbox( h, name, slice, orientation);
+            end
+
+
+            releasedToggleButton( hObject)
         function measureTapeContextualMenusImageToolbox( h, name, slice, orientation)
 
                     addlistener(h,'MovingROI',@(src,evnt) displayLineCoordinates(h, h.Position));
@@ -2256,6 +2255,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             EOL=sprintf('\n');
 
             s = [ 'name' TAB 'length [mm]' TAB 'length [pixels]' TAB 'Angle [degrees]' EOL];
+            s = [ 'placement' TAB 'name' TAB 'length [mm]' TAB 'length [pixels]' TAB 'Angle [degrees]' EOL];
             
             
             %
@@ -2268,8 +2268,19 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     name = lobj(i).UIContextMenu.UserData.textHandle.String;
                     lineContextMenuItem = lobj(i).UIContextMenu;
                     
+                    switch lobj(i).UIContextMenu.UserData.orientation
+                        case 'Axial'
+                            shortOrientation = 'Ax';
+                        case 'Coronal'
+                            shortOrientation = 'Cor';
+                        case 'Sagital'
+                            shortOrientation = 'Sag';
+                    end
+                    
+                    placement = [ 'Slice=' num2str( lobj(i).UIContextMenu.UserData.slice) ' (' shortOrientation ')' ];
+                    
                     [ measureLength, pixels, angle_degrees ] = displayLineCoordinates(lineContextMenuItem, pos);
-                    s=[ s name TAB num2str(measureLength) TAB num2str(pixels) TAB num2str(angle_degrees) EOL];
+                    s = [ s placement TAB name TAB num2str(measureLength) TAB num2str(pixels) TAB num2str(angle_degrees) EOL];
 
                 end
             
@@ -2293,9 +2304,22 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     catch
                         name = 'measure'; % set default name, if crashes
                     end
+                    
+                                        
+                    switch bottomLines(i).UIContextMenu.UserData.orientation
+                        case 'Axial'
+                            shortOrientation = 'Ax';
+                        case 'Coronal'
+                            shortOrientation = 'Cor';
+                        case 'Sagital'
+                            shortOrientation = 'Sag';
+                    end
+                    
+                    placement = [ 'Slice=' num2str( bottomLines(i).UIContextMenu.UserData.slice) ' (' shortOrientation ')' ];
+                    
                     [ measureLength, pixels, angle_degrees ] = displayLineCoordinates(lineContextMenuItem, pos);
 
-                    s=[ s name TAB num2str(measureLength) TAB num2str(pixels) TAB num2str(angle_degrees) EOL];
+                    s = [ s placement TAB name TAB num2str(measureLength) TAB num2str(pixels) TAB num2str(angle_degrees) EOL];
                 end
             
             %
@@ -7243,6 +7267,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     
                     % Save Measures
                     lobj = findobj(gcf, 'Type','images.roi.line');
+                    measure = [];
                     for i = 1:length(lobj)
                         measure(i).pos = lobj(i).Position;
                         
