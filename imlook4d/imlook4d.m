@@ -2051,7 +2051,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             try
                 % If imaging toolbox missing
                 %throw( MException('MyComponent:Testing',' ')); % TEST - fall into non-image toolbox version
-                h = drawline(gca );  % Manually calling this : h = drawline(gca, 'Position', h.Position )
+                h = drawline(gca,'LineWidth',1 );  % Manually calling this : h = drawline(gca, 'Position', h.Position )
                 measureTapeContextualMenusImageToolbox( h, name, slice, orientation);
 
             catch
@@ -2072,7 +2072,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     x = h.Position(1,1);
                     y = h.Position(1,2);
                     d = 2;
-                    htext = text(x(1)+d,y(1)+d,name,'Color','red','FontSize',14);
+                    htext = text(x(1)+d,y(1)+d,name,'Color','red','FontSize',11);
                     
                     
                     %
@@ -2131,7 +2131,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     
                     x = h.XData';
                     y = h.YData';
-                    htext = text(x(1)+d,y(1)+d,name,'Color','red','FontSize',14);
+                    htext = text(x(1)+d,y(1)+d,name,'Color','red','FontSize',11);
                     
                     disp('Imaging toolbox missing -- fallback ');
                     
@@ -2243,7 +2243,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             end
             
             % Without imaging toolbox
-            lobj2 = findobj(gcf, 'Type','line');
+            lobj2 = findobj(gcf, 'Type','Line','Tag','imlook4d_measure');
             for i = 1 : length(lobj2)
                delete( lobj2(i).UIContextMenu.UserData.textHandle );
                delete( lobj2(i).UIContextMenu.UserData.lineHandle);
@@ -2599,7 +2599,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             
             
             % Without imaging toolbox
-            lobj2 = findobj(gcf, 'Type','line');  
+            lobj2 = findobj(gcf, 'Tag','imlook4d_measure');  
             for i = 1 : length(lobj2)
                 if ( strcmp(handles.image.plane, lobj2(i).UIContextMenu.UserData.orientation) ) && ...
                         ( lobj2(i).UIContextMenu.UserData.slice == newSlice)
