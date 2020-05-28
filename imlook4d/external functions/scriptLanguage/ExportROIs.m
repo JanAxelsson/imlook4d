@@ -116,7 +116,7 @@ function  ExportROIs( roiNumbers)
     %for i=1:lastROI
     for i=roiNumbers
         
-        disp([num2str(i) ') Evaluating ROI=' names{i}]);
+        %disp([num2str(i) ') Evaluating ROI=' names{i}]);
         roiPixels=[]; % All pixel values in current ROI
 
 % SLOW old way:
@@ -240,12 +240,22 @@ function  ExportROIs( roiNumbers)
     %
     % PVE-correction (if correction factors exist in pveFactors, typically generated in script beforehand)
     %
-    if exist('pveFactors')
-        try
-            imlook4d_ROI_data.pve = (pveFactors' \ imlook4d_ROI_data.mean')';
-        catch
+    try
+        pveFactors=evalin('base', 'pveFactors');
+        if exist('pveFactors')
+            try
+                disp('Using PVE factors')
+                imlook4d_ROI_data.pve = (pveFactors' \ imlook4d_ROI_data.mean')';
+                
+                
+                
+            catch
+                disp('FAILED using PVE factors')
+            end
         end
+    catch
     end
+
     
     %
     % Print data

@@ -66,7 +66,7 @@ function P = pveMap( ROIs, PSF)
     
     for j=roiNumbers
         thisROI = zeros( size(ROIs) );
-        disp( [ 'Calculating ROI = ' num2str(j) ]);
+        disp( [ 'Calculating spill-out for ROI = ' num2str(j) ]);
         thisROI( ROIs == j ) = 1;
         P(:,:,:,j) = convn( thisROI, psf, 'same');
     end   

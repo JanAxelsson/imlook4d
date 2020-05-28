@@ -47,7 +47,7 @@ function W = pveWeights( ROIs, PSF)
     % Loop static ROI
     for i=roiNumbers
         thisROI = zeros( size(ROIs) );
-        disp( [ 'Calculating ROI = ' num2str(i) ]);
+        disp( [ 'Calculating Weights for ROI = ' num2str(i) ]);
         thisROI( ROIs == i ) = 1;
         %PP = convn( thisROI, psf, 'same'); % 3D pve map of this ROI
         PP = pveMap( thisROI, PSF);
@@ -57,5 +57,6 @@ function W = pveWeights( ROIs, PSF)
             W(i,j) = mean( PP(indeces{j}) );   % Cross talk (from ROI j to ROI i)
         end
         
-    end   
+    end
+
 
