@@ -11,19 +11,12 @@ function T =  loop( myFunction, xlsFileList, sheet, columns )
 %                 that are passed to myFunction.
 %                 Excel sheet "static" contains constants that can be used
 %
-%   sheet       - sheet name in Excel file ('' if only one sheet)
+%   sheet       - sheet name in Excel file ('' can be used if only one sheet)
 %
 %   columns     - Cells with valid Excel column names, from which parameters should be taken.
 %                 Data from selected columns are forwarded as arguments to myFunction. 
 %                 Example: columns = {'A', 'B', 'D', 'E'};  
-%                 Example: columns = {'AA', 'AB'};  
-%                   
-%                 The column names are translated to column numbers internally.
-%                 The column numbers may be used directly as input arguments, instead of names
-%                 Example: columns = [1 2 4 5];
-%
-%                 It is not permitted to mix column names and column
-%                 numbers
+%                 Example: columns = {'AA', 'AB'};  s
 %
 % OUTPUTS:
 %   T             Table with one row per looped file.  Each table row is
@@ -41,7 +34,7 @@ function T =  loop( myFunction, xlsFileList, sheet, columns )
 % "loop_test.xlsx" is a template for implementing the excel sheet
 %
 % REQUIRES: Matlab later than 2012 (for table)
-%           Excel
+%           An xlsx file created in Microsoft Excel or Libre Office
 %
 % AUTHOR: Jan Axelsson
 %         2015-APR-16
@@ -87,6 +80,7 @@ function T =  loop( myFunction, xlsFileList, sheet, columns )
     
     errCount=0; 
     successCount=0;
+    emptyRowCount = 0;
     
     T = table();  % Empty table
 
@@ -143,20 +137,31 @@ function T =  loop( myFunction, xlsFileList, sheet, columns )
 %
     disp('MAIN LOOP');
     
-    files = raw(FIRSTROW:end, FIRSTCOLUMN );   % First column should always be a complete file path.  Start at row 2, allowing for column titles
+    files = raw(FIRSTROW:end, FIRSTCOLUMN );   % First column (doesn't have to be a file path, but called so here).  Start at row 2, allowing for column titles
     numberOfRows = length(files);
     
     errCount = zeros(1,numberOfRows);      % Use matrix to allow parfor signalling
     successCount = zeros(1,numberOfRows);  % Use matrix to allow parfor signalling
-    data = raw(FIRSTROW:end, columns );     % Data in columns
+    data = raw(FIRSTROW:end, columns );    % Data in columns
     
    for i=1:numberOfRows    
    %parfor i=1:numberOfRows
         try
             disp(' ');
-            disp([ '   '  num2str(i) '(' num2str(numberOfRows) ') ===> ' files{i} ]);
             tic;
-            T2 = myFunction( s, data(i, :));  % Send arguments from specified Excel-columns-numbers to my function
+            
+            emptyColumns = sum(  isnan(cell2mat( data(i,:) )) );
+            if emptyColumns == 0
+                disp([ '   '  num2str(i) '(' num2str(numberOfRows) ') ===> ' files{i} ]);
+                T2 = myFunction( s, data(i, :));  % Send arguments from specified Excel-columns-numbers to my function
+            else
+                emptyRowCount(i) = 1;
+                disp([ '   '  num2str(i) '(' num2str(numberOfRows) ') ===> ' files{i} ...
+                    'Found ' num2str(emptyColumns) ' empty columns' ] );
+                emptyRow = cell(1,size(T,2)); % Get variable names from table T
+                T2 = table( emptyRow, 'VariableNames', T.Properties.VariableNames); % Create empty one-row table
+            end
+            
             toc
             T = [T;T2];
             successCount(i) =1;
@@ -186,8 +191,13 @@ function T =  loop( myFunction, xlsFileList, sheet, columns )
 
         disp('=================================');
         disp('SUMMARY');
-        disp(['   Errors     = ' num2str( sum(errCount(:) ) ) ] );
-        disp(['   Successes  = ' num2str( sum(successCount(:) ) ) ]);
+        disp(    ['   Errors     = ' num2str( sum(errCount(:) ) ) ] );
+        if sum( emptyRowCount(:)) == 0
+            disp(['   Successes  = ' num2str( sum(successCount(:) ) ) ]);
+        else
+            disp(['   Successes  = ' num2str( sum(successCount(:) ) ) ...
+                  '  (including ' num2str( sum( emptyRowCount(:))) ' rows with missing data)']);
+        end
         disp('=================================');
 
 end

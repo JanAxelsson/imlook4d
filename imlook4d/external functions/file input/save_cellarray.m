@@ -14,7 +14,7 @@ function save_cellarray(cellarr, filename, header, latex)
 %    can be ommitted or empty.
 % latex: (boolean)
 
-% Rev.1.0, 02.11.98 (Armin Günter)
+% Rev.1.0, 02.11.98 (Armin Gï¿½nter)
 % Rev.1.1, 16.02.99 (A.G.: 'header' can be ommitted or empty)
 % Rev.1.2, 11.11.99 (A.G.: '.txt' appended only if apparently no
 %    other extension exists)
@@ -66,9 +66,9 @@ for i = 1:m
    line = [line sprintf('%s', num2str(cellarr{i, n}))];
    success = fprintf(fid, ['%s' nl], line);
    if ~success
-      error(['Problem writing to the file ' filename])
+      error(['Problem writing to the file ' filename]);
    end
 end
 
 %if fid ~= 1, fclose(fid); end
-fclose(fid)
+fclose(fid);
