@@ -45,8 +45,11 @@ function T =  loop( myFunction, xlsFileList, sheet, columns )
 % 
     displayColumns = cell(size(columns));  % Empty cells -- stores display of column names if in Excel 'A' format (otherwise emtpy)
     
+    functionName = func2str(myFunction);
+    
     disp('=================================');
     disp(['DATA SOURCE (for loop)' ]);
+    disp(['   Function    = ' functionName ]);
     disp(['   Excel file  = ' xlsFileList ]);
     disp(['   Excel sheet = ' sheet ]);
     
@@ -61,10 +64,10 @@ function T =  loop( myFunction, xlsFileList, sheet, columns )
             end
         end
         columns = tempColumns;   
-        disp(['   Columns     = ' displayString ]);
+        %disp(['   Columns     = ' displayString ]);
     end
     
-    disp(['   Columns     = ' num2str(columns)]);
+    %disp(['   Columns     = ' num2str(columns)]);
 
 %
 % Initialize
@@ -93,7 +96,7 @@ function T =  loop( myFunction, xlsFileList, sheet, columns )
         
         % Display columns to use
         for i=1:length(columns)
-            disp(['   Col=' displayColumns{i} ' (' num2str(columns(i)) ') "' text{1,columns(i)} '"'])
+            disp(['   Col = ' displayColumns{i} ' (' num2str(columns(i)) ') "' text{1,columns(i)} '"'])
         end
     catch
         dispRed(['?? Error reading Excel-file = ' xlsFileList  ]);
@@ -152,14 +155,29 @@ function T =  loop( myFunction, xlsFileList, sheet, columns )
             
             emptyColumns = sum(  isnan(cell2mat( data(i,:) )) );
             if emptyColumns == 0
-                disp([ '   '  num2str(i) '(' num2str(numberOfRows) ') ===> ' files{i} ]);
+                % All data needed
+                disp([ '===>  '   num2str(i) '(' num2str(numberOfRows) ') : ' functionName '  (' files{i} ')']);
                 T2 = myFunction( s, data(i, :));  % Send arguments from specified Excel-columns-numbers to my function
             else
+                % Empty data in one or more fields
                 emptyRowCount(i) = 1;
-                disp([ '   '  num2str(i) '(' num2str(numberOfRows) ') ===> ' files{i} ...
-                    'Found ' num2str(emptyColumns) ' empty columns' ] );
-                emptyRow = cell(1,size(T,2)); % Get variable names from table T
-                T2 = table( emptyRow, 'VariableNames', T.Properties.VariableNames); % Create empty one-row table
+                disp([ '===>  '   num2str(i) '(' num2str(numberOfRows) ') : ' functionName '  (' files{i} ')' ...
+                    '   NOTE : Found ' num2str(emptyColumns) ' empty fields' ]);
+
+                % Create emtpy table row
+                T2 = cell2table( num2cell(nan(1,17)) );
+                T2.Properties.VariableNames = T.Properties.VariableNames;
+                
+                for i = 1 : size(T,2)
+                    singleTableElement = T(1,i);
+                    % If cell string in T, then make cellstr
+                    if ~isempty( singleTableElement(1,vartype('cellstr')) )
+                        T2.(i) = {''};
+                    end
+                end
+                
+                
+                
             end
             
             toc
@@ -191,6 +209,7 @@ function T =  loop( myFunction, xlsFileList, sheet, columns )
 
         disp('=================================');
         disp('SUMMARY');
+        disp(    ['   Function    = ' functionName ]);
         disp(    ['   Errors     = ' num2str( sum(errCount(:) ) ) ] );
         if sum( emptyRowCount(:)) == 0
             disp(['   Successes  = ' num2str( sum(successCount(:) ) ) ]);
