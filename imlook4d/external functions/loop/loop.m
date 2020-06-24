@@ -49,6 +49,7 @@ function T =  loop( myFunction, xlsFileList, sheet, columns )
     
     disp('=================================');
     disp(['DATA SOURCE (for loop)' ]);
+    disp(['   Time        = ' char(datetime()) ]);
     disp(['   Function    = ' functionName ]);
     disp(['   Excel file  = ' xlsFileList ]);
     disp(['   Excel sheet = ' sheet ]);
@@ -165,7 +166,7 @@ function T =  loop( myFunction, xlsFileList, sheet, columns )
                     '   NOTE : Found ' num2str(emptyColumns) ' empty fields' ]);
 
                 % Create emtpy table row
-                T2 = cell2table( num2cell(nan(1,17)) );
+                T2 = cell2table( num2cell(nan(1,size(T,2))) );
                 T2.Properties.VariableNames = T.Properties.VariableNames;
                 
                 for i = 1 : size(T,2)
