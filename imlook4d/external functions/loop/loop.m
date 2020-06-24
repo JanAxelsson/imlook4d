@@ -156,12 +156,12 @@ function T =  loop( myFunction, xlsFileList, sheet, columns )
             emptyColumns = sum(  isnan(cell2mat( data(i,:) )) );
             if emptyColumns == 0
                 % All data needed
-                disp([ '===>  '   num2str(i) '(' num2str(numberOfRows) ') : ' functionName '  (' files{i} ')']);
+                dispBold([  num2str(i) '(' num2str(numberOfRows) ') : ' functionName '  (' files{i} ' / ' sheet ')']);
                 T2 = myFunction( s, data(i, :));  % Send arguments from specified Excel-columns-numbers to my function
             else
                 % Empty data in one or more fields
                 emptyRowCount(i) = 1;
-                disp([ '===>  '   num2str(i) '(' num2str(numberOfRows) ') : ' functionName '  (' files{i} ')' ...
+                dispBold([  num2str(i) '(' num2str(numberOfRows) ') : ' functionName  '  (' files{i} ' / ' sheet ')' ...
                     '   NOTE : Found ' num2str(emptyColumns) ' empty fields' ]);
 
                 % Create emtpy table row
