@@ -124,12 +124,16 @@
        set( HmatchNew(i), 'String',  get( HmatchOld(i), 'String') );
     end
     
+    % Copy status of transparancyPanel
+    newHandles.transparancyPanel.Visible = imlook4d_current_handles.transparancyPanel.Visible;
+    newHandles.transparancyText.Visible = imlook4d_current_handles.transparancyText.Visible;
+    newHandles.transparancyEdit.Visible = imlook4d_current_handles.transparancyEdit.Visible;
+    
     % Copy record-button status
     tag = 'record_toolbar_button';
     HmatchOld = findobj(imlook4d_current_handle,'Tag',tag);
     HmatchNew = findobj(newHandle,'Tag',tag);
     set( HmatchNew(1), 'State',  get( HmatchOld(1), 'State') );
-
 
  %   
  % FINALIZE

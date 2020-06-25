@@ -70,4 +70,10 @@ else
 end
 %end
 
+% Show transparancy setting
+imlook4d_current_handles.transparancyEdit.Visible = 'on';
+imlook4d_current_handles.transparancyText.Visible = 'on';
+imlook4d_current_handles.transparancyPanel.Visible = 'on'; 
+
+% Finish
 ClearVariables

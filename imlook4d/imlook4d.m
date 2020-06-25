@@ -1721,6 +1721,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         set(handles.ROILevelEdit,'Enable', 'inactive');
         set(handles.BrushSize,'Enable', 'inactive');
         set(handles.FrameNumEdit,'Enable', 'inactive');
+        set(handles.transparancyEdit,'Enable', 'inactive');
         set(handles.SliceNumEdit,'Enable', 'inactive');
         set(handles.PC_low_edit,'Enable', 'inactive');
         set(handles.PC_high_edit,'Enable', 'inactive');
@@ -1741,6 +1742,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         set(handles.ROILevelEdit,'Enable', 'on');
         set(handles.BrushSize,'Enable', 'on');
         set(handles.FrameNumEdit,'Enable', 'on');
+        set(handles.transparancyEdit,'Enable', 'on');
         set(handles.SliceNumEdit,'Enable', 'on');
         set(handles.PC_low_edit,'Enable', 'on');
         set(handles.PC_high_edit,'Enable', 'on');
@@ -2762,7 +2764,24 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              if DisplayHelp(hObject, eventdata, handles) 
                  return 
              end       
-     
+    function Transparancy_Callback(hObject, eventdata, handles)  
+        % Display HELP and get out of callback
+        if DisplayHelp(hObject, eventdata, handles)
+            return
+        end
+        
+        strg = get(hObject,'String');
+        if str2num(strg)<=100 && str2num(strg)>=0
+            updateImage(hObject, eventdata, handles)
+        else
+            if str2num(strg)>100
+                set(handles.transparancyEdit,'String','100');
+            end
+            
+            if str2num(strg)<0
+                set(handles.transparancyEdit,'String','0');
+            end
+        end
              
     % --------------------------------------------------------------------
     % CHECKBOXES & RADIOBUTTONS
@@ -2873,7 +2892,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         set(handles.ImageRadioButton,'Value',0)
         set(handles.PCImageRadioButton,'Value',0)
         set(handles.ResidualRadiobutton,'Value',0)
-        set(handles.imageRadioButtonGroupActiveButton,'Value',1)
+        set(handles.imageRadioButtonGroupActiveButton,'Value',1)  
         
     function removeNegativesRadioButton_Callback(hObject, eventdata, handles)
        % Display HELP and get out of callback
@@ -8553,9 +8572,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 %
                 % Put images in layers
                 %
+                
+                    transparancy = 1 - 0.01 * str2num(handles.transparancyEdit.String);
 
                     imAlphaData1 = 1;   % bottom-layer
-                    imAlphaData2 = 0.8; % overlay-layer (background image in imlook4d vocabulary)
+                    imAlphaData2 = transparancy; % overlay-layer (background image in imlook4d vocabulary)
                     imAlphaDataROI =0.5;% roi-layer
 
                     % First image
@@ -9775,6 +9796,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                            catch
                                text = ['WARNING - could not find help file = ' helpFileName ];
                                disp(text);
+                               disp('One of the following help file names are plausible, and should be created :');
+                               disp(['<a href="matlab:edit(''' helpFileName ''')">'  helpFileName '</a>']);
+                               disp(['<a href="matlab:edit(''' altHelpFileName ''')">'  altHelpFileName '</a>']);
+                               disp(['<a href="matlab:edit(''' altHelpFileName2 ''')">'  altHelpFileName2 '</a>']);
                            end
 
                        % Read foother
