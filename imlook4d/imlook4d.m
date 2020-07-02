@@ -2781,6 +2781,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             if str2num(strg)<0
                 set(handles.transparancyEdit,'String','0');
             end
+            updateImage(hObject, eventdata, handles);
         end
              
     % --------------------------------------------------------------------
