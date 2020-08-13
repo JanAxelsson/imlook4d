@@ -7070,6 +7070,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 roiSize = size(rois);
                 
                 %roiNames
+                rois( isnan(rois) ) = 0;
                 pixelValues = unique(rois);
                 if length(pixelValues) > 255
                     dispRed(['Cannot open.  Too many pixel values (' num2str(length(pixelValues)) ').  This is probably not a ROI file. ' ]);
