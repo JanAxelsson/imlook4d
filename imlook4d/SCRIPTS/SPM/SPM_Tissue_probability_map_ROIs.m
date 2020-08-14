@@ -33,9 +33,13 @@ StartScript; % Start a script and open a new instance of imlook4d to play with
 %% Open c1-c5
 
 currentFile = imlook4d_current_handles.image.file;
-cFile = [ 'c1' currentFile];
 
 % Open c1
+cFile = [ 'c1' currentFile];
+if ~isfile(cFile)  % Correct file name, may have used 'mean' for a dynamic scan
+    cFile = strrep( cFile, 'c1', 'c1mean')
+end
+    
 V = spm_vol(cFile);
 A = spm_read_vols(V); % Individual's c1... file
 
@@ -49,6 +53,11 @@ M(:,:,:,1) = A;
 % Open c2-c5
 for i = 2:5
     cFile = [ 'c' num2str(i) currentFile];
+    if ~isfile(cFile)  % Correct file name, may have used 'mean' for a dynamic scan
+        was = ['c' num2str(i)]; % 'c2'
+        is = [was 'mean']; % 'c2mean'
+        cFile = strrep( cFile, was, is);
+    end
     V = spm_vol(cFile);
     A = spm_read_vols(V); % Individual's c1... file
     M(:,:,:,i) = A;
