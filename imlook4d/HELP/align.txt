@@ -14,8 +14,12 @@
 	</P>
 
 	<P> 
-        The alignment reads a 4D nifti file and uses the spm spatial realignment functions. 
+        The alignment reads a 4D nifti file and uses the spm spatial realignment functions optimized for PET. 
 	</P>
 
+	<P> 
+        For PET, often the first frames are meaningless being only noise.  This may cause the realignment to fail.  Therefore, you will in a dialog need to
+        define the first frame to use for realignment.  
+	</P>
 	<P> 
 	</P>
