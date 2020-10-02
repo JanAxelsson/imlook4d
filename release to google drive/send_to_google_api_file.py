@@ -1,5 +1,7 @@
 #!/usr/local/bin/python3
 # 
+# Prerequisite (start in same python as first row): 
+# /usr/local/bin/python3 -m pip install pydrive
 import os
 import sys
 from pydrive.drive import GoogleDrive
