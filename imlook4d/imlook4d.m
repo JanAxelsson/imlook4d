@@ -4765,7 +4765,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                     
                % Enable menues
-                    set(newhandles.SaveFile,'Enable','on');
+                    set(newhandles.SaveFile,'Enable','on'); 
                     
                % Save nii struct (except images)
                     nii = rmfield(nii, 'img');
@@ -4786,7 +4786,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 %                     imlook4d('SwapHeadFeetRadioButton_Callback', h,{},newhandles);
                         
                % Save guidata
-                    guidata(h, newhandles);               
+                    guidata(h, newhandles);                
             function LocalOpenBinary(hObject, eventdata, handles, file,path, fileType)
                 % Used for opening different types of binary files
                 % 1) Pure binary
