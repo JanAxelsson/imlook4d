@@ -4666,8 +4666,40 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         openingMode='load_untouch_nii';                        
                     end
                     
+                TimeInfoExists = false;
                     
-                
+                % Get times from PMOD nifti-format - if exists 
+                    try 
+                        ext = load_nii_ext(fullPath);
+                        
+                        if (ext.num_ext == 1)
+                            
+                            % Private creator
+                            out = dirtyDICOMHeaderData( {ext.section.edata'}, 1, '0055', '0010',2);
+                            
+                            if  strcmp( out.string, 'PMOD_1')
+                            
+                                % [Frame Start Times Vector]
+                                out = dirtyDICOMHeaderData( {ext.section.edata'}, 1, '0055', '1001',2);
+                                time = typecast( uint8(out.bytes), 'double')';
+                                
+                                % [Frame Durations (ms) Vector]
+                                out = dirtyDICOMHeaderData( {ext.section.edata'}, 1, '0055', '1004',2);
+                                duration = 0.001 * typecast( uint8(out.bytes), 'double')';
+                                
+                                [ 'time' 'duration'];
+                                [time duration];
+                                
+                                TimeInfoExists = true;
+                            end
+                        end
+
+                    catch
+                        % TODO : have warning display once for missing time
+                        % info in BOTH pmod and sif
+                    end                    
+ 
+                    
                 % Get times from sif file - if exists (Turku data has that)
                     try 
                         fullPath=[path filesep name '.sif'];  % hdr file (img file was opened) 
@@ -4680,20 +4712,34 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         [time duration];
 
                         fclose(fid);
+                        
+                        TimeInfoExists = true;
                     catch
                         % Sif file does not exist
-                        sz = size(nii);
-                        if length(sz)>3
-                            % Dynamic scan -- times are importand
-                             warndlg({...
-                                'Time information missing', ...
-                                ' ', ...
-                                'Nifti does not know time, and this is a dynamic scan so time can be important'...
-                                'Please import time information from .sif file', ...
-                                '(Menu "SCRIPTS/Matrix/Import times sif")', ...
-                                 })
-                        end
                     end
+                    
+%               % Show warning if time-info did not exist
+%                    if (TimeInfoExists == false)
+%                        try
+%                            sz = size(nii.img);
+%                            if length(sz)>3
+%                                % Dynamic scan -- times are importand
+%                                opts = struct('WindowStyle','modal', 'Interpreter','tex');
+%                                warndlg({...
+%                                    'Time information missing', ...
+%                                    ' ', ...
+%                                    'Nifti does not know time, and this is a dynamic scan so time can be important'...
+%                                    'Please import time information from .sif file', ...
+%                                    '(Menu "SCRIPTS/Matrix/Import times sif")'}, ...
+%                                    'WARNING', ...
+%                                    opts ...
+%                                    );
+% 
+%                            end
+%                        catch
+%                        end
+%                    end
+              
                     
               % New imlook4d 
                     %nii.img = flipdim( nii.img, 2);
@@ -4740,7 +4786,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 %                     imlook4d('SwapHeadFeetRadioButton_Callback', h,{},newhandles);
                         
                % Save guidata
-                    guidata(h, newhandles);                
+                    guidata(h, newhandles);               
             function LocalOpenBinary(hObject, eventdata, handles, file,path, fileType)
                 % Used for opening different types of binary files
                 % 1) Pure binary
