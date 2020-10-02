@@ -32,19 +32,34 @@ numberOfFrames = size(imlook4d_Cdata,4);
 % START OWN CODE:
 % --------------------------------------------------
 
+
+% First frame dialog
+prompt={'First frame (noisy data does not align)'};
+[answer, imlook4d_current_handles] = ModelDialog( imlook4d_current_handles, ...
+    'align', ...
+    prompt, ...
+    { '1' } ...
+    );
+
+firstFrame = str2num(answer{1});
+
+% Setup realignment
+
 spm('defaults','pet');
 spm_jobman('initcfg');
 
 matlabbatch{1}.spm.util.exp_frames.files = { [path ',1']};
 %matlabbatch{1}.spm.util.exp_frames.files = {'/Users/jan/Desktop/IMAGES/DAD-tests/D34/native/Sharp.nii,1'};
-matlabbatch{1}.spm.util.exp_frames.frames = [1 : numberOfFrames];
-%matlabbatch{1}.spm.util.exp_frames.frames = [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18];
+
+
+matlabbatch{1}.spm.util.exp_frames.frames = [firstFrame : numberOfFrames];
+disp( ['Aligning frames = ' num2str(firstFrame) ' - ' num2str(numberOfFrames ) ]);
 
 matlabbatch{2}.spm.spatial.realign.estwrite.data{1}(1) = cfg_dep('Expand image frames: Expanded filename list.', substruct('.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1}), substruct('.','files'));
 matlabbatch{2}.spm.spatial.realign.estwrite.eoptions.quality = 0.9;
 matlabbatch{2}.spm.spatial.realign.estwrite.eoptions.sep = 4;
 matlabbatch{2}.spm.spatial.realign.estwrite.eoptions.fwhm = 5;
-matlabbatch{2}.spm.spatial.realign.estwrite.eoptions.rtm = 1;
+matlabbatch{2}.spm.spatial.realign.estwrite.eoptions.rtm = 1; % Register to mean
 matlabbatch{2}.spm.spatial.realign.estwrite.eoptions.interp = 2;
 matlabbatch{2}.spm.spatial.realign.estwrite.eoptions.wrap = [0 0 0];
 matlabbatch{2}.spm.spatial.realign.estwrite.eoptions.weight = '';

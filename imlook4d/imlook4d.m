@@ -1721,6 +1721,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         set(handles.ROILevelEdit,'Enable', 'inactive');
         set(handles.BrushSize,'Enable', 'inactive');
         set(handles.FrameNumEdit,'Enable', 'inactive');
+        set(handles.transparancyEdit,'Enable', 'inactive');
         set(handles.SliceNumEdit,'Enable', 'inactive');
         set(handles.PC_low_edit,'Enable', 'inactive');
         set(handles.PC_high_edit,'Enable', 'inactive');
@@ -1741,6 +1742,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         set(handles.ROILevelEdit,'Enable', 'on');
         set(handles.BrushSize,'Enable', 'on');
         set(handles.FrameNumEdit,'Enable', 'on');
+        set(handles.transparancyEdit,'Enable', 'on');
         set(handles.SliceNumEdit,'Enable', 'on');
         set(handles.PC_low_edit,'Enable', 'on');
         set(handles.PC_high_edit,'Enable', 'on');
@@ -2762,7 +2764,25 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              if DisplayHelp(hObject, eventdata, handles) 
                  return 
              end       
-     
+    function Transparancy_Callback(hObject, eventdata, handles)  
+        % Display HELP and get out of callback
+        if DisplayHelp(hObject, eventdata, handles)
+            return
+        end
+        
+        strg = get(hObject,'String');
+        if str2num(strg)<=100 && str2num(strg)>=0
+            updateImage(hObject, eventdata, handles)
+        else
+            if str2num(strg)>100
+                set(handles.transparancyEdit,'String','100');
+            end
+            
+            if str2num(strg)<0
+                set(handles.transparancyEdit,'String','0');
+            end
+            updateImage(hObject, eventdata, handles);
+        end
              
     % --------------------------------------------------------------------
     % CHECKBOXES & RADIOBUTTONS
@@ -2873,7 +2893,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         set(handles.ImageRadioButton,'Value',0)
         set(handles.PCImageRadioButton,'Value',0)
         set(handles.ResidualRadiobutton,'Value',0)
-        set(handles.imageRadioButtonGroupActiveButton,'Value',1)
+        set(handles.imageRadioButtonGroupActiveButton,'Value',1)  
         
     function removeNegativesRadioButton_Callback(hObject, eventdata, handles)
        % Display HELP and get out of callback
@@ -4646,8 +4666,40 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         openingMode='load_untouch_nii';                        
                     end
                     
+                TimeInfoExists = false;
                     
-                
+                % Get times from PMOD nifti-format - if exists 
+                    try 
+                        ext = load_nii_ext(fullPath);
+                        
+                        if (ext.num_ext == 1)
+                            
+                            % Private creator
+                            out = dirtyDICOMHeaderData( {ext.section.edata'}, 1, '0055', '0010',2);
+                            
+                            if  strcmp( out.string, 'PMOD_1')
+                            
+                                % [Frame Start Times Vector]
+                                out = dirtyDICOMHeaderData( {ext.section.edata'}, 1, '0055', '1001',2);
+                                time = typecast( uint8(out.bytes), 'double')';
+                                
+                                % [Frame Durations (ms) Vector]
+                                out = dirtyDICOMHeaderData( {ext.section.edata'}, 1, '0055', '1004',2);
+                                duration = 0.001 * typecast( uint8(out.bytes), 'double')';
+                                
+                                [ 'time' 'duration'];
+                                [time duration];
+                                
+                                TimeInfoExists = true;
+                            end
+                        end
+
+                    catch
+                        % TODO : have warning display once for missing time
+                        % info in BOTH pmod and sif
+                    end                    
+ 
+                    
                 % Get times from sif file - if exists (Turku data has that)
                     try 
                         fullPath=[path filesep name '.sif'];  % hdr file (img file was opened) 
@@ -4660,9 +4712,34 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         [time duration];
 
                         fclose(fid);
+                        
+                        TimeInfoExists = true;
                     catch
                         % Sif file does not exist
                     end
+                    
+%               % Show warning if time-info did not exist
+%                    if (TimeInfoExists == false)
+%                        try
+%                            sz = size(nii.img);
+%                            if length(sz)>3
+%                                % Dynamic scan -- times are importand
+%                                opts = struct('WindowStyle','modal', 'Interpreter','tex');
+%                                warndlg({...
+%                                    'Time information missing', ...
+%                                    ' ', ...
+%                                    'Nifti does not know time, and this is a dynamic scan so time can be important'...
+%                                    'Please import time information from .sif file', ...
+%                                    '(Menu "SCRIPTS/Matrix/Import times sif")'}, ...
+%                                    'WARNING', ...
+%                                    opts ...
+%                                    );
+% 
+%                            end
+%                        catch
+%                        end
+%                    end
+              
                     
               % New imlook4d 
                     %nii.img = flipdim( nii.img, 2);
@@ -4688,7 +4765,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                     
                % Enable menues
-                    set(newhandles.SaveFile,'Enable','on');
+                    set(newhandles.SaveFile,'Enable','on'); 
                     
                % Save nii struct (except images)
                     nii = rmfield(nii, 'img');
@@ -7039,6 +7116,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 roiSize = size(rois);
                 
                 %roiNames
+                rois( isnan(rois) ) = 0;
                 pixelValues = unique(rois);
                 if length(pixelValues) > 255
                     dispRed(['Cannot open.  Too many pixel values (' num2str(length(pixelValues)) ').  This is probably not a ROI file. ' ]);
@@ -8542,9 +8620,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 %
                 % Put images in layers
                 %
+                
+                    transparancy = 1 - 0.01 * str2num(handles.transparancyEdit.String);
 
                     imAlphaData1 = 1;   % bottom-layer
-                    imAlphaData2 = 0.8; % overlay-layer (background image in imlook4d vocabulary)
+                    imAlphaData2 = transparancy; % overlay-layer (background image in imlook4d vocabulary)
                     imAlphaDataROI =0.5;% roi-layer
 
                     % First image
@@ -9764,6 +9844,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                            catch
                                text = ['WARNING - could not find help file = ' helpFileName ];
                                disp(text);
+                               disp('One of the following help file names are plausible, and should be created :');
+                               disp(['<a href="matlab:edit(''' helpFileName ''')">'  helpFileName '</a>']);
+                               disp(['<a href="matlab:edit(''' altHelpFileName ''')">'  altHelpFileName '</a>']);
+                               disp(['<a href="matlab:edit(''' altHelpFileName2 ''')">'  altHelpFileName2 '</a>']);
                            end
 
                        % Read foother

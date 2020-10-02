@@ -1,6 +1,11 @@
 # Ignore Mac DS_Store files
 .DS_Store
 
+# Ignore file with private information
+imlook4d-zip-and-release-to-google-drive
+release to google drive/client_secrets.json
+release to google drive/mycreds.txt
+
 # Ignore MATLAB backup files
 *~
 

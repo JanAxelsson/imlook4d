@@ -1,0 +1,17 @@
+<h1>Import times from sif</h1>
+<HR></HR>
+<!------------------->
+
+	<P>
+	Nifti files do not carry information about time, which is necessary in some processing of dynamic scans.
+    This script import time information from a .sif file.
+	</P>
+
+
+
+
+	<P>
+	.sif files can be created from the original DICOM files (which carry time information), by "SCRIPTS/Matrix/Export times to sif"
+
+	</P>
+

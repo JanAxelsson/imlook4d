@@ -14,6 +14,18 @@
 if ~verifySpmExists()
     return
 end
+
+Export;
+
+currentFile = imlook4d_current_handles.image.file;
+
+if (startsWith(currentFile,'mni') )
+    warndlg({'Tissue probability map ROIs must be calculated from native-space image'})
+    return
+end
+
+
+
 StartScript; % Start a script and open a new instance of imlook4d to play with
 
 % Data fields that can be modified in your own code:
@@ -32,10 +44,15 @@ StartScript; % Start a script and open a new instance of imlook4d to play with
 
 %% Open c1-c5
 
-currentFile = imlook4d_current_handles.image.file;
-cFile = [ 'c1' currentFile];
+oldDir = pwd();
+cd( imlook4d_current_handles.image.folder);
 
 % Open c1
+cFile = [ 'c1' currentFile];
+if ~isfile( cFile )  % Correct file name, may have used 'mean' for a dynamic scan
+    cFile = strrep( cFile, 'c1', 'c1mean')
+end
+    
 V = spm_vol(cFile);
 A = spm_read_vols(V); % Individual's c1... file
 
@@ -49,6 +66,11 @@ M(:,:,:,1) = A;
 % Open c2-c5
 for i = 2:5
     cFile = [ 'c' num2str(i) currentFile];
+    if ~isfile(cFile)  % Correct file name, may have used 'mean' for a dynamic scan
+        was = ['c' num2str(i)]; % 'c2'
+        is = [was 'mean']; % 'c2mean'
+        cFile = strrep( cFile, was, is);
+    end
     V = spm_vol(cFile);
     A = spm_read_vols(V); % Individual's c1... file
     M(:,:,:,i) = A;
@@ -76,11 +98,13 @@ V.dt = [16 0];
 V = spm_write_vol(V, NewROIs);
 
 LoadROI(newFile);
-
+ROI_naming_from_file( which( 'TPM_based_ROIs.txt'));
+copyfile( which( 'TPM_based_ROIs.txt'),  pwd() ); % is in target directory (cd at top of file)
 
 % --------------------------------------------------
 % END OF OWN CODE
 % --------------------------------------------------
+cd(oldDir);
 
 %EndScript; % Import your changes into new instance and clean up your variables
 

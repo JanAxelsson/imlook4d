@@ -9,6 +9,7 @@
 			<LI> <B><a href="javascript:;" onclick="document.location.hash='ROI';">ROI file + image </a> </B> (.roi)
 			<LI> <B><a href="javascript:;" onclick="document.location.hash='DICOM';">DICOM</a> </B>
 			<LI>  <B><a href="javascript:;" onclick="document.location.hash='Nifti';">Nifti</a> </B> (.nii, .hdr, .img)
+			<LI>  <B><a href="javascript:;" onclick="document.location.hash='Nifti-pmod';">Nifti PMOD</a> </B> (.nii)
 
 			<LI>  <B><a href="javascript:;" onclick="document.location.hash='ECAT';">Siemens/CTI ECAT 7</a></B> (.v)
 			<LI>  <B><a href="javascript:;" onclick="document.location.hash='Analyze';">Analyze</a> </B> (.hdr, .img)
@@ -107,6 +108,20 @@
 	<P>
 		If a .sif file with the same name exists, imlook4d takes the frame time information from this file.<BR> 
 		See the Analyze section above for information about .sif files.
+	</P>
+
+		
+<a href="javascript:;" onclick="document.location.hash='top';">[top]</a>
+
+<h2><a id="Nifti-pmod">Nifti file opening (PMOD)</a></h2>
+<!------------------------>
+
+	<P>
+		Opens  .nii files (one binary file), converted from Dicom using PMOD. This is read-only. 
+	</P>
+
+	<P>
+		Time information from 4D PET is imported using the PMOD Nifti extension format.
 	</P>
 
 		

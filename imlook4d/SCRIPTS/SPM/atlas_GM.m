@@ -38,6 +38,12 @@ fullPath = [imlook4d_current_handles.image.folder imlook4d_current_handles.image
 
 GM_ROI_file = [ folder filesep 'c1' FILE ext];
 
+% Dynamic files has been using mean file, fix name
+if ~isfile(GM_ROI_file)
+    disp('assuming mean file')
+    GM_ROI_file = strrep( GM_ROI_file, 'c1', 'c1mean')
+end
+
 try
     nii = load_nii(GM_ROI_file);
     openingMode='load_nii';

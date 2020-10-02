@@ -6,8 +6,8 @@ ERRORS
 [  ]   Help on Buttons TACT, Clear.  Help on drop down "Clear ROI"
 [  ]   Command Button('TACT') does not work. Button('Clear') works.
 [  ]   Help now goes all the way up to "Image View Port".  Rewrite so it goes only to parent
-[  ]   Help on Record button missing
-
+[  ]   Help on Record button missing  
+ 
 
 
 

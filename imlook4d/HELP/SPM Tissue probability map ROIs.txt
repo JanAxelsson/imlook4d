@@ -2,7 +2,7 @@
 <HR></HR>
 <!------------------->
 	<P>
-		Finds the following region-of-interests (ROIs) from the tissue-probability maps for this file:
+		Finds the following region-of-interests (ROIs), calculated from the tissue-probability maps for this file:
 <ol>
 <li> Gray Matter
 <li> White Matter
@@ -12,10 +12,6 @@
 
 
 </ol>
-	</P>
-
-	<P> 
-Nifti cannot store ROI names. ROI names may be loaded using the script "ROI/ROI naming from file", where "TPM_Based_ROIs.txt" should be selected.
 	</P>
 
 	<P> 
