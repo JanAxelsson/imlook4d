@@ -572,7 +572,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 
                  % Path to look (imlook4d/../USER_SCRIPTS)
                  [pathstr1,name,ext] = fileparts(which('imlook4d'));
-                 userScriptFolderPath = [pathstr1 filesep '..' filesep 'USER_SCRIPTS'];   
+                 userScriptFolderPath = [pathstr1 filesep '..' filesep '..' filesep '..' filesep 'USER_SCRIPTS'];   
                  addpath(userScriptFolderPath);      % Add folder to path (in case you made a new one) 
 
             

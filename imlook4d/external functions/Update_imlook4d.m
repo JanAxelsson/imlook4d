@@ -1,10 +1,12 @@
 StoreVariables  % Remember variables
 
-disp( [ 'Determining latest available version ']);
+disp( [ 'Determining latest available version 2']);
 
 
 ID='13mGVhbnZYUyr6BWq4mXTTo12PvM7gykJ';
 latestFileListURL = ['https://drive.google.com/uc?export=download&id=' ID ]; 
+
+latestFileListURL = 'https://raw.githubusercontent.com/JanAxelsson/imlook4d/master/imlook4d/latest_releases.txt';
 
 % Test to fix error behind firewall
 %text = webread( latestFileListURL);
@@ -127,5 +129,13 @@ savepath
 disp(' ');
 disp( [ 'Installation DONE!  Old version remains on disk']);
 disp( [ ' ']);
+
+%% Update version.txt
+versionFile = which('version.txt');
+
+fid = fopen(versionFile,'w');
+fprintf(fid,ver);
+fclose(fid);
+
 
 ClearVariables  % Clear remembered variables
