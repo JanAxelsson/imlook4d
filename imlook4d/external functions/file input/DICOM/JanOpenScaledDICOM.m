@@ -150,7 +150,7 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
             %
             % Selected series series-uid
             %
-            out3=dirtyDICOMHeaderData(headers, 1, '0020', '000E',2);
+            out3=dirtyDICOMHeaderData(headers, 1, '0020', '000E',guessedMode);
             selectedSeriesUID = out3.string;
 
 
@@ -425,7 +425,7 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                     tempData = typecast( uint8(A(startOfPixelData:end)), numberFormat);
                     
                     % Series UID
-                    out3=dirtyDICOMHeaderData({tempHeader}, 1, '0020', '000E',2); % fix cell array for first argument
+                    out3=dirtyDICOMHeaderData({tempHeader}, 1, '0020', '000E',mode); % fix cell array for first argument
                     seriesUID = out3.string;
                     
                     % Test if DICOM file, Hermes export, or same series
