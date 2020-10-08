@@ -26,10 +26,11 @@ urlToLatestImlook4d = url;
 %% Define Paths
 
 
-% /aaa/bbb/ccc/imlook4d/imlook4d.m
+% /aaa/bbb/ccc/imlook4d/imlook4d/imlook4d.m
+% /aaa/bbb/ccc/imlook4d/imlook4d/
 % /aaa/bbb/ccc/imlook4d/
 % 
-imlook4dFilePath = which('imlook4d.m'); % imlook4dFilePath = /aaa/bbb/ccc/imlook4d/imlook4d.m
+imlook4dFilePath = which('imlook4d.m'); % imlook4dFilePath = /aaa/bbb/ccc/imlook4d/imlook4d/imlook4d.m
 if isempty(imlook4dFilePath)
     warning('imlook4d is not in path -- cannot install');
     warning('Please download and install manually from ');
@@ -38,7 +39,12 @@ if isempty(imlook4dFilePath)
 end
 
 
-[folder,file,ext] = fileparts(imlook4dFilePath); % folder = /aaa/bbb/ccc/imlook4d
+[folder,file,ext] = fileparts(imlook4dFilePath); % folder = /aaa/bbb/ccc/imlook4d/imlook4d
+
+% Remove extra level for versions hosted on github
+if ( string( getImlook4dVersion() ) > "5.2.1")
+    [folder,file,ext] = fileparts(folder); % folder = /aaa/bbb/ccc/imlook4d/
+end
 
 [zipFileFolder,file,ext] = fileparts(folder); % zipFileFolder = /aaa/bbb/ccc
 zipFilePath = [ zipFileFolder filesep 'latestImlook4d.zip']; % zipFilePath = /aaa/bbb/ccc/latestImlook4d.zip
