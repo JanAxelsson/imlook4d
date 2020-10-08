@@ -1,6 +1,6 @@
 StoreVariables  % Remember variables
 
-disp( [ 'Determining latest available version ']);
+disp( [ 'Determining latest available version 2']);
 
 
 ID='13mGVhbnZYUyr6BWq4mXTTo12PvM7gykJ';
