@@ -6,6 +6,8 @@ disp( [ 'Determining latest available version ']);
 ID='13mGVhbnZYUyr6BWq4mXTTo12PvM7gykJ';
 latestFileListURL = ['https://drive.google.com/uc?export=download&id=' ID ]; 
 
+latestFileListURL = 'https://raw.githubusercontent.com/JanAxelsson/imlook4d/master/imlook4d/latest_releases.txt';
+
 % Test to fix error behind firewall
 %text = webread( latestFileListURL);
 %o = weboptions('CertificateFilename','');
