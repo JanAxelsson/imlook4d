@@ -163,7 +163,7 @@ function data=dirtyDICOMHeaderData(headers, col, group, element,explicit,stopAt)
                 % The group '7FE0' does not have any header data
                 %
                 % If error caught for other conditions, report them:
-                disp([ '(' group ',' element ') index='  num2str(i) '  ERROR in dirtyDICOMHeaderData - keep looking in this header' ]);
+                %disp([ '(' group ',' element ') index='  num2str(i) '  ERROR in dirtyDICOMHeaderData - keep looking in this header' ]);
             end
         end
 
