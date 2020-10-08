@@ -23,14 +23,14 @@ disp( [ 'Latest available version = ' ver ]);
 
 urlToLatestImlook4d = url;
 
-%% Define Paths
+
+%% BEFORE, or develop :  Define Paths
 
 
-% /aaa/bbb/ccc/imlook4d/imlook4d/imlook4d.m
-% /aaa/bbb/ccc/imlook4d/imlook4d/
-% /aaa/bbb/ccc/imlook4d/
-% 
-imlook4dFilePath = which('imlook4d.m'); % imlook4dFilePath = /aaa/bbb/ccc/imlook4d/imlook4d/imlook4d.m
+% /aaa/bbb/ccc/imlook4d/imlook4d.m
+% /aaa/bbb/ccc/imlook4d/                <- this is my imlook4d installation folder 
+%  
+imlook4dFilePath = which('imlook4d.m'); % imlook4dFilePath = /aaa/bbb/ccc/imlook4d/imlook4d.m
 if isempty(imlook4dFilePath)
     warning('imlook4d is not in path -- cannot install');
     warning('Please download and install manually from ');
@@ -38,14 +38,40 @@ if isempty(imlook4dFilePath)
     return
 end
 
+[folder,file,ext] = fileparts(imlook4dFilePath); % folder = /aaa/bbb/ccc/imlook4d
 
-[folder,file,ext] = fileparts(imlook4dFilePath); % folder = /aaa/bbb/ccc/imlook4d/imlook4d
 
-% Remove extra level for versions hosted on github
-if ( string( getImlook4dVersion() ) > "5.2.1")
-    [folder,file,ext] = fileparts(folder); % folder = /aaa/bbb/ccc/imlook4d/
+%% GITHUB Paths
+
+% Cannot be Develop version
+% Must be downloaded from Github (indicated by file latest_releases.txt -- which was introduced when moving to Github download)
+if ( exist( which('latest_releases.txt')  ) && ~strcmp( getImlook4dVersion(), 'Develop') ) 
+    % /aaa/bbb/ccc/imlook4d_x.x.x/imlook4d_x.x.x/imlook4d/imlook4d.m (done above)
+    %
+    % start from here:
+    % /aaa/bbb/ccc/imlook4d_x.x.x/imlook4d_x.x.x/imlook4d/
+    % /aaa/bbb/ccc/imlook4d_x.x.x/imlook4d_x.x.x/
+    % /aaa/bbb/ccc/imlook4d_x.x.x/                   <- this is my imlook4d installation folder
+    %
+    
+    [folder,file,ext] = fileparts(imlook4dFilePath); % folder = /aaa/bbb/ccc/imlook4d_x.x.x/imlook4d_x.x.x/imlook4d/
+    
+    % Prior to 5.2.2, the downloaded folder structure was
+    %    imlook4d_x.x.x/imlook4d/imlook4d.m
+    % After 5.2.2. the structure (from github) is:
+    %    imlook4d_x.x.x/imlook4d_x.x.x/imlook4d/imlook4d.m
+    %
+    % To be parallell to the currently installed folder, the installation path
+    % should thus go up three steps (before) or four steps (now), relative the imlook4d.m location
+    
+    % Remove extra level for versions hosted on github
+    if ( string( getImlook4dVersion() ) > "5.2.1") && ( string( getImlook4dVersion() ) ~= "5.2.1")
+        [folder,file,ext] = fileparts(folder); % folder = /aaa/bbb/ccc/imlook4d_x.x.x/imlook4d_x.x.x/
+        [folder,file,ext] = fileparts(folder); % folder = /aaa/bbb/ccc/imlook4d_x.x.x/
+    end
 end
 
+%% Zip paths -- for download and extraction
 [zipFileFolder,file,ext] = fileparts(folder); % zipFileFolder = /aaa/bbb/ccc
 zipFilePath = [ zipFileFolder filesep 'latestImlook4d.zip']; % zipFilePath = /aaa/bbb/ccc/latestImlook4d.zip
 
