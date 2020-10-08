@@ -10,7 +10,7 @@ available. The most important feature is the easy method to extend functionality
 by adding a single matlab file into a folder (resulting in it becoming an
 integrated menu in imlook4d)
 
-![](../docs/Imlook4d_PET_MRI_screenshot.png)
+![](Imlook4d_PET_MRI_screenshot.png)
 
 *Figure: imlook4d PET/MRI with applied temporal Hotelling filter*
 
