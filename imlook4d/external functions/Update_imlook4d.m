@@ -130,4 +130,12 @@ disp(' ');
 disp( [ 'Installation DONE!  Old version remains on disk']);
 disp( [ ' ']);
 
+%% Update version.txt
+versionFile = which('version.txt');
+
+fid = fopen(versionFile,'w');
+fprintf(fid,ver);
+fclose(fid);
+
+
 ClearVariables  % Clear remembered variables
