@@ -1,6 +1,6 @@
 StoreVariables  % Remember variables
 
-disp( [ 'Determining latest available version 2']);
+disp( [ 'Determining latest available version ']);
 
 
 ID='13mGVhbnZYUyr6BWq4mXTTo12PvM7gykJ';
@@ -50,6 +50,9 @@ end
 zipFilePath = [ zipFileFolder filesep 'latestImlook4d.zip']; % zipFilePath = /aaa/bbb/ccc/latestImlook4d.zip
 
 unzipFolderPath = [ zipFileFolder filesep 'latestImlook4d']; % unzipFolderPath = /aaa/bbb/ccc/latestImlook4d
+
+disp( [ 'Download to file path = ' zipFilePath ]);
+disp( [ 'Unzip to temp folder  = ' unzipFolderPath ]);
 
 
 %% Compare if already at latest version
