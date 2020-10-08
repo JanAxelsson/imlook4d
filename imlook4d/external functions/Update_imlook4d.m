@@ -44,6 +44,7 @@ end
 % Remove extra level for versions hosted on github
 if ( string( getImlook4dVersion() ) > "5.2.1")
     [folder,file,ext] = fileparts(folder); % folder = /aaa/bbb/ccc/imlook4d/
+    [folder,file,ext] = fileparts(folder); % folder = /aaa/bbb/ccc/imlook4d/
 end
 
 [zipFileFolder,file,ext] = fileparts(folder); % zipFileFolder = /aaa/bbb/ccc
