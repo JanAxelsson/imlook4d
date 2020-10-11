@@ -11,6 +11,7 @@ for i=1:length(filenames);
   disp(i);
   try
     hdr(j) = spm_dicom_headers(filenames(i).name);
+    hdr(j).Modality = 'MRI';
     j = j+1;
   catch
   end
