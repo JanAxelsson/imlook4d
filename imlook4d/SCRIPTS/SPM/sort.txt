@@ -8,6 +8,6 @@ apply_atlas.m
 atlas_GM.m
 File_to_MNI.m
 ---
-
 SPM_open.m
 SPM_write.m
+SPM_view_image.m
