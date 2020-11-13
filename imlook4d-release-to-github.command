@@ -25,7 +25,7 @@ echo 'imlook4d/latest_releases.txt :'
 head 'imlook4d/latest_releases.txt'
 
 git commit -m "Release created tag = $rev"
-git push master 
+git push  
 
 
 read -n 1 -s -r -p "DONE!  (Press any key to quit!)"
