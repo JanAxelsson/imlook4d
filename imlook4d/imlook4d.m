@@ -4793,7 +4793,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 %                     imlook4d('SwapHeadFeetRadioButton_Callback', h,{},newhandles);
                         
                % Save guidata
-                    guidata(h, newhandles);                
+                    guidata(h, newhandles); 
+                    updateImage(newhandles.figure1, [], newhandles);
             function LocalOpenBinary(hObject, eventdata, handles, file,path, fileType)
                 % Used for opening different types of binary files
                 % 1) Pure binary
