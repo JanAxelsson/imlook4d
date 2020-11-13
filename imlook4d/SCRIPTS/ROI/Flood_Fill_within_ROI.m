@@ -20,7 +20,7 @@ ALGORITHM = 'FloodFill3D';
     %
     % Get user input
     %
-        prompt={'Threshold level (for instance 12345  or 40%)'};
+        prompt={'Threshold level (for instance 12345, <20, or 40%)'};
         title='Threshold level';
         numlines=1;
 
@@ -80,7 +80,7 @@ ALGORITHM = 'FloodFill3D';
         	[P, J] = regionGrowing(cIM, initPos, thresVal);
         end
         if strcmp(ALGORITHM,'FloodFill3D');
-            J = FloodFill3D(cIM, initPos, thresVal,BELOW_THRESHOLD);
+            J = FloodFill3D(cIM, initPos, thresVal,BELOW_THRESHOLD, imlook4d_current_handles);
         end
         
  

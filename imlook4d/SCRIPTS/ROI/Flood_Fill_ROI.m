@@ -1,5 +1,5 @@
-ALGORITHM = 'FloodFill3D';
-%ALGORITHM = 'regionGrowing';
+ALGORITHM = 'FloodFill3D';   % Stops at locked ROI
+%ALGORITHM = 'regionGrowing';% Does not stop at locked ROI -- (but, does not over write locked ROI)
 
 % INITIALIZE
 
@@ -18,7 +18,7 @@ ALGORITHM = 'FloodFill3D';
     %
     % Get user input
     %
-        prompt={'Threshold level (for instance 12345  or 40%)'};
+        prompt={'Threshold level (for instance 12345, <20, or 40%)'};
         title='Threshold level';
         numlines=1;
 
@@ -70,7 +70,7 @@ ALGORITHM = 'FloodFill3D';
         	[P, J] = regionGrowing(cIM, initPos, thresVal);
         end
         if strcmp(ALGORITHM,'FloodFill3D');
-            J = FloodFill3D(cIM, initPos, thresVal,BELOW_THRESHOLD);
+            J = FloodFill3D(cIM, initPos, thresVal,BELOW_THRESHOLD, imlook4d_current_handles);
         end
         
         
@@ -100,11 +100,11 @@ ALGORITHM = 'FloodFill3D';
         	[ P, newROIMatrix] = regionGrowing(cIM, initPos, thresVal); 
         end
         if strcmp(ALGORITHM,'FloodFill3D');
-            newROIMatrix = FloodFill3D(cIM, initPos, thresVal,BELOW_THRESHOLD);
+            newROIMatrix = FloodFill3D(cIM, initPos, thresVal,BELOW_THRESHOLD, imlook4d_current_handles);
         end
 
     %
-    % Write to all except locked ROI pixels
+    % Write to all except locked ROI pixels (NOTE : only needed for algorithm=regionGrowing)
     %
 
         % Make matrix of locked pixels

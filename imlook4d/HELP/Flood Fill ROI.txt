@@ -2,7 +2,9 @@
 <HR></HR>
 <!------------------->
 	<P>
-	This grows the currently selected ROI using the Flood Fill algorithm in 3D. The region growth starts at the highest pixel in the selected ROI and stops when no further connected voxels are found above the threshold value. 
+	This grows the currently selected ROI using the Flood Fill algorithm in 3D. 
+    The region growth starts at the highest pixel in the selected ROI and stops when no further connected voxels are found above the threshold value.
+    It also stops when a locked ROI isfound. 
 
 	</P><P>	
 

@@ -1,4 +1,4 @@
-function [B] = FloodFill3D(cIM, initPos, threshVal,BELOW_THRESHOLD);
+function [B] = FloodFill3D(cIM, initPos, threshVal,BELOW_THRESHOLD, imlook4d_current_handles);
 % [B] = FloodFill3D(A, slice);
 % This program flood fills a 6-connected 3D region. The input matrix MUST
 % be a binary image. The user will select a seed (point) in the matrix to
@@ -10,6 +10,7 @@ function [B] = FloodFill3D(cIM, initPos, threshVal,BELOW_THRESHOLD);
 %      initPos: Coordinates for initial seed position     
 %     thresVal: Absolute threshold level to be included   
 %   BELOW_THRESHOLD : true if flood fill in opposite direction (up to threshold, instead of down to threshold)
+%   imlook4d_current_handles : Honors locked imlook4d ROIs
 %
 % Built on FloodFill3D from F. Dinath
 
@@ -25,6 +26,17 @@ A(:,1,:) = NaN;     % to seek voxels outside the matrix
 A(:,end,:) = NaN;   % boundry during the for loop below.
 A(:,:,1) = NaN;     %
 A(:,:,end) = NaN;   %
+
+% Make matrix of locked pixels
+ROI = imlook4d_current_handles.image.ROI; % Should be same size as cIM
+lockedMatrix = zeros( size(ROI) ,'logical'); % Assume all locked
+numberOfROIs = length( imlook4d_current_handles.image.LockedROIs );
+for i=1:numberOfROIs
+    if ( imlook4d_current_handles.image.LockedROIs(i) == 1)
+        A(ROI == i ) = NaN;
+    end
+end
+
 
 % imagesc(A(:,:,slice));
 % title('select seed on figure');
