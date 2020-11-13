@@ -3028,9 +3028,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         end
 
          handles.image.ROI(handles.image.ROI==ROINumber) = 0;
-
-         guidata(hObject,handles);% Save handles
-
+         handles = storeUndoROI(handles);
+         %printUndoInfo(handles);
+         
+         guidata(handles.figure1,handles);% Save handles
+         
          updateImage(hObject, eventdata, handles); 
          updateROIs(handles);
     function TactButtonCallback(hObject, eventdata, handles)
@@ -4037,28 +4039,33 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         handles = createUndoROI( handles, UNDOSIZE);       
     function handles = storeUndoROI(handles)
         % Undo positions counted from recent (1) to last (UNDOSIZE)
-        % Current ROI is stored in position 1
+        % Current ROI will be stored in position 1
         tic
         UNDOSIZE = length(handles.image.UndoROI.ROI);
         ROI3D = handles.image.ROI;
-        % Shift 
+        
+        % Shift UNDOs back, leave room in position 1
         try
+            handles.image.UndoROI.position = 1;
             for i=(UNDOSIZE-1):-1:1
                 handles.image.UndoROI.ROI{i+1} = handles.image.UndoROI.ROI{i};
             end
         catch
             handles.image.UndoROI.ROI{1} = ROI3D;
-            handles.image.UndoROI.position = 1;
         end
 
         % Store only slices (efficient for large matrices and smaller ROIs)
-            activeROI = get(handles.ROINumberMenu,'Value');
-            slice = round(get(handles.SliceNumSlider,'Value'));
+            %activeROI = get(handles.ROINumberMenu,'Value');
+            %slice = round(get(handles.SliceNumSlider,'Value'));
             slicesWithRois = sum( sum(handles.image.ROI,1) >0 , 2);
             for i = 1: size(handles.image.ROI,3)
                 if slicesWithRois(i)
+                    disp([ 'found ROI in slice = ' num2str(i) ]);
                     handles.image.UndoROI.ROI{1}.roiSlices{i} = handles.image.ROI(:,:,i);
                     handles.image.UndoROI.ROI{1}.nonzeroSlices(i) = 1;  % Vector
+                else
+                    handles.image.UndoROI.ROI{1}.roiSlices{i} = [];
+                    handles.image.UndoROI.ROI{1}.nonzeroSlices(i) = 0;  % Vector
                 end
             end
 
@@ -4175,7 +4182,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 %disp([ 'ROI: ' num2str( sum(handles.image.ROI(:)>0)) '    Undo: ' R]);
                 disp([ 'ROI: ' nnz( sum(handles.image.ROI(:)>0)) '    Undo: ' R]);
             catch
-                disp('Error in printUndoInfo');
+                disp('Error in %printUndoInfo');
             end
     function handles = undoRoi(handles)
         handles = retrieveUndoROI(handles, +1); 
