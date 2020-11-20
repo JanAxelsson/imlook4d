@@ -14,6 +14,11 @@ numlines=1;
 defaultanswer={ '5', '5', '5' };
 %answer=inputdlg(prompt,title,numlines,defaultanswer);
 answer=ModelDialog(imlook4d_current_handles, 'PVE', prompt,defaultanswer);
+if isempty(answer)  % cancelled inputdlg and clean up
+    ClearVariables
+    clear pveFactors
+    return
+end
 
 % FWHM
 fwhm = [ str2num(answer{1}) str2num(answer{2}) str2num(answer{3}) ];

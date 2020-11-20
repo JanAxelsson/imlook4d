@@ -11,7 +11,8 @@ Export;
 
     defaultanswer = RetriveEarlierValues('AdaptiveThreshold', {'0.1', '0'} ); % Read default if exists, or apply these as default
     answer=inputdlg(prompt,myTitle,numlines,defaultanswer);
-    if isempty(answer) % cancelled inputdlg
+    if isempty(answer)  % cancelled inputdlg and clean up
+        ClearVariables
         return
     end
     StoreValues('AdaptiveThreshold', answer ); % Store answer as new dialog default

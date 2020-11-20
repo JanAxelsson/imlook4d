@@ -32,6 +32,10 @@ EOL = sprintf('\n');
         1, ...
         {num2str( N0 )} );
     
+    if isempty(answer)  % cancelled inputdlg and clean up
+        ClearVariables
+        return
+    end
     
     N=str2num( answer{1} );
     

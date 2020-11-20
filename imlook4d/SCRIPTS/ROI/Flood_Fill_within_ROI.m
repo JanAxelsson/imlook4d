@@ -26,7 +26,9 @@ ALGORITHM = 'FloodFill3D';
 
         defaultanswer = RetriveEarlierValues('RegionGrowth', {'40%'} ); % Read default if exists, or apply these as default
         answer=inputdlg(prompt,title,numlines,defaultanswer);
-        if isempty(answer) % cancelled inputdlg
+        if isempty(answer)  % cancelled inputdlg and clean up
+            ClearVariables
+            clear ALGORITHM
             return
         end
         thresholdString = num2str(answer{1});
