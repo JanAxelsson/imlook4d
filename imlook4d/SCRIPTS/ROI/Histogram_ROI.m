@@ -17,7 +17,8 @@ numlines=1;
 
 defaultanswer = RetriveEarlierValues('HistogramNumberOfBins', {'20'} ); % Read default if exists, or apply these as default
 answer=inputdlg(prompt,titleString,numlines,defaultanswer);
-if isempty(answer) % cancelled inputdlg
+if isempty(answer)  % cancelled inputdlg and clean up
+    ClearVariables
     return
 end
 bins = str2num(answer{1});% Number of histogram bins

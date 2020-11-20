@@ -1,4 +1,5 @@
 function version=getImlook4dVersion()
-      version =  fileread('version.txt');
+      fid = fopen('version.txt');
+      version = fgetl(fid)  % read line excluding newline character
                  
                  

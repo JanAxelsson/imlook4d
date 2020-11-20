@@ -39,30 +39,13 @@ imlook4d repository
 Create a release
 ----------------
 
--    
+-   Gör en tag
 
--    
+-   imlook4d-release-to-github.command
 
--   Creating a release from a ”tag” in the git repository, run the script
-    `imlook4d-export-to-zip`. This will place a zip file with correct
-    version.txt in the folder `imlook4d-exports`. The zip file can be
-    distributed as is.
+-   Välj tag
 
--   **Note**: the tagged release will not have the correct `version.txt`, since
-    this is added in the script `imlook4d-export-to-zip`.
-
-Make release available
-----------------------
-
--   Starta Google Drive
-
--   Kopiera zip-file  
-    från: `/Users/jan/Documents/Projects/imlook4d/imlook4d-exports`  
-    till: `/Users/jan/Google Drive/imlook4d-site/downloads/Current release`
-
--   Editera `/Users/jan/Google
-    Drive/imlook4d-site/downloads/latest_releases.txt`  
-    (instruktion inne i den filen)
+ 
 
  
 

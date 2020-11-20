@@ -35,7 +35,8 @@
 
     defaultanswer = RetriveEarlierValues('Threshold', {'100%','40%', '1' , 'end'} ); % Read default if exists, or apply these as default
     answer=inputdlg(prompt,title,numlines,defaultanswer);
-    if isempty(answer) % cancelled inputdlg
+    if isempty(answer)  % cancelled inputdlg and clean up
+        ClearVariables
         return
     end
     StoreValues('Threshold', answer ); % Store answer as new dialog default
