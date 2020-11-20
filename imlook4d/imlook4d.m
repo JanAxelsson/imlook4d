@@ -3156,7 +3156,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             index = round( length(sliceWithHighestValue)/2 );
                             sliceWithHighestValue = sliceWithHighestValue( index);
                         end
-                        disp(['Found ROI in slice number = ' num2str(sliceWithHighestValue) ]);
+                        %disp(['Found ROI in slice number = ' num2str(sliceWithHighestValue) ]);
                         
                         
 
@@ -4064,7 +4064,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             slicesWithRois = sum( sum(handles.image.ROI,1) >0 , 2);
             for i = 1: size(handles.image.ROI,3)
                 if slicesWithRois(i)
-                    disp([ 'found ROI in slice = ' num2str(i) ]);
+                    %disp([ 'found ROI in slice = ' num2str(i) ]);
                     handles.image.UndoROI.ROI{1}.roiSlices{i} = handles.image.ROI(:,:,i);
                     handles.image.UndoROI.ROI{1}.nonzeroSlices(i) = 1;  % Vector
                 else
