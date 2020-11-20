@@ -3153,10 +3153,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         
                         [I,J,sliceWithHighestValue] = ind2sub(dims,indexToHighest);
                         if length(sliceWithHighestValue) > 1
-                            first = sliceWithHighestValue(1);
-                            last = sliceWithHighestValue(end);
-                            mid = floor( (first+last)/2);
-                            sliceWithHighestValue = sliceWithHighestValue(mid);
+                            index = round( length(sliceWithHighestValue)/2 );
+                            sliceWithHighestValue = sliceWithHighestValue( index);
                         end
                         disp(['Found ROI in slice number = ' num2str(sliceWithHighestValue) ]);
                         
