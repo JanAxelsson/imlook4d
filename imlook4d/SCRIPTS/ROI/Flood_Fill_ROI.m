@@ -29,6 +29,8 @@ ALGORITHM = 'FloodFill3D';   % Stops at locked ROI
             clear ALGORITHM
             return
         end
+        clear title; % This variable creates problem for many scripts, if remaining after a crash
+        
         thresholdString = num2str(answer{1});
         
         BELOW_THRESHOLD = strcmp( '<', thresholdString(1) );
@@ -37,6 +39,7 @@ ALGORITHM = 'FloodFill3D';   % Stops at locked ROI
            % Error message if bad inputs
            if strcmp( thresholdString(end), '%')
                dispRed('ERROR: < and % is an impossible combination');
+               ClearVariables
                return
            end
         end
