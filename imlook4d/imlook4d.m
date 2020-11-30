@@ -2334,8 +2334,79 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 
                 disp(s);
                 clipboard('copy',s)  
+   
+    function polyVOIToggleButton_ClickedCallback(hObject, eventdata, handles)
+        % Works similarly to Measures, that the contextual menu stores
+        % internal data
+        
+            % Display HELP and get out of callback
+            if DisplayHelp(hObject, eventdata, handles)
+                %set(hObject,'State', 'off')
+                return
+            end
             
-                
+            slice = round(get(handles.SliceNumSlider,'Value' ));
+            roi_number = get(handles.ROINumberMenu,'Value');
+
+            pressedToggleButton( hObject);
+        
+            % interactive polygon
+            roi = drawpolygon( gca);  
+
+            % Create contextual menu
+            contextMenu = roi.UIContextMenu;
+            contextMenu.Tag = 'polyVoiContextMenu';
+
+            contextMenuItem = uimenu(contextMenu,'Text','To ROI');
+            contextMenuItem.MenuSelectedFcn = @(hObject,eventdata) imlook4d( 'convertPolyVoiToROI', hObject, eventdata, guidata(hObject));
+
+            contextMenuItem = uimenu(contextMenu,'Text','All to ROIs');
+            contextMenuItem.MenuSelectedFcn = @(hObject,eventdata) imlook4d( 'convertAllPolysVoiToROI', hObject, eventdata, guidata(hObject));
+
+            % Store polygon data in context menu
+            data.slice = slice;
+            data.roi_number = roi_number; 
+            data.polygon = roi;
+            contextMenu.UserData = data;
+            
+            % Finish
+            guidata(hObject,handles)
+            releasedToggleButton( hObject)
+        function convertPolyVoiToROI(hObject, eventdata, handles)
+            roi = hObject.Parent.UserData.polygon;
+            handles = convertSinglePolyToROI(handles, roi);
+            guidata(handles.figure1, handles);
+            updateROIs(handles);
+        function convertAllPolysVoiToROI(hObject, eventdata, handles)
+            
+            lobj = findobj(gcf, 'Type','images.roi.polygon');
+            for i = 1:length(lobj)
+                roi = lobj(i);
+                handles = convertSinglePolyToROI(handles, roi);
+                guidata(handles.figure1, handles);
+                updateROIs(handles);
+            end            
+            function handles = convertSinglePolyToROI(handles, roi)    
+                sz = size(handles.image.ROI);
+
+                slice = roi.ContextMenu.UserData.slice;
+                roi_number = roi.ContextMenu.UserData.roi_number;
+
+
+                % Populate ROI pixels
+                if get(handles.FlipAndRotateRadioButton,'Value') 
+                    BW = poly2mask( roi.Position(:,2)', roi.Position(:,1)', sz(1),sz(2) );
+                else
+                    BW = poly2mask( roi.Position(:,1)', roi.Position(:,2)', sz(1),sz(2) );
+                end
+                roi2D = handles.image.ROI(:,:,slice);
+                roi2D( BW ) =  roi_number; 
+                handles.image.ROI(:,:,slice) = roi2D;
+
+                % Delete polygon
+                delete(roi);
+
+            
     function rotateToggleButtonOn_ClickedCallback(hObject, eventdata, handles)
        % NOTE: 
        % I have cleared the ButtonDownFct for the rotate toggle button,
@@ -2584,35 +2655,50 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             %
             % Turn on or off measurement lines
             %
-            
-            % With imaging toolbox
-            lobj = findobj(gcf, 'Type','images.roi.line');  
-            for i = 1 : length(lobj)
-                if ( strcmp(handles.image.plane, lobj(i).UIContextMenu.UserData.orientation) ) && ...
-                        ( lobj(i).UIContextMenu.UserData.slice == newSlice)
-                    % Only turn on if both same slice AND same orientation
-                    lobj(i).Visible = 'on';
-                    lobj(i).UIContextMenu.UserData.textHandle.Visible = 'on';
-                else
-                    lobj(i).Visible = 'off';
-                    lobj(i).UIContextMenu.UserData.textHandle.Visible = 'off';
+
+                % With imaging toolbox
+                lobj = findobj(gcf, 'Type','images.roi.line');  
+                for i = 1 : length(lobj)
+                    if ( strcmp(handles.image.plane, lobj(i).UIContextMenu.UserData.orientation) ) && ...
+                            ( lobj(i).UIContextMenu.UserData.slice == newSlice)
+                        % Only turn on if both same slice AND same orientation
+                        lobj(i).Visible = 'on';
+                        lobj(i).UIContextMenu.UserData.textHandle.Visible = 'on';
+                    else
+                        lobj(i).Visible = 'off';
+                        lobj(i).UIContextMenu.UserData.textHandle.Visible = 'off';
+                    end
                 end
-            end
-            
-            
-            % Without imaging toolbox
-            lobj2 = findobj(gcf, 'Tag','imlook4d_measure');  
-            for i = 1 : length(lobj2)
-                if ( strcmp(handles.image.plane, lobj2(i).UIContextMenu.UserData.orientation) ) && ...
-                        ( lobj2(i).UIContextMenu.UserData.slice == newSlice)
-                    % Only turn on if both same slice AND same orientation
-                    lobj2(i).Visible = 'on';
-                    lobj2(i).UIContextMenu.UserData.textHandle.Visible = 'on';
-                else
-                    lobj2(i).Visible = 'off';
-                    lobj2(i).UIContextMenu.UserData.textHandle.Visible = 'off';
+
+
+                % Without imaging toolbox
+                lobj2 = findobj(gcf, 'Tag','imlook4d_measure');  
+                for i = 1 : length(lobj2)
+                    if ( strcmp(handles.image.plane, lobj2(i).UIContextMenu.UserData.orientation) ) && ...
+                            ( lobj2(i).UIContextMenu.UserData.slice == newSlice)
+                        % Only turn on if both same slice AND same orientation
+                        lobj2(i).Visible = 'on';
+                        lobj2(i).UIContextMenu.UserData.textHandle.Visible = 'on';
+                    else
+                        lobj2(i).Visible = 'off';
+                        lobj2(i).UIContextMenu.UserData.textHandle.Visible = 'off';
+                    end
                 end
-            end
+            
+            %
+            % Turn on or off poly VOIs (requires imaging toolbox)
+            %
+
+                lobj = findobj(gcf, 'Type','images.roi.polygon');  
+                for i = 1 : length(lobj)
+                    if ( lobj(i).UIContextMenu.UserData.slice == newSlice)
+                        lobj(i).Visible = 'on';
+                        lobj(i).UIContextMenu.UserData.textHandle.Visible = 'on';
+                    else
+                        lobj(i).Visible = 'off';
+                        lobj(i).UIContextMenu.UserData.textHandle.Visible = 'off';
+                    end
+                end           
             
         function setSlicesInYokes(slice, this_imlook4d_instance)
             yokes=getappdata( this_imlook4d_instance, 'yokes');
@@ -9736,6 +9822,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         h.LineWidth = linewidth;
                     end
                     hold(axisHandle, 'off')
+                    
     % --------------------------------------------------------------------
     % Help and HTML functions
     % --------------------------------------------------------------------
