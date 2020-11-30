@@ -1,3 +1,4 @@
+5.8.0    https://github.com/JanAxelsson/imlook4d/archive/5.8.0.zip
 5.5.1    https://github.com/JanAxelsson/imlook4d/archive/5.5.1.zip
 5.5.0    https://github.com/JanAxelsson/imlook4d/archive/5.5.0.zip
 5.5.0    https://github.com/JanAxelsson/imlook4d/archive/5.5.0.zip
