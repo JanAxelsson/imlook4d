@@ -2341,7 +2341,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         
             % Display HELP and get out of callback
             if DisplayHelp(hObject, eventdata, handles)
-                %set(hObject,'State', 'off')
+                set(hObject,'State', 'off')
                 return
             end
             
@@ -2358,6 +2358,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             contextMenu.Tag = 'polyVoiContextMenu';
 
             contextMenuItem = uimenu(contextMenu,'Text','To ROI');
+            contextMenuItem.Separator = 'on'
             contextMenuItem.MenuSelectedFcn = @(hObject,eventdata) imlook4d( 'convertPolyVoiToROI', hObject, eventdata, guidata(hObject));
 
             contextMenuItem = uimenu(contextMenu,'Text','All to ROIs');
@@ -2375,6 +2376,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         function convertPolyVoiToROI(hObject, eventdata, handles)
             roi = hObject.Parent.UserData.polygon;
             handles = convertSinglePolyToROI(handles, roi);
+            handles = storeUndoROI(handles);
             guidata(handles.figure1, handles);
             updateROIs(handles);
         function convertAllPolysVoiToROI(hObject, eventdata, handles)
@@ -2385,8 +2387,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 handles = convertSinglePolyToROI(handles, roi);
                 guidata(handles.figure1, handles);
                 updateROIs(handles);
-            end            
-            function handles = convertSinglePolyToROI(handles, roi)    
+            end
+            
+            handles = storeUndoROI(handles);
+            guidata(handles.figure1, handles);
+            
+            function handles = convertSinglePolyToROI(handles, roi)
                 sz = size(handles.image.ROI);
 
                 slice = roi.ContextMenu.UserData.slice;
@@ -2406,6 +2412,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 % Delete polygon
                 delete(roi);
 
+            
             
     function rotateToggleButtonOn_ClickedCallback(hObject, eventdata, handles)
        % NOTE: 
@@ -2691,12 +2698,15 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                 lobj = findobj(gcf, 'Type','images.roi.polygon');  
                 for i = 1 : length(lobj)
-                    if ( lobj(i).UIContextMenu.UserData.slice == newSlice)
-                        lobj(i).Visible = 'on';
-                        lobj(i).UIContextMenu.UserData.textHandle.Visible = 'on';
-                    else
-                        lobj(i).Visible = 'off';
-                        lobj(i).UIContextMenu.UserData.textHandle.Visible = 'off';
+                    try % Error if still drawing polygon
+                        if ( lobj(i).UIContextMenu.UserData.slice == newSlice)
+                            lobj(i).Visible = 'on';
+                            lobj(i).UIContextMenu.UserData.textHandle.Visible = 'on';
+                        else
+                            lobj(i).Visible = 'off';
+                            lobj(i).UIContextMenu.UserData.textHandle.Visible = 'off';
+                        end
+                    catch
                     end
                 end           
             

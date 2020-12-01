@@ -1,0 +1,42 @@
+<h1>Define a ROI using a Polygon</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	If "Add Polygon ROI" is pressed, a new ROI contour can be defined in the currently selectedROI. 
+    This is done by drawing a polygon. The polygon is not a ROI, but is a tool to create a ROI.
+    This polygon can be converted to a normal ROI (which is defined for individual pixels in the image the polygon ROI).
+	</P>
+
+
+	<P>
+	The following steps are involved when using the polygon tool to make a ROI:
+       
+		<OL>
+
+			<LI> If no ROI is defined, start with selecting "Add ROI" from the ROI dropdown menu.  Otherwise, select the ROI you wish work in.
+			<LI> Select the "Add Polygon ROI" button
+            
+			<LI> Make new nodes (corners) of the polygon by clicking in the image
+
+
+			<LI>  Close the polygon by either 1) clicking on the first node, or 2) right-click
+			<LI>  You may draw additional polygons, in this or other slices
+
+			<LI>  The final step is to convert the polygon to a ROI. This is done by right-clicking one of the following:
+            <UL>
+                <LI>  <B>To ROI </B> which converts the polygon you clicked to a ROI
+                <LI>  <B>All to ROIs</B> which converts all polygons to a ROI
+            </UL>
+
+		</OL>
+ 
+	</P>
+	
+	<P>
+	<B>NOTE:</B> On some computers, the right-click works only when simultaneously pressing [Ctrl] key on keyboard
+
+	</P>		
+
+
+	
+
