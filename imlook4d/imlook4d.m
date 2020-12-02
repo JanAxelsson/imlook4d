@@ -2345,6 +2345,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 return
             end
             
+            % If already pressed
+            if hObject.State == 'on'
+                return
+            end
+            
             slice = round(get(handles.SliceNumSlider,'Value' ));
             roi_number = get(handles.ROINumberMenu,'Value');
 
@@ -2371,8 +2376,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             contextMenu.UserData = data;
             
             % Finish
+            releasedToggleButton( hObject);
             guidata(hObject,handles)
-            releasedToggleButton( hObject)
+            
+            disp(['hObject.State = ' hObject.State]);
+            hObject.UserData
         function convertPolyVoiToROI(hObject, eventdata, handles)
             roi = hObject.Parent.UserData.polygon;
             handles = convertSinglePolyToROI(handles, roi);
@@ -2583,27 +2591,43 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 
                 
    % Shading of Pressed Toolbar Buttons
-       function pressedToggleButton( hObject)
+       function hObject = pressedToggleButton( hObject)
+           
+           if ( hObject.Type == 'uitoggletool' )
+               hObject.State = 'on';
+           end
+
+           % Special shade mac button background
            if ismac
-               icon = hObject.CData;
-               hObject.UserData = icon; % Remember original icon
                
+               % First time only
+               if ( isempty(hObject.UserData)  )
+                   hObject.UserData = hObject.CData; % Remember original icon
+               end
+
+               % Set to original icon
+               icon = hObject.UserData; 
+
                % Determine background from NaN in first dimension (which is
                % what Matlab seems to use for built in togglebuttons)
                background(:,:,3) = isnan( icon(:,:,1) );
                background(:,:,2) = isnan( icon(:,:,1) );
                background(:,:,1) = isnan( icon(:,:,1) );
                
-               newIcon = icon;
-               newIcon( background) = 0.8;
-               
-               hObject.CData = newIcon;
+               % Make shaded icon
+               icon( background) = 0.8;
+               hObject.CData = icon; 
+
            end
-       function releasedToggleButton( hObject)
+       function hObject = releasedToggleButton( hObject)
+
            if ismac
-               hObject.CData = hObject.UserData;  % Restore
+               hObject.CData = hObject.UserData;  % Set to original icon
            end
-               
+           
+           if ( hObject.Type == 'uitoggletool' )
+               hObject.State = 'off';
+           end
 
     % --------------------------------------------------------------------
     % SLIDERS
