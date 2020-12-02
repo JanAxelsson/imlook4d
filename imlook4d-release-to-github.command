@@ -24,9 +24,9 @@ mv /tmp/imlook4d_added_new_release.txt imlook4d/latest_releases.txt
 echo 'imlook4d/latest_releases.txt :'
 head 'imlook4d/latest_releases.txt'
 
-#git add .
-#git commit -m "Release created tag = $rev"
-#git push  
+git add .
+git commit -m "Release created tag = $rev"
+git push  
 
 
 read -n 1 -s -r -p "DONE!  (Press any key to quit!)"
