@@ -17,7 +17,7 @@ echo "Selected tag =  $rev"
 #git switch master
 
 
-echo "$rev    https://github.com/JanAxelsson/imlook4d/archive/$rev.zip" > /tmp/imlook4d_release.txt
+echo "$rev    https://codeload.github.com/JanAxelsson/imlook4d/zip/$rev" > /tmp/imlook4d_release.txt
 cat /tmp/imlook4d_release.txt imlook4d/latest_releases.txt > /tmp/imlook4d_added_new_release.txt
 mv /tmp/imlook4d_added_new_release.txt imlook4d/latest_releases.txt
  
