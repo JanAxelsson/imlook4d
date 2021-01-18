@@ -2593,7 +2593,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
    % Shading of Pressed Toolbar Buttons
        function hObject = pressedToggleButton( hObject)
            
-           if ( hObject.Type == 'uitoggletool' )
+           if ( strcmp(hObject.Type , 'uitoggletool') )
                hObject.State = 'on';
            end
 
@@ -2625,7 +2625,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                hObject.CData = hObject.UserData;  % Set to original icon
            end
            
-           if ( hObject.Type == 'uitoggletool' )
+           if ( strcmp(hObject.Type , 'uitoggletool') )
                hObject.State = 'off';
            end
 
