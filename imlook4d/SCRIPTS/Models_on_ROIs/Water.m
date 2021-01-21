@@ -40,13 +40,6 @@ size( Cinp_for_this_script)
 disp('Calculating model ...');
 a = jjwater( tact, imlook4d_time/60, imlook4d_duration/60, Cinp_for_this_script); 
 
-% Get Patlak axes for reference tissue
-% r = jjpatlak( Cinp, imlook4d_time/60, imlook4d_duration/60, Cinp, range);
-% 
-% 
-% a.Yref = r.Y{1};
-% a.Xref = r.X{1};
-
 % Display
 modelWindow( ...
     a , ...
