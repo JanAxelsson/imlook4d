@@ -178,6 +178,9 @@
 
         % Update handles structure
         guidata(hObject, handles);
+        
+        % Adjust for Dark mode in 2020a
+        dark_mode_adjust(hObject, [], handles)
 
 %
 % Utility functions
