@@ -26,7 +26,8 @@ ref = generateReferenceTACT( imlook4d_current_handles);
 tact = tacts;  % all ROIs
 
 
-a = jjratio( tacts, imlook4d_time/60, imlook4d_duration/60, ref, imlook4d_frame);
+%a = jjratio( tacts, imlook4d_time/60, imlook4d_duration/60, ref, imlook4d_frame);
+a = jjratio( tacts, imlook4d_time/60, imlook4d_duration/60, ref, 0);
 
 % Remove model parameter "ratios" from output, since I am only interested
 % in the ratios graph
