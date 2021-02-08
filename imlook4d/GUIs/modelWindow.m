@@ -186,6 +186,10 @@ function modelWindow_OpeningFcn(hObject, ~, handles, datastruct, roinames, title
 
         % Update handles structure
         guidata(hObject, handles);
+        
+        % Adjust for Dark mode in 2020a
+        dark_mode_adjust(hObject, [], handles)
+        
     function hObject = figureUnits( hObject, unitname) % Modify drawing units 
             hObject.Units = unitname; 
             objects = hObject.Children;

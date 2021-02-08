@@ -1291,7 +1291,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             BrushSize_Callback(hObject, eventdata, handles)    
 
            
+            
+            % Adjust for Dark mode in 2020a
+            dark_mode_adjust(hObject, eventdata, handles)
 
+            
+        
 
 % ========================================================================
 % 

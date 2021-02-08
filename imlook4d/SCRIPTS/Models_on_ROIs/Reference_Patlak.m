@@ -21,16 +21,17 @@ tact = tacts;  % all ROIs
 % Dialog
 %
 
-prompt={'Start Frame ', 'Last Frame '};
+prompt={'Start Frame ', 'Last Frame ', 'L3 (ref region spec binding)'};
 [answer, imlook4d_current_handles] = ModelDialog( imlook4d_current_handles, ...
     model_name, ...
     prompt, ...
-    { num2str(imlook4d_frame), num2str( size(imlook4d_Cdata,4) )} ...
+    { num2str(imlook4d_frame), num2str( size(imlook4d_Cdata,4) ), '0' } ...
     );
 
 startFrame = str2num( answer{1});
 endFrame = str2num( answer{2});
 range = [startFrame endFrame];
+L3 = str2num( answer{3});
 
 %Cinp_for_this_script = tacts(imlook4d_ROI_number,:); % Input function in current ROI
 Cinp_for_this_script = generateReferenceTACT( imlook4d_current_handles);
@@ -41,7 +42,7 @@ Cinp_for_this_script = generateReferenceTACT( imlook4d_current_handles);
 size( Cinp_for_this_script)
 
 disp('Calculating model ...');
-a = jjpatlak( tact, imlook4d_time/60, imlook4d_duration/60, Cinp_for_this_script, range); % Fit to end frame
+a = jjpatlak( L3, tact, imlook4d_time/60, imlook4d_duration/60, Cinp_for_this_script, range); % Fit to end frame
 
 % Get Patlak axes for reference tissue
 % r = jjpatlak( Cinp, imlook4d_time/60, imlook4d_duration/60, Cinp, range);

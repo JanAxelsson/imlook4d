@@ -1,8 +1,11 @@
-function out =  jjpatlak( matrix, t, dt, Cinp, range)
+function out =  jjpatlak( L3, matrix, t, dt, Cinp, range)
 
-    % Patlak
+    % Reference Patlak 
+    %
+    % (with extension for specific binding in reference region, doi:10.1016/j.jns.2007.01.057 )
     %
     % Inputs:
+    %   L3 = (unit min-1), rate constant for specific irreversible binding in reference region (zero when no specific binding in reference region = normal patlak)
     %   matrix = data with last dimension being frames (could be image matrix, or ROI values)
     %   t = frame start times in minutes
     %   dt = frame duration in minutes
@@ -67,12 +70,35 @@ function out =  jjpatlak( matrix, t, dt, Cinp, range)
         
     
     Ct = reshape( matrix, n, [] ) ;  % [  pixels frames ]
-  
+
+    
+    % time
+    tmid = t + 0.5 * dt;
+    dt      = [tmid(1), tmid(2:length(tmid))-tmid(1:length(tmid)-1)]; % For integration
+    
   
     % Integrate to mid times
     function value_vector = integrate( C, dt)
         value_vector = cumsum( C.*dt);% -0.5 * C .* dt; % exclude activity from second half (after midtime)
     end        
+
+
+    % SPECIAL Modify Cinp if specific binding in reference region
+    if (L3 ~= 0)
+        sub(1) = 0;
+        for i = 2 : length(t)
+            range = 1:i;
+            sub(i) =  sum( ...
+                L3 ...
+                * exp(L3 * ( tmid(range) - t(i) ) ) ... 
+                .* Cinp( range ) ... 
+                .* dt(range) ...
+            ); % Convolution for time t(i)
+        end
+
+        % Subtract specific binding from reference region
+        Cinp = Cinp - sub;
+    end
 
     % ----------------
     %  Patlak model

@@ -50,9 +50,23 @@ function out =  jjratio( matrix, t, dt, Cr, frame)
     s = size(matrix);
     switch length(s)
         case 2
-            IS_ROI = true; 
-            n = s(1);
-            outsize = [ s(1) 1 ]; % reshape needs 2D input
+            % This could be:
+            % 1) ROI ( SCRIPTS/Model on ROI/Ratio sets frame = 0, to signal that ROI)
+            % 2) Static image (non-dynamic)
+            % 
+            
+            if (frame == 0) % Signal that ROI
+                % 1) ROI
+                IS_ROI = true;
+                n = s(1);
+                outsize = [ s(1) 1 ]; % reshape needs 2D input
+                frame = 1; % Restore output frame to 1
+            else
+                % 2) Static image
+                IS_ROI = false;  
+                n= s(1)*s(2);
+                outsize = [ s(1) s(2)];
+            end
         case 3
             IS_ROI = false;  
             n= s(1)*s(2);
