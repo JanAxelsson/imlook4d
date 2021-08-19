@@ -24,7 +24,7 @@ prompt={'Start Frame ', 'Last Frame ', 'Input Function variable-name (time point
 [answer, imlook4d_current_handles] = ModelDialog( imlook4d_current_handles, ...
     model_name, ...
     prompt, ...
-    { num2str(imlook4d_frame), num2str( size(imlook4d_Cdata,4) ), '' } ...
+    { num2str(imlook4d_frame), num2str( size(imlook4d_Cdata,4) ), 'Cinp' } ...
     );
 
 startFrame = str2num( answer{1});
@@ -41,7 +41,8 @@ Cinp_for_this_script = Cinp_for_this_script(:)'; % Allow both column and row vec
 size( Cinp_for_this_script)
 
 disp('Calculating model ...');
-a = jjpatlak( tact, imlook4d_time/60, imlook4d_duration/60, Cinp_for_this_script, range); % Fit to end frame
+L3 = 0;  % This only applies on reference Patlak with specific binding in reference region
+a = jjpatlak( L3, tact, imlook4d_time/60, imlook4d_duration/60, Cinp_for_this_script, range); % Fit to end frame
 
 % Get Patlak axes for reference tissue
 % r = jjpatlak( Cinp, imlook4d_time/60, imlook4d_duration/60, Cinp, range);
