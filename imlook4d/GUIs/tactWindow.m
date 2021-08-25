@@ -23,7 +23,7 @@
 
         % Edit the above text to modify the response to help tactWindow
 
-        % Last Modified by GUIDE v2.5 06-Sep-2019 23:19:48
+        % Last Modified by GUIDE v2.5 25-Aug-2021 16:44:22
 
         % Begin initialization code - DO NOT EDIT
     gui_Singleton = 0;
@@ -340,3 +340,27 @@ function edit_menu_Callback(hObject, eventdata, handles)
 % hObject    handle to edit_menu (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+% --- Executes on button press in setAxesRange.
+function setAxesRange_Callback(hObject, eventdata, handles)
+% hObject    handle to setAxesRange (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+    XLim = handles.mainAxes.XLim;
+    YLim = handles.mainAxes.YLim;
+    name='Input for plot limits';
+    numlines=1;
+
+    prompt={'Xmin:','Xmax:','Ymin:','Ymax:'};
+    defaultanswer={num2str(XLim(1)),num2str(XLim(2)),num2str(YLim(1)),num2str(YLim(2))};
+    answer = inputdlg(prompt,name,numlines,defaultanswer);
+    handles.mainAxes.XLim = [ str2num(answer{1}), str2num(answer{2}) ];
+    handles.mainAxes.YLim = [ str2num(answer{3}), str2num(answer{4}) ];
+    
+    handles.secondAxes.XLim = [ str2num(answer{1}), str2num(answer{2}) ];
+    handles.secondAxes.YLim = [ str2num(answer{3}), str2num(answer{4}) ];
+    
+    handles.lockedXradiobutton.Value = true;
+    setappdata(handles.tactWindow, 'previousMainXLim', handles.mainAxes.XLim);
+    setappdata(handles.tactWindow, 'previousMainXTickLabel', handles.mainAxes.XLim);
+

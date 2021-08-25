@@ -110,6 +110,18 @@
 		See the Analyze section above for information about .sif files.
 	</P>
 
+	<P>
+		If a nifti file's geometrical transforms fails, imloo4d tries to open it without performing transforms.
+        This is indicated by a warning dialog.
+        For some images, this may result in that axial, sagital and coronal views are exchanged.
+	</P>
+
+	<P>
+		A fix for nifti files that do not work with transformations, is to reslice them manually.  This is done
+        from Matlab command window with the command <code>reslice_nii( file_path, new_file_path , [ x y z ]);</code>
+        where x y z are the voxel dimensions in mm.  Example:
+        <code>reslice_nii( ’016.nii',  ’016_resliced.nii' , [ 1 1 1 ]);</code>
+	</P>
 		
 <a href="javascript:;" onclick="document.location.hash='top';">[top]</a>
 

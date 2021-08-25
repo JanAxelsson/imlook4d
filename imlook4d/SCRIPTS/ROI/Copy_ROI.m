@@ -66,9 +66,25 @@
     %indecesToROI=find(imlook4d_ROI==ROINumber);
     indecesToROICopiedSlice=find(ROISlice==ROINumber);
     offset=size(imlook4d_ROI,1)*size(imlook4d_ROI,2);
+    newROI=zeros(size(imlook4d_ROI),'uint8');
     for i=firstSlice:lastSlice
-        imlook4d_ROI(indecesToROICopiedSlice+ offset*(i-1) )=destinationROINumber; %OR with existing ROI
+        newROI(indecesToROICopiedSlice+ offset*(i-1) )=destinationROINumber; %OR with existing ROI
     end
+    
+        
+    % Make matrix of locked pixels
+    lockedMatrix = zeros( size(imlook4d_ROI) ,'logical'); % Assume all locked
+    numberOfROIs = length( imlook4d_current_handles.image.LockedROIs );
+    for i=1:numberOfROIs
+        lockedMatrix(imlook4d_ROI == i ) = imlook4d_current_handles.image.LockedROIs(i); % Pixels = 0 if locked, 1 if not locked
+    end
+    
+    newROI( lockedMatrix) = 0; % Remove pixels that are locked from newROI
+    
+    
+%     % Add pixels to new ROI
+    imlook4d_ROI=imlook4d_ROI - uint8(newROI>0).*imlook4d_ROI ;   % Remove existing ROI pixels that overlap new ROI
+    imlook4d_ROI=imlook4d_ROI + uint8(newROI>0).*newROI;          % Add new ROI pixels
 
 
 % Finish
