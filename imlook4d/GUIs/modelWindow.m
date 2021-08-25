@@ -23,7 +23,7 @@ function varargout = modelWindow(varargin)
 
     % Edit the above text to modify the response to help modelWindow
 
-    % Last Modified by GUIDE v2.5 20-Dec-2019 16:31:11
+    % Last Modified by GUIDE v2.5 25-Aug-2021 16:15:49
 
     % Begin initialization code - DO NOT EDIT
 gui_Singleton = 0;
@@ -171,6 +171,7 @@ function modelWindow_OpeningFcn(hObject, ~, handles, datastruct, roinames, title
                  % Move down and left
                  handles.mainAxes.Position = handles.mainAxes.Position + y_move + x_move; 
                  handles.lockedYradiobutton.Position = handles.lockedYradiobutton.Position + y_move + x_move; 
+                 handles.setAxesRange.Position = handles.setAxesRange.Position + y_move + x_move; 
 
                 % Normalized units on objects in figure (objects will change size on window resize)
                 hObject = figureUnits( hObject, 'normalized');
@@ -328,14 +329,13 @@ function drawPlots( handles,roinumbers)
     %
     % Write info
     %
-        xlabel(handles.mainAxes,datastruct.xlabel);
-        ylabel(handles.mainAxes,datastruct.ylabel);
+        xlab = xlabel(handles.mainAxes,datastruct.xlabel);
+        ylab = ylabel(handles.mainAxes,datastruct.ylabel);
         title(handles.mainAxes,'Data');
 
         legend(handles.mainAxes,myLegends, 'Interpreter', 'none','Location','east');    
         hold(handles.mainAxes,'off');
 
- 
     %
     % Draw residuals
     %
@@ -401,7 +401,8 @@ function drawPlots( handles,roinumbers)
 %                 handles.residualAxes.Legend.Position(4), ... 
 %                 ];
         catch
-        end
+          end
+
 
 %
 % Callbacks
@@ -637,3 +638,22 @@ function SaveVariableToWorkspace_Callback(hObject, eventdata, handles)
 function SaveAsInputFunction_Callback(hObject, eventdata, handles)
     selectedRoinumbers = handles.selectedRow; 
     assignin('base', 'Cinp', handles.datastruct.Y{selectedRoinumbers});
+
+
+% --- Executes on button press in setAxesRange.
+function setAxesRange_Callback(hObject, eventdata, handles)
+% hObject    handle to setAxesRange (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+    XLim = handles.mainAxes.XLim;
+    YLim = handles.mainAxes.YLim;
+    name='Input for plot limits';
+    numlines=1;
+
+    prompt={'Xmin:','Xmax:','Ymin:','Ymax:'};
+    defaultanswer={num2str(XLim(1)),num2str(XLim(2)),num2str(YLim(1)),num2str(YLim(2))};
+    answer = inputdlg(prompt,name,numlines,defaultanswer);
+    handles.mainAxes.XLim = [ str2num(answer{1}), str2num(answer{2}) ];
+    handles.mainAxes.YLim = [ str2num(answer{3}), str2num(answer{4}) ];
+    
+    handles.lockedYradiobutton.Value = true;
