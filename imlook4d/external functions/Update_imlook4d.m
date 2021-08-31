@@ -10,8 +10,8 @@ latestFileListURL = 'https://raw.githubusercontent.com/JanAxelsson/imlook4d/mast
 
 % Test to fix error behind firewall
 %text = webread( latestFileListURL);
-%o = weboptions('CertificateFilename','');
-o = weboptions('Timeout', 30);
+o = weboptions('CertificateFilename','');
+%o = weboptions('Timeout', 30);
 text = webread(latestFileListURL,o);
 
 data = strsplit( text);

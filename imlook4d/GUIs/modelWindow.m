@@ -225,6 +225,8 @@ function drawPlots( handles,roinumbers)
         held = false;
         for i = 1:length(roinumbers)
             roinumber = roinumbers(i);
+            
+            
             try 
                 h = plot (handles.datastruct.X{roinumber},handles.datastruct.Y{roinumber},...
                     'Marker','o', ...
@@ -232,9 +234,12 @@ function drawPlots( handles,roinumbers)
                     'LineStyle','none',...
                     'Parent',handles.mainAxes ...
                     );
+                % Get ROI color
                 try
-                    c{i} = get(h, 'Color'); % Store colors for each ROI
+                    imlook4d_current_handles=evalin('base', 'imlook4d_current_handles');
+                    c{i} = imlook4d_current_handles.roiColors(i,:);
                     set(h, 'MarkerFaceColor', c{i} );
+                    set(h, 'MarkerEdgeColor', c{i} );
                 catch
                     disp('Data Marker Color Error');
                 end
