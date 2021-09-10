@@ -8,7 +8,7 @@ function [activity, NPixels, stdev, maxActivity]=generateReferenceTACT(handles)
     
     % Make ROI containing only reference ROI
     ROI = handles.image.ROI;
-    tempROI = zeros( size(ROI));
+    tempROI = zeros( size(ROI),'uint8');
     for i = roisToCalculate
         tempROI( ROI == i ) = 1;
     end
@@ -18,9 +18,9 @@ function [activity, NPixels, stdev, maxActivity]=generateReferenceTACT(handles)
 %            'Please Select Reference Region from ', ...
 %            ' SCRIPTS/Models on ROIs/Select Reference ROIs'} );
        
-       dispRed('No reference region defined'); 
-       dispRed('Please Select Reference Region from ');
-       dispRed(' SCRIPTS/Models on ROIs/Select Reference ROIs');
+       disp('No reference region defined'); 
+       disp('Please Select Reference Region from ');
+       disp(' SCRIPTS/Models on ROIs/Select Reference ROIs');
     end
 
     

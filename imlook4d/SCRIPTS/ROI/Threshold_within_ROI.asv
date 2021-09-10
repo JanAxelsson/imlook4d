@@ -2,6 +2,12 @@
 %
 % SCRIPT for imlook4d to obtain ROI from pixels above threshold, AND within existing ROI.
 %
+% Inputs :
+% - highest value to include (per cent of max, or absolute value)
+% - threshold (per cent of max, or absolute value)
+% - first slice
+% - last slice 
+% - background value (auto from
 %
 % Strategy:  Reuse Threshold_ROI script to find pixels, and pick out the
 % pixels that are both in original ROI (oldROI) and in newly Thresholded ROI.
@@ -70,7 +76,6 @@ temp_variable_list=imlook4d_variables_before_script;
     %imlook4d_current_handles = imlook4d('storeUndoROI', guidata(imlook4d_current_handle));
     %guidata(gcf, imlook4d_current_handles)
     catch
-        dispRed('Threshold within ROI -- catch error');
         % Canceled or crashed
         imlook4d_ROI=oldROI;
         ImportUntouched;

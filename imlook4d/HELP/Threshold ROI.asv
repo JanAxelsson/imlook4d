@@ -7,18 +7,12 @@ whole volume.
 	</P><P>	
 Compare this to "Threshold within ROI" which searches for pixels in the whole volume (both inside and outside the ROI). 
 Threshold level can be determined two ways, either as an absolute level, or as a relative level specified as %.
-
-
- <!-- This text is the same for Threshold_ROI.txt and Threshold_within_ROI.txt--> 
-
-
+ 
 </P><P>	
-If the background = 0, and threshold value is in percent, then the <br>
-<code>threshold level = 0.01 * thresholdValue * maxValue</code>.
-
+If the background = 0, and threshold value is in percent, then the threshold level = 0.01 * threshold * maxValue.
 </P><P>	
-If the background different from 0, and threshold value is in percent, then the <br>
-<code>threshold level = 0.01 * maxValue * (thresholdValue - background) + background</code>.
+If the background different from 0, and threshold value is in percent, then the 
+<pre>threshold level = 0.01 * (threshold - background) * maxValue + background.
 
 	</P> 
 	<P>The inputs in the dialog are:
@@ -46,11 +40,11 @@ If the background different from 0, and threshold value is in percent, then the 
 			
 			<TR>
 			<TD> <B> Background</B></TD>
-			<TD> The background value. If a reference ROI has been set, this value is filled in by default</TD>
+			<TD> The background value</TD>
 			</TR>
 		</TABLE>
 
-	</P> 
+	</P>  <!-- This text is the same for Threshold_ROI.txt and Threshold_within_ROI.txt-->
 	<p>
 		The first and last slice can be specified either as an absolute slice number, or as a slice number relative to the current displayed slice.  
 		A relative slice number starts with one of the signs + or -.  
