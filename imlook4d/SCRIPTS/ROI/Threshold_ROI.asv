@@ -32,18 +32,10 @@
         maxLevel=max(reshape(imlook4d_Cdata(:,:,:,imlook4d_frame), 1,size(imlook4d_Cdata,1)*size(imlook4d_Cdata,2)*size(imlook4d_Cdata,3)  ) );
     end
     
-    % Read default if exists, or apply these as default
-    defaultanswer = RetriveEarlierValues('Threshold', {'100%','40%', '1' , 'end', '0'} ); 
-    
-    
-    % Calculate Reference ROI value (if Reference ROI set)
-    try
-        [activity, NPixels, stdev, maxActivity]=generateReferenceTACT(imlook4d_current_handles);
-        background = activity(imlook4d_frame);
-        disp( ['Background = ' num2str(background) ]); 
-        defaultanswer{5} = num2str(background);
-    catch
-    end
+    % Calculate Reference ROI value
+    [activity, NPixels, stdev, maxActivity]=generateReferenceTACT(imlook4d_current_handles);
+    background = activity(imlook4d_frame);
+    disp( ['Background = ' num2str(background) ]); 
     
     % Get user input
     prompt={'Max value(for instance 12345  or 40%)',...
@@ -53,6 +45,8 @@
                 'Background level'};
         title='Threshold levels';
         numlines=1;
+
+    defaultanswer = RetriveEarlierValues('Threshold', {'100%','40%', '1' , 'end', '0'} ); % Read default if exists, or apply these as default
     answer=inputdlg(prompt,title,numlines,defaultanswer);
     if isempty(answer)  % cancelled inputdlg and clean up
         ClearVariables
@@ -67,7 +61,6 @@
     minThresholdLevel=answer{2} ;
     firstSlice=str2num(answer{3});
     lastSlice=str2num(answer{4});
-    background=str2num(answer{5});
     % Handle if lastSlice='end'
     if strcmp('end', strtrim(answer{4}) )
         lastSlice=size(imlook4d_Cdata,3)
@@ -103,7 +96,7 @@
                 %currentMaxThresholdLevel=0.01*maxLevel * str2num(maxThresholdLevel(1:end-1)) ;
                 
                 maxInputPercent = str2num(maxThresholdLevel(1:end-1)) ;
-                currentMaxThresholdLevel = 0.01 * maxInputPercent * ( maxLevel - background ) + background;
+                currentMinThresholdLevel = 0.01 * maxInputPercent * ( maxLevel - background ) + background;
             else
                 currentMaxThresholdLevel=  eval(maxThresholdLevel) ;  % If not percent, then whole string is a number
             end

@@ -16,18 +16,26 @@ Compare this to "Threshold ROI" which searches for pixels in the whole volume.
 	</P> 
 
 
+</P><P>	
+If the background = 0, and threshold value is in percent, then the <br>
+<code>threshold level = 0.01 * thresholdValue * maxValue</code>.
 
-The inputs in the dialog are:
+</P><P>	
+If the background different from 0, and threshold value is in percent, then the <br>
+<code>threshold level = 0.01 * maxValue * (thresholdValue - background) + background</code>.
+
+	</P> 
+	<P>The inputs in the dialog are:
 	
 		<TABLE>
 			<TR>
 			<TD> <B> Max pixel value &nbsp;</B></TD>
-			<TD> Either an absolute pixel value, or a value in % of max pixel value in current ROI. </TD>
+			<TD> Either an absolute pixel value, or a value in % of max pixel value in current frame. </TD>
 			</TR>
 			
 			<TR>
 			<TD> <B> Min pixel value</B></TD>
-			<TD> Either an absolute pixel value, or a value in % of min pixel value in current ROI. </TD>
+			<TD> This is the last slice the ROI will be copied into.  Absolute or % of max pixel value in frame.</TD>
 			</TR>
 			
 			<TR>
@@ -39,9 +47,14 @@ The inputs in the dialog are:
 			<TD> <B> Last slice</B></TD>
 			<TD> The last slice to threshold with.  Thus the thresholding will only occur between [First slice] and [Last slice].</TD>
 			</TR>
+			
+			<TR>
+			<TD> <B> Background</B></TD>
+			<TD> The background value. If a reference ROI has been set, this value is filled in by default</TD>
+			</TR>
 		</TABLE>
-   
-	</P>  <!-- Below text is the same for Threshold_ROI.txt and Threshold_within_ROI.txt.  -->
+
+	</P> 
 	<p>
 		The first and last slice can be specified either as an absolute slice number, or as a slice number relative to the current displayed slice.  
 		A relative slice number starts with one of the signs + or -.  
