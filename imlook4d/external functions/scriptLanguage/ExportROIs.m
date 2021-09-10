@@ -260,6 +260,9 @@ function  ExportROIs( roiNumbers)
     %
     % Print data
     %
+    
+        
+         header = [];
 
         % Find frame to use (set to frame=1 when a model is used)
             
@@ -282,7 +285,8 @@ function  ExportROIs( roiNumbers)
         if (STAT_TOOLBOX)
             if isfield(imlook4d_ROI_data,'pve')
                 % PVE-corrected
-                disp([ 'ROI-name'  TAB 'pvc-mean'  TAB 'mean'  TAB 'volume[cm3]' TAB '# of pixels' TAB 'max     ' TAB 'min     ' TAB 'stdev   '  TAB 'skewness   ' TAB 'kurtosis   ' TAB 'uniformity   ' TAB 'entropy   ']);
+                header = [ 'ROI-name'  TAB 'pvc-mean'  TAB 'mean'  TAB 'volume[cm3]' TAB '# of pixels' TAB 'max     ' TAB 'min     ' TAB 'stdev   '  TAB 'skewness   ' TAB 'kurtosis   ' TAB 'uniformity   ' TAB 'entropy   '];
+                disp(header);
                 data=[ imlook4d_ROI_data.pve(frame,:),
                     imlook4d_ROI_data.mean(frame,:),
                     imlook4d_ROI_data.volume(:)',
@@ -292,27 +296,33 @@ function  ExportROIs( roiNumbers)
                     imlook4d_ROI_data.stdev(frame,:)]';
             else
                 % Not corrected
-                disp([ 'ROI-name'  TAB 'mean'  TAB 'volume[cm3]' TAB '# of pixels' TAB 'max     ' TAB 'min     ' TAB 'stdev   '  TAB 'skewness   ' TAB 'kurtosis   ' TAB 'uniformity   ' TAB 'entropy   ']);
+                header = [ 'ROI-name'  TAB 'mean'  TAB 'volume[cm3]' TAB '# of pixels' TAB 'max     ' TAB 'min     ' TAB 'stdev   '  TAB 'skewness   ' TAB 'kurtosis   ' TAB 'uniformity   ' TAB 'entropy   '];
+                disp(header);
             end
         else
-            disp([ 'ROI-name'  TAB 'mean'  TAB 'volume[cm3]' TAB '# of pixels' TAB 'max     ' TAB 'min     ' TAB 'stdev   ' TAB 'uniformity   ' TAB 'entropy   ' ]);
+            header = [ 'ROI-name'  TAB 'mean'  TAB 'volume[cm3]' TAB '# of pixels' TAB 'max     ' TAB 'min     ' TAB 'stdev   ' TAB 'uniformity   ' TAB 'entropy   ' ];
+            disp(header);
         end
      
 
+        total = header;
 
-            
-            if (STAT_TOOLBOX)  % No need for STAT_TOOLBOX anymore
-                % Append columns to the right
-                data = [ data imlook4d_ROI_data.skewness(frame,:)' imlook4d_ROI_data.kurtosis(frame,:)'];   
-                data = [ data imlook4d_ROI_data.uniformity(frame,:)' imlook4d_ROI_data.entropy(frame,:)' ];   
-            end
-           
-            %for i=1:size(data,1)
-            for i=roiNumbers
-                disp(sprintf('%s\t%9.5f\t%9.5f\t%9d\t%9.5f\t%9.5f\t',names{i},data(i,:)));
-            end  
-            
-            disp(['Pixel dimensions=(' num2str(dX) ', ' num2str(dY) ', ' num2str(dZ) ') [mm]']);
+        if (STAT_TOOLBOX)  % No need for STAT_TOOLBOX anymore
+            % Append columns to the right
+            data = [ data imlook4d_ROI_data.skewness(frame,:)' imlook4d_ROI_data.kurtosis(frame,:)'];   
+            data = [ data imlook4d_ROI_data.uniformity(frame,:)' imlook4d_ROI_data.entropy(frame,:)' ];   
+        end
+
+        for i=roiNumbers
+            row = sprintf('%s\t%9.5f\t%9.5f\t%9d\t%9.5f\t%9.5f\t',names{i},data(i,:));
+            disp(row);
+            total =[ total sprintf('\n') row ];
+        end  
+        disp('--------------');
+        disp(total)
+        clipboard ( 'copy', total );
+
+        disp(['Pixel dimensions=(' num2str(dX) ', ' num2str(dY) ', ' num2str(dZ) ') [mm]']);
     
     
     %ClearVariables
