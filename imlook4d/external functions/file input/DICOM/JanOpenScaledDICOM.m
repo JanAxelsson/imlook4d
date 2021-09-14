@@ -421,8 +421,12 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                   
                     % Read header and data
                     tempHeader = A(1:headerSize);
-                    %tempData = typecast( uint8(A(startOfPixelData:startOfPixelData+numberOfBytesInData-1)), numberFormat);
-                    tempData = typecast( uint8(A(startOfPixelData:end)), numberFormat);
+                    try
+                        %tempData = typecast( uint8(A(startOfPixelData:startOfPixelData+numberOfBytesInData-1)), numberFormat);
+                        tempData = typecast( uint8(A(startOfPixelData:end)), numberFormat);
+                    catch
+                        % Will still work for Imaging Toolbox reader
+                    end
                     
                     % Series UID
                     out3=dirtyDICOMHeaderData({tempHeader}, 1, '0020', '000E',mode); % fix cell array for first argument
