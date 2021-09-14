@@ -7,6 +7,8 @@
         
         pos = get(event_obj,'Position');
         handles = guidata(gcf);
+        
+        EOL = sprintf('\n');
                 
                 
         x = round( pos(1) +0.5);
@@ -20,6 +22,8 @@
         end
         
         output_txt = {['X=',num2str(x) '  Y=',num2str(y)  '  Z=',num2str(z) ]};
+        
+        %
 
         % ROI   
         try
@@ -34,12 +38,13 @@
             
             roiNames=get(handles.ROINumberMenu,'String'); % Cell array
             
-            output_txt = { output_txt{:}, ...
-                
-            ['ROI= "' roiNames{roi} '" (' num2str(roi) ')'] ...
-            
-            };
         
+            output_txt = { output_txt{:}, EOL};
+        
+            output_txt = { output_txt{:}, ...  
+                ['Name = "' roiNames{roi} '" (' num2str(roi) ')'] ...
+            };
+         
         catch
         end
 
@@ -47,14 +52,36 @@
         try 
             value = handles.image.Cdata(x,y,z,t);
             
+            valuesInROI =  handles.image.Cdata( handles.image.ROI == roi);
+            avg = mean( valuesInROI(:) );
+            highest = max( valuesInROI(:) );
+            lowest = min( valuesInROI(:) );
+            
             % Fast Calculate pixel value (use generateImage, thus gettting models, PCA-filter etc)
             handles.image.Cdata = handles.image.Cdata(x,y,z,:);  % Call using [1,1,1,:] matrix for this pixel only
             [tempData, explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, 1, t);
             value = tempData;
             
+            output_txt = { output_txt{:}, EOL};
+            
             output_txt = { output_txt{:}, ...
                 ['Value: ',num2str( value,'%10.5g\n') ], ...
                 };     
+            
+            
+            output_txt = { output_txt{:}, ...
+                ['Mean : ', num2str(avg) ], ...
+                };  
+            
+            output_txt = { output_txt{:}, EOL};
+            
+            output_txt = { output_txt{:}, ...
+                ['Max : ', num2str(highest) ], ...
+                };  
+            
+            output_txt = { output_txt{:}, ...
+                ['Min : ', num2str(lowest) ], ...
+                };       
             
             % If background image exists
             try
