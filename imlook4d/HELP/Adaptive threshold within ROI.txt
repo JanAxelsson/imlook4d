@@ -22,7 +22,9 @@ The inputs in the dialog are:
 			
 			<TR>
 			<TD> <B> Background </B></TD>
-			<TD> A background level which is subtracted from the pixel values, prior to adaptive thresholding.  This value may be zero if the contrast is high between signal and background </TD>
+			<TD> A background level which is subtracted from the pixel values, prior to adaptive thresholding.  
+                This value may be zero if the contrast is high between signal and background.
+                If a reference ROI has been set, this value is filled in by default </TD>
 			</TR>
 
 		</TABLE>

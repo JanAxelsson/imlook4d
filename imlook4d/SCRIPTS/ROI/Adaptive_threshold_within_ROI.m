@@ -10,11 +10,28 @@ Export;
     numlines=1;
 
     defaultanswer = RetriveEarlierValues('AdaptiveThreshold', {'0.1', '0'} ); % Read default if exists, or apply these as default
+    
+    
+        
+        
+    % Calculate Reference ROI value (if Reference ROI set)
+    try
+        [activity, NPixels, stdev, maxActivity]=generateReferenceTACT(imlook4d_current_handles);
+        background = activity(imlook4d_frame);
+        disp( ['Background = ' num2str(background) ]); 
+        defaultanswer{2} = num2str(background);
+    catch
+    end
+    
+    
     answer=inputdlg(prompt,myTitle,numlines,defaultanswer);
     if isempty(answer)  % cancelled inputdlg and clean up
         ClearVariables
         return
     end
+
+    
+    
     StoreValues('AdaptiveThreshold', answer ); % Store answer as new dialog default
 
     sensitivity = str2num(answer{1});
