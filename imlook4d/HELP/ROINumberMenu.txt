@@ -18,6 +18,7 @@
 			<LI> <B>Clear ROI</B>, which clears the currently selected ROI, to remove all defined ROI pixels in selected ROI.
 			<LI> <B>Rename</B>, which renames the currently selected ROI
 			<LI> <B>Edit Color</B>, change color of currently selected ROI
+			<LI> <B>Merge ROIs</B>, merges multiple ROIs to a new ROI
 
 
 			<LI>  <B>Hide </B>, which hides the currently selected ROI from ROI analysis
@@ -25,9 +26,9 @@
 
 			<LI>  <B>Show </B>, displays the currently selected ROI (if hidden)
 			<LI>  <B>Show All </B>, displays all hidden ROIs
+			<LI> <B>Show Ref ROIs only</B>, hides all ROIs except ROIs marked as reference ROI (see ROI scripts)
 
-			<LI>  <B>Lock </B>, locks a ROI from editing
-			<LI>  <B>Unlock </B>, unlocks a ROI from editing
+			<LI>  <B>Lock </B>, locks and unlocks a ROI from editing
 
 			<LI>  <B>Remove </B>, removes the currently selected ROI
 			<LI>  <B>Remove All </B>, removes all ROIs
