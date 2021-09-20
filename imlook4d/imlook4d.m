@@ -3513,6 +3513,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             ];
                     end
                 catch
+                    disp('Error removing reference ROIs');
                 end
             end
     function ROI_Remove_All_Callback(hObject, eventdata, handles, name)
@@ -3525,6 +3526,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 for i = length(contents)-1 : -1: 1
                     handles = removeSingleRoi(handles, i);
                 end
+                
+                handles.model.common.ReferenceROINumbers = [];
 
                 set(handles.ROINumberMenu,'Value', 1 );
                 guidata(hObject,handles);% Save handles
@@ -4355,6 +4358,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 set(handles.ROINumberMenu,'String',ROINames);            
                 handles.image.VisibleROIs = VisibleROIs;           
                 handles.image.LockedROIs = LockedROIs;
+                
+                % Copy Reference ROIs
+                handles.model.common.ReferenceROINumbers = thisHandles.model.common.ReferenceROINumbers;
 
                 % Insert axialROI in Axial view, and rotate to original
                 % view
@@ -7369,7 +7375,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             % LockedROIs
             if ( exist('LockedROIs') )
                 handles.image.LockedROIs = LockedROIs; % From .roi file
-                for i = 1: length(LockedROIs)
+                for i = 1: length(roiNames)
                     if ~startsWith( roiNames{i}, '(locked)' )
                         if LockedROIs(i)
                             roiNames{i} = [ '(locked) ' roiNames{i}];
@@ -7388,6 +7394,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 end
             catch
             end
+           
             
             % Read ROI names from file
             roiNameFile = [pathstr filesep name '.txt'];
