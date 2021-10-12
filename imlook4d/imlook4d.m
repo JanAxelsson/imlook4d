@@ -7396,7 +7396,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             end
             
             % Roi colors
-            handles.roiColors = roiColors;
+            try
+                handles.roiColors = roiColors;
+            catch
+                
+            end
            
             
             % Read ROI names from file
@@ -7513,8 +7517,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     end
                     
                     
-                    
                     save(fullPath, 'rois', 'roiNames', 'measure', 'parentVolume', 'roiColors', 'GuiSettings', 'roiSize','VisibleROIs','LockedROIs', 'version', '-v7.3');
+     
                 end
  
                 
