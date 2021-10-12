@@ -7375,7 +7375,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             % LockedROIs
             if ( exist('LockedROIs') )
                 handles.image.LockedROIs = LockedROIs; % From .roi file
-                for i = 1: length(roiNames)
+                for i = 1: numberOfROIs
                     if ~startsWith( roiNames{i}, '(locked)' )
                         if LockedROIs(i)
                             roiNames{i} = [ '(locked) ' roiNames{i}];
@@ -7394,6 +7394,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 end
             catch
             end
+            
+            % Roi colors
+            handles.roiColors = roiColors;
            
             
             % Read ROI names from file
@@ -7478,6 +7481,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     VisibleROIs=handles.image.VisibleROIs;
                     LockedROIs=handles.image.LockedROIs;
                     
+                    roiColors = handles.roiColors;
+                    
                     try
                         version = getImlook4dVersion();
                     catch
@@ -7509,7 +7514,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     
                     
                     
-                    save(fullPath, 'rois', 'roiNames', 'measure', 'parentVolume', 'GuiSettings', 'roiSize','VisibleROIs','LockedROIs', 'version', '-v7.3');
+                    save(fullPath, 'rois', 'roiNames', 'measure', 'parentVolume', 'roiColors', 'GuiSettings', 'roiSize','VisibleROIs','LockedROIs', 'version', '-v7.3');
                 end
  
                 
