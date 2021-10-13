@@ -41,7 +41,10 @@
          );
     
      % Copy reference ROIs
-     newHandles.model.common.ReferenceROINumbers = imlook4d_current_handles.model.common.ReferenceROINumbers;
+     try
+        newHandles.model.common.ReferenceROINumbers = imlook4d_current_handles.model.common.ReferenceROINumbers;
+     catch
+     end
      
      % Copy Orientation (Ax,Cor,Sag) to GUI
      set(newHandles.orientationMenu,'Value',get(imlook4d_current_handles.orientationMenu,'Value') );  
