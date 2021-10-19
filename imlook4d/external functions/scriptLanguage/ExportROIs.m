@@ -319,7 +319,7 @@ function  ExportROIs( roiNumbers)
             total =[ total sprintf('\n') row ];
         end  
         disp('--------------');
-        disp(total)
+        %disp(total)
         clipboard ( 'copy', total );
 
         disp(['Pixel dimensions=(' num2str(dX) ', ' num2str(dY) ', ' num2str(dZ) ') [mm]']);
