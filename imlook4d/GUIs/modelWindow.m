@@ -237,7 +237,7 @@ function drawPlots( handles,roinumbers)
                 % Get ROI color
                 try
                     imlook4d_current_handles=evalin('base', 'imlook4d_current_handles');
-                    c{i} = imlook4d_current_handles.roiColors(i,:);
+                    c{i} = imlook4d_current_handles.roiColors(roinumber,:);
                     set(h, 'MarkerFaceColor', c{i} );
                     set(h, 'MarkerEdgeColor', c{i} );
                 catch
