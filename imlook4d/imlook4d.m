@@ -3172,7 +3172,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
          end 
          
         % Run  script Time_activity_curve in base workspace
-        imlook4d('ScriptsMenu_Callback',get(gcbo,'Parent'),[],guidata(gcf));
+        imlook4d('ScriptsMenu_Callback',handles.TACT,[],guidata(gcf));
         evalin('base', 'Time_activity_curve')
             
     % --------------------------------------------------------------------
