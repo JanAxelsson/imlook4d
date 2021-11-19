@@ -35,3 +35,4 @@ imlook4d_current_handles.model.Zhou.imagetype = 1; % BP
 
 ImportUntouched
 ClearVariables
+setModelsCheckbox()

@@ -25,3 +25,4 @@
 
     ImportUntouched
     ClearVariables
+    setModelsCheckbox()

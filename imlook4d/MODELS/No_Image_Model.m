@@ -4,3 +4,4 @@ model_name = 'No Model';
 imlook4d_current_handles.model.functionHandle = [];
 Import
 ClearVariables
+setModelsCheckbox()
