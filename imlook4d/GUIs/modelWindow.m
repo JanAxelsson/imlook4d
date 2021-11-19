@@ -269,7 +269,7 @@ function drawPlots( handles,roinumbers)
             myLegends = [ myLegends 'Reference'];
 
         catch
-            disp('reference plot error');
+            % Lands here if no ref roi
         end      
         
         
