@@ -10558,7 +10558,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
        % For instance:
        % - import from workspace may change number of frames or slices
        [r,c,z,frames]=size(handles.image.Cdata);
-       
+       middleSlice = round(z/2);
      
         % one or multiple slides
         if z == 1
@@ -10574,7 +10574,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              if ( get(handles.SliceNumSlider,'Max')~=z)
                 % Change slider range
                 set(handles.SliceNumSlider,'visible','on','Min',1,'Max',z,...
-                    'SliderStep',[1.0/double(z-1) 1.0/double(z-1)]);
+                    'SliderStep',[1.0/double(z-1) 1.0/double(z-1)], 'Value', middleSlice);
+                set(handles.SliceNumEdit,'String',num2str(middleSlice) ); 
              end
              
             % slice number > number of slices ?
