@@ -49,9 +49,9 @@
     
     javaaddpath(fullfile(d ,'dcm4che-tool-dcm2txt-2.0.19.jar'))
     javaaddpath(fullfile(d ,'dcm4che-core-2.0.19.jar'))
-    javaaddpath(fullfile(d ,'slf4j-log4j12-1.5.0.jar'))
-    javaaddpath(fullfile(d ,'slf4j-api-1.5.0.jar'))
-    javaaddpath(fullfile(d ,'log4j-1.2.13.jar'))
+%     javaaddpath(fullfile(d ,'slf4j-log4j12-1.5.0.jar'))
+%     javaaddpath(fullfile(d ,'slf4j-api-1.5.0.jar'))
+%     javaaddpath(fullfile(d ,'log4j-1.2.13.jar'))
     javaaddpath(fullfile(d,'commons-cli-1.1.jar'))
     
 %
