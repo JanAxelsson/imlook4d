@@ -36,3 +36,4 @@ imlook4d_current_handles.model.SRTM2.imagetype = selection;
 
 ImportUntouched
 ClearVariables
+setModelsCheckbox()

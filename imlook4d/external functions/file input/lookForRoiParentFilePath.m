@@ -19,13 +19,14 @@ disp([ 'Trying to identify new location of parentVolume = ' parentVolume ])
 splitParent = split( split(parentVolume,'/'), '\'); % Allow both Windows and Mac file separators in stored string
 
 
-% PLAN A : Try to identify relative path from folders within same folder as ROI-file  (=ROI-folder)
+% PLAN A : Try to identify image file name from folders within same folder as ROI-file  (=ROI-folder)
 disp('Plan A : look for subfolders with correct name -- in same folder as .roi file');
 folderList = dir(roiFolder);
+fileName = splitParent{end};s
 firstFolder = length(splitParent)-1; % First folder - assuming last part in parentVolume is a file
 for i = 1 : length(folderList)
-    if strcmp(folderList(i).name, splitParent{firstFolder})
-        newFullPath = [roiFolder folderList(i).name filesep splitParent{firstFolder+1} ];
+    if strcmp(folderList(i).name, fileName)
+        newFullPath = [roiFolder folderList(i).name ];
         disp([ '  newFullPath = ' newFullPath ]);
         return
     end

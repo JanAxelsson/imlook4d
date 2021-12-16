@@ -29,3 +29,4 @@ model_name = 'SRTM';
 
 ImportUntouched
 ClearVariables
+setModelsCheckbox()

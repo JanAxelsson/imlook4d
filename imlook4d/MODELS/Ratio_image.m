@@ -14,3 +14,4 @@ imlook4d_current_handles.model.Ratio.imagetype = 1; % Ratio
 
 ImportUntouched
 ClearVariables
+setModelsCheckbox()
