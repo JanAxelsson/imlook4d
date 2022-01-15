@@ -1,6 +1,7 @@
         function displayMessageRow( s)
                 % Display information row at bottom of GUI
                 
+                
                 % gcf if running script without gui, or running from within imlook4d
                   
                 % Get handles to imlook4d

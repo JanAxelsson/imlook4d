@@ -309,6 +309,10 @@ function varargout = imlook4d(varargin)
     else
         gui_mainfcn(gui_State, varargin{:});
     end
+    
+               
+
+    
 % End initialization code - DO NOT EDIT
   
 % Executes just before imlook4d is made visible
@@ -853,6 +857,8 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 
                 version=getImlook4dVersion();
                 set(handles.versionText, 'String', ['imlook4d (' version ') /Jan Axelsson'  ]);
+                
+
 
 
             %
@@ -912,6 +918,11 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
            % Set HitTest (Matlab 2016b is sensitive to this, see my support issue to MathWorks #0235001)
            h=handles.figure1;h.HitTest='on';
            imlook4d_set_defaults(hObject, eventdata, handles);
+           
+          if ( checkForNewVersion() )
+              handles.updateNeededText.String = ' ! Update to latest version in menu: Help/Update' ;
+          end
+
     function handles = makeSubMenues( handles, parentMenuHandle, subMenuFolder)
         if strcmp( subMenuFolder(end), '.') % Ignore '.' and '..'
             return
