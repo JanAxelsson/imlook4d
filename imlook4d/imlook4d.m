@@ -919,9 +919,13 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
            h=handles.figure1;h.HitTest='on';
            imlook4d_set_defaults(hObject, eventdata, handles);
            
-          if ( checkForNewVersion() )
-              handles.updateNeededText.String = ' ! Update to latest version in menu: Help/Update' ;
-          end
+           try
+               if ( checkForNewVersion() )
+                   handles.updateNeededText.String = 'Latest version : menu Help/Update' ;
+               end
+           catch
+               
+           end
 
     function handles = makeSubMenues( handles, parentMenuHandle, subMenuFolder)
         if strcmp( subMenuFolder(end), '.') % Ignore '.' and '..'
