@@ -187,9 +187,7 @@ function modelWindow_OpeningFcn(hObject, ~, handles, datastruct, roinames, title
 
         % Update handles structure
         guidata(hObject, handles);
-        
-        % Adjust for Dark mode in 2020a
-        dark_mode_adjust(hObject, [], handles)
+
         
     function hObject = figureUnits( hObject, unitname) % Modify drawing units 
             hObject.Units = unitname; 
@@ -629,7 +627,7 @@ function GenerateScreenDump(hObject, eventdata, handles,DISPLAY_ON_SCREEN)
                 close(h1)
             end   
 function workspaceMenu_Callback(hObject, eventdata, handles)
-    if (handles.selectedRow ==1)
+    if ( length( handles.selectedRow) == 1)
         handles.SaveAsInputFunction.Enable = 'on';
     else
         handles.SaveAsInputFunction.Enable = 'off';

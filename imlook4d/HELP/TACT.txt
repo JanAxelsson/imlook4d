@@ -45,11 +45,14 @@ Menus in this  window, have different functions :
     <ul style="list-style-type:circle;"> 
  
         <li><B>Save to Variable</B><BR>
-        Saves the time-activity curve to variable "StoredTACT"
+        Saves the selected time-activity curve to variable "StoredTACT".  If more than one ROI name is selected, a two-dimensional matrix is saved into variable "StoredTACT".
  
         <li><B>Save as input function (Cinp)</B><BR>
-        Saves the marked time-activity curve to variable "Cinp".  
-        This variable can be used as an image-derived input function for non-reference tissue models, such as "Water" and "Patlak"
+        Saves the marked time-activity curve to variable "Cinp".  This menu is only active when a single ROI is selected.
+        This variable can be used as an image-derived input function for some non-reference tissue models, 
+        such as "Water" and "Patlak" (note, this requires knowledge about metabolite behaviour, blood-brain barrier transfer, etc, and is not working for all molecules).
+        For less well-behaved molecles, if you have knowledge and have performed metabolite measures you may write your own script to recalculate the Cinp to a proper input function.
+
 
 </ul> 
 </ul> 
