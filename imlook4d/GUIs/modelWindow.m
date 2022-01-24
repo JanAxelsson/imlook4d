@@ -627,7 +627,7 @@ function GenerateScreenDump(hObject, eventdata, handles,DISPLAY_ON_SCREEN)
                 close(h1)
             end   
 function workspaceMenu_Callback(hObject, eventdata, handles)
-    if (handles.selectedRow ==1)
+    if ( length( handles.selectedRow) == 1)
         handles.SaveAsInputFunction.Enable = 'on';
     else
         handles.SaveAsInputFunction.Enable = 'off';
