@@ -1,0 +1,12 @@
+<h1>MIP log-scale</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	Creates a Maximum Intensity Projection (MIP) logaritmic intensity scale, of the currently selected image.  
+    The value 0.001 is added before calculating the logarithm to avoid errors if intensity value is zero. Negative intensity values are not allowed.  
+	</P>
+
+	<P>
+	This function is similar to MIP
+	</P>
+
