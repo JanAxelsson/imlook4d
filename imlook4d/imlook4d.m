@@ -7370,41 +7370,60 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 
             end
             
-            %numberOfROIs = size(roiNames,2) -1 ;
             numberOfROIs = length(roiNames) -1 ;
 
 
+            %% TEST disturb
+            %LockedROIs = LockedROIs( 1: end-1);
+            %VisibleROIs = VisibleROIs( 1: end-1); 
+ 
             
             % VisibleROIs
             if ( exist('VisibleROIs') )
+                
+                % Fix if missing LockedROIs-entry
+                for i = 1: numberOfROIs
+                    if (i > length( VisibleROIs ) )
+                        VisibleROIs(i) = 1; % Set to visible
+                    end
+                end
                 handles.image.VisibleROIs = VisibleROIs;  % From .roi file
+                
             else
                 handles.image.VisibleROIs = ones( [ 1 numberOfROIs ] );
             end
- 
+            
             
             % LockedROIs
             if ( exist('LockedROIs') )
-                handles.image.LockedROIs = LockedROIs; % From .roi file
                 for i = 1: numberOfROIs
+                    % Fix if missing LockedROIs-entry
+                    if (i > length( LockedROIs ) )
+                        LockedROIs(i) = 0; % Set to unlocked
+                    end
+                    
+                    % Add locked-prefix
                     if ~startsWith( roiNames{i}, '(locked)' )
                         if LockedROIs(i)
                             roiNames{i} = [ '(locked) ' roiNames{i}];
                         end
                     end
                 end
+                handles.image.LockedROIs = LockedROIs; % From .roi file
             else
                 LockedROIs = zeros( [ 1 numberOfROIs ] );
                 handles.image.LockedROIs = LockedROIs;
             end
             
-            % Set locked marker
+            
+            % Set locked marker for first ROI if needed
             try
                 if LockedROIs(1)
                     handles.Lock_ROI.Checked = 'on'; % Lock check mark
                 end
             catch
             end
+            
             
             % Roi colors
             try
