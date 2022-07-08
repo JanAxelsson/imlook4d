@@ -7526,6 +7526,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     try
                         parentVolume = [handles.image.folder handles.image.file];
                     catch
+                        parentVolume = [];
                     end
                     
                     % Save settings
