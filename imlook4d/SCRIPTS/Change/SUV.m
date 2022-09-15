@@ -85,8 +85,12 @@ try
               warndlg('Image unit not defined');
 
            end
+           
            if strcmp(out3.string,'BQML') 
                conversionFactorTokBq=1e-3;
+           else
+               warndlg( ['Image unit = ' out3.string ' (must be BQML)' ], 'Can''t make SUV' );
+               return
            end
 
 
@@ -112,17 +116,17 @@ try
 
            % [series time]-[inj time]
            deltaT=SeriesTimeInSeconds-InjectionTimeInSeconds;
-           disp(['Time from injection to scan start=' deltaT ' s' ]);
+           disp(['Time from injection to scan start = ' num2str( deltaT) ' s' ]);
            decayFactor=2^-(deltaT/halflife);
-           disp(['Decay from injection to scan start=' decayFactor  ]);
+           disp(['Decay from injection to scan start = ' num2str(decayFactor)  ]);
 
 
         % Loop frames and slices
             for i=1:size(imlook4d_Cdata,3)
                 for j=1:size(imlook4d_Cdata,4)
-                    SUV_factor=1/( DoseMBq / weight_kg  );
-                    SUV_factor=SUV_factor;  % Convert from Bq/ml to kBq/ml
-                    imlook4d_Cdata(:,:,i,j)=conversionFactorTokBq*imlook4d_Cdata(:,:,i,j)*SUV_factor /decayFactor;
+                    SUV_factor = 1/( DoseMBq / weight_kg  );
+                    SUV_factor = SUV_factor;  % Convert from Bq/ml to kBq/ml
+                    imlook4d_Cdata(:,:,i,j)=conversionFactorTokBq  * imlook4d_Cdata(:,:,i,j) * SUV_factor /decayFactor;
                 end
             end
 
