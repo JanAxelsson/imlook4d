@@ -1,13 +1,31 @@
-<h1>ROI pixel data to workspace</h1>
+<h1>ROI data to workspace</h1>
 <HR></HR>
 <!------------------->
+<h2>Simple use</h2>
+
 	<P>
-	This script writes the following to the MATLAB command window:<BR>
-	<UL>
-	<LI> all pixel values
-	<LI> ROI statistics 
-	</UL>
-    It also writes this to the workspace variable  <CODE>imlook4d_ROI_data </CODE> (which is a struct). <BR>
+	This script writes the ROI statistics to the MATLAB command window, as in below example :<BR>
+
+<pre>
+<b>ROI-name	 mean    	 volume[cm3]	 # of pixels	 max     	 min     	 stdev   	 skewness   	 kurtosis   	 uniformity   	 entropy   </b>
+ROI 1   	1717837.26684	  0.01152	      180	3478393.25000	276784.25000	812743.66662	  0.08337	  2.19396	  0.01377	  6.36375	
+ROI 2   	1076171.76014	  0.01222	      191	1565690.12500	612781.06250	217538.67213	  0.09248	  2.22306	  0.01417	  6.31409	
+ROI 3   	323231.31771	  0.00710	      111	527404.81250	209309.48438	70463.09765	  0.70378	  2.85509	  0.01956	  5.81871	
+</pre>
+
+    This table is automatically copied into the system clipboard, so it can be directly pasted into (for instance) Excel or Libre Office Calc.
+
+	</P>
+
+	<P> 
+For a dynamic scan, the table displays the data for the currently selected frame.
+	</P>
+
+
+<h2>Advanced use (for programmers)</h2>
+
+	<P>
+    This script also writes detailed statistics to the workspace variable  <CODE>imlook4d_ROI_data </CODE> (which is a struct). <BR>
     The struct contains the following variables:
 	</P>
 
@@ -69,15 +87,16 @@
 			</TR>
 			
 			<TR>
-			<TD valign="top"> <B> imlook4d_ROI_data.pixels</B></TD>
-			<TD valign="top"> A cell array with one 2D matrix per ROI.  The cell for a ROI contains a matrix [pixel,frame] with: 
-            <UL>
-            <LI> rows = one row per pixel in ROI
-            <LI> column= one column per frame
-            </UL>
+                <TD valign="top"> 
+                    <B> imlook4d_ROI_data.pixels</B>
+                </TD>
 
-
-            </TD>
+                <TD valign="top"> A cell array with one 2D matrix per ROI.  The cell for a ROI contains a matrix [pixel,frame] with: 
+                    <UL>
+                        <LI> rows = one row per pixel in ROI</LI>
+                        <LI> column= one column per frame</LI>
+                    </UL>
+                </TD>
 			</TR>
 		</TABLE>
 
