@@ -1,0 +1,48 @@
+<h1>Histogram ROI to table</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	Tabulates histogrammed pixels values for each ROI, from the currently selected frame. A dialog is allows selection of 
+    <UL>
+        <LI> Lowest value.  If the text "min" is set, the lowest value in all ROIs (in current frame) is used
+        <LI> Highest value.  If the text "max" is set, the lowest value in all ROIs (in current frame) is used
+        <LI> Number of bins.  
+    </UL>
+
+	</P>
+
+
+	<P>
+	The first column shows start value of each histogram bin, and the following columns the number of occurances in that bin.  The following is an example :
+	</P>
+
+	<P>
+    The histogram table is automatically copied into the system clipboard, so it can be directly pasted into (for instance) Excel or Libre Office Calc.
+	</P>
+
+<pre>
+HISTOGRAM (values in clipboard) : 
+ 
+         bin            ROI 1            ROI 2
+     -334.00000	             11	             23
+     -211.20000	             30	             31
+      -88.40000	             52	             21
+       34.40000	             78	             93
+      157.20000	             33	             45
+      280.00000	              6	              0
+      402.80000	              2	              0
+      525.60000	              3	              0
+      648.40000	              3	              0
+      771.20000	              5	              0
+      894.00000	              5	              0
+     1016.80000	              3	              0
+     1139.60000	              4	              0
+     1262.40000	              4	              0
+     1385.20000	              6	              0
+     1508.00000	              2	              0
+     1630.80000	              3	              0
+     1753.60000	              2	              0
+     1876.40000	              2	              0
+     1999.20000	              4	              0
+</pre>
+

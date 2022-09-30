@@ -63,6 +63,12 @@ function modelWindow_OpeningFcn(hObject, ~, handles, datastruct, roinames, title
     % eventdata  reserved - to be defined in a future version of MATLAB
     % handles    structure with handles and user data (see GUIDATA)
     % varargin   command line arguments to modelWindow (see VARARGIN)
+    
+    % Read title of opening window from BASE workspace
+    openingWindowTitle = evalin('base', 'imlook4d_current_handle.Name');
+    
+    % Modify title to reflect opening window
+    title = [ title ' ( ' openingWindowTitle ' )'];
 
     % Choose default command line output for modelWindow
     handles.output = hObject;

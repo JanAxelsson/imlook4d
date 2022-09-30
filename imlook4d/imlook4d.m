@@ -4371,7 +4371,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 handles.image.LockedROIs = LockedROIs;
                 
                 % Copy Reference ROIs
-                handles.model.common.ReferenceROINumbers = thisHandles.model.common.ReferenceROINumbers;
+                try
+                    handles.model.common.ReferenceROINumbers = thisHandles.model.common.ReferenceROINumbers;
+                catch 
+                end
 
                 % Insert axialROI in Axial view, and rotate to original
                 % view
@@ -7526,6 +7529,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     try
                         parentVolume = [handles.image.folder handles.image.file];
                     catch
+                        parentVolume = [];
                     end
                     
                     % Save settings

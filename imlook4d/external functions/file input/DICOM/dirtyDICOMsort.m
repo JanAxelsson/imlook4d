@@ -62,7 +62,7 @@
           % Build list on how to sort
           %                      
              % Build index with columns (see comment block below)
-                
+
                 for i=1:last
                   if (mod(i, 100)==0) waitbar(i/last); end
                   
@@ -160,7 +160,7 @@
                     indexlist(i,8)=str2num(out.string);    
                   end
                 end
-                
+                toc
             %
             % Calculate number of slices and number of frames
             %
@@ -197,7 +197,7 @@
                 % all possible tags for 1), 2), 3), and fallback on 4).
                 
                 disp('sorting ');
-                
+                tic
      
             
                 % Sort everything except slice location
@@ -278,3 +278,4 @@
         % Finalize
         %
             close(waitBarHandle);
+

@@ -115,11 +115,17 @@ function [activity, NPixels, stdev, maxActivity, roisToCalculate ]=generateTACT(
                         stdev(i,:)=0;
                         maxActivity(i,:)=0;
                     else
+                        if NPixels(i)==1
+                           stdev(i,:) = zeros( 1, numberOfFrames);
+                        else
+                           stdev(i,:)=std( reshape(roiPixelValues,[],numberOfFrames),1 ); % Standard deviation value of each column
+                        end
+                        
                         activity(i,:)=mean( reshape(roiPixelValues,[],numberOfFrames),1 ); % Mean value of each column
-                        stdev(i,:)=std( reshape(roiPixelValues,[],numberOfFrames),1 ); % Standard deviation value of each column
                         maxActivity(i,:)=max( reshape(roiPixelValues,[],numberOfFrames),[],1 ); % Max pixelvalue
                     end
 
             end %for
             
             
+
