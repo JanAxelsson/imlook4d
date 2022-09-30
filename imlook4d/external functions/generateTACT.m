@@ -129,10 +129,3 @@ function [activity, NPixels, stdev, maxActivity, roisToCalculate ]=generateTACT(
             
             
 
-
--- 
-============================
-Jan Axelsson
-Djupbäcksvägen 18, 90342 Umeå
-072-743 8435 
-============================
