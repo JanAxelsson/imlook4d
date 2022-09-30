@@ -322,7 +322,7 @@ function  ExportROIs( roiNumbers)
             data = [ data imlook4d_ROI_data.uniformity(frame,:)' imlook4d_ROI_data.entropy(frame,:)' ];   
         end
         
-        data(1,end) = 1e-8;
+        %data(1,end) = 1e-8;
 
         for i=roiNumbers
             row = sprintf( ['%-' num2str(lengthLongestRoiName) 's\t%9.5f\t%9.5f\t%9d\t%9.5f\t%9.5f\t%9.5f\t%9.5f\t%9.5f\t%9.5f\t%9.5f\t%9.5f\t%9.5f' ],names{i},data(i,:));
