@@ -25,6 +25,7 @@ set(newhandles.axes1, 'YDir', 'normal');
 WindowTitle(file);
 
 % Remember path
+newhandles.image.file = file;
 newhandles.image.folder = path;
 
 % Store struct
