@@ -20,37 +20,21 @@
         if ~get(handles.FlipAndRotateRadioButton,'Value')
             temp=x;   x=y; y=temp;
         end
-        
-        output_txt = {['X=',num2str(x) '  Y=',num2str(y)  '  Z=',num2str(z) ]};
-        
+
         %
 
         % ROI   
         try
             
             roi = handles.image.ROI(x,y,z);
-            
-            % output_txt = { output_txt{:}, ...
-            
-            % ['ROI: ',num2str(roi) ] ...
-            
-            % };
-            
             roiNames=get(handles.ROINumberMenu,'String'); % Cell array
-            
-        
-            output_txt = { output_txt{:}, EOL};
-        
-            output_txt = { output_txt{:}, ...  
-                ['Name = "' roiNames{roi} '" (' num2str(roi) ')'] ...
-            };
-         
+
         catch
         end
 
         % Value
         try 
-            value = handles.image.Cdata(x,y,z,t);
+            %value = handles.image.Cdata(x,y,z,t);
             
             valuesInROI =  handles.image.Cdata( handles.image.ROI == roi);
             avg = mean( valuesInROI(:) );
@@ -62,26 +46,44 @@
             [tempData, explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, 1, t);
             value = tempData;
             
-            output_txt = { output_txt{:}, EOL};
             
-            output_txt = { output_txt{:}, ...
-                ['Value: ',num2str( value,'%10.5g\n') ], ...
-                };     
+            output_txt = {  ...
+                ['Pixel value: ',num2str( value,'%10.5g\n') ], ...
+                };    
             
             
-            output_txt = { output_txt{:}, ...
-                ['Mean : ', num2str(avg) ], ...
-                };  
+            output_txt = { output_txt{:}, EOL};        
+            output_txt = { output_txt{:}, ['X=',num2str(x) '  Y=',num2str(y)  '  Z=',num2str(z) ]};
+        
             
-            output_txt = { output_txt{:}, EOL};
+            % Only if ROI exists
+            if (roi > 0 )
+
+                output_txt = { output_txt{:}, EOL, '------------------------', EOL};
+
+
+                output_txt = { output_txt{:}, ...  
+                    ['ROI = "' roiNames{roi} ] ...
+                };
+
+                output_txt = { output_txt{:}, EOL}; 
+
+                output_txt = { output_txt{:}, ...
+                    ['Mean : ', num2str(avg) ], ...
+                    };  
+
+                output_txt = { output_txt{:}, EOL};
+
+                output_txt = { output_txt{:}, ...
+                    ['Max : ', num2str(highest) ], ...
+                    };  
+
+                output_txt = { output_txt{:}, ...
+                    ['Min : ', num2str(lowest) ], ...
+                    };      
+            end
             
-            output_txt = { output_txt{:}, ...
-                ['Max : ', num2str(highest) ], ...
-                };  
             
-            output_txt = { output_txt{:}, ...
-                ['Min : ', num2str(lowest) ], ...
-                };       
             
             % If background image exists
             try
@@ -90,6 +92,7 @@
                 frame2 = round(get(handles2.FrameNumSlider,'Value'));
                 value_bck = handles2.image.Cdata(x,y,z,frame2);
                 
+                output_txt = { output_txt{:}, EOL, '------------------------'};
                 output_txt = { output_txt{:}, ...
                     ['Foreground: ',num2str( value,'%10.5g\n') ], ...
                     ['Background: ',num2str( value_bck,'%10.5g\n') ], ...

@@ -3480,11 +3480,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             set(handles.ROINumberMenu,'Value', 1 );
             guidata(hObject,handles);% Save handles
             updateROIs(handles);
-        function handles = removeSingleRoi(handles, ROINumber)
+        function handles = removeSingleRoi(handles, ROINumber, keepLockedROI)
             ROINumberMenu=get(handles.ROINumberMenu);
             contents = ROINumberMenu.String; % Cell array
             
-            if ( handles.image.LockedROIs(ROINumber) == 1 )
+            if ( ( handles.image.LockedROIs(ROINumber) == 1 ) && keepLockedROI )
                 disp(['LOCKED ROI - not allowed to remove ROI = ' contents{ROINumber}] );
             else
                 
@@ -3528,15 +3528,44 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 end
             end
     function ROI_Remove_All_Callback(hObject, eventdata, handles, name)
+        
                 if DisplayHelp(hObject, eventdata, handles)
                     return
                 end
+
+        
+                
                 ROINumberMenu=get(handles.ROINumberMenu);
                 contents= ROINumberMenu.String; % Cell array
                 
-                for i = length(contents)-1 : -1: 1
-                    handles = removeSingleRoi(handles, i);
-                end
+                % Dialog, what to do about locked ROIs
+                if ( sum( handles.image.LockedROIs) > 0 )
+                    
+                    switch questdlg('Threre are locked ROIs, do you want to delete these?','Locked ROIs')
+                        
+                        case 'Yes'
+                            
+                            for i = length(contents)-1 : -1: 1
+                                keepLockedROI = false;
+                                handles = removeSingleRoi(handles, i, keepLockedROI); % Remove locked ROIs
+                            end
+                            
+                            
+                        case 'No'
+                            
+                            for i = length(contents)-1 : -1: 1
+                                keepLockedROI = true;
+                                handles = removeSingleRoi(handles, i, keepLockedROI); % Don't remove locked ROIs
+                            end
+                            
+                            
+                        case 'Cancel'
+                            return
+                            
+                    end
+                    
+                end                
+
                 
                 handles.model.common.ReferenceROINumbers = [];
 
