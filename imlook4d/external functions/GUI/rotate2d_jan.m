@@ -343,7 +343,7 @@ function localSetCallbacks(rdata)
 set(rdata,'WindowButtonDownFcn',@(obj,evd)rotaButtonDownFcn(obj,evd,rdata));
 set(rdata,'WindowButtonUpFcn','');
 set(rdata,'WindowButtonMotionFcn',@(obj,evd)rotaUpMotionFcn(obj,evd,rdata));
-set(rdata,'WindowFocusLostFcn',@(obj,evd)locWindowFocusLostFcn(obj,evd,rdata));
+%set(rdata,'WindowFocusLostFcn',@(obj,evd)locWindowFocusLostFcn(obj,evd,rdata));
 set(rdata,'KeyPressFcn',@(obj,evd)rotaKeyPressFcn(obj,evd,rdata));
 set(rdata,'KeyReleaseFcn',@(obj,evd)locKeyReleaseFcn(obj,evd,rdata));
 set(rdata,'ModeStartFcn',@(~,~)localDoRotateOn(rdata));
