@@ -3563,7 +3563,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             return
                             
                     end
-                    
+                else
+                    for i = length(contents)-1 : -1: 1
+                        keepLockedROI = false;
+                        handles = removeSingleRoi(handles, i, keepLockedROI); % Remove locked ROIs
+                        disp('Deleting ROI');
+                    end
                 end                
 
                 
