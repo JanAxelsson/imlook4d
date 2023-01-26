@@ -71,6 +71,7 @@
     % Handle if lastSlice='end'
     if strcmp('end', strtrim(answer{4}) )
         lastSlice=size(imlook4d_Cdata,3)
+        answer{4} = 'end';
     end
 
     activeROI=get(imlook4d_current_handles.ROINumberMenu,'Value');
