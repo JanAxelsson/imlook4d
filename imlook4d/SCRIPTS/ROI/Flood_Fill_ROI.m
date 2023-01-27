@@ -1,6 +1,13 @@
 ALGORITHM = 'FloodFill3D';   % Stops at locked ROI
 %ALGORITHM = 'regionGrowing';% Does not stop at locked ROI -- (but, does not over write locked ROI)
 
+
+if (~areTheseToolboxesInstalled({'Image Processing Toolbox'}) )
+    warndlg('Missing the required toolbox:  Image Processing Toolbox');
+    return
+end
+
+
 % INITIALIZE
 
     % Export to workspace
