@@ -1,5 +1,11 @@
 % Same as Grow_ROI, except code-section at the bottom
 
+
+if (~areTheseToolboxesInstalled({'Image Processing Toolbox'}) )
+    warndlg('Missing the required toolbox:  Image Processing Toolbox');
+    return
+end
+
 ALGORITHM = 'FloodFill3D';
 %ALGORITHM = 'regionGrowing';
 
