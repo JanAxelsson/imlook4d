@@ -15,6 +15,7 @@ Threshold_within_ROI.m
 Highest_pixels_within_ROI.m
 Adaptive_threshold_within_ROI.m
 ---
+Fill_Hole.m
 Flood_Fill_ROI.m
 Flood_Fill_within_ROI.m
 ---
