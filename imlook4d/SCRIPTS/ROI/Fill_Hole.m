@@ -27,12 +27,12 @@ end
     StoreVariables
     Export
     % Read default if exists, or apply these as default
-    defaultanswer = RetriveEarlierValues('Fill', {'new'} ); 
+    defaultanswer = RetriveEarlierValues('Fill', {'new', '15'} ); 
     
   
     
     % Get user input
-    prompt={'Output ROI (number or "new" or "current")'};
+    prompt={'Output ROI (number or "new" or "current")', 'Filter size (pixels)'};
         title='Fill ROI hole';
         numlines=1;
     answer=inputdlg(prompt,title,numlines,defaultanswer);
@@ -42,7 +42,8 @@ end
     end
 
     activeROI = get(imlook4d_current_handles.ROINumberMenu,'Value');
-    outputROI = num2str(answer{1});
+    outputROI = str2num(answer{1});
+    filterSize = str2num(answer{2});
 
     % outputROI ='new'
     if strcmp('new', strtrim(answer{1}) )
@@ -77,7 +78,7 @@ end
         
         mask = imlook4d_ROI(:,:,iz) == activeROI ;
         
-        se = strel('disk', 10, 0);
+        se = strel('disk', filterSize, 0);
         newMask = imclose(mask, se);
         newMask = imfill(newMask, 'holes'); % Will contain original ROI (mask)
         newMask( mask == 1) = 0; % Remove original ROI (mask) from newMask
