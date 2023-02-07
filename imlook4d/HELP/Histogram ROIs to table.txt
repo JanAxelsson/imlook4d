@@ -2,7 +2,7 @@
 <HR></HR>
 <!------------------->
 	<P>
-	Tabulates histogrammed pixels values for each ROI, from the currently selected frame. A dialog is allows selection of 
+	Tabulates histogrammed pixels values for each ROI, from the currently selected frame. A dialog allows selection of 
     <UL>
         <LI> Lowest value.  If the text "min" is set, the lowest value in all ROIs (in current frame) is used
         <LI> Highest value.  If the text "max" is set, the lowest value in all ROIs (in current frame) is used

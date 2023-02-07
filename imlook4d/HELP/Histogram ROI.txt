@@ -2,12 +2,20 @@
 <HR></HR>
 <!------------------->
 	<P>
-	Displays a histogram of pixels values from the currently selected ROI.
+	Displays a histogram of pixels values from the currently selected ROI, and the current frame.
 	</P>
+    
+    <P>
+	A dialog allows selection of 
+    <UL>
+        <LI> Lowest value.  If the text "min" is set, the lowest value in all ROIs (in current frame) is used
+        <LI> Highest value.  If the text "max" is set, the lowest value in all ROIs (in current frame) is used
+        <LI> Number of bins.  
+    </UL>
+
+	</P>
+    
 
 	<P>
 	The histogram display the frequency of the ROI pixel values. If a 4D image, the pixel data is from the currently selected frame.  
-
-
-	The x-axis range is defined by the color bar limits.
 	</P>

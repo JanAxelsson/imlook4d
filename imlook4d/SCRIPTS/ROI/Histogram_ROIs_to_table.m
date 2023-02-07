@@ -86,9 +86,6 @@ TAB=sprintf('\t');
 
 % Print data
 
-    disp(' ');
-    disp('HISTOGRAM (values in clipboard) : ');
-    disp(' ');
     
     total = header; % Build for Clipboard
     disp( [ '<strong>' sprintf( headerForMatlabDisplayFormat, headerForMatlabDisplay ) '</strong>']); % Display in Matlab
@@ -104,6 +101,11 @@ TAB=sprintf('\t');
     disp(' ');
     
     clipboard ( 'copy', total );
+    
+    
+    disp(' ');
+    disp('(HISTOGRAM values in clipboard) ');
+    disp(' ');
 
 
     
