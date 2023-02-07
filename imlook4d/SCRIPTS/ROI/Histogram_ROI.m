@@ -15,8 +15,38 @@ prompt={'Number of bins'};
 titleString='Number of bins';
 numlines=1;
 
-defaultanswer = RetriveEarlierValues('HistogramNumberOfBins', {'20'} ); % Read default if exists, or apply these as default
+
+prompt={'Number of bins', 'start (value, or "min" for lowest pixel)', 'end (value, or "max" for highest pixel)'};
+titleString='Number of bins';
+numlines=1;
+
+defaultanswer = RetriveEarlierValues('HistogramROI', {'20', 'min', 'max' } ); % Read default if exists, or apply these as default
 answer=inputdlg(prompt,titleString,numlines,defaultanswer);
+
+
+
+if isempty(answer)  % cancelled inputdlg and clean up
+    ClearVariables
+    return
+end
+bins = str2num(answer{1});% Number of histogram bins
+
+
+if strcmp( answer{2}, 'min')
+    first = min( imlook4d_ROI_data.min(:) );
+else
+    first = str2num(answer{2});% Number of histogram bins
+end
+
+if strcmp( answer{3}, 'max')
+    last = max( imlook4d_ROI_data.max(:) );
+else
+    last = str2num(answer{3});% Number of histogram bins
+end
+
+
+
+
 if isempty(answer)  % cancelled inputdlg and clean up
     ClearVariables
     return
@@ -24,12 +54,11 @@ end
 bins = str2num(answer{1});% Number of histogram bins
 
 % Set up histogramming
-low = imlook4d_current_handles.ColorBar.Limits(1);
-high = imlook4d_current_handles.ColorBar.Limits(2);
+low = first
+high = last
 step = ceil( (high - low) / bins );
 step =  (high - low) / bins ;
 
-%data = imlook4d_ROI_data.pixels{imlook4d_ROI_number}(:,imlook4d_frame);
 
 oneFrame=imlook4d_Cdata(:,:,:,imlook4d_frame);
 data =oneFrame(imlook4d_ROI==imlook4d_ROI_number);
@@ -133,6 +162,6 @@ data =oneFrame(imlook4d_ROI==imlook4d_ROI_number);
     set(gcf,'Name', windowTitle) % set window title
 
 
-    StoreValues('HistogramNumberOfBins', answer ); % Store answer as new dialog default
+    StoreValues('HistogramROI', answer ); % Store answer as new dialog default
     ClearVariables    
 

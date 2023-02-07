@@ -4,6 +4,10 @@ Fill_ROI_Slice_Gaps.m
 Clean_ROI.m
 Move_ROI.m
 ---
+Fill_Hole.m
+Inflate_ROI.m
+Erode_ROI.m
+---
 Select_Reference_ROIs__.m
 Clear_Reference_ROIs_.m
 ---
@@ -15,7 +19,6 @@ Threshold_within_ROI.m
 Highest_pixels_within_ROI.m
 Adaptive_threshold_within_ROI.m
 ---
-Fill_Hole.m
 Flood_Fill_ROI.m
 Flood_Fill_within_ROI.m
 ---
