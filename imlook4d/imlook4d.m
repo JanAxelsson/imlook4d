@@ -926,6 +926,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
            catch
                
            end
+           
 
     function handles = makeSubMenues( handles, parentMenuHandle, subMenuFolder)
         if strcmp( subMenuFolder(end), '.') % Ignore '.' and '..'
@@ -1098,6 +1099,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 
             
         end    
+        
  
 % Output to command line                    
 function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
@@ -4493,6 +4495,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 end
                     disp(['file=' file]);
                     disp(['path=' path]);
+                    
+                %   
+                % Store history
+                %
+                    fileID = fopen([ '' prefdir filesep 'imlook4d_file_open_history.txt' ''],'a');
+                    nbytes = fprintf(fileID, '%s\t%s\n', datetime, fullPath)
+                    fclose(fileID);
+    
                 %   
                 % Determine file type
                 %
@@ -4747,9 +4757,31 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 imlook4d_set_colorscale_from_modality(gcf, {}, guidata(gcf));
                 imlook4d_set_ROIColor(gcf, {}, guidata(gcf));
                 % Print file path
-                dispOpenWithImlook4d( [path file] );
+                %dispOpenWithImlook4d( [path file] );
             catch
             end
+            
+            % Show links to open  previous files
+                varNames = {'Time','Path'} ;
+                varTypes = {'datetime','string'} ;
+                opts = delimitedTextImportOptions('VariableNames',varNames,...
+                            'VariableTypes',varTypes,...
+                            'Delimiter','\t',...
+                            'LineEnding','\n');
+                A = readtable([ '' prefdir filesep 'imlook4d_file_open_history.txt' ''], opts);
+
+                N_ENTRIES = 20
+                i = size(A,1) - N_ENTRIES + 1;  % Show this many entries
+                if ( i <= 0)
+                    i = 1;
+                end
+                while i <= size(A,1)
+                    t = datestr( A{i,1} );
+                    p = convertStringsToChars( A{i,2} );
+                    command = [ 'imlook4d(''' p ''')' ];
+                    disp(  [ t ' : <a href="matlab:' command '" >' p  '</a>' ] ); 
+                    i = i + 1;
+                end
 
             function LocalOpenMGH(hObject, eventdata, handles, file,path)  
                 % Test if Freesurfer files exist
