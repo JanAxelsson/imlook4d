@@ -6246,8 +6246,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 if( strcmp(FILETYPE,'BINARY'))  warndlg('Saving Binary is not supported');end
                 if( strcmp(FILETYPE,'UNKNOWN')) end    
 
-
-                cd(oldPath);    % Restore path
+                if( ~strcmp(FILETYPE,'DICOM'))
+                    cd(oldPath);    % Restore path
+                end
+                
                 try
                     displayMessageRow(['DONE writing file'   ]);
                     handles.cd.TooltipString = [ 'Go to folder = ' handles.image.folder];
@@ -7062,8 +7064,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             %Dirty_Write_DICOM(matrix, headers(1:iNumberOfSelectedFiles), fileNames(1:iNumberOfSelectedFiles), ByteOrder);
                             Dirty_Write_DICOM(matrix, headers(1:iNumberOfSelectedFiles), newFileNames(1:iNumberOfSelectedFiles), ByteOrder);
 
-                        % Clean up
-                            cd('..');   % Move out of DICOM directory
+                        % Change data folder for this imlook4d instance
+                            cd(newPath);
+                            handles.image.folder = newPath;
+                            guidata(handles.figure1, handles);
                         
    % Save State
         function SaveMat_Callback(hObject, eventdata, handles)
