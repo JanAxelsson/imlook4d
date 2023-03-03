@@ -4499,9 +4499,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 %   
                 % Store history
                 %
-                    fileID = fopen([ '' prefdir filesep 'imlook4d_file_open_history.txt' ''],'a');
-                    nbytes = fprintf(fileID, '%s\t%s\n', datetime, fullPath)
-                    fclose(fileID);
+                    storeOpenedFilePaths( fullPath);
     
                 %   
                 % Determine file type
@@ -4761,28 +4759,38 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             catch
             end
             
+            showOpenedFilePaths()
+            
             % Show links to open  previous files
-                varNames = {'Time','Path'} ;
-                varTypes = {'datetime','string'} ;
-                opts = delimitedTextImportOptions('VariableNames',varNames,...
-                            'VariableTypes',varTypes,...
-                            'Delimiter','\t',...
-                            'LineEnding','\n');
-                A = readtable([ '' prefdir filesep 'imlook4d_file_open_history.txt' ''], opts);
+            function showOpenedFilePaths()
 
-                N_ENTRIES = 20
-                i = size(A,1) - N_ENTRIES + 1;  % Show this many entries
-                if ( i <= 0)
-                    i = 1;
-                end
-                while i <= size(A,1)
-                    t = datestr( A{i,1} );
-                    p = convertStringsToChars( A{i,2} );
-                    command = [ 'imlook4d(''' p ''')' ];
-                    disp(  [ t ' : <a href="matlab:' command '" >' p  '</a>' ] ); 
-                    i = i + 1;
-                end
+                % Read old history
+                    historyFile = [ '' prefdir filesep 'imlook4d_file_open_history.mat' ''];
+                    try
+                        load(historyFile); % struct "history" should be loaded
+                    catch
+                        % make empty struct "history" 
+                        history = [];
+                        history.time = {};
+                        history.filePath = {};
+                    end
 
+                % Show in command window
+                    N_ENTRIES = 20;
+                    i = length(history.time) - N_ENTRIES + 1;  % Show this many entries
+                    if ( i <= 0)
+                        i = 1;
+                    end
+                    disp('RECENT FILES  (CLICK LINK TO OPEN) :');
+                    disp('------------------------------------');
+                    while i <= length(history.time)
+                        t = history.time{i};
+                        p = history.filePath{i};
+                        command = [ 'imlook4d(''' p ''')' ];
+                        disp(  [ t ' : <a href="matlab:' command '" >' p  '</a>' ] ); 
+                        i = i + 1;
+                    end
+                
             function LocalOpenMGH(hObject, eventdata, handles, file,path)  
                 % Test if Freesurfer files exist
                     if strcmp('', which('MRIread'))
@@ -7098,9 +7106,40 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                         % Change data folder for this imlook4d instance
                             cd(newPath);
-                            handles.image.folder = newPath;
+                            handles.image.folder = [ newPath filesep newFileNames{1}]; % Use first file name
                             guidata(handles.figure1, handles);
-                        
+                            storeOpenedFilePaths( handles.image.folder);  % remember new file in history list
+                            showOpenedFilePaths()
+
+   % Remember opened / saved file paths
+        function storeOpenedFilePaths(fullPath)
+
+            % Read old history
+            historyFile = [ '' prefdir filesep 'imlook4d_file_open_history.mat' ''];
+            try
+                load(historyFile); % struct "history" should be loaded
+            catch
+                % make empty struct "history" 
+                history = [];
+                history.time = {};
+                history.filePath = {};
+            end
+            
+            % Append 
+            history.time{ end + 1 } = datestr(datetime());
+            history.filePath{ end + 1 } = fullPath;
+            
+            % Shorten history to save
+            N = 20;
+            if length(history.filePath) > N
+                history.time = history.time( end-N+1 : end );
+                history.filePath = history.filePath( end-N+1 : end);
+            end
+            
+            % Save
+            save(historyFile, 'history', '-v7.3');
+
+                            
    % Save State
         function SaveMat_Callback(hObject, eventdata, handles)
              % Display HELP and get out of callback
