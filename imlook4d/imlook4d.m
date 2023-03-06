@@ -4760,6 +4760,36 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             end
             
             showOpenedFilePaths()
+        function openRecent_Callback(hObject, eventdata, handles, varargin)
+
+             % Display HELP and get out of callback
+             if DisplayHelp(hObject, eventdata, handles) 
+                 return 
+             end
+                 
+            % Get recent file list
+            historyFile = [ '' prefdir filesep 'imlook4d_file_open_history.mat' ''];
+            try
+                load(historyFile); % struct "history" should be loaded
+            catch
+                % make empty struct "history" 
+                history = [];
+                history.time = {};
+                history.filePath = {};
+            end
+
+            % Display list
+            pathList = flip(history.filePath);  % Reverse order, newest first
+            [index,ok] = listdlg('ListString', pathList,...
+                'SelectionMode','single',...
+                'ListSize', [900 400],...
+                'Name', 'Open recent file');
+            
+            % Open if not cancelled
+            if ok
+               imlook4d( pathList{index});
+            end
+            
             
             % Show links to open  previous files
             function showOpenedFilePaths()
@@ -7735,6 +7765,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              if DisplayHelp(hObject, eventdata, handles) 
                  return 
              end
+             
         
         % Find figures
             g=findobj('Type', 'figure');
