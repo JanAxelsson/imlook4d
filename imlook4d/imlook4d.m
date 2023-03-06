@@ -4457,8 +4457,30 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             SelectedRaw3D = false;
             SelectedRaw4D = false;
             
-            try % Catch if error or "Cancel" from GUI
+            try 
                 if isempty(varargin)
+                    historyFile = [ '' prefdir filesep 'imlook4d_file_open_history.mat' ''];
+                    
+                    % Select way to open file
+                    if ( exist(historyFile) == 2 ) % Only if historyFile exists, otherwise assume file dialog
+                        answer = questdlg('What do you want to open', ...
+                            'Open options', ...
+                            'File dialog','Recent File','Cancel','File dialog');
+
+                        % Handle response
+                        switch answer
+                            case 'File dialog'
+                                % Just continue below
+                            case 'Recent File'
+                                openRecent_Callback(handles.figure1, [], handles)
+                                return
+                            case 'Cancel'
+                                return
+                        end
+                    
+                    end
+
+                    
                     try
                     % Select file
                        [file,path,indx] = uigetfile( ...
