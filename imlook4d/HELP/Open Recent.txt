@@ -1,0 +1,4 @@
+<h1  id="top">Open Recent</h1>
+<HR></HR>
+
+Opens a recently opened file.  See File/Open for details on opening files

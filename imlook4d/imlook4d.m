@@ -926,6 +926,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
            catch
                
            end
+           
 
     function handles = makeSubMenues( handles, parentMenuHandle, subMenuFolder)
         if strcmp( subMenuFolder(end), '.') % Ignore '.' and '..'
@@ -1098,6 +1099,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 
             
         end    
+        
  
 % Output to command line                    
 function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
@@ -4455,8 +4457,30 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             SelectedRaw3D = false;
             SelectedRaw4D = false;
             
-            try % Catch if error or "Cancel" from GUI
+            try 
                 if isempty(varargin)
+                    historyFile = [ '' prefdir filesep 'imlook4d_file_open_history.mat' ''];
+                    
+                    % Select way to open file
+                    if ( exist(historyFile) == 2 ) % Only if historyFile exists, otherwise assume file dialog
+                        answer = questdlg('What do you want to open', ...
+                            'Open options', ...
+                            'File dialog','Recent File','Cancel','File dialog');
+
+                        % Handle response
+                        switch answer
+                            case 'File dialog'
+                                % Just continue below
+                            case 'Recent File'
+                                openRecent_Callback(handles.figure1, [], handles)
+                                return
+                            case 'Cancel'
+                                return
+                        end
+                    
+                    end
+
+                    
                     try
                     % Select file
                        [file,path,indx] = uigetfile( ...
@@ -4493,6 +4517,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 end
                     disp(['file=' file]);
                     disp(['path=' path]);
+                    
+                %   
+                % Store history
+                %
+                    storeOpenedFilePaths( fullPath);
+    
                 %   
                 % Determine file type
                 %
@@ -4747,10 +4777,72 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 imlook4d_set_colorscale_from_modality(gcf, {}, guidata(gcf));
                 imlook4d_set_ROIColor(gcf, {}, guidata(gcf));
                 % Print file path
-                dispOpenWithImlook4d( [path file] );
+                %dispOpenWithImlook4d( [path file] );
             catch
             end
+            
+            showOpenedFilePaths()
+        function openRecent_Callback(hObject, eventdata, handles, varargin)
 
+             % Display HELP and get out of callback
+             if DisplayHelp(hObject, eventdata, handles) 
+                 return 
+             end
+                 
+            % Get recent file list
+            historyFile = [ '' prefdir filesep 'imlook4d_file_open_history.mat' ''];
+            try
+                load(historyFile); % struct "history" should be loaded
+            catch
+                % make empty struct "history" 
+                history = [];
+                history.time = {};
+                history.filePath = {};
+            end
+
+            % Display list
+            pathList = flip(history.filePath);  % Reverse order, newest first
+            [index,ok] = listdlg('ListString', pathList,...
+                'SelectionMode','single',...
+                'ListSize', [900 400],...
+                'Name', 'Open recent file');
+            
+            % Open if not cancelled
+            if ok
+               imlook4d( pathList{index});
+            end
+            
+            
+            % Show links to open  previous files
+            function showOpenedFilePaths()
+
+                % Read old history
+                    historyFile = [ '' prefdir filesep 'imlook4d_file_open_history.mat' ''];
+                    try
+                        load(historyFile); % struct "history" should be loaded
+                    catch
+                        % make empty struct "history" 
+                        history = [];
+                        history.time = {};
+                        history.filePath = {};
+                    end
+
+                % Show in command window
+                    N_ENTRIES = 20;
+                    i = length(history.time) - N_ENTRIES + 1;  % Show this many entries
+                    if ( i <= 0)
+                        i = 1;
+                    end
+                    disp('RECENT FILES  (CLICK LINK TO OPEN) :');
+                    disp('------------------------------------');
+                    while i <= length(history.time)
+                        t = history.time{i};
+                        p = history.filePath{i};
+                        command = [ 'imlook4d(''' p ''')' ];
+                        disp(  [ t ' : <a href="matlab:' command '" >' p  '</a>' ] ); 
+                        i = i + 1;
+                    end
+                
             function LocalOpenMGH(hObject, eventdata, handles, file,path)  
                 % Test if Freesurfer files exist
                     if strcmp('', which('MRIread'))
@@ -6246,8 +6338,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 if( strcmp(FILETYPE,'BINARY'))  warndlg('Saving Binary is not supported');end
                 if( strcmp(FILETYPE,'UNKNOWN')) end    
 
-
-                cd(oldPath);    % Restore path
+                if( ~strcmp(FILETYPE,'DICOM'))
+                    cd(oldPath);    % Restore path
+                end
+                
                 try
                     displayMessageRow(['DONE writing file'   ]);
                     handles.cd.TooltipString = [ 'Go to folder = ' handles.image.folder];
@@ -7062,9 +7156,42 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             %Dirty_Write_DICOM(matrix, headers(1:iNumberOfSelectedFiles), fileNames(1:iNumberOfSelectedFiles), ByteOrder);
                             Dirty_Write_DICOM(matrix, headers(1:iNumberOfSelectedFiles), newFileNames(1:iNumberOfSelectedFiles), ByteOrder);
 
-                        % Clean up
-                            cd('..');   % Move out of DICOM directory
-                        
+                        % Change data folder for this imlook4d instance
+                            cd(newPath);
+                            handles.image.folder = [ newPath filesep newFileNames{1}]; % Use first file name
+                            guidata(handles.figure1, handles);
+                            storeOpenedFilePaths( handles.image.folder);  % remember new file in history list
+                            showOpenedFilePaths()
+
+   % Remember opened / saved file paths
+        function storeOpenedFilePaths(fullPath)
+
+            % Read old history
+            historyFile = [ '' prefdir filesep 'imlook4d_file_open_history.mat' ''];
+            try
+                load(historyFile); % struct "history" should be loaded
+            catch
+                % make empty struct "history" 
+                history = [];
+                history.time = {};
+                history.filePath = {};
+            end
+            
+            % Append 
+            history.time{ end + 1 } = datestr(datetime());
+            history.filePath{ end + 1 } = fullPath;
+            
+            % Shorten history to save
+            N = 20;
+            if length(history.filePath) > N
+                history.time = history.time( end-N+1 : end );
+                history.filePath = history.filePath( end-N+1 : end);
+            end
+            
+            % Save
+            save(historyFile, 'history', '-v7.3');
+
+                            
    % Save State
         function SaveMat_Callback(hObject, eventdata, handles)
              % Display HELP and get out of callback
@@ -7660,6 +7787,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              if DisplayHelp(hObject, eventdata, handles) 
                  return 
              end
+             
         
         % Find figures
             g=findobj('Type', 'figure');

@@ -74,7 +74,7 @@
         DICOMStruct.duration2D=duration;
         DICOMStruct.duration=duration(1,1:numberOfFrames);
     catch
-        message='dirtyDICOMTimeAndDuration error:  Missing time or duration';
+        message='Info : Missing time or duration';
         %warning(message);
         disp(message);
     end   
@@ -89,7 +89,7 @@
         halflife=str2num(out3.string);
         DICOMStruct.halflife=halflife;
     catch
-        message='dirtyDICOMTimeAndDuration error:  Error reading radioactive halflife';
+        message='Info : Did not find radioactive halflife';
         disp(message);
     end
 
