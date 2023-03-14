@@ -61,6 +61,13 @@ imlook4d_current_handles=guidata(imlook4d_current_handle);
          disp('useage:');
          help SelectOrientation( number)
      end
- end
+
+% Update slice number
+    imlook4d_slice = str2num( get(imlook4d_current_handles.SliceNumEdit,'String') );
+    assignin('base', 'imlook4d_slice' , imlook4d_slice );
+
+end
+
+
 
 
