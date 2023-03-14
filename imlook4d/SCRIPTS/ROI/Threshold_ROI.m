@@ -46,10 +46,10 @@
     end
     
     % Get user input
-    prompt={'Max value(for instance 12345  or 40%)',...
-                'Threshold level (for instance 12345  or 40%)',...
-                'First slice',...
-                'Last slice (number or "end")', ...
+    prompt={'Max value  (for instance "12345"  or "100%")',...
+                'Threshold level  (for instance "12345"  or "40%")',...
+                'First slice  (for instance "15", or "-2" for two slices down from current)',...
+                'Last slice  (for instance "20", or "end" for last slice)', ...
                 'Background level'};
         title='Threshold levels';
         numlines=1;
@@ -61,18 +61,18 @@
     StoreValues('Threshold', answer ); % Store answer as new dialog default
 
     
-    answer(3:4)=makeAbsoluteSliceNumber(answer(3:4), imlook4d_slice, size(imlook4d_Cdata,3)); % Handle Relative or Absolute positions
+    newanswer(3:4)=makeAbsoluteSliceNumber(answer(3:4), imlook4d_slice, size(imlook4d_Cdata,3)); % Handle Relative or Absolute positions
         
     maxThresholdLevel=answer{1} ;
     minThresholdLevel=answer{2} ;
-    firstSlice=str2num(answer{3});
-    lastSlice=str2num(answer{4});
+    firstSlice=str2num(newanswer{3});
+    lastSlice=str2num(newanswer{4});
     background=str2num(answer{5});
-    % Handle if lastSlice='end'
-    if strcmp('end', strtrim(answer{4}) )
-        lastSlice=size(imlook4d_Cdata,3)
-        answer{4} = 'end';
-    end
+%     % Handle if lastSlice='end'
+%     if strcmp('end', strtrim(answer{4}) )
+%         lastSlice=size(imlook4d_Cdata,3)
+%         answer{4} = 'end';
+%     end
 
     activeROI=get(imlook4d_current_handles.ROINumberMenu,'Value');
 

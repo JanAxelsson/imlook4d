@@ -1,6 +1,6 @@
 % YOUR SCRIPT NAME HERE
 % ---------------------
-% This is a template for an imlook4d script that runs your code and puts the results into a NEW imlook4d window.
+% This is a template for an imlook4d script that runs your code and works in EXISTING imlook4d window.
 % For documentation:  a) imlook4d menu "/HELP/Help",   or 
 %                     b) type in matlab:   open('Scripting-imlook4d.pdf')  
 %
@@ -11,7 +11,9 @@
 % 2) Open a new imlook4d and the code can be executed on your own data from
 %    the menu /SCRIPTS/USER
 
-StartScript; % Start a script and open a new instance of imlook4d to play with
+% Start a script and retrieve variables to work with
+StoreVariables
+Export
 
 % Data fields that can be modified in your own code:
 % --------------------------------------------------
@@ -35,5 +37,8 @@ imlook4d_Cdata = 10 * imlook4d_Cdata;  % Multiply pixel values by 10
 % END OF OWN CODE
 % --------------------------------------------------
 
-EndScript; % Import your changes into new instance and clean up your variables
+% End script, import changed variables to original imlook4d window, and
+% clear variables
+Import
+ClearVariables
 
