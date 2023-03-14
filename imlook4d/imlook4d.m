@@ -596,8 +596,10 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                      
                      % Copy README-file
                      try
-                        copyfile(which('README-USER_SCRIPTS.txt'), [userScriptFolderPath filesep 'README.txt']);
-                        copyfile(which('Scripting-imlook4d.pdf'), [userScriptFolderPath filesep 'Scripting-imlook4d.pdf']);  % Throws error if already existing (since I don't rename it)
+                        %copyfile(which('README-USER_SCRIPTS.txt'), [userScriptFolderPath filesep 'README.txt']);
+                        copyfile( [pathstr1 filesep 'DOCS' filesep 'README-USER_SCRIPTS.txt'], [userScriptFolderPath filesep 'README.txt']);  % Throws error if already existing (since I don't rename it)
+
+                        copyfile( [pathstr1 filesep 'DOCS' filesep 'Scripting-imlook4d.pdf'], [userScriptFolderPath filesep 'Scripting-imlook4d.pdf']);  % Throws error if already existing (since I don't rename it)
                      catch
                      end
 
@@ -640,12 +642,21 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                             
                             
                             % Advanced callback to allow help files for scripts
-                            nameWithSpaces = 'New Script';
-                            handles.userScriptsMenuNewScriptItemHandle = ...
+                            nameWithSpaces = 'New Script Duplicate Window';
+                            handles.userScriptsMenuNewScriptItemHandle1 = ...
                                 uimenu(handles.scriptsMenuNewScriptUserHandle,'Label',nameWithSpaces, 'Callback', [ ...
                                 'if imlook4d(''DisplayHelp'',gcbo,[],guidata(gcbo));return;end;' ...
-                                'cd(''' userScriptFolderPath '''); imlook4d(''newScriptFunction'')' ...
+                                'cd(''' userScriptFolderPath '''); imlook4d(''newScriptDuplicateWindow'')' ...
                                 ]);    
+
+
+                            nameWithSpaces = 'New Script Same Window';
+                            handles.userScriptsMenuNewScriptItemHandle2 = ...
+                                uimenu(handles.scriptsMenuNewScriptUserHandle,'Label',nameWithSpaces, 'Callback', [ ...
+                                'if imlook4d(''DisplayHelp'',gcbo,[],guidata(gcbo));return;end;' ...
+                                'cd(''' userScriptFolderPath '''); imlook4d(''newScriptSameWindow'')' ...
+                                ]);    
+
                             
                             % Advanced callback to allow help files for scripts
                             nameWithSpaces = 'Scripting Manual';
@@ -654,6 +665,10 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                                 %'open(''Scripting-imlook4d.pdf'')' ...
                                  'openInFileManager( which(''Scripting-imlook4d.pdf''))' ...
                                 ]);   
+
+
+                            % Separator
+                            set(handles.userScriptsMenuNewScriptItemHandle2,'Separator','on');
                                                                              
                             % Advanced callback to allow help files for scripts
                             nameWithSpaces = 'Open USER_SCRIPTS folder';
@@ -8562,12 +8577,24 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         assignin('base', 'imlook4d_current_handle', get(hObject,'Parent'))
         assignin('base', 'imlook4d_current_handles', handles)   
         a = whos('handles');disp([ 'Size = ' num2str( round( a.bytes/1e6 )) ' MB']);
-    function newScriptFunction()
+    function newScriptDuplicateWindow()
             EOL=sprintf('\r\n');
+
             % Put text in new editor
             text = fileread('UserScript1.m');
             a = com.mathworks.mde.editor.MatlabEditorApplication.getInstance();
             editor = a.newEditor( text );
+    function newScriptSameWindow()
+            EOL=sprintf('\r\n');
+
+            % Put text in new editor
+            text = fileread('UserScript2.m');
+            a = com.mathworks.mde.editor.MatlabEditorApplication.getInstance();
+            editor = a.newEditor( text );
+
+
+
+
 
     % --------------------------------------------------------------------
     % MODELS 
