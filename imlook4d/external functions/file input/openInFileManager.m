@@ -9,7 +9,7 @@ elseif isunix
 
     % Mac
     if ismac
-        C = evalc(['!open -n "' myDir '"']);
+        C = evalc(['!open -a Finder "' myDir '"']);
 
     % Linux
     else
