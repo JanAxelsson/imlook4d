@@ -4472,27 +4472,40 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             SelectedRaw3D = false;
             SelectedRaw4D = false;
             
+            % Administrative tasks figuring out if fileDialog is asked for by Menu/Open
+            openWithDialog = isempty(varargin);  
+            if length(varargin) == 1
+                if strcmp( varargin, 'File dialog')
+                    openWithDialog = true;
+                end
+            end
+            
+            % If empty, or file dialog is needed
             try 
-                if isempty(varargin)
+                if ( isempty(varargin) || openWithDialog ) 
                     historyFile = [ '' prefdir filesep 'imlook4d_file_open_history.mat' ''];
                     
-                    % Select way to open file
-                    if ( exist(historyFile) == 2 ) % Only if historyFile exists, otherwise assume file dialog
-                        answer = questdlg('What do you want to open', ...
-                            'Open options', ...
-                            'File dialog','Recent File','Cancel','File dialog');
+                    % Handle response
+                    if (isempty(varargin) )
+                                            
+                        % Select way to open file
+                        if ( exist(historyFile) == 2 ) % Only if historyFile exists, otherwise assume file dialog
+                            answer = questdlg('What do you want to open', ...
+                                'Open options', ...
+                                'File dialog','Recent File','Cancel','File dialog');
 
-                        % Handle response
-                        switch answer
-                            case 'File dialog'
-                                % Just continue below
-                            case 'Recent File'
-                                openRecent_Callback(handles.figure1, [], handles)
-                                return
-                            case 'Cancel'
-                                return
+                            % Handle response
+                            switch answer
+                                case 'File dialog'
+                                    % Just continue below
+                                case 'Recent File'
+                                    openRecent_Callback(handles.figure1, [], handles)
+                                    return
+                                case 'Cancel'
+                                    return
+                            end
+
                         end
-                    
                     end
 
                     
