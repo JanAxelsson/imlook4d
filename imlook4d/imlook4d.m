@@ -4472,27 +4472,40 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             SelectedRaw3D = false;
             SelectedRaw4D = false;
             
+            % Administrative tasks figuring out if fileDialog is asked for by Menu/Open
+            openWithDialog = isempty(varargin);  
+            if length(varargin) == 1
+                if strcmp( varargin, 'File dialog')
+                    openWithDialog = true;
+                end
+            end
+            
+            % If empty, or file dialog is needed
             try 
-                if isempty(varargin)
+                if ( isempty(varargin) || openWithDialog ) 
                     historyFile = [ '' prefdir filesep 'imlook4d_file_open_history.mat' ''];
                     
-                    % Select way to open file
-                    if ( exist(historyFile) == 2 ) % Only if historyFile exists, otherwise assume file dialog
-                        answer = questdlg('What do you want to open', ...
-                            'Open options', ...
-                            'File dialog','Recent File','Cancel','File dialog');
+                    % Handle response
+                    if (isempty(varargin) )
+                                            
+                        % Select way to open file
+                        if ( exist(historyFile) == 2 ) % Only if historyFile exists, otherwise assume file dialog
+                            answer = questdlg('What do you want to open', ...
+                                'Open options', ...
+                                'File dialog','Recent File','Cancel','File dialog');
 
-                        % Handle response
-                        switch answer
-                            case 'File dialog'
-                                % Just continue below
-                            case 'Recent File'
-                                openRecent_Callback(handles.figure1, [], handles)
-                                return
-                            case 'Cancel'
-                                return
+                            % Handle response
+                            switch answer
+                                case 'File dialog'
+                                    % Just continue below
+                                case 'Recent File'
+                                    openRecent_Callback(handles.figure1, [], handles)
+                                    return
+                                case 'Cancel'
+                                    return
+                            end
+
                         end
-                    
                     end
 
                     
@@ -7158,9 +7171,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         % Set Transfer Syntax UID
                             out = dirtyDICOMHeaderData(headers, 1, '0002', '0010',2);
                             Default_TSUID = '1.2.840.10008.1.2.1'; % Explicit Little Endian is imlook4d default
-                            if ~strcmp( Default_TSUID, out.string)
-                                for i = 1 : length(headers)
-                                    headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0002', '0010',mode, Default_TSUID); 
+                            
+                            if (mode == 2)
+                                % Change to default, if explicit mode   (implicit = 0)
+                                if ~strcmp( Default_TSUID, out.string)
+                                    for i = 1 : length(headers)
+                                        headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0002', '0010',mode, Default_TSUID); 
+                                    end
                                 end
                             end
 
