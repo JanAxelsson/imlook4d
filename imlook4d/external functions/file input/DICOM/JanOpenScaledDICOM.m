@@ -49,6 +49,7 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                 % Read Transfer syntax UID  (Group 0002 elements should always be EXPLICIT VR LITTLE ENDIAN)
                 try
                     out3=dirtyDICOMHeaderData(headers, 1, '0002', '0010',2);
+                    out3.string = [ out3.string  '     '];
                 catch
                     disp('Could not find tag "Transfer syntax UID" (0002,0010)!' );
                 end
@@ -261,10 +262,13 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                         
                         imlook4dWindowTitle=[imlook4dWindowTitle '@' out3.string(1:2) ':' out3.string(3:4)  ')'];
 
-                
-                    out3=dirtyDICOMHeaderData(headers, 1, '0020', '0010',mode);
+                 
+                   try
+                        out3=dirtyDICOMHeaderData(headers, 1, '0020', '0010',mode);
                         disp(['Study id=' out3.string]);
-                        
+                   catch
+                   end
+                   
                    try
                         out3=dirtyDICOMHeaderData(headers, 1, '0018', '1075',mode);
                             disp(['halflife=' out3.string]);                        

@@ -7171,9 +7171,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         % Set Transfer Syntax UID
                             out = dirtyDICOMHeaderData(headers, 1, '0002', '0010',2);
                             Default_TSUID = '1.2.840.10008.1.2.1'; % Explicit Little Endian is imlook4d default
-                            if ~strcmp( Default_TSUID, out.string)
-                                for i = 1 : length(headers)
-                                    headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0002', '0010',mode, Default_TSUID); 
+                            
+                            if (mode == 2)
+                                % Change to default, if explicit mode   (implicit = 0)
+                                if ~strcmp( Default_TSUID, out.string)
+                                    for i = 1 : length(headers)
+                                        headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0002', '0010',mode, Default_TSUID); 
+                                    end
                                 end
                             end
 
