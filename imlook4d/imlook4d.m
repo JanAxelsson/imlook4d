@@ -7044,7 +7044,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                     imagePositionString = [ num2str( location(1) ) '\' num2str( location(2) ) '\' num2str( location(3) )];
                                     
                                     % Breaks in implicit
-                                    % headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0020', '0032',mode, imagePositionString);
+                                    headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0020', '0032',mode, imagePositionString);
 
                                     % 2) Slice Location
                                     try
