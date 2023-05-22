@@ -6907,14 +6907,13 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                     numberOfImages = s(3)*s(4);    
                                 end 
 
-                                % Copy headers from template
-                               % if numberOfImages ~= iNumberOfHeaders
-                                    template = headers{1};
-                                    for i = 1:numberOfImages
-                                        newHeaders{i} = template;
-                                    end
-                                    headers = newHeaders;
-                              %  end
+                                % Keep original headers, and modify them below
+%                                % Copy headers from template
+%                                 template = headers{1};
+%                                 for i = 1:numberOfImages
+%                                     newHeaders{i} = template;
+%                                 end
+%                                 headers = newHeaders;
 
                             % Build slice Locations
                                 slices = size( handles.image.Cdata,3);
@@ -7043,7 +7042,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                     % 1) Image Position Patient
                                     location = handles.image.imagePosition{i};
                                     imagePositionString = [ num2str( location(1) ) '\' num2str( location(2) ) '\' num2str( location(3) )];
-                                    headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0020', '0032',mode, imagePositionString);
+                                    
+                                    % Breaks in implicit
+                                    % headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0020', '0032',mode, imagePositionString);
 
                                     % 2) Slice Location
                                     try
