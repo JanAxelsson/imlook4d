@@ -7824,6 +7824,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         
         % Find figures
             g=findobj('Type', 'figure');
+            g=findall(0,'Type', 'figure');
             
         % Show only figures and imlook4d instances
             j=1;
@@ -7832,7 +7833,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 if ( strcmp( get(g(i),'Tag'), 'imlook4d' ) || ...
                         strcmp( get(g(i),'Tag'), '' )  || ...
                         strcmp( get(g(i),'Tag'), 'modelWindow' ) || ...
-                        strcmp( get(g(i),'Tag'), 'tactWindow' ) ...
+                        strcmp( get(g(i),'Tag'), 'tactWindow' ) || ...
+                        strcmp( get(g(i),'Tag'), 'TMWWaitbar' ) ...
                         )
                      h(j,1) = g(i);
                      get(h(j),'Tag');
@@ -10569,6 +10571,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                 else  
                         % Here we have non-gui applications (such as normal plot figures)
+                        temp = get(listOfWindows(i),'Tag');
+                        if strcmp(temp, 'TMWWaitbar')
+                           temp = ['Waitbar -- ' listOfWindows(i).Children(1).Title.String ];
+                        end
+                        
+                        windowDescriptions{i}=strrep(temp,char(0),''); 
                 end
             end
             
