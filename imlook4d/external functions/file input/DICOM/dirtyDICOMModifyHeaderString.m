@@ -187,8 +187,10 @@ try
     
         % Make even number of chars
         if mod( length(newString),2 )
-            if char(vr2') == 'UI'
-                newString=[newString char(0)]; % NULL
+            if ~isempty(vr2)  % Can only do string comparison if not null
+                if char(vr2') == 'UI' 
+                    newString=[newString char(0)]; % Only VR=UI should be padded with NULL
+                end
             else
                 newString=[newString ' ']; % Space
             end
