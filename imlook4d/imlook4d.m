@@ -471,9 +471,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 
                 %handles.image.ROI=zeros(size(inpargs),'int8'); % Matrix for ROIs
                 handles.image.ROI=zeros(size(inpargs,1),size(inpargs,2),size(inpargs,3),'uint8'); % 3D Matrix for ROIs
-                 
-                UNDOSIZE = 5;
-                handles = createUndoROI( handles, UNDOSIZE);
+
                 
                 handles.image.UndoROI.position = 1; % Position in UndoROI.ROI fourth dimension, for current displayed undo level
                 
@@ -482,6 +480,10 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 handles.imSize = [r,c,z];
                 cimg = handles.image.Cdata(:,:,1,1);    % put current image (slice 1, frame 1) into cimg 
                 %cimg=orientImage(cimg);                 % correct orientation on first image to display
+                
+                                 
+                UNDOSIZE = 5;
+                handles = createUndoROI( handles, UNDOSIZE);
 
                 % Create image object and set the properties
                 handles.ImgObject = image(Img,'Parent',handles.axes1);
@@ -3541,7 +3543,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             ];
                     end
                 catch
-                    disp('Error removing reference ROIs');
+                    disp('Exception removing reference ROIs (probably because no reference ROI has been set)');
                 end
             end
     function ROI_Remove_All_Callback(hObject, eventdata, handles, name)
@@ -4248,6 +4250,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             handles.image.UndoROI.position = 1;
             for i=(UNDOSIZE-1):-1:1
                 handles.image.UndoROI.ROI{i+1} = handles.image.UndoROI.ROI{i};
+                handles.image.UndoROI.roiNames{i+1} = handles.image.UndoROI.roiNames{i};
+                handles.image.UndoROI.VisibleROIs{i+1} = handles.image.UndoROI.VisibleROIs{i};
+                handles.image.UndoROI.LockedROIs{i+1} = handles.image.UndoROI.LockedROIs{i};
             end
         catch
             handles.image.UndoROI.ROI{1} = ROI3D;
@@ -4273,6 +4278,10 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             handles.image.UndoROI.position = 1; % Always set to 1 when drawing
             %storeUndoROI(handles);
      %   end
+     
+         handles.image.UndoROI.roiNames{1} = get(handles.ROINumberMenu,'String'); % Cell array
+         handles.image.UndoROI.VisibleROIs{1} = handles.image.VisibleROIs;
+         handles.image.UndoROI.LockedROIs{1} = handles.image.LockedROIs;
 
         % Print current Undo Level and number of pixels in all Undo-ROIs
         %printUndoInfo(handles);
@@ -4302,6 +4311,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             end
         catch
         end
+        
+        set(handles.ROINumberMenu,'String', handles.image.UndoROI.roiNames{position} );
+        
+        handles.image.VisibleROIs = handles.image.UndoROI.VisibleROIs{position};
+        handles.image.LockedROIs = handles.image.UndoROI.LockedROIs{position};
 
         handles.image.UndoROI.position = position; % Remember position
 
@@ -4314,6 +4328,18 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             handles.image.UndoROI.ROI = cell(1,UNDOSIZE);
             handles.image.UndoROI.ROI{1}.roiSlices = cell(1,size(handles.image.ROI,3));
             handles.image.UndoROI.ROI{1}.nonzeroSlices = zeros( 1, size(handles.image.ROI,3));  % Vector
+            
+            handles.image.UndoROI.roiNames = cell(1,UNDOSIZE);
+            handles.image.UndoROI.roiNames{1} = get(handles.ROINumberMenu,'String'); % Cell array
+            
+            handles.image.UndoROI.VisibleROIs = cell(1,UNDOSIZE);
+            handles.image.UndoROI.VisibleROIs{1} = cell(1,UNDOSIZE);
+            handles.image.UndoROI.VisibleROIs{1} = handles.image.VisibleROIs;
+            
+            handles.image.UndoROI.LockedROIs = cell(1,UNDOSIZE);
+            handles.image.UndoROI.LockedROIs{1} = cell(1,UNDOSIZE);
+            handles.image.UndoROI.LockedROIs{1} = handles.image.LockedROIs;
+            
     function handles = permuteUndoROI(handles,permutation)
         UNDOSIZE = length(handles.image.UndoROI.ROI);
         for j=1:UNDOSIZE
