@@ -4528,8 +4528,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                            '*.mat','m4 object (*.mat)'} ...
                            ,'Select one file to open');
                            
-                        SelectedRaw3D = (indx == 10); % 'GE RAW (3D, sum ToF)'
-                        SelectedRaw4D = (indx == 11); % 'GE RAW (4D, w ToF)'
+                        SelectedRaw3D = (indx == 11); % 'GE RAW (3D, sum ToF)'
+                        SelectedRaw4D = (indx == 12); % 'GE RAW (4D, w ToF)'
                         fullPath=[path file];
                         cd(path);
                     catch
