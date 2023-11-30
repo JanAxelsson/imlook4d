@@ -7780,6 +7780,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     displayMessageRow('Saving rois in Nifti format ...');
                     nii = handles.image.nii;
 
+                    % Make 3-dimensional (in case it was a 4D image)
+                    nii.hdr.dime.dim(1)=3;
+                    nii.hdr.dime.dim(5)=1;
+                    nii.hdr.hist.descrip=['ROI (imlook4d ' getImlook4dVersion() ')']; 
+
+
                     UINT8 = 2;
                     nii.hdr.dime.datatype = UINT8;
                     nii.hdr.dime.bitpix = UINT8;
