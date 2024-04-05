@@ -2379,9 +2379,19 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 set(hObject,'State', 'off')
                 return
             end
+
+            roi_number = get(handles.ROINumberMenu,'Value');
+            % Bail out if locked ROI
+            if ( handles.image.LockedROIs(roi_number) == 1 )
+                warndlg({'The ROI is locked! ',...
+                            'Locked ROIs can not be edited.  ',...
+                            'Unlock, or make a new ROI before making a polygon'});
+                return
+            end
+            
+
             
             slice = round(get(handles.SliceNumSlider,'Value' ));
-            roi_number = get(handles.ROINumberMenu,'Value');
 
             pressedToggleButton( hObject);
 
@@ -2436,6 +2446,17 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 slice = roi.ContextMenu.UserData.slice;
                 roi_number = roi.ContextMenu.UserData.roi_number;
 
+                ROI2d = handles.image.ROI(:,:,slice);
+
+
+                % Make 2d matrix of locked pixels
+                lockedMatrix = zeros( size(ROI2d) ,'logical'); % Assume all locked
+                numberOfROIs = length( handles.image.LockedROIs );
+                for i=1:numberOfROIs
+                    lockedMatrix( ROI2d == i ) = handles.image.LockedROIs(i); % Pixels = 0 if locked, 1 if not locked
+                end
+
+
 
                 % Populate ROI pixels
                 if get(handles.FlipAndRotateRadioButton,'Value') 
@@ -2443,6 +2464,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 else
                     BW = poly2mask( roi.Position(:,1)', roi.Position(:,2)', sz(1),sz(2) );
                 end
+
+    
+                % Remove pixels that are locked from newROI
+                BW( lockedMatrix) = false; 
+
                 roi2D = handles.image.ROI(:,:,slice);
                 roi2D( BW ) =  roi_number; 
                 handles.image.ROI(:,:,slice) = roi2D;
