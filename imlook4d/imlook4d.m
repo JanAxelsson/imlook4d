@@ -2380,16 +2380,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 return
             end
             
-            % If already pressed
-            if hObject.State == 'on'
-                return
-            end
-            
             slice = round(get(handles.SliceNumSlider,'Value' ));
             roi_number = get(handles.ROINumberMenu,'Value');
 
             pressedToggleButton( hObject);
-        
+
             % interactive polygon
             roi = drawpolygon( gca);  
 
