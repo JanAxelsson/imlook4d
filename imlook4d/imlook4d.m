@@ -874,9 +874,8 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 
                 version=getImlook4dVersion();
                 set(handles.versionText, 'String', ['imlook4d (' version ') /Jan Axelsson'  ]);
-                
 
-
+            
 
             %
             % Finalize
@@ -943,6 +942,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
            catch
                
            end
+
            
 
     function handles = makeSubMenues( handles, parentMenuHandle, subMenuFolder)
@@ -4836,7 +4836,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     
                     if( strcmp(FILETYPE,'UNKNOWN')) end
 
-               %Remember path
+                    %Remember path
                     cd(path);
                     handles.image.folder = path;
                     handles.image.file = file;
@@ -4846,6 +4846,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     newHandles.image.folder = path;
                     newHandles.image.file = file;
                     newHandles.cd.TooltipString = [ 'Go to folder = ' handles.image.folder];
+                    
+                    % Show/hide extra save menu-item for Nifti 
+                    if startsWith(FILETYPE, 'NIFTY')
+                        newHandles.Save_nifti_short.Visible = 'on';
+                    else
+                        newHandles.Save_nifti_short.Visible = 'off';
+                    end
+                    
                     
                     guidata(newHandle,newHandles);
 
@@ -5158,6 +5166,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     newhandles.image.unit='';  % Unit not in header, but needed in some scripts
                     
                     newhandles.image.openingMode=openingMode;
+
+
  
                 % Set radio button and call callback function
 %                     set(newhandles.SwapHeadFeetRadioButton,'Value',1);
@@ -6394,6 +6404,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             %
             % Call function to open correct file format
             %
+                SaveAsShort = strcmp(hObject.Tag,'Save_nifti_short');  % Nifti menu for short save
+                
                 displayMessageRow(['Writing data'   ]);
                 %if( strcmp(FILETYPE,'ECAT'))    SaveECAT_Callback(hObject, eventdata, handles);end
                 
@@ -6403,9 +6415,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 if( strcmp(FILETYPE,'SHR'))     warndlg('Saving SHR is not supported');end
                 if( strcmp(FILETYPE,'DICOM'))   LocalSaveDICOM(handles, tempData);end
                 %if( strcmp(FILETYPE,'ANALYZE'))   LocalSaveAnalyze(handles, tempData);end
-                if( strcmp(FILETYPE,'ANALYZE'))  LocalSaveNifti(handles, tempData);end         % ANALYZE
-                if( strcmp(FILETYPE,'NIFTY_TWOFILES'))  LocalSaveNifti(handles, tempData);end  % NIFTY behaving as Analyze (img+hdr files)
-                if( strcmp(FILETYPE,'NIFTY_ONEFILE'))  LocalSaveNifti(handles, tempData);end  % Single-file NIFTY
+                if( strcmp(FILETYPE,'ANALYZE'))  LocalSaveNifti(handles, tempData, SaveAsShort);end         % ANALYZE
+                if( strcmp(FILETYPE,'NIFTY_TWOFILES'))  LocalSaveNifti(handles, tempData, SaveAsShort);end  % NIFTY behaving as Analyze (img+hdr files)
+                if( strcmp(FILETYPE,'NIFTY_ONEFILE'))  LocalSaveNifti(handles, tempData, SaveAsShort);end  % Single-file NIFTY
                 if( strcmp(FILETYPE,'Matrix4D')) localSaveM4(handles, tempData); end  % M4 Ume format
                 
                 if( strcmp(FILETYPE,'ModernRDF'))
@@ -6498,7 +6510,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                            gzip( fullPath);
                            movefile( [fullPath '.gz'], fullPath);
                         end
-            function LocalSaveNifti(handles, tempData)
+
+            function LocalSaveNifti(handles, tempData, SaveAsShort)
 
                     % New file name
                         suggestedFileName=get(handles.figure1, 'Name');
@@ -6540,9 +6553,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         % Set output format to float
                         nii.hdr.dime.datatype=16;
                         nii.hdr.dime.bitpix=32;
+                        
                         % Set output format signed short
-                        %nii.hdr.dime.datatype=4;
-                        %nii.hdr.dime.bitpix=16;
+                        if (SaveAsShort)
+                            nii.hdr.dime.datatype=4;
+                            nii.hdr.dime.bitpix=16;
+                        end
 
                         if strcmp(handles.image.openingMode,'load_nii')
                             save_nii(nii, destination);

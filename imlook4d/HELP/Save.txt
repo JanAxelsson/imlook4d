@@ -3,13 +3,16 @@
 <!------------------->
 
 <P>
-Saves medical images in the <B>same format</B> as it was opened (ECAT saved to ECAT, DICOM saved to DICOM, etc).  
+Saves medical images in the <B>same format</B> as it was opened (ECAT saved to ECAT, DICOM saved to DICOM, etc).  <BR>
+</P>
+
+<P>
+The following file formats are supported: 
 		<UL>
-			The following file formats are supported: 
 			<LI>  <B>DICOM </B> 
 			<LI>  <B>ECAT </B> 
 			<LI>  <B>Analyze </B> 
-			<LI>  <B>Nifti </B> 
+			<LI>  <B>Nifti (as double).</B>  <BR> See also 'File/Save (short format)' 
 			<LI>  <B>Freesurfer (see requirements in Open help).  Freesurfer files can be saved as .mgz .mgh and .nii files (as selected by extension in save dialog)</B> 
 			<LI>  <B>GE PET raw data</B>. Time-of-flight (TOF) data must be explicitly opened in 4D mode (read help on Open), otherwise it cannot be saved.  Non-TOF data can be saved as is.
 		</UL>
