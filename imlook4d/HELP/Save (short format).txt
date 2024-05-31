@@ -1,0 +1,14 @@
+<H1>Save (short format)</H1>
+<HR></HR>
+<!------------------->
+
+<P>
+Saves Nifti image in <B>signed short</B> format.    
+</P>
+
+
+<P>
+Some softwares do not like double Nifti files in double format.  This option saves it as signed short integers instead.
+</p>
+
+

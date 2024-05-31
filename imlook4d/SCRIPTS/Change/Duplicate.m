@@ -140,6 +140,9 @@
     HmatchOld = findobj(imlook4d_current_handle,'Tag',tag);
     HmatchNew = findobj(newHandle,'Tag',tag);
     set( HmatchNew(1), 'State',  get( HmatchOld(1), 'State') );
+    
+    % Copy 'Save short' menu visibility
+     set(newHandles.Save_nifti_short,'Visible',get(imlook4d_current_handles.Save_nifti_short,'Visible') );   
 
  %   
  % FINALIZE
