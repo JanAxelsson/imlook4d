@@ -2381,6 +2381,15 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             end
 
             roi_number = get(handles.ROINumberMenu,'Value');
+            numberOfRois = length(handles.ROINumberMenu.String) - 1;  % Ignore  'Add ROI' menu string
+            % Bail out if not ROI
+            if (  roi_number > numberOfRois )
+                warndlg({'The ROI is not created yet ! ',...
+                            'You need to click "Add ROI" first  ',...
+                            ''});
+                return
+            end
+            
             % Bail out if locked ROI
             if ( handles.image.LockedROIs(roi_number) == 1 )
                 warndlg({'The ROI is locked! ',...
@@ -2420,7 +2429,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             guidata(hObject,handles)
             
             disp(['hObject.State = ' hObject.State]);
-            hObject.UserData
+            hObject.UserData;
         function convertPolyVoiToROI(hObject, eventdata, handles)
             roi = hObject.Parent.UserData.polygon;
             handles = convertSinglePolyToROI(handles, roi);
