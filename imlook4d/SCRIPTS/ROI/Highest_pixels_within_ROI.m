@@ -44,7 +44,8 @@ EOL = sprintf('\n');
     maxLevel=sortedPixels(N);
     
     % Threshold at 
-    INPUTS = Parameters( {'100%', num2str(maxLevel), '1', 'end'} );
+    backgroundString = '0';  % Default level 
+    INPUTS = Parameters( {'100%', num2str(maxLevel), '1', 'end', backgroundString} );
     Threshold_within_ROI
     
  

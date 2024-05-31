@@ -72,7 +72,13 @@ if ( exist( which('latest_releases.txt')  ) && ~strcmp( getImlook4dVersion(), 'D
 end
 
 %% Zip paths -- for download and extraction
-[zipFileFolder,file,ext] = fileparts(folder); % zipFileFolder = /aaa/bbb/ccc
+if contains(folder,'imlook4d')
+	% Go down one more level if imlook4d in path
+    [zipFileFolder,file,ext] = fileparts(folder); % zipFileFolder = /aaa/bbb/ccc
+else
+	% Stop going down at this level if imlook4d not in path
+    zipFileFolder = folder;
+end
 zipFilePath = [ zipFileFolder filesep 'latestImlook4d.zip']; % zipFilePath = /aaa/bbb/ccc/latestImlook4d.zip
 
 unzipFolderPath = [ zipFileFolder filesep 'latestImlook4d']; % unzipFolderPath = /aaa/bbb/ccc/latestImlook4d
@@ -141,7 +147,7 @@ b = strsplit(a,':'); % Cell array of paths
 
 % Remove old imlook4d paths
 for i = 1:length(b)
-    if ~isempty(strfind( b{i}, folder)) % Remove everything containing path to imlook4d installation
+    if ~isempty(strfind( b{i}, 'imlook4d')) % Remove everything containing path to imlook4d installation
         rmpath( b{i} );
     end
 end

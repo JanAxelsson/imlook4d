@@ -2379,17 +2379,31 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 set(hObject,'State', 'off')
                 return
             end
-            
-            % If already pressed
-            if hObject.State == 'on'
+
+            roi_number = get(handles.ROINumberMenu,'Value');
+            numberOfRois = length(handles.ROINumberMenu.String) - 1;  % Ignore  'Add ROI' menu string
+            % Bail out if not ROI
+            if (  roi_number > numberOfRois )
+                warndlg({'The ROI is not created yet ! ',...
+                            'You need to click "Add ROI" first  ',...
+                            ''});
                 return
             end
             
+            % Bail out if locked ROI
+            if ( handles.image.LockedROIs(roi_number) == 1 )
+                warndlg({'The ROI is locked! ',...
+                            'Locked ROIs can not be edited.  ',...
+                            'Unlock, or make a new ROI before making a polygon'});
+                return
+            end
+            
+
+            
             slice = round(get(handles.SliceNumSlider,'Value' ));
-            roi_number = get(handles.ROINumberMenu,'Value');
 
             pressedToggleButton( hObject);
-        
+
             % interactive polygon
             roi = drawpolygon( gca);  
 
@@ -2415,7 +2429,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             guidata(hObject,handles)
             
             disp(['hObject.State = ' hObject.State]);
-            hObject.UserData
+            hObject.UserData;
         function convertPolyVoiToROI(hObject, eventdata, handles)
             roi = hObject.Parent.UserData.polygon;
             handles = convertSinglePolyToROI(handles, roi);
@@ -2441,6 +2455,17 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 slice = roi.ContextMenu.UserData.slice;
                 roi_number = roi.ContextMenu.UserData.roi_number;
 
+                ROI2d = handles.image.ROI(:,:,slice);
+
+
+                % Make 2d matrix of locked pixels
+                lockedMatrix = zeros( size(ROI2d) ,'logical'); % Assume all locked
+                numberOfROIs = length( handles.image.LockedROIs );
+                for i=1:numberOfROIs
+                    lockedMatrix( ROI2d == i ) = handles.image.LockedROIs(i); % Pixels = 0 if locked, 1 if not locked
+                end
+
+
 
                 % Populate ROI pixels
                 if get(handles.FlipAndRotateRadioButton,'Value') 
@@ -2448,6 +2473,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 else
                     BW = poly2mask( roi.Position(:,1)', roi.Position(:,2)', sz(1),sz(2) );
                 end
+
+    
+                % Remove pixels that are locked from newROI
+                BW( lockedMatrix) = false; 
+
                 roi2D = handles.image.ROI(:,:,slice);
                 roi2D( BW ) =  roi_number; 
                 handles.image.ROI(:,:,slice) = roi2D;
@@ -4536,24 +4566,31 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                     
                     try
-                    % Select file
-                       [file,path,indx] = uigetfile( ...
+                        try
+                            currentFilePath = [handles.image.folder, filesep,  handles.image.file ];  % Used to pre-select same file.
+                        catch
+                            currentFilePath = '';  % Gets here if not opening from menu
+                        end
+
+                        % Select file
+                        [file,path,indx] = uigetfile( ...
                             {'*',  'All Files'; ...
-                           '*.roi',  'ROI files (*.roi)'; ...
-                           '*.dcm',  'DICOM files (*.dcm)'; ...
+                            '*.roi',  'ROI files (*.roi)'; ...
+                            '*.dcm',  'DICOM files (*.dcm)'; ...
                             '*.v','ECAT Files (*.v)'; ...
                             '*.img;*.hdr','Analyze Files (*.img, *.hdr)'; ...
                             '*.nii,*.img;*.hdr','Nifti Files (*.nii, *.img, *.hdr)'; ...
                             '*.nii.gz','Nifti Files (*.nii.gz)'; ...
-                           '*.mhd;*.mha',  'ITK files (*.mhd, *.mha)'; ...
-                           '*.mgh;*.mgz',  'Freesurfer files (*.mgh, *.mgz)'; ...
-                           '*.ima*','SHR files (*.ima)'; ...
-                           'SINO*','GE RAW (3D, sum ToF)'; ...
-                           'SINO*','GE RAW (4D, w ToF)'; ...
-                           '*.mat','State files (*.mat)';...
-                           '*.mat','m4 object (*.mat)'} ...
-                           ,'Select one file to open');
-                           
+                            '*.mhd;*.mha',  'ITK files (*.mhd, *.mha)'; ...
+                            '*.mgh;*.mgz',  'Freesurfer files (*.mgh, *.mgz)'; ...
+                            '*.ima*','SHR files (*.ima)'; ...
+                            'SINO*','GE RAW (3D, sum ToF)'; ...
+                            'SINO*','GE RAW (4D, w ToF)'; ...
+                            '*.mat','State files (*.mat)';...
+                            '*.mat','m4 object (*.mat)'} ...
+                            ,'Select one file to open', ...
+                            currentFilePath);
+
                         SelectedRaw3D = (indx == 11); % 'GE RAW (3D, sum ToF)'
                         SelectedRaw4D = (indx == 12); % 'GE RAW (4D, w ToF)'
                         fullPath=[path file];
