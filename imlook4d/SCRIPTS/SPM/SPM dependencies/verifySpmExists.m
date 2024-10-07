@@ -1,14 +1,13 @@
 function ok = verifySpmExists()
-    spmName = 'spm12'; % Folder name of spm main folder
+
 
     oldFolder = cd;
     
-    ok = false
+    % Check if SPM12 installed
+    ok = false;
     try
-        [dir folder ] = fileparts( parentDir( which('spm')) );
-        if contains(folder, spmName)
-            ok = true;
-        end
+        ok = strcmp('SPM12', spm('ver') );
+        disp(['[OK] -- SPM 12 exists in path  ('  fileparts( which('spm')) ')'] )
     catch
     end
    
@@ -20,7 +19,7 @@ function ok = verifySpmExists()
     %
     % From here, SPM does not exist
     %
-    dispRed( 'ERROR : SPM  is not on Matlab path');
+    dispRed( 'ERROR : SPM 12  is not on Matlab path');
     dispRed( 'Did not find spm in a folder with name "spm12"' );
     dispRed( 'You may have to download SPM and "add with subfolders" to the Matlab path');
     dispRed( ['Link to atlas: <a href="http://www.fil.ion.ucl.ac.uk/spm/software/download.html">http://www.fil.ion.ucl.ac.uk/spm/software/download.html</a>.'])
