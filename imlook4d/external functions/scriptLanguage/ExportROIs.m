@@ -158,6 +158,7 @@ function  ExportROIs( roiNumbers)
        % Assign matrix to the cell of ROI i
        % imlook4d_ROI_vectors{i}=roiPixels;
 
+            imlook4d_ROI_data.median(:,i)=median(roiPixels)';
             imlook4d_ROI_data.mean(:,i)=mean(roiPixels)';
             imlook4d_ROI_data.stdev(:,i)=std(roiPixels)';
             
@@ -277,6 +278,7 @@ function  ExportROIs( roiNumbers)
             
         % Not PVE-corrected data
         data=[ imlook4d_ROI_data.mean(frame,:),
+            imlook4d_ROI_data.median(frame,:),
             imlook4d_ROI_data.volume(:)',
             imlook4d_ROI_data.Npixels(:)',
             imlook4d_ROI_data.max(frame,:),
@@ -284,7 +286,7 @@ function  ExportROIs( roiNumbers)
             imlook4d_ROI_data.stdev(frame,:)]';
         
         
-        TAB=sprintf('\t');
+        TAB=sprintf('\t ');
         disp(' ');
         
         if (lengthLongestRoiName < length('ROI-name') )
@@ -295,9 +297,10 @@ function  ExportROIs( roiNumbers)
         if (STAT_TOOLBOX)
             if isfield(imlook4d_ROI_data,'pve')
                 % PVE-corrected
-                header = [ RoiNameString  TAB ' pvc-mean'  TAB ' mean'  TAB ' volume[cm3]' TAB ' # of pixels' TAB ' max     ' TAB ' min     ' TAB ' stdev   '  TAB ' skewness   ' TAB ' kurtosis   ' TAB ' uniformity   ' TAB ' entropy   '];
+                header = [ RoiNameString  TAB ' pvc-mean'  TAB ' mean'  TAB ' median'  TAB ' volume[cm3]' TAB ' #pixels' TAB ' max     ' TAB ' min     ' TAB ' stdev   '  TAB ' skewness   ' TAB ' kurtosis   ' TAB ' uniformity   ' TAB ' entropy   '];
                 data=[ imlook4d_ROI_data.pve(frame,:),
                     imlook4d_ROI_data.mean(frame,:),
+                    imlook4d_ROI_data.median(frame,:),
                     imlook4d_ROI_data.volume(:)',
                     imlook4d_ROI_data.Npixels(:)',
                     imlook4d_ROI_data.max(frame,:),
@@ -305,10 +308,10 @@ function  ExportROIs( roiNumbers)
                     imlook4d_ROI_data.stdev(frame,:)]';
             else
                 % Not corrected
-                header = [ RoiNameString  TAB ' mean    '  TAB ' volume[cm3]' TAB ' # of pixels' TAB ' max     ' TAB ' min     ' TAB ' stdev   '  TAB ' skewness   ' TAB ' kurtosis   ' TAB ' uniformity   ' TAB ' entropy   '];
+                header = [ RoiNameString  TAB ' mean    '  TAB ' median'  TAB ' volume[cm3]' TAB ' #pixels' TAB ' max     ' TAB ' min     ' TAB ' stdev   '  TAB ' skewness   ' TAB ' kurtosis   ' TAB ' uniformity   ' TAB ' entropy   '];
             end
         else
-            header = [ RoiNameString  TAB ' mean'  TAB ' volume[cm3]' TAB ' # of pixels' TAB  ' max     ' TAB ' min     ' TAB ' stdev   ' TAB ' uniformity   ' TAB ' entropy   ' ];
+            header = [ RoiNameString  TAB ' mean'  TAB ' median'  TAB ' volume[cm3]' TAB ' #pixels' TAB  ' max     ' TAB ' min     ' TAB ' stdev   ' TAB ' uniformity   ' TAB ' entropy   ' ];
             
         end
         %disp(header);
@@ -325,16 +328,59 @@ function  ExportROIs( roiNumbers)
         %data(1,end) = 1e-8;
 
         for i=roiNumbers
-            row = sprintf( ['%-' num2str(lengthLongestRoiName) 's\t%9.5f\t%9.5f\t%9d\t%9.5f\t%9.5f\t%9.5f\t%9.5f\t%9.5f\t%9.5f\t%9.5f\t%9.5f\t%9.5f' ],names{i},data(i,:));
+            row = sprintf( ['%-' num2str(lengthLongestRoiName) 's\t%9.5f\t%9.5f\t%9.5f\t%9d\t%9.5f\t%9.5f\t%9.5f\t%9.5f\t%9.5f\t%9.5f\t%9.5f\t%9.5f\t%9.5f' ],names{i},data(i,:));
             disp(row);
             total =[ total sprintf('\n') row ];
         end  
+        
+        % Store data table and header text
+        imlook4d_ROI_data.table.header = header; % Stored as single string
+        imlook4d_ROI_data.table.data = data; % Stored as matrix
+        
         disp('--------------');
         %disp(total)
         clipboard ( 'copy', total );
 
         disp(['Pixel dimensions=(' num2str(dX) ', ' num2str(dY) ', ' num2str(dZ) ') [mm]']);
+
+%
+% Additionally, single line output
+%
+
+    roiNames = imlook4d_ROI_data.names;
+    headerFields = strsplit(header) ;  % {'ROI-name'}    {'mean'}    {'median'}    {'volume[cm3]'}    {'#pixels'}    {'max'}    {'min'}    {'stdev'}    {'skewness'}    {'kurtosis'}    {'uniformity'}    {'entropy'}
+    columns = [ 2 3 8 4 6 7]; % mean median stdev volume max min
     
+    % Single line header
+    total = '';
+    for i = 1 : length(roiNames)
+        for j = columns
+            compositeName = [ roiNames{i} ' - ' headerFields{j} ];
+            total = [total sprintf('%s\t', compositeName)];
+        end
+    end
+    imlook4d_ROI_data.singleLineOutput.header = total;
+
+    % Single line data
+    total = '';
+    for i = 1 : length(roiNames)
+        for j = columns
+            value = data(i,j);
+            total = [total sprintf('%9.5f\t', value)];
+        end
+    end
+    imlook4d_ROI_data.singleLineOutput.data = total;
+
+    % Make clickable to get single-line output
+    disp(' ');
+    disp([...
+        'TABLE is in clipboard.     ' ...
+        'Click to copy all ROIs to clipboard as single line :    ' ...
+        '<a href="matlab:disp(imlook4d_ROI_data.singleLineOutput.header); clipboard( ''copy'', imlook4d_ROI_data.singleLineOutput.header )">header</a>' ...
+        '     ' ...
+        '<a href="matlab:disp(imlook4d_ROI_data.singleLineOutput.data); clipboard( ''copy'', imlook4d_ROI_data.singleLineOutput.data )">data only</a>' ...
+    ]);
+    disp(' ');
     
     %ClearVariables
    assignin('base', 'imlook4d_ROI_data', imlook4d_ROI_data);

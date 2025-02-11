@@ -7,7 +7,7 @@
 % Initialize
 StoreVariables
 Export
-%ROI_data_to_workspace
+ROI_data_to_workspace
 
 
 % Get user input
@@ -75,7 +75,7 @@ data =oneFrame(imlook4d_ROI==imlook4d_ROI_number);
     if ( size(imlook4d_Cdata,4) > 1 )
         titleText = [ titleText '  (frame ' num2str(imlook4d_frame) ')'];
     end
-    title( titleText);
+    title( titleText,'Interpreter','none');
 
 % Set x-axis limits
     g = gcf;

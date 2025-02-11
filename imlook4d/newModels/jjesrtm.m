@@ -67,7 +67,7 @@ function out =  jjesrtm( matrix, t, dt, Cr, Frame0)
     
     Ct = reshape( matrix, n, [] ) ;  % [  pixels frames ]
     
-    % TODO: Is this closer to Jarkkos ?
+    % Midtime intensities 
     Ct  = [Ct(:,1)/2, (Ct(:,2:end)+Ct(:,1:end-1))/2];
     Cr  = [Cr(:,1)/2, (Cr(:,2:end)+Cr(:,1:end-1))/2];
     
@@ -112,7 +112,9 @@ function out =  jjesrtm( matrix, t, dt, Cr, Frame0)
     %     | k2a |  
     %     | k2b |
     
-    N = length(Ct); % Number of frames
+    %N = length(Ct); % Number of frames
+    sc = size(Ct); % Number of frames
+    N = sc(end);
     rangePreT0 = 1 : Frame0-1;
     rangePastT0 = Frame0 : N;
 
@@ -145,9 +147,15 @@ function out =  jjesrtm( matrix, t, dt, Cr, Frame0)
             %[X se mse]   = lscov(A,Ct(i,:)'); 
             %X = A\Ct(i,:)';  % Faster!
         
-        % Faster!
+        
         if ( rank(A) == 4)
-            X = A\Ct(i,:)';  
+            % Faster!
+            %X = A\Ct(i,:)';  
+            
+            % Weighted fit 
+            estimated_variance = (Ct(i,:) .* dt ) + 1; % Variance scales with number of counts in frame (Poisson). 1 to avoid divide by zero
+            w = 1 ./ estimated_variance;
+            [X se mse]   = lscov(A,Ct(i,:)', w'); 
         else
             X = [0; 0; 0; 0];
         end
