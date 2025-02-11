@@ -7,19 +7,45 @@
 	This script writes the ROI statistics to the MATLAB command window, as in below example :<BR>
 
 <pre>
-<b>ROI-name	 mean    	 volume[cm3]	 # of pixels	 max     	 min     	 stdev   	 skewness   	 kurtosis   	 uniformity   	 entropy   </b>
-ROI 1   	1717837.26684	  0.01152	      180	3478393.25000	276784.25000	812743.66662	  0.08337	  2.19396	  0.01377	  6.36375	
-ROI 2   	1076171.76014	  0.01222	      191	1565690.12500	612781.06250	217538.67213	  0.09248	  2.22306	  0.01417	  6.31409	
-ROI 3   	323231.31771	  0.00710	      111	527404.81250	209309.48438	70463.09765	  0.70378	  2.85509	  0.01956	  5.81871	
+<b>ROI-name	  mean    	  median	  volume[cm3]	  #pixels	  max     	  min     	  stdev   	  skewness   	  kurtosis   	  uniformity   	  entropy   </b>
+ROI 1   	925.77220	928.00000	  0.08868	     1453	1111.00000	709.00000	 55.97754	 -0.21088	  3.44840	  0.01712	  6.11822	
+ROI 2   	2738.53213	3071.00000	  0.03040	      498	3071.00000	-471.00000	811.06522	 -2.33058	  7.03326	  0.67848	  1.68065	
+ROI 3   	-967.88095	-978.00000	  0.07947	     1302	-425.00000	-1000.00000	 48.21608	  5.77775	 46.54898	  0.07579	  4.07233
+--------------
+Pixel dimensions=(0.3125, 0.3125, 0.625) [mm]
+ 
+TABLE is in clipboard.     Copy important data to clipboard as single line :    <a  href="#" onclick="return false;">header</a>       <a  href="#" onclick="return false;">data only</a>
 </pre>
 
-    This table is automatically copied into the system clipboard, so it can be directly pasted into (for instance) Excel or Libre Office Calc.
 
-	</P>
-
+</P>
 	<P> 
 For a dynamic scan, the table displays the data for the currently selected frame.
 	</P>
+
+
+    This table is automatically copied into the system clipboard, so it can be directly pasted into (for instance) Excel or Libre Office Calc.
+
+	</P><BR>
+
+
+
+	<P> 
+        The table data for multiple ROIs can be merged to a single line, useful to copy into Excel.  Then only the fields mean, median, stdev, volume, max, min are copied.
+
+
+	</P><P>         
+    Clicking the link '<a  href="#" onclick="return false;">header</a>' gives output 
+        <pre> ROI 1 - mean	ROI 1 - median	ROI 1 - stdev	ROI 1 - volume[cm3]	ROI 1 - max	ROI 1 - min	ROI 2 - mean	ROI 2 - median	ROI 2 - stdev	ROI 2 - volume[cm3]	ROI 2 - max	ROI 2 - min	ROI 3 - mean	ROI 3 - median	ROI 3 - stdev	ROI 3 - volume[cm3]	ROI 3 - max	ROI 3 - min	</pre>
+        and copies the headers describing multiple ROIs to the clipboard.  Usful to paste into a single row in Excel
+<BR><BR><BR>
+
+
+        Clicking the link '<a  href="#" onclick="return false;">data only</a>' gives output 
+        <pre> 928.00000	  0.08868	 -0.21088	1453.00000	709.00000	 55.97754	3071.00000	  0.03040	 -2.33058	498.00000	-471.00000	811.06522	-978.00000	  0.07947	  5.77775	1302.00000	-1000.00000	 48.21608	</pre>
+        and copies the data for multiple ROIs to the clipboard.  Usful to paste into a single row in Excel
+	</P>
+
 
 
 <h2>Advanced use (for programmers)</h2>
