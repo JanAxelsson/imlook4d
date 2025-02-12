@@ -349,7 +349,8 @@ function  ExportROIs( roiNumbers)
 
     roiNames = imlook4d_ROI_data.names;
     headerFields = strsplit(header) ;  % {'ROI-name'}    {'mean'}    {'median'}    {'volume[cm3]'}    {'#pixels'}    {'max'}    {'min'}    {'stdev'}    {'skewness'}    {'kurtosis'}    {'uniformity'}    {'entropy'}
-    columns = [ 2 3 8 4 6 7]; % mean median stdev volume max min
+    headerFields = {headerFields{1,2:end}};  % {'mean'}    {'median'}    {'volume[cm3]'}    {'#pixels'}    {'max'}    {'min'}    {'stdev'}    {'skewness'}    {'kurtosis'}
+    columns = [ 1 2 7 3 5 6]; % mean median stdev volume max min 
     
     % Single line header
     total = '';
