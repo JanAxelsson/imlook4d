@@ -354,8 +354,9 @@ function  ExportROIs( roiNumbers)
     
     % Single line header
     total = '';
-    for i = 1 : length(roiNames)
-        for j = columns
+    
+    for j = columns
+        for i = 1 : length(roiNames)
             compositeName = [ roiNames{i} ' - ' headerFields{j} ];
             total = [total sprintf('%s\t', compositeName)];
         end
@@ -364,8 +365,8 @@ function  ExportROIs( roiNumbers)
 
     % Single line data
     total = '';
-    for i = 1 : length(roiNames)
-        for j = columns
+    for j = columns
+        for i = 1 : length(roiNames)
             value = data(i,j);
             total = [total sprintf('%9.5f\t', value)];
         end
