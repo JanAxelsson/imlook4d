@@ -26,8 +26,8 @@ head 'imlook4d/latest_releases.txt'
 
 git add .
 git commit -m "Release created tag = $rev"
-git push  
+git -c "credential.usehttppath=true" push # To make sure git credential helper outputs correct user
 
-
-read -n 1 -s -r -p "DONE!  (Press any key to quit!)"
+echo ' '
+read -n 1 -s -r -p "DONE!  (Press any key to quit!) $(echo $'\n\b') "
 exit
