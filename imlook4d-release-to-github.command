@@ -1,4 +1,4 @@
-#!/usr/bin/env bash    -x
+#!/usr/bin/env bash   # -x
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" # script's directory
 
@@ -26,7 +26,7 @@ head 'imlook4d/latest_releases.txt'
 
 git add .
 git commit -m "Release created tag = $rev"
-git -c "credential.usehttppath=true" push  
+git -c "credential.usehttppath=true" push # To make sure git credential helper outputs correct user
 
 
 read -n 1 -s -r -p "DONE!  (Press any key to quit!)"
