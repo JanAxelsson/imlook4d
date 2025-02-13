@@ -29,5 +29,5 @@ git commit -m "Release created tag = $rev"
 git -c "credential.usehttppath=true" push # To make sure git credential helper outputs correct user
 
 
-read -n 1 -s -r -p "DONE!  (Press any key to quit!)"
+read -n 1 -s -r -p "DONE!  (Press any key to quit!)$'\n'"
 exit
