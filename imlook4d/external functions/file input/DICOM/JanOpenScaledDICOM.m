@@ -419,7 +419,8 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
 
                 %
                 % Read matrix
-                %                
+                %             
+                %USE_IMAGING_TOOLBOX = true;
                 
                 if  (headerSize>0) % Ignore really small files
                   
