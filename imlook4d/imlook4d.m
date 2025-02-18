@@ -4575,6 +4575,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         % Select file
                         [file,path,indx] = uigetfile( ...
                             {'*',  'All Files'; ...
+                            '*',  'DICOM imaging toolbox'; ...
                             '*.roi',  'ROI files (*.roi)'; ...
                             '*.dcm',  'DICOM files (*.dcm)'; ...
                             '*.v','ECAT Files (*.v)'; ...
@@ -4590,6 +4591,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             '*.mat','m4 object (*.mat)'} ...
                             ,'Select one file to open', ...
                             currentFilePath);
+
+                        DicomWithToolbox = (indx == 2); % 'Force DICOM using Imaging Toolbox'
 
                         SelectedRaw3D = (indx == 11); % 'GE RAW (3D, sum ToF)'
                         SelectedRaw4D = (indx == 12); % 'GE RAW (4D, w ToF)'
@@ -4740,6 +4743,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         tempHeader= fread(fid, 132);                     % Binary header in memory  
                         fclose(fid);
                         if strcmp(char(tempHeader(129:132))', 'DICM')  FILETYPE='DICOM';end
+                        if (DicomWithToolbox) FILETYPE='DICOM_TOOLBOX';end
 
                     % Test if HERMES (taken from CD cache)
                         if( strcmp(FILETYPE,'UNKNOWN'))
@@ -4816,6 +4820,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     if( strcmp(FILETYPE,'MATLAB'))  LocalOpenMat(hObject, eventdata, handles, file,path);end
                     if( strcmp(FILETYPE,'SHR'))     LocalOpenSHR(hObject, eventdata, handles, file,path);end
                     if( strcmp(FILETYPE,'DICOM'))   LocalOpenDirtyDICOM3(hObject, eventdata, handles, file,path);end
+                    if( strcmp(FILETYPE,'DICOM_TOOLBOX'))   LocalOpenDirtyDICOM3(hObject, eventdata, handles, file,path, true);end
                     if( strcmp(FILETYPE,'DICOMDIR')) LocalOpenDICOMDIR(hObject, eventdata, handles, file,path);end
                     if( strcmp(FILETYPE,'BINARY'))  LocalOpenBinary(hObject, eventdata, handles, file,path,'BINARY');end                    
                     if( strcmp(FILETYPE,'ITK'))     LocalOpenBinary(hObject, eventdata, handles, file,path,'ITK' );end                   
@@ -5774,11 +5779,24 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                         % Save guidata
                         guidata(h, newhandles);
-            function h=LocalOpenDirtyDICOM3(hObject, eventdata, handles, file,directoryPath)
-                % This function is a new version which relies on new external
-                % functions
+            function h=LocalOpenDirtyDICOM3(hObject, eventdata, handles, file,directoryPath, optionalArgumentForceToolbox)
+                % This function is a new version which relies on new
+                % external functions
+                %
+                % optionalArgumentForceToolbox --  is optional parameter
+                % (true means openening with imaging toolbox if exists)
+
                     selectedFile=file;
 
+
+                    % Force reading dicom with imaging toolbox?
+                    if ~exist('optionalArgumentForceToolbox','var')
+                        % parameter does not exist, so default it to something
+                        FORCE_OPEN_WITH_IMAGING_TOOLBOX = false;
+                    else
+                        FORCE_OPEN_WITH_IMAGING_TOOLBOX = optionalArgumentForceToolbox;
+                    end
+                
 
                 %
                 % Select files
@@ -5801,8 +5819,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 %
                 % Open scaled image
                 %
+
                     try
-                        [outputMatrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, selectedFile);
+                        [outputMatrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, selectedFile, FORCE_OPEN_WITH_IMAGING_TOOLBOX);
                     catch
                         disp('imlook4d ERROR: Failed opening images (when calling JanOpenScaledDICOM) ');
                         disp(lasterr)
@@ -5932,7 +5951,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                         % Open selected series
                         try
-                            [outputMatrix, outputStruct]=JanOpenScaledDICOM(directoryPath, newFileNames, selectedFile);
+                            [outputMatrix, outputStruct]=JanOpenScaledDICOM(directoryPath, newFileNames, selectedFile, FORCE_OPEN_WITH_IMAGING_TOOLBOX);
                         catch
                             disp('imlook4d ERROR: Failed opening images');
                         end

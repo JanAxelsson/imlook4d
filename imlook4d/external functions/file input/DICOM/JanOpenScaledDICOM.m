@@ -1,4 +1,4 @@
-function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, selectedFile)
+function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, selectedFile, optionalArgumentForceToolbox)
 % JAN Added input fileNames which is a cell array of paths relative
 % directoryPath
 %
@@ -12,10 +12,15 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
 %     Comments: For a multi-slice DICOM file, some tricks have been employed, to keep the structure.
 %               The header and file name is duplicated in all slices (same filename for all slices).
 %
-%     Input:        directoryPath   path to base directory
-%                   fileNames       struct where fileNames.name is the file name
-%                                   struct where fileNames.bytes is the file size
-%                   selectedFile    file name of selected file
+%     Input:        directoryPath                   path to base directory
+%
+%                   fileNames                       struct where fileNames.name is the file name
+%                                                   struct where fileNames.bytes is the file size
+%
+%                   selectedFile                    file name of selected file
+%
+%                   optionalArgumentForceToolbox    if set to true, forceusing imaging toolbox dicom reader.
+%                                                   If non-existing, use imlook4d dicom reader
 %                                 
 %                                 
 %     Output:       struct  
@@ -34,6 +39,16 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
     
     % Imaging toolbox ?
     IMAGING_TOOLBOX = exist('dicomread');
+
+    % Force reading dicom with imaging toolbox?
+    if ~exist('optionalArgumentForceToolbox','var')
+        % parameter does not exist, so default it to something
+        FORCE_USE_IMAGING_TOOLBOX = false;
+    else
+        FORCE_USE_IMAGING_TOOLBOX = optionalArgumentForceToolbox;
+    end
+
+
 %
 % PROBE first selected file
 %
@@ -145,7 +160,11 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                     explanation='(Little endian, explicit)';
                     
                 end                
-                USE_IMAGING_TOOLBOX = (~supportedTransferSyntaxFlag) && IMAGING_TOOLBOX;                   
+                USE_IMAGING_TOOLBOX = (~supportedTransferSyntaxFlag) && IMAGING_TOOLBOX;   
+                % Override if FORCE_USE_IMAGING_TOOLBOX is set
+                if (FORCE_USE_IMAGING_TOOLBOX && IMAGING_TOOLBOX)
+                    USE_IMAGING_TOOLBOX = true;
+                end
                 disp(['Transfer syntax UID=' foundTransferSyntaxUID ' ' explanation]); 
               
             %
@@ -420,7 +439,6 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                 %
                 % Read matrix
                 %             
-                %USE_IMAGING_TOOLBOX = true;
                 
                 if  (headerSize>0) % Ignore really small files
                   

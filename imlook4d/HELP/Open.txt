@@ -68,11 +68,19 @@
 
 <B>2. DICOM opening  - supported formats</B>
 <!---------------------------------------->
-    <P>Non-compressed little-endian DICOM files are supported using basic Matlab. 
-    </P><P>Compressed formats supported by Matlab Imaging Toolbox are opened, if Imaging Toolbox is installed </P>  
+    <P>Non-compressed little-endian DICOM files are supported using basic Matlab. </P>
+    <P>Compressed formats supported by Matlab Imaging Toolbox are opened, if Imaging Toolbox is installed </P> 
 
-	
-<B>3. DICOM opening  - how it works</B>
+
+<B>3. DICOM opening  - force using imaging toolbox</B>
+<!---------------------------------------->
+ 
+    <P> The Matlab imaging toolbox dicomreader can be forced, in the opening dialog.  
+        This is done by selecting the drop-down option 'DICOM imaging toolbox' in the opening dialog.
+        This is beneficial if the imlook4d default reader does not work.  This is known to happen for certain compression formats, or for for color images such as for instance ultrasound.
+    </P>
+
+<B>4. DICOM opening  - how it works</B>
 <!---------------------------------------->
 	<P>
 
