@@ -4528,6 +4528,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             % Make these state variables defined (in case try-catch error)
             SelectedRaw3D = false;
             SelectedRaw4D = false;
+            DicomWithToolbox = false;
             
             % Administrative tasks figuring out if fileDialog is asked for by Menu/Open
             openWithDialog = isempty(varargin);  
