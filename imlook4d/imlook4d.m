@@ -938,6 +938,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
            try
                if ( checkForNewVersion() )
                    handles.updateNeededText.String = 'New version - click menu Help/Update' ;
+                   handles.updateNeededText.Visible = 1;
                end
            catch
                
