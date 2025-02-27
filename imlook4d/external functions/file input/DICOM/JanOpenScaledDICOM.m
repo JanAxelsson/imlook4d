@@ -552,7 +552,25 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
 
         end
         
-        matrix=matrix(:,:,1:count);    
+        matrix=matrix(:,:,1:count);  
+        
+        % If color image, make intensity (assume RGB)
+        if (numberOfsamplesPerPixel > 1)
+            R = single( matrix( :, :, 1:3:count) );
+            G = single( matrix( :, :, 2:3:count) );
+            B = single( matrix( :, :, 3:3:count) );
+            intensity = (R + G + B) / 3;
+            matrix = intensity;
+            for i = 1 : count/3
+                
+            end
+            
+            tempHeader = cell(1,count/3)
+            for i = 1:count/3
+                tempHeader{i} = header{ 1 + (i-1) * 3 };
+            end
+            header = tempHeader;
+        end
         
 % 
 % Scale data
