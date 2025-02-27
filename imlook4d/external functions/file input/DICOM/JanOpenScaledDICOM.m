@@ -391,7 +391,7 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                     out3=dirtyDICOMHeaderData(headers, 1, '0028', '0002',mode);  % samples per pixel
                     numberOfsamplesPerPixel=out3.bytes(1)+256*out3.bytes(2);
                     
-                    out3=dirtyDICOMHeaderData(headers, 1, '0028', '0004',mode, 100);  % Photometric Representation, last occurance (100 is a too large value, so reports last)
+                    out3=dirtyDICOMHeaderData(headers, 1, '0028', '0004',mode);  % Photometric Representation
                     
                     if ( (numberOfsamplesPerPixel == 3) && IMAGING_TOOLBOX )
                         USE_IMAGING_TOOLBOX = true;
