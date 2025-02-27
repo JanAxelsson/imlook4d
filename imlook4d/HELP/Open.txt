@@ -70,6 +70,8 @@
 <!---------------------------------------->
     <P>Non-compressed little-endian DICOM files are supported using basic Matlab. </P>
     <P>Compressed formats supported by Matlab Imaging Toolbox are opened, if Imaging Toolbox is installed </P> 
+    <P>Color images (Typically UltraSound stored in RGB or Y'CrCb) are read by Matlab Imaging Toolbox, if Imaging Toolbox is installed.
+        Every third image will be the same color representation (for instance "R", or "Y' ").  For Y'CrCb images, the Y' (first, fourth, .. image) are intensity image</P>
 
 
 <B>3. DICOM opening  - force using imaging toolbox</B>

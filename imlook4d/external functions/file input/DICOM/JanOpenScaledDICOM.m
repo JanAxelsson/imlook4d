@@ -262,7 +262,7 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                     out3=dirtyDICOMHeaderData(headers, 1, '0010', '0010',mode);
                         disp(['Patient name=' out3.string]);
                         imlook4dWindowTitle=out3.string;
-                    out3=dirtyDICOMHeaderData(headers, 1, '0010', '0020',mode);
+                    out3=dirtyDICOMHeaderData(headers, 1, '0010', '0020',mode);0
                         disp(['Patient id=' out3.string]);
                         %imlook4dWindowTitle=[imlook4dWindowTitle '(' out3.string ')'];
 
@@ -386,6 +386,21 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                         end                        
                     end
                     signed=( (out3.bytes(1)+256*out3.bytes(2))==0 );
+                    
+               % Number of samples per pixel (Color is 3, otherwise 1)
+                    out3=dirtyDICOMHeaderData(headers, 1, '0028', '0002',mode);  % samples per pixel
+                    numberOfsamplesPerPixel=out3.bytes(1)+256*out3.bytes(2);
+                    
+                    out3=dirtyDICOMHeaderData(headers, 1, '0028', '0004',mode, 100);  % Photometric Representation, last occurance (100 is a too large value, so reports last)
+                    
+                    if ( (numberOfsamplesPerPixel == 3) && IMAGING_TOOLBOX )
+                        USE_IMAGING_TOOLBOX = true;
+                        disp('Force using imaging toolbox, because 3 numberOfsamplesPerPixel');
+                        disp('Every third pixel is the same color space');
+                        disp(['Photometric representation = '  out3.string ]);
+                        disp('---------------------------------------');
+                    end
+                    
                     
 
                 
