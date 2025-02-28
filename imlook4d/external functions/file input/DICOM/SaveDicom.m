@@ -345,7 +345,7 @@
                             % This function reuses file names (good for traceability)
 
                             %Dirty_Write_DICOM(matrix, headers(1:iNumberOfSelectedFiles), fileNames(1:iNumberOfSelectedFiles), ByteOrder);
-                            Dirty_Write_DICOM(matrix, headers(1:iNumberOfSelectedFiles), newFileNames(1:iNumberOfSelectedFiles), ByteOrder);
+                            Dirty_Write_DICOM(matrix, headers(1:iNumberOfSelectedFiles), newFileNames(1:iNumberOfSelectedFiles), ByteOrder, handles.image.dirtyDICOMMode);
 
                         % Clean up
                             cd('..');   % Move out of DICOM directory

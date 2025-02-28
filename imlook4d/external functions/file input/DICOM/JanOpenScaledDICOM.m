@@ -262,7 +262,7 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                     out3=dirtyDICOMHeaderData(headers, 1, '0010', '0010',mode);
                         disp(['Patient name=' out3.string]);
                         imlook4dWindowTitle=out3.string;
-                    out3=dirtyDICOMHeaderData(headers, 1, '0010', '0020',mode);0
+                    out3=dirtyDICOMHeaderData(headers, 1, '0010', '0020',mode);
                         disp(['Patient id=' out3.string]);
                         %imlook4dWindowTitle=[imlook4dWindowTitle '(' out3.string ')'];
 
@@ -369,8 +369,9 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                     numberOfBytesPerPixel=numberOfBitsStored/8;
                     
                 % Number format
-                    out3=dirtyDICOMHeaderData(headers, 1, '0028', '0103',mode);  % Pixel Representation 
-                    if (out3.bytes(1)+256*out3.bytes(2))==0  % 0 means unsigned
+                    out3=dirtyDICOMHeaderData(headers, 1, '0028', '0103',mode);  % Pixel Representation
+                    signed=( (out3.bytes(1)+256*out3.bytes(2))==0 ); 
+                    if (signed)  % 0 means unsigned
                         if (numberOfBytesPerPixel==1)
                             numberFormat='uint8';
                         end
@@ -385,7 +386,6 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                             numberFormat='int16';
                         end                        
                     end
-                    signed=( (out3.bytes(1)+256*out3.bytes(2))==0 );
                     
                % Number of samples per pixel (Color is 3, otherwise 1)
                     out3=dirtyDICOMHeaderData(headers, 1, '0028', '0002',mode);  % samples per pixel
@@ -555,15 +555,12 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
         matrix=matrix(:,:,1:count);  
         
         % If color image, make intensity (assume RGB)
-        if (numberOfsamplesPerPixel > 1)
+        if (numberOfsamplesPerPixel == 3)
             R = single( matrix( :, :, 1:3:count) );
             G = single( matrix( :, :, 2:3:count) );
             B = single( matrix( :, :, 3:3:count) );
             intensity = (R + G + B) / 3;
             matrix = intensity;
-            for i = 1 : count/3
-                
-            end
             
             tempHeader = cell(1,count/3)
             for i = 1:count/3

@@ -6217,6 +6217,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     
                     newhandles.image.sliceLocations=sliceLocations;
                     newhandles.image.DICOMsortedIndexList=outputStruct.dirtyDICOMsortedIndexList;
+                 
                     
                     try
                         unit=dirtyDICOMHeaderData(headers, 1, '0054', '1001' ,mode); % Unit
@@ -6859,6 +6860,18 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             fileNames=handles.image.dirtyDICOMFileNames;
                             %indecesToScaleFactor=handles.image.dirtyDICOMIndecesToScaleFactor;
                             mode=handles.image.dirtyDICOMMode;
+                            
+                            
+%                        % Intensity image from color (ultrasound is typical case where header is marked as color)
+                            out3=dirtyDICOMHeaderData(headers, 1, '0028', '0002',mode);  % samples per pixel
+                            numberOfsamplesPerPixel=out3.bytes(1)+256*out3.bytes(2);
+                            
+                            if (numberOfsamplesPerPixel == 3)
+                                for i = 1: length(headers)
+                                    headers{i}=dirtyDICOMModifyHeaderUS(headers{i}, '0028', '0002',mode, 1); % 
+                                end
+                            end
+
 
                         % USER INPUT:  Modify Patient ID, Patient Name, Series Description
 
@@ -7052,8 +7065,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                      headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0008', '0060',mode, modalityString); % ImageType
 
                                      % Change image properties
-                                     headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0008', '0008',mode, 'DERIVED\SECONDARY'); % ImageType
-                                     headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0008' ,'2111',mode, 'imlook4d - not for clinical use'); % Derivation Description
+                                     % headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0008', '0008',mode, 'DERIVED\SECONDARY'); % ImageType
+                                     % headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0008' ,'2111',mode, 'imlook4d - not for clinical use'); % Derivation Description
 
 
                                  % Set scale factors (Fails if scale factor not existing)
@@ -7091,7 +7104,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                                 % Pixel representation (Make it signed) 
                                 try
-                                    headers{i}=dirtyDICOMModifyHeaderUS(headers{i}, '0028', '0103',mode, 1); % Make signed (0=unsigned)
+                                    headers{i}=dirtyDICOMModifyHeaderUS(headers{i}, '0028', '0103',mode, 0); % Make signed (0=unsigned)
                                 catch
                                 end
 
@@ -7266,7 +7279,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                                % Set value length for image (7FE0,0010)
                                i=1;
-                               headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '7FE0', '0010',mode, num2str(length(matrix)*2 )); % New valuelength for image
+                               headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '7FE0', '0010',mode, num2str(length(matrix)*1 )); % New valuelength for image
                             end
                             
                         % Set Transfer Syntax UID
@@ -7287,7 +7300,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             % This function reuses file names (good for traceability)
 
                             %Dirty_Write_DICOM(matrix, headers(1:iNumberOfSelectedFiles), fileNames(1:iNumberOfSelectedFiles), ByteOrder);
-                            Dirty_Write_DICOM(matrix, headers(1:iNumberOfSelectedFiles), newFileNames(1:iNumberOfSelectedFiles), ByteOrder);
+                            Dirty_Write_DICOM(matrix, headers(1:iNumberOfSelectedFiles), newFileNames(1:iNumberOfSelectedFiles), ByteOrder, handles.image.dirtyDICOMMode);
 
                         % Change data folder for this imlook4d instance
                             cd(newPath);
