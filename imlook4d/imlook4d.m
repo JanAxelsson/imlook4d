@@ -4673,6 +4673,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                     set(newHandles.SliceNumSlider,'Value',GuiSettings.slice);
                                     set(newHandles.SliceNumEdit,'String',num2str(GuiSettings.slice) );
                                     
+                                    set(newHandles.figure1,'Name',GuiSettings.windowTitle );
+                                    
                                     set(newHandles.FrameNumSlider,'Value',GuiSettings.frame);
                                     set(newHandles.FrameNumEdit,'String',num2str(GuiSettings.frame) );
                                     
@@ -7847,6 +7849,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     GuiSettings.slice=round(get(handles.SliceNumSlider,'Value'));
                     GuiSettings.frame=round(get(handles.FrameNumSlider,'Value'));
                     GuiSettings.selectedROI=get(handles.ROINumberMenu,'Value');
+                    GuiSettings.windowTitle = handles.figure1.Name;
                     
                     
                     % Save Measures
