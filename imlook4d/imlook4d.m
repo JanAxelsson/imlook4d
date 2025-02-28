@@ -2002,13 +2002,17 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              disp('Pressed cdPushButton');
              
              try
-                disp([ 'File type = '  handles.image.fileType] ); 
+                disp([ '  File type = '  handles.image.fileType] ); 
              catch
              end
 
              try
-                disp([ 'Changing Matlab workspace directory to  "' handles.image.folder '"' ]); 
+                clipboard('copy', ['''' handles.image.folder handles.image.file '''']);
+
+                disp([ '  Changing Matlab workspace directory to  "' handles.image.folder '"' ]); 
                 cd( handles.image.folder )
+
+                disp('File path copied to system clipboard')
              catch
                 disp([ 'Failed changing Matlab workspace directory to  "' handles.image.folder '"' ]); 
 
