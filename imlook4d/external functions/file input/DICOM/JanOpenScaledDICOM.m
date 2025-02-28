@@ -567,6 +567,20 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                 tempHeader{i} = header{ 1 + (i-1) * 3 };
             end
             header = tempHeader;
+
+
+            % Also make a preview of first image in color scale 
+            try
+                r =  uint8( rot90( fliplr( R(:,:,1) )));
+                g =  uint8( rot90( fliplr( G(:,:,1) )));
+                b =  uint8( rot90( fliplr( B(:,:,1) )));
+                I = cat(3, r, g, b);
+                figure('Name', ['Color preview -- ' selectedFile]);
+                image(I);
+            catch
+            end
+
+
         end
         
 % 
