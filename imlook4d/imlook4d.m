@@ -7502,7 +7502,61 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             catch
                 disp(['imlook4d/Savemat_Callback:ERROR Save Data was not completed']);
             end  
-            
+    
+    % Save All Windows + Layout to folder
+    function SaveWindows_Callback(hObject, eventdata, handles)
+         % Display HELP and get out of callback
+             if DisplayHelp(hObject, eventdata, handles) 
+                 return 
+             end
+    
+        % Get folder name
+            newPath=java_uigetdir( pwd(),'Select/create directory to save files to'); % Use java directory open dialog (nicer than windows)
+            if newPath == 0
+                disp('Cancelled by user');
+                return
+            end
+    
+        % Make directory if not existing
+            fn = fullfile(newPath);
+            if ~exist(fn, 'dir')
+                disp(['Make directory = ' newPath ]);
+                mkdir(fn);
+            end
+        
+            try
+                cd(newPath);                                    % Go to selected directory
+            catch
+                try
+                    mkdir(newPath);
+                catch
+                    error(['imlook4d ERROR - failed creating directory' newPath]);
+                end
+            end
+
+
+        % Save all windows to folder
+            g=findobj('Type', 'figure');
+            w = waitbar(0, 'Starting');
+            n = length(g);
+            for i=1:n
+                % Save only figures and imlook4d instances
+                if ( strcmp( get(g(i),'Tag'), 'imlook4d' ) || strcmp( get(g(i),'Tag'), '' ) )
+                     try
+                         filename = [ g(i).Name '.fig'];
+                         disp( ['Saving ' filename ]);
+                         waitbar(i/n, w, ['Saving ' filename ] );
+    
+                         %
+                         savefig( g(i), filename )
+    
+                     catch EXCEPTION
+                        dispRed( ['Failed saving ' filename ]);
+                     end
+                end
+            end   
+            close(w)
+
     % Load ROI
         function LoadRoiPushbutton_Callback(hObject, eventdata, handles, fullPath)
             % Display HELP and get out of callback
