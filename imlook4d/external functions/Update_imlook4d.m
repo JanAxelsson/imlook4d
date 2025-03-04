@@ -136,7 +136,7 @@ if ~exist(newFolderName, 'dir')
     % Change name of folder
     [parentFolder,name,ext] = fileparts(unzipFolderPath);
     disp( [ 'Installing to folder = ' newFolderName ]);
-    movefile( unzipFolderPath, newFolderName);
+    movefile( unzipFolderPath, newFolderName, 'f');
     
 else
     disp( [ 'The latest version already on disk, no need to download again = ' newFolderName]);
