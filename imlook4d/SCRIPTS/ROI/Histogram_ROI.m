@@ -22,8 +22,7 @@ numlines=1;
 
 defaultanswer = RetriveEarlierValues('HistogramROI', {'20', 'min', 'max' } ); % Read default if exists, or apply these as default
 answer=inputdlg(prompt,titleString,numlines,defaultanswer);
-
-
+StoreValues('HistogramROI', answer ); % Store answer as new dialog default
 
 if isempty(answer)  % cancelled inputdlg and clean up
     ClearVariables
@@ -162,6 +161,5 @@ data =oneFrame(imlook4d_ROI==imlook4d_ROI_number);
     set(gcf,'Name', windowTitle) % set window title
 
 
-    StoreValues('HistogramROI', answer ); % Store answer as new dialog default
     ClearVariables    
 
