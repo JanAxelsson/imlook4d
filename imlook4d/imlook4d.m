@@ -936,9 +936,46 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
            imlook4d_set_defaults(hObject, eventdata, handles);
            
            try
-               if ( checkForNewVersion() )
-                   handles.updateNeededText.String = 'New version - click menu Help/Update' ;
-                   handles.updateNeededText.Visible = 1;
+               if isempty( getappdata(0, 'doNotUpdateImlook4dThisSession') ) % Check if stored opt out answer 
+
+                   % Here because: have not opted out for update during
+                   % this session !
+
+                   if ( checkForNewVersion() )
+
+                       handles.updateNeededText.String = 'New version - click menu Help/Update' ;
+                       handles.updateNeededText.Visible = 1;
+                   
+                       % show update dialog
+                       answer = questdlg('There is a later version of imlook4d.  Do you want to upgrade ? ', ...
+                           'Upgrade imlook4d ?', ...
+                           'Yes','Not this session', ...
+                           'Yes');
+                       
+                       % Handle response
+                       switch answer
+                           case 'Not this session'
+                               setappdata(0, 'doNotUpdateImlook4dThisSession', true);  % Remember 'No' answer, this session (signalled by existence of variable 'doNotUpdateImlook4dThisSession'
+                               dispRed(' You will wait to upgrade.  This dialog will show next time you start matlab');
+
+                           case 'Yes'
+                               dispRed('Upgrade started :');
+                               evalin( 'base', 'Update_imlook4d')
+                               dispRed('--> Next imlook4d window will be opened in the new version. <--');
+                               dispRed(' ');
+                               msgbox({ '' 'Please run imlook4d command again' ''  'Next imlook4d window will be opened in the new version' ''}, 'Upgrade done');
+                               
+                               evalin( 'base', 'close gcf') % Kill the current (this) started imlook4d session
+                       end
+
+
+                   end
+
+
+
+
+
+
                end
            catch
                
