@@ -4324,7 +4324,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
       % Call with steps = +1 to undo, steps = -1 to redo
       % 
 
-        undoMax = length(handles.image.UndoROI.ROI);  
+        % undoMax = length(handles.image.UndoROI.ROI);  
+        undoMax = sum(~cellfun('isempty', handles.image.UndoROI.ROI)); % Number of non-empty undo-ROI matrices
         roiSize = size( handles.image.ROI);
         position = handles.image.UndoROI.position;
         position = position + steps; % Point at next position
