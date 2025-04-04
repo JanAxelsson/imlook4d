@@ -6,7 +6,7 @@ function isNewVersion = checkForNewVersion()
 
     %% Bail out if Develop version
     if (  strcmpi( currentVersion, 'Develop') ) 
-        return
+        %return
     end
 
 
