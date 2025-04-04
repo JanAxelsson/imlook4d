@@ -1,3 +1,5 @@
+
+storedPath = path; % Save path prior to installation, to make restore link
 StoreVariables  % Remember variables
 
 disp( [ 'Determining latest available version ']);
@@ -19,6 +21,7 @@ ver = data{1}; % Latest version
 url = data{2}; % URL for latest version
 
 disp( [ 'Latest available version = ' ver ]);
+disp(' ')
 
 
 urlToLatestImlook4d = url;
@@ -133,7 +136,7 @@ if ~exist(newFolderName, 'dir')
     % Change name of folder
     [parentFolder,name,ext] = fileparts(unzipFolderPath);
     disp( [ 'Installing to folder = ' newFolderName ]);
-    movefile( unzipFolderPath, newFolderName);
+    movefile( unzipFolderPath, newFolderName, 'f');
     
 else
     disp( [ 'The latest version already on disk, no need to download again = ' newFolderName]);
@@ -142,8 +145,7 @@ end
 %% Set Matlab path
 disp( [ 'Removing old imlook4d from matlab path = ' folder]);
 
-a = path;
-b = strsplit(a,':'); % Cell array of paths
+b = strsplit(storedPath,':'); % Cell array of paths
 
 % Remove old imlook4d paths
 for i = 1:length(b)
@@ -168,7 +170,15 @@ disp(['Saving as default path' ])
 savepath
 
 disp(' ');
-disp( [ 'Installation DONE!  Old version remains on disk']);
+disp( [ 'Installation of version ' ver  ' DONE!  (Old version remains on disk)']);
+disp(' ');
+disp( [ ...
+        'Click to undo installation :  ' ...
+        '<a href="matlab:path(storedPath);rmdir( newFolderName, ''s''); disp([''Deleted version '' ver '' files, and restored Matlab path to previous state. ''])">restore to previous version</a>' ...
+      ]...
+);
+
+
 disp( [ ' ']);
 
 %% Update version.txt

@@ -1,4 +1,4 @@
-function Dirty_Write_DICOM(matrix, header, fileNames, machineFormat)
+function Dirty_Write_DICOM(matrix, header, fileNames, machineFormat, mode)
 %
 %     Purpose:  Write a modified DICOM file.    
 %
@@ -11,11 +11,12 @@ function Dirty_Write_DICOM(matrix, header, fileNames, machineFormat)
 %                   header      cell array with binary DICOM headers
 %                   fileNames   cell array with file names
 %                   machineFormat   b (big-endian, default) or l (little-endian)
+%                   mode            0 or 2 (2 being explicit)
 %
 %     Output:     none
 %
 %     Example:
-%       Dirty_Write_DICOM(matrix, header, fileNames, 'b');           
+%       Dirty_Write_DICOM(matrix, header, fileNames, 'b', 2);           
 %
 %     Author: Jan Axelsson
 
@@ -51,6 +52,33 @@ function Dirty_Write_DICOM(matrix, header, fileNames, machineFormat)
 %       cd('..');
 %       mkdir('out');
 %       cd('out');
+
+
+
+    % Number of bytes per pixel
+        out3=dirtyDICOMHeaderData(header, 1, '0028', '0100',mode);  % Bits allocated
+        numberOfBitsStored=out3.bytes(1)+256*out3.bytes(2);
+        numberOfBytesPerPixel=numberOfBitsStored/8;
+
+    % Number format
+        out3=dirtyDICOMHeaderData(header, 1, '0028', '0103',mode);  % Pixel Representation
+        signed=( (out3.bytes(1)+256*out3.bytes(2))==0 ); 
+        if (signed)  % 0 means unsigned
+            if (numberOfBytesPerPixel==1)
+                numberFormat='uint8';
+            end
+            if (numberOfBytesPerPixel==2)
+                numberFormat='uint16';
+            end
+        else  % 1 means signed
+            if (numberOfBytesPerPixel==1)
+                numberFormat='int8';
+            end
+            if (numberOfBytesPerPixel==2)
+                numberFormat='int16';
+            end                        
+        end
+
      
 
      count=0;  % Number of written files
@@ -69,10 +97,14 @@ function Dirty_Write_DICOM(matrix, header, fileNames, machineFormat)
                 %fid = fopen(filename, 'w', 'b');
                 
                 fid = fopen(filename, 'w', machineFormat);
+                
+                slice = matrix(:,:,nr);
+                L = length( slice(:));
+                header{nr}=dirtyDICOMModifyHeaderString(header{nr}, '7FE0', '0010',mode, num2str( numberOfBytesPerPixel * L ) ); % New valuelength for image
                                 
                 fwrite(fid, header{nr});
 
-                fwrite(fid, round( matrix(:,:,nr)), 'int16');
+                fwrite(fid, round( matrix(:,:,nr)), numberFormat);
                 
                 fclose(fid);
                 

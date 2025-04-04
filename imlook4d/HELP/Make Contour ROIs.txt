@@ -1,0 +1,39 @@
+<h1>Make Contour ROIs</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	This script creates <i>N</i> multiple  ROIs from the currently selected ROI name.  The dialog gives threshold condition (min and max) used to subdivide the ROI 
+        into <i>N</i> values in the min-max interval.
+	</P>
+
+	</P> 
+	<P>The inputs in the dialog are:
+	
+		<TABLE>
+			<TR>
+			<TD> <B> Max pixel value &nbsp;</B></TD>
+			<TD> Defines the highest value to be included in range.  Either an absolute pixel value, or a value in % of max pixel value in current ROI, and (for dynamic data) current frame. </TD>
+			</TR>
+			
+			<TR>
+			<TD> <B> Min pixel value</B></TD>
+			<TD> Defines the lowest value in range.  Either an absolute pixel value, or a value in % of max pixel value in current frame. </TD>
+			</TR>
+			
+			<TR>
+			<TD> <B> Number of ROIs <i>N</i></B></TD>
+			<TD> The number of ROIs to create in intensity interval min to max.</TD>
+			</TR>
+			
+		</TABLE>
+
+	</P> 
+	<p>
+		Pixels from the original ROI that are outside the min-max interval remains in the original ROI.
+	</P>
+	<p>		
+		<B>An example:</B><BR>
+		A ROI named 'Liver' has the lowest pixel value 0, and max value 1234. Selecting min=0, max=1000, N=5, gives 5 new 
+                ROIs named '1 - Liver', '2 - Liver', ... '5 - Liver'.  The pixels in '1 - Liver' will range from 0 to 200 (1000/5). 
+                The pixels in '2 - Liver' will range from 200 to 400. And the values above the range (1000-1234) will remain in the original 'Liver' ROI.
+	</P>

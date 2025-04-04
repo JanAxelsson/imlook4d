@@ -5,6 +5,8 @@ Saves a ROI definition file.
 Allowed formats are 
 <ul>
 <li> imlook4d ROI format (.roi), which saves ROI data. ROI matris is saved as a sparse MATLAB matrix. It also stores length measurements within the ROI file
+<li> The ROI file remembers which file it was drawn on.  This means you can select "Open" menu (different to Load ROI) and select the roi file, to open both original image, and ROI.  
+<li> Settings such as slice, frame, window title are also stored
 <li> Nifti file format (.nii)
 </ul>
 

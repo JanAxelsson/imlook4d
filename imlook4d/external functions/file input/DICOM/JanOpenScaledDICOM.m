@@ -1,4 +1,4 @@
-function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, selectedFile)
+function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, selectedFile, optionalArgumentForceToolbox)
 % JAN Added input fileNames which is a cell array of paths relative
 % directoryPath
 %
@@ -12,10 +12,15 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
 %     Comments: For a multi-slice DICOM file, some tricks have been employed, to keep the structure.
 %               The header and file name is duplicated in all slices (same filename for all slices).
 %
-%     Input:        directoryPath   path to base directory
-%                   fileNames       struct where fileNames.name is the file name
-%                                   struct where fileNames.bytes is the file size
-%                   selectedFile    file name of selected file
+%     Input:        directoryPath                   path to base directory
+%
+%                   fileNames                       struct where fileNames.name is the file name
+%                                                   struct where fileNames.bytes is the file size
+%
+%                   selectedFile                    file name of selected file
+%
+%                   optionalArgumentForceToolbox    if set to true, forceusing imaging toolbox dicom reader.
+%                                                   If non-existing, use imlook4d dicom reader
 %                                 
 %                                 
 %     Output:       struct  
@@ -34,6 +39,16 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
     
     % Imaging toolbox ?
     IMAGING_TOOLBOX = exist('dicomread');
+
+    % Force reading dicom with imaging toolbox?
+    if ~exist('optionalArgumentForceToolbox','var')
+        % parameter does not exist, so default it to something
+        FORCE_USE_IMAGING_TOOLBOX = false;
+    else
+        FORCE_USE_IMAGING_TOOLBOX = optionalArgumentForceToolbox;
+    end
+
+
 %
 % PROBE first selected file
 %
@@ -145,7 +160,11 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                     explanation='(Little endian, explicit)';
                     
                 end                
-                USE_IMAGING_TOOLBOX = (~supportedTransferSyntaxFlag) && IMAGING_TOOLBOX;                   
+                USE_IMAGING_TOOLBOX = (~supportedTransferSyntaxFlag) && IMAGING_TOOLBOX;   
+                % Override if FORCE_USE_IMAGING_TOOLBOX is set
+                if (FORCE_USE_IMAGING_TOOLBOX && IMAGING_TOOLBOX)
+                    USE_IMAGING_TOOLBOX = true;
+                end
                 disp(['Transfer syntax UID=' foundTransferSyntaxUID ' ' explanation]); 
               
             %
@@ -350,8 +369,9 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                     numberOfBytesPerPixel=numberOfBitsStored/8;
                     
                 % Number format
-                    out3=dirtyDICOMHeaderData(headers, 1, '0028', '0103',mode);  % Pixel Representation 
-                    if (out3.bytes(1)+256*out3.bytes(2))==0  % 0 means unsigned
+                    out3=dirtyDICOMHeaderData(headers, 1, '0028', '0103',mode);  % Pixel Representation
+                    signed=( (out3.bytes(1)+256*out3.bytes(2))==0 ); 
+                    if (signed)  % 0 means unsigned
                         if (numberOfBytesPerPixel==1)
                             numberFormat='uint8';
                         end
@@ -366,7 +386,21 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
                             numberFormat='int16';
                         end                        
                     end
-                    signed=( (out3.bytes(1)+256*out3.bytes(2))==0 );
+                    
+               % Number of samples per pixel (Color is 3, otherwise 1)
+                    out3=dirtyDICOMHeaderData(headers, 1, '0028', '0002',mode);  % samples per pixel
+                    numberOfsamplesPerPixel=out3.bytes(1)+256*out3.bytes(2);
+                    
+                    out3=dirtyDICOMHeaderData(headers, 1, '0028', '0004',mode);  % Photometric Representation
+                    
+                    if ( (numberOfsamplesPerPixel == 3) && IMAGING_TOOLBOX )
+                        USE_IMAGING_TOOLBOX = true;
+                        disp('Force using imaging toolbox, because 3 numberOfsamplesPerPixel');
+                        disp('Every third pixel is the same color space');
+                        disp(['Photometric representation = '  out3.string ]);
+                        disp('---------------------------------------');
+                    end
+                    
                     
 
                 
@@ -419,7 +453,7 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
 
                 %
                 % Read matrix
-                %                
+                %             
                 
                 if  (headerSize>0) % Ignore really small files
                   
@@ -518,7 +552,36 @@ function [matrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, sel
 
         end
         
-        matrix=matrix(:,:,1:count);    
+        matrix=matrix(:,:,1:count);  
+        
+        % If color image, make intensity (assume RGB)
+        if (numberOfsamplesPerPixel == 3)
+            R = single( matrix( :, :, 1:3:count) );
+            G = single( matrix( :, :, 2:3:count) );
+            B = single( matrix( :, :, 3:3:count) );
+            intensity = (R + G + B) / 3;
+            matrix = intensity;
+            
+            tempHeader = cell(1,count/3)
+            for i = 1:count/3
+                tempHeader{i} = header{ 1 + (i-1) * 3 };
+            end
+            header = tempHeader;
+
+
+            % Also make a preview of first image in color scale 
+            try
+                r =  uint8( rot90( fliplr( R(:,:,1) )));
+                g =  uint8( rot90( fliplr( G(:,:,1) )));
+                b =  uint8( rot90( fliplr( B(:,:,1) )));
+                I = cat(3, r, g, b);
+                figure('Name', ['Color preview -- ' selectedFile]);
+                image(I);
+            catch
+            end
+
+
+        end
         
 % 
 % Scale data

@@ -68,11 +68,23 @@
 
 <B>2. DICOM opening  - supported formats</B>
 <!---------------------------------------->
-    <P>Non-compressed little-endian DICOM files are supported using basic Matlab. 
-    </P><P>Compressed formats supported by Matlab Imaging Toolbox are opened, if Imaging Toolbox is installed </P>  
+<UL>
+    <LI>Non-compressed little-endian DICOM files are supported using basic Matlab. 
+    <LI>Compressed formats supported by Matlab Imaging Toolbox are opened, if Imaging Toolbox is installed 
+    <LI>Color images (Typically UltraSound stored in RGB or Y'CrCb) are read by Matlab Imaging Toolbox, if Imaging Toolbox is installed. 
+        imlook4d converts to intensity by taking an average of the three channels, always assuming equal weights of all channels. 
+        This is only correct if the saved color-image is that of a grey-scale image.  Thus a real color image will give strange intensity values
+</UL>
 
-	
-<B>3. DICOM opening  - how it works</B>
+<B>3. DICOM opening  - force using imaging toolbox</B>
+<!---------------------------------------->
+ 
+    <P> The Matlab imaging toolbox dicomreader can be forced, in the opening dialog.  
+        This is done by selecting the drop-down option 'DICOM imaging toolbox' in the opening dialog.
+        This is beneficial if the imlook4d default reader does not work.  This is known to happen for certain compression formats, or for for color images such as for instance ultrasound.
+    </P>
+
+<B>4. DICOM opening  - how it works</B>
 <!---------------------------------------->
 	<P>
 

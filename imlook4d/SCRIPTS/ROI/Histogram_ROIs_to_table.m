@@ -15,6 +15,8 @@ TAB=sprintf('\t');
     defaultanswer = RetriveEarlierValues('HistogramTableDialog', {'20', 'min', 'max' } ); % Read default if exists, or apply these as default
     answer=inputdlg(prompt,titleString,numlines,defaultanswer);
 
+    StoreValues('HistogramTableDialog', answer ); % Store answer as new dialog default
+
     if isempty(answer)  % cancelled inputdlg and clean up
         ClearVariables
         return
@@ -111,5 +113,4 @@ TAB=sprintf('\t');
     
     
     
-StoreValues('HistogramTableDialog', answer ); % Store answer as new dialog default
 ClearVariables  

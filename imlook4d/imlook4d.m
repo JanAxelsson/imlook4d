@@ -938,6 +938,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
            try
                if ( checkForNewVersion() )
                    handles.updateNeededText.String = 'New version - click menu Help/Update' ;
+                   handles.updateNeededText.Visible = 1;
                end
            catch
                
@@ -2001,13 +2002,17 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              disp('Pressed cdPushButton');
              
              try
-                disp([ 'File type = '  handles.image.fileType] ); 
+                disp([ '  File type = '  handles.image.fileType] ); 
              catch
              end
 
              try
-                disp([ 'Changing Matlab workspace directory to  "' handles.image.folder '"' ]); 
+                clipboard('copy', ['''' handles.image.folder handles.image.file '''']);
+
+                disp([ '  Changing Matlab workspace directory to  "' handles.image.folder '"' ]); 
                 cd( handles.image.folder )
+
+                disp('File path copied to system clipboard')
              catch
                 disp([ 'Failed changing Matlab workspace directory to  "' handles.image.folder '"' ]); 
 
@@ -4319,7 +4324,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
       % Call with steps = +1 to undo, steps = -1 to redo
       % 
 
-        undoMax = length(handles.image.UndoROI.ROI);  
+        % undoMax = length(handles.image.UndoROI.ROI);  
+        undoMax = sum(~cellfun('isempty', handles.image.UndoROI.ROI)); % Number of non-empty undo-ROI matrices
         roiSize = size( handles.image.ROI);
         position = handles.image.UndoROI.position;
         position = position + steps; % Point at next position
@@ -4527,6 +4533,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             % Make these state variables defined (in case try-catch error)
             SelectedRaw3D = false;
             SelectedRaw4D = false;
+            DicomWithToolbox = false;
             
             % Administrative tasks figuring out if fileDialog is asked for by Menu/Open
             openWithDialog = isempty(varargin);  
@@ -4575,6 +4582,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         % Select file
                         [file,path,indx] = uigetfile( ...
                             {'*',  'All Files'; ...
+                            '*',  'DICOM imaging toolbox'; ...
                             '*.roi',  'ROI files (*.roi)'; ...
                             '*.dcm',  'DICOM files (*.dcm)'; ...
                             '*.v','ECAT Files (*.v)'; ...
@@ -4590,6 +4598,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             '*.mat','m4 object (*.mat)'} ...
                             ,'Select one file to open', ...
                             currentFilePath);
+
+                        DicomWithToolbox = (indx == 2); % 'Force DICOM using Imaging Toolbox'
 
                         SelectedRaw3D = (indx == 11); % 'GE RAW (3D, sum ToF)'
                         SelectedRaw4D = (indx == 12); % 'GE RAW (4D, w ToF)'
@@ -4663,6 +4673,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                     % Apply settings stored in ROI file
                                     set(newHandles.SliceNumSlider,'Value',GuiSettings.slice);
                                     set(newHandles.SliceNumEdit,'String',num2str(GuiSettings.slice) );
+                                    
+                                    set(newHandles.figure1,'Name',GuiSettings.windowTitle );
                                     
                                     set(newHandles.FrameNumSlider,'Value',GuiSettings.frame);
                                     set(newHandles.FrameNumEdit,'String',num2str(GuiSettings.frame) );
@@ -4740,6 +4752,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         tempHeader= fread(fid, 132);                     % Binary header in memory  
                         fclose(fid);
                         if strcmp(char(tempHeader(129:132))', 'DICM')  FILETYPE='DICOM';end
+                        if (DicomWithToolbox) FILETYPE='DICOM_TOOLBOX';end
 
                     % Test if HERMES (taken from CD cache)
                         if( strcmp(FILETYPE,'UNKNOWN'))
@@ -4816,6 +4829,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     if( strcmp(FILETYPE,'MATLAB'))  LocalOpenMat(hObject, eventdata, handles, file,path);end
                     if( strcmp(FILETYPE,'SHR'))     LocalOpenSHR(hObject, eventdata, handles, file,path);end
                     if( strcmp(FILETYPE,'DICOM'))   LocalOpenDirtyDICOM3(hObject, eventdata, handles, file,path);end
+                    if( strcmp(FILETYPE,'DICOM_TOOLBOX'))   LocalOpenDirtyDICOM3(hObject, eventdata, handles, file,path, true);end
                     if( strcmp(FILETYPE,'DICOMDIR')) LocalOpenDICOMDIR(hObject, eventdata, handles, file,path);end
                     if( strcmp(FILETYPE,'BINARY'))  LocalOpenBinary(hObject, eventdata, handles, file,path,'BINARY');end                    
                     if( strcmp(FILETYPE,'ITK'))     LocalOpenBinary(hObject, eventdata, handles, file,path,'ITK' );end                   
@@ -5774,11 +5788,24 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                         % Save guidata
                         guidata(h, newhandles);
-            function h=LocalOpenDirtyDICOM3(hObject, eventdata, handles, file,directoryPath)
-                % This function is a new version which relies on new external
-                % functions
+            function h=LocalOpenDirtyDICOM3(hObject, eventdata, handles, file,directoryPath, optionalArgumentForceToolbox)
+                % This function is a new version which relies on new
+                % external functions
+                %
+                % optionalArgumentForceToolbox --  is optional parameter
+                % (true means openening with imaging toolbox if exists)
+
                     selectedFile=file;
 
+
+                    % Force reading dicom with imaging toolbox?
+                    if ~exist('optionalArgumentForceToolbox','var')
+                        % parameter does not exist, so default it to something
+                        FORCE_OPEN_WITH_IMAGING_TOOLBOX = false;
+                    else
+                        FORCE_OPEN_WITH_IMAGING_TOOLBOX = optionalArgumentForceToolbox;
+                    end
+                
 
                 %
                 % Select files
@@ -5801,8 +5828,9 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 %
                 % Open scaled image
                 %
+
                     try
-                        [outputMatrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, selectedFile);
+                        [outputMatrix, outputStruct]=JanOpenScaledDICOM(directoryPath, fileNames, selectedFile, FORCE_OPEN_WITH_IMAGING_TOOLBOX);
                     catch
                         disp('imlook4d ERROR: Failed opening images (when calling JanOpenScaledDICOM) ');
                         disp(lasterr)
@@ -5932,7 +5960,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                         % Open selected series
                         try
-                            [outputMatrix, outputStruct]=JanOpenScaledDICOM(directoryPath, newFileNames, selectedFile);
+                            [outputMatrix, outputStruct]=JanOpenScaledDICOM(directoryPath, newFileNames, selectedFile, FORCE_OPEN_WITH_IMAGING_TOOLBOX);
                         catch
                             disp('imlook4d ERROR: Failed opening images');
                         end
@@ -6196,6 +6224,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     
                     newhandles.image.sliceLocations=sliceLocations;
                     newhandles.image.DICOMsortedIndexList=outputStruct.dirtyDICOMsortedIndexList;
+                 
                     
                     try
                         unit=dirtyDICOMHeaderData(headers, 1, '0054', '1001' ,mode); % Unit
@@ -6838,6 +6867,18 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             fileNames=handles.image.dirtyDICOMFileNames;
                             %indecesToScaleFactor=handles.image.dirtyDICOMIndecesToScaleFactor;
                             mode=handles.image.dirtyDICOMMode;
+                            
+                            
+%                        % Intensity image from color (ultrasound is typical case where header is marked as color)
+                            out3=dirtyDICOMHeaderData(headers, 1, '0028', '0002',mode);  % samples per pixel
+                            numberOfsamplesPerPixel=out3.bytes(1)+256*out3.bytes(2);
+                            
+                            if (numberOfsamplesPerPixel == 3)
+                                for i = 1: length(headers)
+                                    headers{i}=dirtyDICOMModifyHeaderUS(headers{i}, '0028', '0002',mode, 1); % 
+                                end
+                            end
+
 
                         % USER INPUT:  Modify Patient ID, Patient Name, Series Description
 
@@ -7031,8 +7072,8 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                                      headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0008', '0060',mode, modalityString); % ImageType
 
                                      % Change image properties
-                                     headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0008', '0008',mode, 'DERIVED\SECONDARY'); % ImageType
-                                     headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0008' ,'2111',mode, 'imlook4d - not for clinical use'); % Derivation Description
+                                     % headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0008', '0008',mode, 'DERIVED\SECONDARY'); % ImageType
+                                     % headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '0008' ,'2111',mode, 'imlook4d - not for clinical use'); % Derivation Description
 
 
                                  % Set scale factors (Fails if scale factor not existing)
@@ -7070,7 +7111,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                                 % Pixel representation (Make it signed) 
                                 try
-                                    headers{i}=dirtyDICOMModifyHeaderUS(headers{i}, '0028', '0103',mode, 1); % Make signed (0=unsigned)
+                                    headers{i}=dirtyDICOMModifyHeaderUS(headers{i}, '0028', '0103',mode, 0); % Make signed (0=unsigned)
                                 catch
                                 end
 
@@ -7245,7 +7286,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                                % Set value length for image (7FE0,0010)
                                i=1;
-                               headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '7FE0', '0010',mode, num2str(length(matrix)*2 )); % New valuelength for image
+                               headers{i}=dirtyDICOMModifyHeaderString(headers{i}, '7FE0', '0010',mode, num2str(length(matrix)*1 )); % New valuelength for image
                             end
                             
                         % Set Transfer Syntax UID
@@ -7266,7 +7307,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                             % This function reuses file names (good for traceability)
 
                             %Dirty_Write_DICOM(matrix, headers(1:iNumberOfSelectedFiles), fileNames(1:iNumberOfSelectedFiles), ByteOrder);
-                            Dirty_Write_DICOM(matrix, headers(1:iNumberOfSelectedFiles), newFileNames(1:iNumberOfSelectedFiles), ByteOrder);
+                            Dirty_Write_DICOM(matrix, headers(1:iNumberOfSelectedFiles), newFileNames(1:iNumberOfSelectedFiles), ByteOrder, handles.image.dirtyDICOMMode);
 
                         % Change data folder for this imlook4d instance
                             cd(newPath);
@@ -7462,7 +7503,61 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             catch
                 disp(['imlook4d/Savemat_Callback:ERROR Save Data was not completed']);
             end  
-            
+    
+    % Save All Windows + Layout to folder
+    function SaveWindows_Callback(hObject, eventdata, handles)
+         % Display HELP and get out of callback
+             if DisplayHelp(hObject, eventdata, handles) 
+                 return 
+             end
+    
+        % Get folder name
+            newPath=java_uigetdir( pwd(),'Select/create directory to save files to'); % Use java directory open dialog (nicer than windows)
+            if newPath == 0
+                disp('Cancelled by user');
+                return
+            end
+    
+        % Make directory if not existing
+            fn = fullfile(newPath);
+            if ~exist(fn, 'dir')
+                disp(['Make directory = ' newPath ]);
+                mkdir(fn);
+            end
+        
+            try
+                cd(newPath);                                    % Go to selected directory
+            catch
+                try
+                    mkdir(newPath);
+                catch
+                    error(['imlook4d ERROR - failed creating directory' newPath]);
+                end
+            end
+
+
+        % Save all windows to folder
+            g=findobj('Type', 'figure');
+            w = waitbar(0, 'Starting');
+            n = length(g);
+            for i=1:n
+                % Save only figures and imlook4d instances
+                if ( strcmp( get(g(i),'Tag'), 'imlook4d' ) || strcmp( get(g(i),'Tag'), '' ) )
+                     try
+                         filename = [ g(i).Name '.fig'];
+                         disp( ['Saving ' filename ]);
+                         waitbar(i/n, w, ['Saving ' filename ] );
+    
+                         %
+                         savefig( g(i), filename )
+    
+                     catch EXCEPTION
+                        dispRed( ['Failed saving ' filename ]);
+                     end
+                end
+            end   
+            close(w)
+
     % Load ROI
         function LoadRoiPushbutton_Callback(hObject, eventdata, handles, fullPath)
             % Display HELP and get out of callback
@@ -7809,6 +7904,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     GuiSettings.slice=round(get(handles.SliceNumSlider,'Value'));
                     GuiSettings.frame=round(get(handles.FrameNumSlider,'Value'));
                     GuiSettings.selectedROI=get(handles.ROINumberMenu,'Value');
+                    GuiSettings.windowTitle = handles.figure1.Name;
                     
                     
                     % Save Measures
