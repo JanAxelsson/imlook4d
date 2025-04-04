@@ -1,5 +1,8 @@
 
-storedPath = path; % Save path prior to installation, to make restore link
+storedPath = path;   % Save path variable prior to installation, to make restore link work
+newFolderName = '';  % Save new folder variable prior to installation, to make restore link work
+ver = '';            % Save new version variable prior to installation, to make restore link work
+
 StoreVariables  % Remember variables
 
 disp( [ 'Determining latest available version ']);
