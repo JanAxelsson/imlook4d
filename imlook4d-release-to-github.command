@@ -1,4 +1,4 @@
-#!/usr/bin/env bash    -x
+#!/usr/bin/env bash   # -x
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" # script's directory
 
