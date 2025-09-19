@@ -859,7 +859,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 %             %
 %                figureBackgroundColor=get(hObject,'Color');    
 %                guiHandles=findobj(hObject, '-not', 'uimenu', '-not', 'Style', 'edit', '-not', 'Style', 'popupmenu');
-%                for i=1:size(guiHandles,1)
+%                for i=1:length(guiHandles,1)
 %                    try  
 %                            % set(guiHandles(i),'BackgroundColor',  figureBackgroundColor); 
 %                    catch
@@ -1086,7 +1086,8 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 if strcmp( get(parentMenuHandle, 'Label'), 'Color')
                     callBack=['imlook4d(''Color_Callback'',gcbo,[],guidata(gcbo), ''' name ''' )']; 
                     [pathstr2,name2,ext2] = fileparts( which(name));
-                    label = [ '<html> <img width=100 height=15  src="file:///' pathstr2 filesep name2 '.png" ></img><font color="white">--</font>'  nameWithSpaces '</html>'];
+                    %label = [ '<html> <img width=100 height=15  src="file:///' pathstr2 filesep name2 '.png" ></img><font color="white">--</font>'  nameWithSpaces '</html>'];
+                    label = nameWithSpaces
                     tag = nameWithSpaces;
                 end
                 
@@ -3425,7 +3426,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         % Show all hidden
         ROINumberMenu=get(handles.ROINumberMenu);
         contents = ROINumberMenu.String; % Cell array 
-        handles.image.VisibleROIs(1:size(ROINumberMenu.String,1)-1)=1;       
+        handles.image.VisibleROIs(1:length(ROINumberMenu.String,1)-1)=1;       
         ROINumber=ROINumberMenu.Value;
         contents = regexprep(contents, '\(hidden\) ', ''); % Remove (hidden) prefix
         set(handles.ROINumberMenu,'String', contents);
@@ -5954,12 +5955,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                            str{i}=[patientName.string TAB '(' patientID.string ')' TAB studyDesc.string TAB '---' TAB seriesDesc.string];
                             
                            % Colored text in listdlg
-                           strColor{i}=[ '<HTML><FONT color="blue">' patientName.string TAB '</FONT>' ...
-                                    '<HTML><FONT color="gray">' '(' patientID.string ')' TAB '</FONT>' ...
-                                    '<HTML><FONT color="blue">' studyDesc.string TAB '</FONT>' ...
-                                    '<HTML><FONT color="gray">' TAB seriesDesc.string '</FONT>' ...
-                                    '</HTML>' ];
-                           
+                           % strColor{i}=[ '<HTML><FONT color="blue">' patientName.string TAB '</FONT>' ...
+                           %          '<HTML><FONT color="gray">' '(' patientID.string ')' TAB '</FONT>' ...
+                           %          '<HTML><FONT color="blue">' studyDesc.string TAB '</FONT>' ...
+                           %          '<HTML><FONT color="gray">' TAB seriesDesc.string '</FONT>' ...
+                           %          '</HTML>' ];
+                           strColor{i} = [ patientName.string ' -- ' patientID.string ' -- ' studyDesc.string ' -- ' seriesDesc.string ];
                         end
 
 
@@ -6419,7 +6420,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                      
                     % Checkmarks
                        hPACSMenuObjects=get( get(hObject,'Parent'), 'Children');  % All other
-                       for i=1:size(hPACSMenuObjects)
+                       for i=1:length(hPACSMenuObjects)
                            set(hPACSMenuObjects(i),'Checked','off')
                        end
                        set(hObject,'Checked','on')
@@ -8046,7 +8047,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             
         % Show only figures and imlook4d instances
             j=1;
-            for i=1:size(g)
+            for i=1:length(g)
                 % Mark current window with a checkbox
                 if ( strcmp( get(g(i),'Tag'), 'imlook4d' ) || ...
                         strcmp( get(g(i),'Tag'), '' )  || ...
@@ -8066,10 +8067,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         
         % Find index to current window
             thisWindow=[];
-            for i=1:size(h)
+            for i=1:length(h)
 %                % Mark current window with a checkbox
                  if (h(i) == handles.figure1)
-                      windowDescriptions{i} = strrep( windowDescriptions{i},'<HTML>','<HTML> --> <B> <I>');
+                      %windowDescriptions{i} = strrep( windowDescriptions{i},'<HTML>','<HTML> --> <B> <I>');
+                      windowDescriptions{i} = windowDescriptions{i};
                  end
                 % Mark all except current window with a checkbox
                 if (h(i) ~= handles.figure1)
@@ -8310,7 +8312,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 %            
 %            % Checkmarks
 %            hColorMenuObjects=get( get(hObject,'Parent'), 'Children');  % All other
-%            for i=1:size(hColorMenuObjects)
+%            for i=1:length(hColorMenuObjects)
 %                set(hColorMenuObjects(i),'Checked','off')
 %            end
 %            set(hObject,'Checked','on')
@@ -8351,7 +8353,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     
                     % Checkmarks
                     hColorMenuObjects=get( get(tempObject,'Parent'), 'Children');  % All other
-                    for i=1:size(hColorMenuObjects)
+                    for i=1:length(hColorMenuObjects)
                         set(hColorMenuObjects(i),'Checked','off')
                     end
                     set(tempObject,'Checked','on')
@@ -8380,7 +8382,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
            
            % Checkmarks
            hROIObjects=get( get(hObject,'Parent'), 'Children');  % All other
-           for i=1:size(hROIObjects)
+           for i=1:length(hROIObjects)
                set(hROIObjects(i),'Checked','off')
            end
            set(hObject,'Checked','on')
@@ -8400,7 +8402,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
            
            % Checkmarks
            hROIObjects=get( get(hObject,'Parent'), 'Children');  % All other
-           for i=1:size(hROIObjects)
+           for i=1:length(hROIObjects)
                set(hROIObjects(i),'Checked','off')
            end
            set(hObject,'Checked','on')
@@ -8422,7 +8424,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
            
            % Checkmarks
            hROIObjects=get( get(hObject,'Parent'), 'Children');  % All other
-           for i=1:size(hROIObjects)
+           for i=1:length(hROIObjects)
                set(hROIObjects(i),'Checked','off')
            end
            set(hObject,'Checked','on')
@@ -8444,7 +8446,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
            
            % Checkmarks
            hROIObjects=get( get(hObject,'Parent'), 'Children');  % All other
-           for i=1:size(hROIObjects)
+           for i=1:length(hROIObjects)
                set(hROIObjects(i),'Checked','off')
            end
            set(hObject,'Checked','on')
@@ -8851,7 +8853,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
         % Clear sub-menues
             subMenuHandles=get(handles.windows,'Children');
-%             for i=1:size(subMenuHandles)
+%             for i=1:length(subMenuHandles)
 %                 delete(subMenuHandles(i))
 %             end
             delete(subMenuHandles);
@@ -8861,7 +8863,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             
         % Show only figures and imlook4d instances
             j=1;
-            for i=1:size(g)
+            for i=1:length(g)
                 % Mark current window with a checkbox
                 if ( strcmp( get(g(i),'Tag'), 'imlook4d' ) || strcmp( get(g(i),'Tag'), '' ) )
                      h(j,1) = g(i);
@@ -9571,7 +9573,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
 
                         % LOOP multiple slices and fill 4D matrix
-                        for j=1:size(inputSliceRange(:))
+                        for j=1:length(inputSliceRange(:))
                             i=inputSliceRange(j);
 
                             waitbar(i/inputSliceRange(end) );
@@ -10766,13 +10768,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                           % Colored text in listdlg
                           % PatientName [Modality] SeriesDesc figureName          
-                          temp=[ '<HTML>' ...
-                                        '<FONT ' yokeBackgroundColor ' color="blue">' Yoke '</FONT> '...
-                                        '<FONT color="blue">' patientName.string TAB '</FONT>' ...
-                                        '<FONT color="gray">[' Modality ']' TAB  '</FONT>'...
-                                        '<FONT color="black">' seriesDesc.string TAB '</FONT>'...
-                                        '<FONT color="red">' figureName TAB '</FONT>' ...
-                                        '</HTML>' ];  
+                          % temp=[ '<HTML>' ...
+                          %               '<FONT ' yokeBackgroundColor ' color="blue">' Yoke '</FONT> '...
+                          %               '<FONT color="blue">' patientName.string TAB '</FONT>' ...
+                          %               '<FONT color="gray">[' Modality ']' TAB  '</FONT>'...
+                          %               '<FONT color="black">' seriesDesc.string TAB '</FONT>'...
+                          %               '<FONT color="red">' figureName TAB '</FONT>' ...
+                          %               '</HTML>' ];  
+                          temp = [ patientName.string ' [' Modality '] seriesDesc.string ' -- ' ' figureName ];
                           % Remove null-characters (DICOM can have that)
                           windowDescriptions{i}=strrep(temp,char(0),'');          
 
@@ -10780,10 +10783,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         catch
                         % NOT DICOM 
                         %disp('htmlWindowDescriptions - PROBLEM');
-                           temp=[ '<HTML>' ...
-                                        '<FONT ' yokeBackgroundColor ' color="blue">' Yoke '</FONT> '...
-                                        '<FONT color="black">' figureName TAB '</FONT>' ...
-                                        '</HTML>' ];                         
+                           % temp=[ '<HTML>' ...
+                           %              '<FONT ' yokeBackgroundColor ' color="blue">' Yoke '</FONT> '...
+                           %              '<FONT color="black">' figureName TAB '</FONT>' ...
+                           %              '</HTML>' ];           
+                           temp = yokeBackgroundColor -- figureName
                         windowDescriptions{i}=strrep(temp,char(0),'');  
                     end
 
