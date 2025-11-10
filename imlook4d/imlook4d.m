@@ -773,19 +773,23 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 MEDIUM = 8;
                 FONTNAME = 'Arial';
                 
-                
-                if ismac()
-                    % MAC OSX detected; increase font sizes
-                    SMALL = 10;
-                    MEDIUM = 12;
-                    FONTNAME = 'Arial';
-                end
-                
+
+               % Before 2022a
+               matlabVersion = ver('matlab');
+               handles.matlabReleaseYear = str2double( regexprep( matlabVersion.Release, '[()a-zA-Z]', '') );
+               if ( handles.matlabReleaseYear < 2022 )
+                   if ismac()
+                       % MAC OSX detected; increase font sizes
+                       SMALL = 10;
+                       MEDIUM = 12;
+                       FONTNAME = 'Arial';
+                   end
+               end
                 
                 
                 
                 % Loop all GUI objects including figure1, axes1 
-                 guiNames=fieldnames(handles);
+                guiNames=fieldnames(handles);
                 for i=1:size(guiNames,1)
                     h=eval(['handles.' guiNames{i}]);
                     try % Some things in handles struct do not have Units property
@@ -795,11 +799,13 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                         % For all except edit boxes and text 
                         if ~strcmp( 'edit', get(h,'Style'))&&~strcmp( 'text', get(h,'Style'))
                             set(h,'FontSize',MEDIUM)
+                            set(h,'FontUnit','pixels')
                         end
                         
                         % For text
                         if strcmp( 'text', get(h,'Style'))
                             set(h,'FontSize',SMALL)
+                            set(h,'FontUnit','pixels')
                         end
                     catch
                     end
@@ -825,13 +831,46 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 handles.GUILayout.uipanel5=get(handles.uipanel5, 'Position');
                 handles.GUILayout.uipanel6=get(handles.uipanel6, 'Position');
                 handles.GUILayout.uipanel7=get(handles.uipanel7, 'Position');
-                %handles.GUILayout.ColorBar=get(handles.ColorBar, 'Position');
+
+           %
+           % Fine adjusts (because I cannot use GUIDE anymore)
+           %
+
+               % After 2024b
+               if ( handles.matlabReleaseYear > 2024 )
+    
+                   handles.ROIEraserRadiobutton.Position(4) = handles.ROIEraserRadiobutton.Position(4) - 5;
+                   handles.FlipAndRotateRadioButton.Position(4) = handles.FlipAndRotateRadioButton.Position(4) - 5;
+                   handles.ImageRadioButton.Position(4) = handles.ImageRadioButton.Position(4) - 5;
+
+                   handles.transparancyPanel.Position(4) = handles.transparancyPanel.Position(4) - 5;
+
+                   uiPanels=findobj(hObject,'Type','uipanel');
+                   uiPanels( end +1 ) = handles.uipanel7;
+                   for i=1:size(uiPanels,1)
+                       try % Some things in handles struct do not have Units property
+                           set(uiPanels(i),'BorderColor', 0.5*[1 1 1]);
+                       catch
+                       end
+                   end
+
+
+               end
+
+
                 
                 % Textboxes that should move
                 handles.GUILayout.floatingTextEdit1=get(handles.floatingTextEdit1, 'Position');
 
 
                 set(handles.ColorBar,'Units','normalized');  % Correct above loop (otherwise interactive colorbar does not work)
+
+                handles.transparancyText.FontUnits='pixels';
+                handles.transparancyEdit.FontUnits='pixels';
+                handles.transparancyPanel.FontUnits='pixels';
+                handles.transparancyText.FontSize=MEDIUM;
+                handles.transparancyEdit.FontSize=MEDIUM;
+                handles.transparancyPanel.FontSize=MEDIUM;
     
 
             %
@@ -1438,7 +1477,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 
                 % Bail out if too small of a change 
                 % (otherwise GUI will shake from small movement)
-                if ( abs( dx - dx1 ) <1 )
+                if ( abs( dx - dx1 ) < 30 )
                     return
                 end
 
@@ -1954,12 +1993,19 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              newEditor = false;
              try
                  % Try to use existing editor -- with dummy command
-                handles.record.editor.getLength();
+                if ( ~ handles.record.editor.Opened() )
+                    handles.record.editor = matlab.desktop.editor.newDocument(['% Script recording started at : ' datestr(now) EOL ]);
+                end
              catch
-                % Editor not open -- make a new one
-                a = com.mathworks.mde.editor.MatlabEditorApplication.getInstance();
-                handles.record.editor = a.newEditor( ['% Script recording started at : ' datestr(now) EOL ]);
-                handles.record.editor.setCaretPosition(handles.record.editor.getLength());  % Go to end of line
+                % % Editor not open -- make a new one
+                % a = com.mathworks.mde.editor.MatlabEditorApplication.getInstance();
+                % handles.record.editor = a.newEditor( ['% Script recording started at : ' datestr(now) EOL ]);
+                % handles.record.editor.setCaretPosition(handles.record.editor.getLength());  % Go to end of line
+                % newEditor = true;
+
+                % Use official API instead
+                handles.record.editor = matlab.desktop.editor.newDocument(['% Script recording started at : ' datestr(now) EOL ]);
+                
                 newEditor = true;
              end
              
@@ -2711,31 +2757,35 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
            end
 
            % Special shade mac button background
-           if ismac
-               
-               % First time only
-               if ( isempty(hObject.UserData)  )
-                   hObject.UserData = hObject.CData; % Remember original icon
-               end
-
-               % Set to original icon
-               icon = hObject.UserData; 
-
-               % Determine background from NaN in first dimension (which is
-               % what Matlab seems to use for built in togglebuttons)
-               background(:,:,3) = isnan( icon(:,:,1) );
-               background(:,:,2) = isnan( icon(:,:,1) );
-               background(:,:,1) = isnan( icon(:,:,1) );
-               
-               % Make shaded icon
-               icon( background) = 0.8;
-               hObject.CData = icon; 
-
-           end
+           % if ismac
+           % 
+           %     % First time only
+           %     if ( isempty(hObject.UserData)  )
+           %         hObject.UserData = hObject.CData; % Remember original icon
+           %     end
+           % 
+           %     % Set to original icon
+           %     icon = hObject.UserData; 
+           % 
+           %     % Determine background from NaN in first dimension (which is
+           %     % what Matlab seems to use for built in togglebuttons)
+           %     background(:,:,3) = isnan( icon(:,:,1) );
+           %     background(:,:,2) = isnan( icon(:,:,1) );
+           %     background(:,:,1) = isnan( icon(:,:,1) );
+           % 
+           %     % Make shaded icon
+           %     icon( background) = 0.8;
+           %     hObject.CData = icon; 
+           % 
+           % end
        function hObject = releasedToggleButton( hObject)
 
-           if ismac
-               hObject.CData = hObject.UserData;  % Set to original icon
+           handles = guidata(hObject);
+
+           if ( handles.matlabReleaseYear < 2025 )
+               if ismac
+                   hObject.CData = hObject.UserData;  % Set to original icon
+               end
            end
            
            if ( strcmp(hObject.Type , 'uitoggletool') )
@@ -10642,7 +10692,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                            end % switch get(hObject,'Type')
 
 
-                           handles.record.editor.insertTextAtCaret([cmd EOL EOL]);  % Insert text at caret
+                           handles.record.editor.appendText([cmd EOL EOL]);  % Insert text at caret
 
                        catch
                        end

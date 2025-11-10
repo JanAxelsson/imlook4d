@@ -8,7 +8,8 @@ function SaveTactToFile(hObject, eventdata, handles)
    try
     if (handles.record.enabled == 1)
         EOL = sprintf('\n');
-        handles.record.editor.insertTextAtCaret(['Button(''TACT to file'')' EOL]);  % Insert text at caret
+        %handles.record.editor.insertTextAtCaret(['Button(''TACT to file'')' EOL]);  % Insert text at caret
+        handles.record.editor.appendText(['Button(''TACT to file'')' EOL]);  % Insert text at caret
     end
    catch
    end           
