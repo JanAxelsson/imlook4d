@@ -3823,6 +3823,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         setSlice(handles, slice, handles.figure1)
       function handles = setOrientation(handles, newNumericOrientation)
 
+        if ( length(size( handles.image.Cdata)) <= 2)  % Do only if a rotation is possible
+                         % Update image   
+                updateROIs(handles);
+                updateImage(handles.figure1, [], handles);
+                figure1_ResizeFcn(handles.figure1, [], handles, 0)  
+            return
+        end
+
         % Numerical constants
             AXIAL=1;
             CORONAL=2;
