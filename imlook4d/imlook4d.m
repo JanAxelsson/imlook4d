@@ -773,19 +773,23 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 MEDIUM = 8;
                 FONTNAME = 'Arial';
                 
-                
-                if ismac()
-                    % MAC OSX detected; increase font sizes
-                    SMALL = 10;
-                    MEDIUM = 12;
-                    FONTNAME = 'Arial';
-                end
-                
+
+               % Before 2022a
+               matlabVersion = ver('matlab');
+               handles.matlabReleaseYear = str2double( regexprep( matlabVersion.Release, '[()a-zA-Z]', '') );
+               if ( handles.matlabReleaseYear < 2022 )
+                   if ismac()
+                       % MAC OSX detected; increase font sizes
+                       SMALL = 10;
+                       MEDIUM = 12;
+                       FONTNAME = 'Arial';
+                   end
+               end
                 
                 
                 
                 % Loop all GUI objects including figure1, axes1 
-                 guiNames=fieldnames(handles);
+                guiNames=fieldnames(handles);
                 for i=1:size(guiNames,1)
                     h=eval(['handles.' guiNames{i}]);
                     try % Some things in handles struct do not have Units property
@@ -795,11 +799,13 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                         % For all except edit boxes and text 
                         if ~strcmp( 'edit', get(h,'Style'))&&~strcmp( 'text', get(h,'Style'))
                             set(h,'FontSize',MEDIUM)
+                            set(h,'FontUnit','pixels')
                         end
                         
                         % For text
                         if strcmp( 'text', get(h,'Style'))
                             set(h,'FontSize',SMALL)
+                            set(h,'FontUnit','pixels')
                         end
                     catch
                     end
@@ -825,13 +831,46 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 handles.GUILayout.uipanel5=get(handles.uipanel5, 'Position');
                 handles.GUILayout.uipanel6=get(handles.uipanel6, 'Position');
                 handles.GUILayout.uipanel7=get(handles.uipanel7, 'Position');
-                %handles.GUILayout.ColorBar=get(handles.ColorBar, 'Position');
+
+           %
+           % Fine adjusts (because I cannot use GUIDE anymore)
+           %
+
+               % After 2024b
+               if ( handles.matlabReleaseYear > 2024 )
+    
+                   handles.ROIEraserRadiobutton.Position(4) = handles.ROIEraserRadiobutton.Position(4) - 5;
+                   handles.FlipAndRotateRadioButton.Position(4) = handles.FlipAndRotateRadioButton.Position(4) - 5;
+                   handles.ImageRadioButton.Position(4) = handles.ImageRadioButton.Position(4) - 5;
+
+                   handles.transparancyPanel.Position(4) = handles.transparancyPanel.Position(4) - 5;
+
+                   uiPanels=findobj(hObject,'Type','uipanel');
+                   uiPanels( end +1 ) = handles.uipanel7;
+                   for i=1:size(uiPanels,1)
+                       try % Some things in handles struct do not have Units property
+                           set(uiPanels(i),'BorderColor', 0.5*[1 1 1]);
+                       catch
+                       end
+                   end
+
+
+               end
+
+
                 
                 % Textboxes that should move
                 handles.GUILayout.floatingTextEdit1=get(handles.floatingTextEdit1, 'Position');
 
 
                 set(handles.ColorBar,'Units','normalized');  % Correct above loop (otherwise interactive colorbar does not work)
+
+                handles.transparancyText.FontUnits='pixels';
+                handles.transparancyEdit.FontUnits='pixels';
+                handles.transparancyPanel.FontUnits='pixels';
+                handles.transparancyText.FontSize=MEDIUM;
+                handles.transparancyEdit.FontSize=MEDIUM;
+                handles.transparancyPanel.FontSize=MEDIUM;
     
 
             %
@@ -859,7 +898,7 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
 %             %
 %                figureBackgroundColor=get(hObject,'Color');    
 %                guiHandles=findobj(hObject, '-not', 'uimenu', '-not', 'Style', 'edit', '-not', 'Style', 'popupmenu');
-%                for i=1:size(guiHandles,1)
+%                for i=1:length(guiHandles,1)
 %                    try  
 %                            % set(guiHandles(i),'BackgroundColor',  figureBackgroundColor); 
 %                    catch
@@ -1086,7 +1125,8 @@ function imlook4d_OpeningFcn(hObject, eventdata, handles, varargin)
                 if strcmp( get(parentMenuHandle, 'Label'), 'Color')
                     callBack=['imlook4d(''Color_Callback'',gcbo,[],guidata(gcbo), ''' name ''' )']; 
                     [pathstr2,name2,ext2] = fileparts( which(name));
-                    label = [ '<html> <img width=100 height=15  src="file:///' pathstr2 filesep name2 '.png" ></img><font color="white">--</font>'  nameWithSpaces '</html>'];
+                    %label = [ '<html> <img width=100 height=15  src="file:///' pathstr2 filesep name2 '.png" ></img><font color="white">--</font>'  nameWithSpaces '</html>'];
+                    label = nameWithSpaces
                     tag = nameWithSpaces;
                 end
                 
@@ -1437,7 +1477,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                 
                 % Bail out if too small of a change 
                 % (otherwise GUI will shake from small movement)
-                if ( abs( dx - dx1 ) <1 )
+                if ( abs( dx - dx1 ) < 30 )
                     return
                 end
 
@@ -1953,12 +1993,19 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
              newEditor = false;
              try
                  % Try to use existing editor -- with dummy command
-                handles.record.editor.getLength();
+                if ( ~ handles.record.editor.Opened() )
+                    handles.record.editor = matlab.desktop.editor.newDocument(['% Script recording started at : ' datestr(now) EOL ]);
+                end
              catch
-                % Editor not open -- make a new one
-                a = com.mathworks.mde.editor.MatlabEditorApplication.getInstance();
-                handles.record.editor = a.newEditor( ['% Script recording started at : ' datestr(now) EOL ]);
-                handles.record.editor.setCaretPosition(handles.record.editor.getLength());  % Go to end of line
+                % % Editor not open -- make a new one
+                % a = com.mathworks.mde.editor.MatlabEditorApplication.getInstance();
+                % handles.record.editor = a.newEditor( ['% Script recording started at : ' datestr(now) EOL ]);
+                % handles.record.editor.setCaretPosition(handles.record.editor.getLength());  % Go to end of line
+                % newEditor = true;
+
+                % Use official API instead
+                handles.record.editor = matlab.desktop.editor.newDocument(['% Script recording started at : ' datestr(now) EOL ]);
+                
                 newEditor = true;
              end
              
@@ -2710,31 +2757,35 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
            end
 
            % Special shade mac button background
-           if ismac
-               
-               % First time only
-               if ( isempty(hObject.UserData)  )
-                   hObject.UserData = hObject.CData; % Remember original icon
-               end
-
-               % Set to original icon
-               icon = hObject.UserData; 
-
-               % Determine background from NaN in first dimension (which is
-               % what Matlab seems to use for built in togglebuttons)
-               background(:,:,3) = isnan( icon(:,:,1) );
-               background(:,:,2) = isnan( icon(:,:,1) );
-               background(:,:,1) = isnan( icon(:,:,1) );
-               
-               % Make shaded icon
-               icon( background) = 0.8;
-               hObject.CData = icon; 
-
-           end
+           % if ismac
+           % 
+           %     % First time only
+           %     if ( isempty(hObject.UserData)  )
+           %         hObject.UserData = hObject.CData; % Remember original icon
+           %     end
+           % 
+           %     % Set to original icon
+           %     icon = hObject.UserData; 
+           % 
+           %     % Determine background from NaN in first dimension (which is
+           %     % what Matlab seems to use for built in togglebuttons)
+           %     background(:,:,3) = isnan( icon(:,:,1) );
+           %     background(:,:,2) = isnan( icon(:,:,1) );
+           %     background(:,:,1) = isnan( icon(:,:,1) );
+           % 
+           %     % Make shaded icon
+           %     icon( background) = 0.8;
+           %     hObject.CData = icon; 
+           % 
+           % end
        function hObject = releasedToggleButton( hObject)
 
-           if ismac
-               hObject.CData = hObject.UserData;  % Set to original icon
+           handles = guidata(hObject);
+
+           if ( handles.matlabReleaseYear < 2025 )
+               if ismac
+                   hObject.CData = hObject.UserData;  % Set to original icon
+               end
            end
            
            if ( strcmp(hObject.Type , 'uitoggletool') )
@@ -3425,7 +3476,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         % Show all hidden
         ROINumberMenu=get(handles.ROINumberMenu);
         contents = ROINumberMenu.String; % Cell array 
-        handles.image.VisibleROIs(1:size(ROINumberMenu.String,1)-1)=1;       
+        handles.image.VisibleROIs(1:length(ROINumberMenu.String,1)-1)=1;       
         ROINumber=ROINumberMenu.Value;
         contents = regexprep(contents, '\(hidden\) ', ''); % Remove (hidden) prefix
         set(handles.ROINumberMenu,'String', contents);
@@ -3771,6 +3822,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         slice=round(get(handles.SliceNumSlider,'Value'));
         setSlice(handles, slice, handles.figure1)
       function handles = setOrientation(handles, newNumericOrientation)
+
+        if ( length(size( handles.image.Cdata)) <= 2)  % Do only if a rotation is possible
+                         % Update image   
+                updateROIs(handles);
+                updateImage(handles.figure1, [], handles);
+                figure1_ResizeFcn(handles.figure1, [], handles, 0)  
+            return
+        end
 
         % Numerical constants
             AXIAL=1;
@@ -5954,12 +6013,12 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                            str{i}=[patientName.string TAB '(' patientID.string ')' TAB studyDesc.string TAB '---' TAB seriesDesc.string];
                             
                            % Colored text in listdlg
-                           strColor{i}=[ '<HTML><FONT color="blue">' patientName.string TAB '</FONT>' ...
-                                    '<HTML><FONT color="gray">' '(' patientID.string ')' TAB '</FONT>' ...
-                                    '<HTML><FONT color="blue">' studyDesc.string TAB '</FONT>' ...
-                                    '<HTML><FONT color="gray">' TAB seriesDesc.string '</FONT>' ...
-                                    '</HTML>' ];
-                           
+                           % strColor{i}=[ '<HTML><FONT color="blue">' patientName.string TAB '</FONT>' ...
+                           %          '<HTML><FONT color="gray">' '(' patientID.string ')' TAB '</FONT>' ...
+                           %          '<HTML><FONT color="blue">' studyDesc.string TAB '</FONT>' ...
+                           %          '<HTML><FONT color="gray">' TAB seriesDesc.string '</FONT>' ...
+                           %          '</HTML>' ];
+                           strColor{i} = [ patientName.string ' -- ' patientID.string ' -- ' studyDesc.string ' -- ' seriesDesc.string ];
                         end
 
 
@@ -6419,7 +6478,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                      
                     % Checkmarks
                        hPACSMenuObjects=get( get(hObject,'Parent'), 'Children');  % All other
-                       for i=1:size(hPACSMenuObjects)
+                       for i=1:length(hPACSMenuObjects)
                            set(hPACSMenuObjects(i),'Checked','off')
                        end
                        set(hObject,'Checked','on')
@@ -8046,7 +8105,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             
         % Show only figures and imlook4d instances
             j=1;
-            for i=1:size(g)
+            for i=1:length(g)
                 % Mark current window with a checkbox
                 if ( strcmp( get(g(i),'Tag'), 'imlook4d' ) || ...
                         strcmp( get(g(i),'Tag'), '' )  || ...
@@ -8066,10 +8125,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
         
         % Find index to current window
             thisWindow=[];
-            for i=1:size(h)
+            for i=1:length(h)
 %                % Mark current window with a checkbox
                  if (h(i) == handles.figure1)
-                      windowDescriptions{i} = strrep( windowDescriptions{i},'<HTML>','<HTML> --> <B> <I>');
+                      %windowDescriptions{i} = strrep( windowDescriptions{i},'<HTML>','<HTML> --> <B> <I>');
+                      windowDescriptions{i} = windowDescriptions{i};
                  end
                 % Mark all except current window with a checkbox
                 if (h(i) ~= handles.figure1)
@@ -8310,7 +8370,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 %            
 %            % Checkmarks
 %            hColorMenuObjects=get( get(hObject,'Parent'), 'Children');  % All other
-%            for i=1:size(hColorMenuObjects)
+%            for i=1:length(hColorMenuObjects)
 %                set(hColorMenuObjects(i),'Checked','off')
 %            end
 %            set(hObject,'Checked','on')
@@ -8351,7 +8411,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                     
                     % Checkmarks
                     hColorMenuObjects=get( get(tempObject,'Parent'), 'Children');  % All other
-                    for i=1:size(hColorMenuObjects)
+                    for i=1:length(hColorMenuObjects)
                         set(hColorMenuObjects(i),'Checked','off')
                     end
                     set(tempObject,'Checked','on')
@@ -8380,7 +8440,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
            
            % Checkmarks
            hROIObjects=get( get(hObject,'Parent'), 'Children');  % All other
-           for i=1:size(hROIObjects)
+           for i=1:length(hROIObjects)
                set(hROIObjects(i),'Checked','off')
            end
            set(hObject,'Checked','on')
@@ -8400,7 +8460,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
            
            % Checkmarks
            hROIObjects=get( get(hObject,'Parent'), 'Children');  % All other
-           for i=1:size(hROIObjects)
+           for i=1:length(hROIObjects)
                set(hROIObjects(i),'Checked','off')
            end
            set(hObject,'Checked','on')
@@ -8422,7 +8482,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
            
            % Checkmarks
            hROIObjects=get( get(hObject,'Parent'), 'Children');  % All other
-           for i=1:size(hROIObjects)
+           for i=1:length(hROIObjects)
                set(hROIObjects(i),'Checked','off')
            end
            set(hObject,'Checked','on')
@@ -8444,7 +8504,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
            
            % Checkmarks
            hROIObjects=get( get(hObject,'Parent'), 'Children');  % All other
-           for i=1:size(hROIObjects)
+           for i=1:length(hROIObjects)
                set(hROIObjects(i),'Checked','off')
            end
            set(hObject,'Checked','on')
@@ -8851,7 +8911,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
         % Clear sub-menues
             subMenuHandles=get(handles.windows,'Children');
-%             for i=1:size(subMenuHandles)
+%             for i=1:length(subMenuHandles)
 %                 delete(subMenuHandles(i))
 %             end
             delete(subMenuHandles);
@@ -8861,7 +8921,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
             
         % Show only figures and imlook4d instances
             j=1;
-            for i=1:size(g)
+            for i=1:length(g)
                 % Mark current window with a checkbox
                 if ( strcmp( get(g(i),'Tag'), 'imlook4d' ) || strcmp( get(g(i),'Tag'), '' ) )
                      h(j,1) = g(i);
@@ -9571,7 +9631,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
 
                         % LOOP multiple slices and fill 4D matrix
-                        for j=1:size(inputSliceRange(:))
+                        for j=1:length(inputSliceRange(:))
                             i=inputSliceRange(j);
 
                             waitbar(i/inputSliceRange(end) );
@@ -10640,7 +10700,7 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                            end % switch get(hObject,'Type')
 
 
-                           handles.record.editor.insertTextAtCaret([cmd EOL EOL]);  % Insert text at caret
+                           handles.record.editor.appendText([cmd EOL EOL]);  % Insert text at caret
 
                        catch
                        end
@@ -10766,13 +10826,14 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
 
                           % Colored text in listdlg
                           % PatientName [Modality] SeriesDesc figureName          
-                          temp=[ '<HTML>' ...
-                                        '<FONT ' yokeBackgroundColor ' color="blue">' Yoke '</FONT> '...
-                                        '<FONT color="blue">' patientName.string TAB '</FONT>' ...
-                                        '<FONT color="gray">[' Modality ']' TAB  '</FONT>'...
-                                        '<FONT color="black">' seriesDesc.string TAB '</FONT>'...
-                                        '<FONT color="red">' figureName TAB '</FONT>' ...
-                                        '</HTML>' ];  
+                          % temp=[ '<HTML>' ...
+                          %               '<FONT ' yokeBackgroundColor ' color="blue">' Yoke '</FONT> '...
+                          %               '<FONT color="blue">' patientName.string TAB '</FONT>' ...
+                          %               '<FONT color="gray">[' Modality ']' TAB  '</FONT>'...
+                          %               '<FONT color="black">' seriesDesc.string TAB '</FONT>'...
+                          %               '<FONT color="red">' figureName TAB '</FONT>' ...
+                          %               '</HTML>' ];  
+                          temp = [ patientName.string ' [' Modality '] seriesDesc.string ' -- ' ' figureName ];
                           % Remove null-characters (DICOM can have that)
                           windowDescriptions{i}=strrep(temp,char(0),'');          
 
@@ -10780,10 +10841,11 @@ function varargout = imlook4d_OutputFcn(hObject, eventdata, handles)
                         catch
                         % NOT DICOM 
                         %disp('htmlWindowDescriptions - PROBLEM');
-                           temp=[ '<HTML>' ...
-                                        '<FONT ' yokeBackgroundColor ' color="blue">' Yoke '</FONT> '...
-                                        '<FONT color="black">' figureName TAB '</FONT>' ...
-                                        '</HTML>' ];                         
+                           % temp=[ '<HTML>' ...
+                           %              '<FONT ' yokeBackgroundColor ' color="blue">' Yoke '</FONT> '...
+                           %              '<FONT color="black">' figureName TAB '</FONT>' ...
+                           %              '</HTML>' ];           
+                           temp = yokeBackgroundColor -- figureName
                         windowDescriptions{i}=strrep(temp,char(0),'');  
                     end
 

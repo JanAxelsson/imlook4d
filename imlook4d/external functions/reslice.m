@@ -78,24 +78,33 @@ for i=1:numberOfSlices
 %         
 %         % Linear interpolation (distance-weighted average)
          [distances,ind]=sortrows((abs(oldPositions-newPositions(i)) )); % ind(1:2) show nearest two slices
-         totDistance=distances(1)+distances(2);
-         % Weights - biggest weight to nearest (therefore reversed indeces 1,2)
-         if (totDistance==0)
-             weight1=1;
-             weight2=1;
-         else
-            weight2=distances(1)/totDistance;
-            weight1=distances(2)/totDistance;
-         end
-         
-         %outImageStruct.Cdata(:,:,i,:)=weight1*oldImageStruct.Cdata(:,:,ind(1),:)+weight2*oldImageStruct.Cdata(:,:,ind(2),:);
-         
-         if ( ind(1)>1 ) & ( ind(1)<oldNumberOfSlices )
-            outImageStruct.Cdata(:,:,i,:)=weight1*oldImageStruct.Cdata(:,:,ind(1),:)+weight2*oldImageStruct.Cdata(:,:,ind(2),:);
-         else
-            outImageStruct.Cdata(:,:,i,:) = 0;
-         end 
 
+
+         if ( length( indeces)  == 1)
+            outImageStruct.Cdata = oldImageStruct.Cdata;;
+         end
+
+
+         if ( length( indeces)  > 1)
+             totDistance=distances(1)+distances(2);
+             % Weights - biggest weight to nearest (therefore reversed indeces 1,2)
+             if (totDistance==0)
+                 weight1=1;
+                 weight2=1;
+             else
+                 weight2=distances(1)/totDistance;
+                 weight1=distances(2)/totDistance;
+             end
+
+             %outImageStruct.Cdata(:,:,i,:)=weight1*oldImageStruct.Cdata(:,:,ind(1),:)+weight2*oldImageStruct.Cdata(:,:,ind(2),:);
+
+             if ( ind(1)>1 ) & ( ind(1)<oldNumberOfSlices )
+                 outImageStruct.Cdata(:,:,i,:)=weight1*oldImageStruct.Cdata(:,:,ind(1),:)+weight2*oldImageStruct.Cdata(:,:,ind(2),:);
+             else
+                 outImageStruct.Cdata(:,:,i,:) = 0;
+             end
+
+         end
 end
 
 %

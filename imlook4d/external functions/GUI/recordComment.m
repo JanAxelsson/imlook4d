@@ -32,11 +32,9 @@ function recordComment(varargin)
    
     % Record the comment to editor window
     try          
-        pos = imlook4d_current_handles.record.editor.getCaretPosition();
-    
-        imlook4d_current_handles.record.editor.setCaretPosition( pos -1); % Assume we are at beginning of next row.  Go back one row
-  
-        imlook4d_current_handles.record.editor.insertTextAtCaret( [ ' % ' comment EOL] );  % Insert text at caret
+
+        recordInsertBeforeLastNonEmptyLine(imlook4d_current_handles.record.editor, [ ' % ' comment EOL])
+
     catch
         disp('ERROR - recordInputsText (your Matlab is probably too old for this)');
     end

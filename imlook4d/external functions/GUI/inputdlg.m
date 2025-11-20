@@ -46,7 +46,7 @@ function answer = inputdlg(varargin)
           answer = shipped(varargin{:});
          % answer=inputdlg(prompt,title,numlines,defaultanswer);
          
-         recordComment('Set field to ''-'', if you wish to keep value supplied by imlook4d'); % Insert text at caret
+         recordComment('Set field to ''-'', if you wish to keep default value sometimes supplied by imlook4d'); % Insert text at caret
          recordInputsText(answer);  % Insert text at caret
 
       end

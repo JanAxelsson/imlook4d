@@ -32,13 +32,17 @@ function recordText(answer)
     
     % Record the inputs to editor window
     try 
-        lineNumber = imlook4d_current_handles.record.editor.getLineNumber();  % Line number
-  
-        imlook4d_current_handles.record.editor.goToLine( lineNumber-1 ,1);      % Set caret one line up (NOTE that getLineNumber and goToLine uses numbering that differ by one)
-        imlook4d_current_handles.record.editor.insertTextAtCaret( outText );  % Insert text at caret
-        
-        lineNumber = imlook4d_current_handles.record.editor.getLineNumber();  % Line number
-        imlook4d_current_handles.record.editor.goToLine( lineNumber+3 ,1);  % Set caret one line down again
+        % lineNumber = imlook4d_current_handles.record.editor.getLineNumber();  % Line number
+        % 
+        % imlook4d_current_handles.record.editor.goToLine( lineNumber-1 ,1);      % Set caret one line up (NOTE that getLineNumber and goToLine uses numbering that differ by one)
+        % imlook4d_current_handles.record.editor.insertTextAtCaret( outText );  % Insert text at caret
+        % 
+        % lineNumber = imlook4d_current_handles.record.editor.getLineNumber();  % Line number
+        % imlook4d_current_handles.record.editor.goToLine( lineNumber+3 ,1);  % Set caret one line down again
+
+        recordInsertBeforeLastNonEmptyLine(imlook4d_current_handles.record.editor, outText)
+
+
     catch
         disp('ERROR - recordInputsText (your Matlab is probably too old for this)');
     end
