@@ -51,7 +51,6 @@ function varargout = imlook4d(varargin)
                     app = evalin('base', 'app'); % Get from 'app' in 'base' workspace -- which should have been exported
                     callbackName = varargin{1}; 
                     disp( [ 'imlook4d  -- callbackName = ' callbackName ]);
-                    disp( [ 'imlook4d  -- size(varargin{4}.image.Cdata) = ' num2str( size(varargin{4}.image.Cdata)) ]);
                     app.callOldCallback(callbackName, varargin{2:end})
                     disp('Leave imlook4d -- handle old callback format')
                     return

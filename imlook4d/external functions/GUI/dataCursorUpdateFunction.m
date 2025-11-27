@@ -22,7 +22,6 @@
         end
 
         %
-
         % ROI   
         try
             
@@ -30,6 +29,7 @@
             roiNames=get(handles.ROINumberMenu,'String'); % Cell array
 
         catch
+            disp('dataCursorUpdateFunction failed on ROI') 
         end
 
         % Value
@@ -40,12 +40,19 @@
             avg = mean( valuesInROI(:) );
             highest = max( valuesInROI(:) );
             lowest = min( valuesInROI(:) );
-            
+           
             % Fast Calculate pixel value (use generateImage, thus gettting models, PCA-filter etc)
             handles.image.Cdata = handles.image.Cdata(x,y,z,:);  % Call using [1,1,1,:] matrix for this pixel only
+
+			disp('dataCursorUpdateFunction2')
+            
             [tempData, explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, 1, t);
+            
+			disp('dataCursorUpdateFunction3')
+            
             value = tempData;
             
+            disp('dataCursorUpdateFunction') 
             
             output_txt = {  ...
                 ['Pixel value: ',num2str( value,'%10.5g\n') ], ...
@@ -55,7 +62,7 @@
             output_txt = { output_txt{:}, EOL};        
             output_txt = { output_txt{:}, ['X=',num2str(x) '  Y=',num2str(y)  '  Z=',num2str(z) ]};
         
-            
+
             % Only if ROI exists
             if (roi > 0 )
 
@@ -98,12 +105,14 @@
                     ['Background: ',num2str( value_bck,'%10.5g\n') ], ...
                     };
             catch
+                disp('dataCursorUpdateFunction failed on background image') 
             end
             
 
 
             
         catch
+            disp('dataCursorUpdateFunction failed on Value -- create fall back values') 
             value = handles.image.Cdata(x,y,z,t);
             output_txt = { output_txt{:}, ...
                 ['Value: ',num2str( value,'%10.5g\n') ], ...
