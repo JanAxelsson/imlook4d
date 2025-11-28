@@ -51,7 +51,7 @@ function varargout = imlook4d(varargin)
                     app = evalin('base', 'app'); % Get from 'app' in 'base' workspace -- which should have been exported
                     callbackName = varargin{1}; 
                     disp( [ 'imlook4d  -- callbackName = ' callbackName ]);
-                    app.callOldCallback(callbackName, varargin{2:end})
+                    app.callOldCallback(callbackName, varargin{2:end});  % I need app instance here, to call private function callOldCallback
                     disp('Leave imlook4d -- handle old callback format')
                     return
                end
@@ -74,6 +74,7 @@ function varargout = imlook4d(varargin)
     % [    ] h = imlook4d('/Users/jan/Desktop/IMAGES/ATTR/PETMR-2024-102 (2024-OCT-03) - 250846/[MR] Ax FIESTA ungated - serie7/6')
     if nargout
          [varargout{1:nargout}] = imlook4d_App( varargin{:});   % TODO: imlook4d_App returns app, not handle / handles.  handles.image is lost in app !
+         varargout{1} = gcf;
     end
 
 
