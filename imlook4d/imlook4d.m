@@ -9,7 +9,7 @@
 % --------------------------------------------------------------------
 % OPEN FILE DIALOG
 %   imlook4d   
-%   h=imlook4d 
+%   h=imlook4d (returns an old fashioned guide-like handle)  NOTE:imlook4d_App returns an app object instead
 %
 % OPEN A MATRIX
 %   imlook4d(matrix)
@@ -48,7 +48,7 @@ function varargout = imlook4d(varargin)
                if ~exist(pathstr,'dir') % Not an existing file path (thus, must be other option which is a function name)
 
                     % TODO: Write code for a callback
-                    app = evalin('base', 'app'); % Get from 'app' in 'base' workspace -- which should have been exported
+                    app = evalin('base', 'imlook4d_app'); % Get from 'app' in 'base' workspace -- which should have been exported
                     callbackName = varargin{1}; 
                     disp( [ 'imlook4d  -- callbackName = ' callbackName ]);
                     app.callOldCallback(callbackName, varargin{2:end});  % I need app instance here, to call private function callOldCallback

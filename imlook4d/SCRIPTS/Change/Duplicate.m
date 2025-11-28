@@ -9,12 +9,17 @@
 % INITIALIZE
 %
      disp('SCRIPTS/Duplicate.m entered');
-     
+
+     %imlook4d_current_handle = gcf;
      imlook4d_current_handles=guidata(imlook4d_current_handle);
 
      % Create imlook4d
      newHandle=imlook4d(imlook4d_current_handles.image.Cdata);  % Create new imlook4d instance with image matrix only
-     newHandles=guidata(newHandle);                             % Get handles
+
+     return
+     
+     %newHandle = imlook4d_app.figure1; % Get the handle from app object
+     newHandles=guidata(newHandle);    % Get handles
 %      
 %      % Move window slightly offset to original
 %      dx = 30;
@@ -30,7 +35,7 @@
      newHandles.image.windowOpenedTime = now(); % Set new 
      
      % Copy handles.record
-     %%newHandles.record=imlook4d_current_handles.record;   
+     newHandles.record=imlook4d_current_handles.record;   
      
      % Copy handles.model
      newHandles.model=imlook4d_current_handles.model;           
