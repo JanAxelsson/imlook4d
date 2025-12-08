@@ -37,50 +37,84 @@
 
 function varargout = imlook4d(varargin)
 
-   
-   % [    ] Old callback format : imlook4d('LoadRoiPushbutton_Callback', imlook4d_current_handles.LoadROI,{} ,imlook4d_current_handles, filePath)
-   % try            
+
+       disp('Calling imlook4d wrapper');
+       disp(varargin);
+
+   % Run if-statements to identify case, in this order :
+   % 1) first argument = non-path string
+   % 2) forward all arguments
+   % 3) forward all arguments + return handle to figure
+   % 4) no arguments
+
+   % 1) first argument = non-path string
+   %
+   % [    ] Old callback format starting with non-path string : imlook4d('LoadRoiPushbutton_Callback', imlook4d_current_handles.LoadROI, {} ,imlook4d_current_handles, filePath)
+   % [    ] Old callback format with
+   try            
             % Has characters in first argument
             if nargin && ischar(varargin{1}) 
 
                [pathstr,name,ext] = fileparts(varargin{1});  % 
-               % Open old callback format 
+               % If string is not a path -- Open old callback format 
                if ~exist(pathstr,'dir') % Not an existing file path (thus, must be other option which is a function name)
 
                     % TODO: Write code for a callback
-                    app = evalin('base', 'imlook4d_app'); % Get from 'app' in 'base' workspace -- which should have been exported
+                    %%app = evalin('base', 'imlook4d_app'); % Get from 'app' in 'base' workspace -- which should have been exported
+
+
+                    disp('   1) first argument = non-path string');
+                    
                     callbackName = varargin{1}; 
-                    disp( [ 'imlook4d  -- callbackName = ' callbackName ]);
+                    handles = varargin{4};
+                    app = handles.figure1.UserData.app;
                     app.callOldCallback(callbackName, varargin{2:end});  % I need app instance here, to call private function callOldCallback
-                    disp('Leave imlook4d -- handle old callback format')
+              
                     return
                end
             end
-   % catch
-   %     disp('ERROR IN imlook4d function')
-   % end
+   catch
+       disp('   ERROR IN imlook4d wrapper -- handling "1) first argument = non-path string"');
+       if (nargin < 4)
+            disp(['   Expected 4 arguments, received ' num2str(nargin) ' arguments']);
+       end
+       disp(' '); % New row
+       return
+
+   end
+   
 
 
-    % Has input arguments
-    % [ OK ] imlook4d('/Users/jan/Desktop/IMAGES/ATTR/PETMR-2024-102 (2024-OCT-03) - 250846/[MR] Ax FIESTA ungated - serie7/6')
-    % [ OK ] imlook4d( imlook4d_Cdata)
-    % [ OK ] imlook4d( imlook4d_Cdata, imlook4d_time, imlook4d_duration) 
+    % 2) forward all arguments
+    %
+    % [ OK ] Starts with path:          imlook4d('/Users/jan/Desktop/IMAGES/ATTR/PETMR-2024-102 (2024-OCT-03) - 250846/[MR] Ax FIESTA ungated - serie7/6')
+    % [ OK ] Data matrix  :             imlook4d( imlook4d_Cdata)
+    % [ OK ] Data matrix + time info :  imlook4d( imlook4d_Cdata, imlook4d_time, imlook4d_duration) 
     if ~nargout
+
+        disp('   2) forward all arguments');
+
         imlook4d_App(varargin{:});
         disp(['Leave imlook4d -- called with one or several arguments'])
         return
     end
 
-    % [    ] h = imlook4d('/Users/jan/Desktop/IMAGES/ATTR/PETMR-2024-102 (2024-OCT-03) - 250846/[MR] Ax FIESTA ungated - serie7/6')
+    % 3) forward all arguments + return handle to figure
+    %
+    %  [    ] Return handle to figure (and forward input arguments) : h = imlook4d('/Users/jan/Desktop/IMAGES/ATTR/PETMR-2024-102 (2024-OCT-03) - 250846/[MR] Ax FIESTA ungated - serie7/6')
     if nargout
+         disp('   3) forward all arguments + return handle to figure');
          [varargout{1:nargout}] = imlook4d_App( varargin{:});   % TODO: imlook4d_App returns app, not handle / handles.  handles.image is lost in app !
          varargout{1} = gcf;
     end
 
 
+    % 4) no arguments
+    %
     % [ OK ] imlook4d
     % [ OK ] imlook4d()
     if isempty(varargin)
+        disp('   4) no arguments');
         imlook4d_App
         disp('Leave imlook4d -- called with zero arguments')
         return

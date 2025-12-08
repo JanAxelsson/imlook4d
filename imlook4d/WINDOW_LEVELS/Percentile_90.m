@@ -14,7 +14,7 @@ function Percentile_90(hObject, eventdata, handles)
     frame=round(get(imlook4d_handles.FrameNumSlider,'Value'));
     sliceImage = imlook4d_handles.image.Cdata(:,:,slice,frame);
     
-    minValue=min(min(min( sliceImage) ))
+    minValue=min(min(min( sliceImage) ));
     
     % Percentile in frame
     sorted = sort( sliceImage(:), 'ascend');
@@ -23,4 +23,4 @@ function Percentile_90(hObject, eventdata, handles)
 
     % Set window level    
     window=[minValue maxValue];
-    imlook4d('setColorBar',guidata(gcf),window )
+    imlook4d('setColorBar',guidata(gcf),window );
