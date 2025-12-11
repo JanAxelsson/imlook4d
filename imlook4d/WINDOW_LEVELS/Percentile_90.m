@@ -3,9 +3,9 @@ function Percentile_90(hObject, eventdata, handles)
     %window=[-1500 500];
 
     % Display HELP and get out of callback
-     if imlook4d('DisplayHelp', hObject, eventdata, handles) 
-         return 
-     end
+     % if imlook4d('DisplayHelp', hObject, eventdata, handles) 
+     %     return 
+     % end
      
 
     % Determine min in frame

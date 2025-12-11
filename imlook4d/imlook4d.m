@@ -66,9 +66,19 @@ function varargout = imlook4d(varargin)
                     disp('   1) first argument = non-path string');
                     
                     callbackName = varargin{1}; 
-                    handles = varargin{4};
+
+                    % Handles at different positions, use figure1 field to determine if handles structure
+                    if isfield( varargin{2}, 'figure1')
+                        handles = varargin{2};
+                    elseif isfield( varargin{4}, 'figure1')
+                        handles = varargin{4};
+                    end
+
                     app = handles.figure1.UserData.app;
-                    app.callOldCallback(callbackName, varargin{2:end});  % I need app instance here, to call private function callOldCallback
+                    %app.callOldCallback(callbackName, varargin{2:end});  % I need app instance here, to call private function callOldCallback
+              
+                    newVarargin = varargin(2:end);
+                    app.callOldCallback(callbackName, newVarargin{:});  % I need app instance here, to call private function callOldCallback
               
                     return
                end

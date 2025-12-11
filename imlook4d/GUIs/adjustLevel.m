@@ -96,7 +96,9 @@ function adjustLevel_OpeningFcn(hObject, eventdata, handles, varargin)
     handles.minEdit.String = num2str(currentMin);
     handles.maxEdit.String = num2str(currentMax);
     
-  
+   labelFontSize = 8; 
+   handles.maxStaticText.FontSize = labelFontSize;
+   handles.minStaticText.FontSize = labelFontSize;
 
     
     tempData = handles.imlook4d_handles.image.CachedImage;      % Read cached image, Image data (not flipped or rotated)
