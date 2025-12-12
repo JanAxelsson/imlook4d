@@ -35,7 +35,7 @@
 %
 
 
-function varargout = imlook4d(varargin)
+function out = imlook4d(varargin)
 
 
        disp('Calling imlook4d wrapper');
@@ -78,7 +78,7 @@ function varargout = imlook4d(varargin)
                     %app.callOldCallback(callbackName, varargin{2:end});  % I need app instance here, to call private function callOldCallback
               
                     newVarargin = varargin(2:end);
-                    app.callOldCallback(callbackName, newVarargin{:});  % I need app instance here, to call private function callOldCallback
+                    out = app.callOldCallback(callbackName, newVarargin{:});  % I need app instance here, to call private function callOldCallback
               
                     return
                end
@@ -115,7 +115,7 @@ function varargout = imlook4d(varargin)
     if nargout
          disp('   3) forward all arguments + return handle to figure');
          [varargout{1:nargout}] = imlook4d_App( varargin{:});   % TODO: imlook4d_App returns app, not handle / handles.  handles.image is lost in app !
-         varargout{1} = gcf;
+         out = gcf;
     end
 
 
