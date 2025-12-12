@@ -788,7 +788,7 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                                 % hObject = varargin{1}{1};
                                 % eventdata = varargin{1}{2};
                                 % handles = varargin{1}{3};
-                                [hObject, eventdata, handles] = myConvertToGUIDECallbackArguments(app, varargin);
+                                [hObject, eventdata, handles] = myConvertToGUIDECallbackArguments(app, varargin{:});
                                 hObject = eventdata.Source.CurrentObject;
                             else % migrated call updateImage( app, hObject, eventdata, handles)
                                 eventdata = varargin{2};
@@ -7209,8 +7209,12 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
 
             %[imlook4d_current_handle, eventdata, imlook4d_current_handle] = myConvertToGUIDECallbackArguments(app, event); %#ok<ASGLU>
             f = eval(['@app.' callbackName ]); 
-            %out = f(varargin);
-            f(varargin);
+
+            if strcmp( callbackName, 'DisplayHelp')
+                out = f(varargin{:});  % Best solution, since the return from DisplayHelp has to be handled differently (apparantly)
+            else
+                f(varargin);
+            end
 
 
 
