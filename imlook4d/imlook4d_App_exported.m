@@ -1106,16 +1106,20 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
             
                            %
                            % If toolbar Help button is pressed,
-                           % toggle radio-buttons and check boxes
+                           % toggle check boxes 
+                           % toggle toolbar buttons
+                           % TODO: toggle uiradiobuttons  
                            % (thus keeping state before being pressed)
                            %
                                try
+                                   %if ( trueIfChecked && strcmp( hObject.Type, 'uicheckbox' ) )
                                    if trueIfChecked
-            
-                                       if get( hObject,'Value')==1
-                                           set( hObject,'Value', 0);
-                                       else
-                                           set(hObject,'Value', 1);
+                                       if strcmp( eventdata.EventName, 'WindowMousePress' ) 
+                                           if get( hObject,'Value')==1
+                                               set( hObject,'Value', 0);
+                                           else
+                                               set(hObject,'Value', 1);
+                                           end
                                        end
             
                                        restoreImageRadioButtonGroup(app, handles);
@@ -13155,6 +13159,7 @@ end
             app.PC_high_slider.MajorTicks = [];
             app.PC_high_slider.Orientation = 'vertical';
             app.PC_high_slider.ValueChangedFcn = createCallbackFcn(app, @PC_high_slider_Callback, true);
+            app.PC_high_slider.MinorTicks = [1 112 223 334 445 556 667 778 889 1000];
             app.PC_high_slider.Step = 0.03125;
             app.PC_high_slider.FontSize = 10.6666666666667;
             app.PC_high_slider.FontColor = [0 0 0];
@@ -13240,6 +13245,7 @@ end
             app.FrameNumSlider.MajorTicks = [];
             app.FrameNumSlider.ValueChangedFcn = createCallbackFcn(app, @FrameNumSlider_Callback, true);
             app.FrameNumSlider.ValueChangingFcn = createCallbackFcn(app, @FrameNumSlider_Callback, true);
+            app.FrameNumSlider.MinorTicks = [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33];
             app.FrameNumSlider.Step = 0.03125;
             app.FrameNumSlider.FontSize = 10.6666666666667;
             app.FrameNumSlider.FontColor = [0 0 0];
@@ -13256,6 +13262,7 @@ end
             app.SliceNumSlider.MajorTicks = [];
             app.SliceNumSlider.ValueChangedFcn = createCallbackFcn(app, @SliceNumSlider_Callback, true);
             app.SliceNumSlider.ValueChangingFcn = createCallbackFcn(app, @SliceNumSlider_Callback, true);
+            app.SliceNumSlider.MinorTicks = [1 3 5 7 9 11 13 15 17 19 21 23 25 27 29 31 33 35 37 39 41 43 45 47 49 51 53 55 57 59 61 63];
             app.SliceNumSlider.Step = 0.0161290322580645;
             app.SliceNumSlider.FontSize = 10.6666666666667;
             app.SliceNumSlider.FontColor = [0 0 0];
