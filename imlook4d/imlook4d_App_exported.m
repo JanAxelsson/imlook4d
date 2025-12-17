@@ -356,8 +356,8 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                                             '*.roi',  'ROI files (*.roi)'; ...
                                             '*.dcm',  'DICOM files (*.dcm)'; ...
                                             '*.v','ECAT Files (*.v)'; ...
-                                            '*.img;*.hdr','Analyze Files (*.img, *.hdr)'; ...
-                                            '*.nii,*.img;*.hdr','Nifti Files (*.nii, *.img, *.hdr)'; ...
+                                            '*.img; *.hdr','Analyze Files (*.img, *.hdr)'; ...
+                                            '*.nii; *.img; *.hdr', 'Nifti Files (*.nii,  *.img,  *.hdr)'; ...
                                             '*.nii.gz','Nifti Files (*.nii.gz)'; ...
                                             '*.mhd;*.mha',  'ITK files (*.mhd, *.mha)'; ...
                                             '*.mgh;*.mgz',  'Freesurfer files (*.mgh, *.mgz)'; ...
@@ -2508,8 +2508,8 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                                      h=imlook4d(single(nii.img));
                                 end
             
-                                newhandles = guidata(h.figure1)
-                                newhandles.figure1.Name = file;
+                                newhandles = guidata(h)
+                                newhandles.Name = file;
             
                           % Display message
                                 if strcmp(openingMode,'load_untouch_nii')
@@ -2547,8 +2547,8 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
             
                            % Save guidata
                                 %guidata(h, newhandles);
-                                guidata(h.figure1, newhandles);
-                                updateImage(app, h.figure1, [], newhandles);
+                                guidata(h, newhandles);
+                                updateImage(app, h, [], newhandles);
                                 
         end
         
@@ -7184,10 +7184,7 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
             app.upgrade_menu.MenuSelectedFcn = 'if imlook4d(''app.DisplayHelp'',gcbo,[],guidata(gcbo));return;end;eval(''Update_imlook4d'')';
 
         end
-        
-        function results = func95(app)
-            
-        end
+
     end
     
     methods (Access = public)
