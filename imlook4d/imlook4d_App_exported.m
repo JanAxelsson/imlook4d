@@ -3579,7 +3579,8 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                                 hold(axisHandle, 'off')
         end
         
-        function convertAllPolysVoiToROI(app, hObject, eventdata, handles)
+        function convertAllPolysVoiToROI(app, varargin)
+                        [hObject, eventdata, handles] = myConvertToGUIDECallbackArguments(app, varargin{:});
             
                         lobj = findobj(gcf, 'Type','images.roi.polygon');
                         for i = 1:length(lobj)
@@ -3593,7 +3594,9 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                         guidata(handles.figure1, handles);
         end
         
-        function convertPolyVoiToROI(app, hObject, eventdata, handles)
+        function convertPolyVoiToROI(app, varargin)
+
+                        [hObject, eventdata, handles] = myConvertToGUIDECallbackArguments(app, varargin{:});
                         roi = hObject.Parent.UserData.polygon;
                         handles = convertSinglePolyToROI(app, handles, roi);
                         handles = storeUndoROI(app, handles);
