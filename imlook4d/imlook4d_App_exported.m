@@ -2512,8 +2512,8 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                                      h=imlook4d(single(nii.img));
                                 end
             
-                                newhandles = guidata(h)
-                                newhandles.Name = file;
+                                newhandles = guidata(h);
+                                newhandles.figure1.Name = file;
             
                           % Display message
                                 if strcmp(openingMode,'load_untouch_nii')
