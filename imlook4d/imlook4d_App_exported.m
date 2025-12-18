@@ -4225,8 +4225,7 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                                 IsPCAFilter = not( (get(handles.PC_low_slider, 'Value')==1) &&  (get(handles.PC_high_slider, 'Value')==numberOfFrames) ); % PCA-filter selected with sliders
                                 IsPCImage = get(handles.PCImageRadioButton,'Value');      % PC images radio button selected
             
-                                % % IsModel =  isa(handles.model.functionHandle, 'function_handle');
-                                IsModel = false;
+                                IsModel =  isa(handles.model.functionHandle, 'function_handle');
             
                                 IsDynamic = (numberOfFrames>1);
             
@@ -4904,13 +4903,17 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                         % Make submenu item
                         if strcmp(ext,'.m')
                             nameWithSpaces= regexprep(name,'_', ' ');  % Replace '_' with ' '
-            
-                            % For SCRIPTS, MODEL,
-                            callBack = [ '@(src, event) doSubMenuCallback(app, event, ''' name ''')' ];
-
 
                             label = nameWithSpaces;
                             tag = nameWithSpaces;
+            
+                            % For SCRIPTS
+                            % - help files for scripts
+                            if ~strcmp( get(parentMenuHandle, 'Label'), 'Color')
+                                handles.scriptsMenuSubItemHandle(j) = ...
+                                    uimenu(parentMenuHandle,'Label',label, 'Callback', @(src,event) doSubMenuCallback(app, event, name) , 'Tag', tag);
+                            end
+
 
                            % 
                            % % Special for OLD MODEL menu
@@ -4922,9 +4925,11 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                             if strcmp( get(parentMenuHandle, 'Label'), 'Color')
                                 callBack=['imlook4d(''Color_Callback'',gcbo,[],guidata(gcbo), ''' name ''' )'];
                                 [pathstr2,name2,ext2] = fileparts( which(name));
-                                %label = [ '<html> <img width=100 height=15  src="file:///' pathstr2 filesep name2 '.png" ></img><font color="white">--</font>'  nameWithSpaces '</html>'];
                                 label = nameWithSpaces;
                                 tag = nameWithSpaces;
+
+                                % COLOR
+                                handles.scriptsMenuSubItemHandle(j) = uimenu(parentMenuHandle,'Label',label, 'Callback', callBack , 'Tag', tag);
                             end
             
                             % Special for Window Levels menu
@@ -4939,11 +4944,6 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                                 tag = nameWithSpaces;
                             end 
             
-            
-                            % Advanced callback to allow
-                            % - help files for scripts
-                            handles.scriptsMenuSubItemHandle(j) = ...
-                                uimenu(parentMenuHandle,'Label',label, 'Callback', @(src,event) doSubMenuCallback(app, event, name) , 'Tag', tag);
             
             
             
