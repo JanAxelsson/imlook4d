@@ -5150,7 +5150,7 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                         labelHandle.String = answer{1};
             
                         % Name in contextual menu
-                        nameContextMenuItem = contextMenu.Children(end);
+                        nameContextMenuItem = renameContextMenuItem.Children(end);
                         nameContextMenuItem.Text = labelHandle.String;
         end
         
@@ -7199,7 +7199,10 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
             %[imlook4d_current_handle, eventdata, imlook4d_current_handle] = myConvertToGUIDECallbackArguments(app, event); 
             f = eval(['@app.' callbackName ]); 
 
-            if strcmp( callbackName, 'DisplayHelp')
+            % Functions that need an output argument
+            callbackNamesRequireOut = {'DisplayHelp'};
+
+            if ismember( callbackName, callbackNamesRequireOut)
                 out = f(varargin{:});  % Best solution, since the return from DisplayHelp has to be handled differently (apparantly)
             else
                 f(varargin);
@@ -9194,9 +9197,20 @@ end
             % --------------------------------------------------------------------
             % SELECTIONS
             % --------------------------------------------------------------------
+
             
             % Create GUIDE-style callback args - Added by Migration Tool
-            [hObject, eventdata, handles] = myConvertToGUIDECallbackArguments(app, event); 
+            args = event;
+
+            if length(args) == 4
+                [hObject, eventdata, handles] = myConvertToGUIDECallbackArguments(app,  args{1:3}); 
+                name = args{4};
+            else
+                [hObject, eventdata, handles] = myConvertToGUIDECallbackArguments(app,  args); 
+            end
+
+
+
             
                    % This function asks for a ROI name, and creates an empty ROI.
                    % If input parameter name is given, this will be the ROI name, and no dialog will be displayed.
@@ -9219,32 +9233,31 @@ end
             
                         %IF Add ROI
                         if strcmp( contents{ROINumber},'Add ROI' )
-                            n=size(contents,1);
-            
-                            % Default ROI names only
-                            %contents={ contents{1:(n-1)}, ['ROI ' num2str(n)],contents{n}};
-                            %set(hObject,'String', contents);
-            
-                            if nargin==2
-                            % Dialog option
-                                prompt={'Enter ROI name:'};
-                                name='Input ROI name';
-                                numlines=1;
-                                defaultanswer={['ROI ' num2str(n)]};
-                                answer=inputdlg(prompt,name,numlines,defaultanswer);
-                                name=answer{1};
-                            end
-                            if nargin==3
-                                %
-                            end
-            
-                            contents={ contents{1:(n-1)}, name, contents{n}}; % Put "Add ROI" last
-            
-                            set(hObject,'String', contents);
-                            handles.image.VisibleROIs=[ handles.image.VisibleROIs 1];
-                            handles.image.LockedROIs=[ handles.image.LockedROIs 0];
-            
-                        end
+                                n=size(contents,1);
+                
+                                % Default ROI names only
+                                %contents={ contents{1:(n-1)}, ['ROI ' num2str(n)],contents{n}};
+                                %set(hObject,'String', contents);
+                
+                                %if length(args) == 3
+                                % Dialog option
+                                    prompt={'Enter ROI name:'};
+                                    name='Input ROI name';
+                                    numlines=1;
+                                    defaultanswer={['ROI ' num2str(n)]};
+                                    answer=inputdlg(prompt,name,numlines,defaultanswer);
+                                    name=answer{1};
+                                %end
+    
+                
+                                contents={ contents{1:(n-1)}, name, contents{n}}; % Put "Add ROI" last
+                
+                                set(hObject,'String', contents);
+                                handles.image.VisibleROIs=[ handles.image.VisibleROIs 1];
+                                handles.image.LockedROIs=[ handles.image.LockedROIs 0];
+                
+                       end
+
             
             
                         % If an existing ROI - we will now:
@@ -9486,9 +9499,28 @@ end
             name=answer{1};
 
             % Make new ROI at end of list
-            newROINumber = length(ROINames);
-            set(handles.ROINumberMenu,'Value',length(ROINames) ); % Add ROI is the last one
-            handles = ROINumberMenu_Callback(handles.ROINumberMenu, eventdata, handles, name);
+            % newROINumber = length(ROINames);
+            % set(handles.ROINumberMenu,'Value',length(ROINames) ); % Add ROI is the last one
+            % %handles = ROINumberMenu_Callback(app, {handles.ROINumberMenu, eventdata, handles, name});
+            % ROINumberMenu_Callback(app, {handles.ROINumberMenu, eventdata, handles, name});
+
+
+            % Hints: contents = get(hObject,'String') returns ROINumberMenu contents as cell array
+            %        contents{get(hObject,'Value')} returns selected item from ROINumberMenu
+            contents = handles.ROINumberMenu.String;
+            newROINumber = length(contents);   % Add last
+
+            % Make new ROI
+            n = length(contents);
+            updatedContents={ contents{1:(n-1)}, name, contents{n}}; % Put "Add ROI" last
+    
+            handles.ROINumberMenu.String = updatedContents;
+
+            handles.image.VisibleROIs=[ handles.image.VisibleROIs 1];
+            handles.image.LockedROIs=[ handles.image.LockedROIs 0];
+
+            handles.ROINumberMenu.Value = newROINumber;
+
 
             % Make compund ROI
             for i = s
@@ -9618,7 +9650,7 @@ end
                     % Show all hidden
                     ROINumberMenu=get(handles.ROINumberMenu);
                     contents = ROINumberMenu.String; % Cell array
-                    handles.image.VisibleROIs(1:length(ROINumberMenu.String,1)-1)=1;
+                    handles.image.VisibleROIs(1:length(ROINumberMenu.String)-1)=1;
                     ROINumber=ROINumberMenu.Value;
                     contents = regexprep(contents, '\(hidden\) ', ''); % Remove (hidden) prefix
                     set(handles.ROINumberMenu,'String', contents);
@@ -11172,135 +11204,134 @@ end
         function measureTape_CopyValues(app, event)
             % Create GUIDE-style callback args - Added by Migration Tool
             [copyValuesContextMenuItem, eventdata, handles] = myConvertToGUIDECallbackArguments(app, event); 
-                     % Copy values to clipboard
             
-            TAB=sprintf('\t');
-            EOL=sprintf('\n');
-
-            s = [ 'name' TAB 'length [mm]' TAB 'length [pixels]' TAB 'Angle [degrees]' EOL];
-            s = [ 'placement' TAB 'name' TAB 'length [mm]' TAB 'length [pixels]' TAB 'Angle [degrees]' EOL];
+                        % Copy values to clipboard
+            
+                        TAB=sprintf('\t');
+                        EOL=sprintf('\n');
+            
+                        s = [ 'name' TAB 'length [mm]' TAB 'length [pixels]' TAB 'Angle [degrees]' EOL];
+                        s = [ 'placement' TAB 'name' TAB 'length [mm]' TAB 'length [pixels]' TAB 'Angle [degrees]' EOL];
             
             
-            %
-            % With imaging toolbox
-            %
-                lobj = findobj(gcf, 'Type','images.roi.line');
-                for i = 1:length(lobj)
-                    pos = lobj(i).Position;
-                    
-                    name = lobj(i).UIContextMenu.UserData.textHandle.String;
-                    lineContextMenuItem = lobj(i).UIContextMenu;
-                    
-                    switch lobj(i).UIContextMenu.UserData.orientation
-                        case 'Axial'
-                            shortOrientation = 'Ax';
-                        case 'Coronal'
-                            shortOrientation = 'Cor';
-                        case 'Sagital'
-                            shortOrientation = 'Sag';
-                    end
-                    
-                    placement = [ 'Slice=' num2str( lobj(i).UIContextMenu.UserData.slice) ' (' shortOrientation ')' ];
-                    
-                    [ measureLength, pixels, angle_degrees ] = displayLineCoordinates(lineContextMenuItem, pos);
-                    s = [ s placement TAB name TAB num2str(measureLength) TAB num2str(pixels) TAB num2str(angle_degrees) EOL];
-
-                end
+                        %
+                        % With imaging toolbox
+                        %
+                            lobj = findobj(gcf, 'Type','images.roi.line');
+                            for i = 1:length(lobj)
+                                pos = lobj(i).Position;
             
-            %
-            % Without imaging toolbox
-            % 
-                contextMenu = copyValuesContextMenuItem.Parent;
-                bottomLines = findobj(gcf, 'Type','Line', 'Tag','imlook4d_measure');
-
-                for i = 1:length(bottomLines)
-                    line = bottomLines(i);
-                    pos = [ line.XData ; line.YData]';
-                    %disp(mat2str(pos,3));
-                    try
-                        lineContextMenuItem = line.UIContextMenu.Children(end); % Last one is the top contextual menu, which contains the name (if imaging toolbox imline function existed)
-                        if strcmp( lineContextMenuItem.Tag, 'nameContextMenuItem')
-                            name = lineContextMenuItem.Text;
-                        else
-                            name = 'measure'; % set default name, if not imaging toolbox
-                        end
-                    catch
-                        name = 'measure'; % set default name, if crashes
-                    end
-                    
-                                        
-                    switch bottomLines(i).UIContextMenu.UserData.orientation
-                        case 'Axial'
-                            shortOrientation = 'Ax';
-                        case 'Coronal'
-                            shortOrientation = 'Cor';
-                        case 'Sagital'
-                            shortOrientation = 'Sag';
-                    end
-                    
-                    placement = [ 'Slice=' num2str( bottomLines(i).UIContextMenu.UserData.slice) ' (' shortOrientation ')' ];
-                    
-                    [ measureLength, pixels, angle_degrees ] = displayLineCoordinates(lineContextMenuItem, pos);
-
-                    s = [ s placement TAB name TAB num2str(measureLength) TAB num2str(pixels) TAB num2str(angle_degrees) EOL];
-                end
+                                name = lobj(i).UIContextMenu.UserData.textHandle.String;
+                                lineContextMenuItem = lobj(i).UIContextMenu;
             
-            %
-            % To clipboard and command window
-            %
+                                switch lobj(i).UIContextMenu.UserData.orientation
+                                    case 'Axial'
+                                        shortOrientation = 'Ax';
+                                    case 'Coronal'
+                                        shortOrientation = 'Cor';
+                                    case 'Sagital'
+                                        shortOrientation = 'Sag';
+                                end
             
-                disp(' ');
-                disp('Measures copied to system clipboard :');
-                disp(' ');
-                
-                disp(s);
-                clipboard('copy',s)  
- 
-  
+                                placement = [ 'Slice=' num2str( lobj(i).UIContextMenu.UserData.slice) ' (' shortOrientation ')' ];
+            
+                                [ measureLength, pixels, angle_degrees ] = displayLineCoordinates(app, lineContextMenuItem, pos);
+                                s = [ s placement TAB name TAB num2str(measureLength) TAB num2str(pixels) TAB num2str(angle_degrees) EOL];
+            
+                            end
+            
+                        %
+                        % Without imaging toolbox
+                        %
+                            contextMenu = copyValuesContextMenuItem.Parent;
+                            bottomLines = findobj(gcf, 'Type','Line', 'Tag','imlook4d_measure');
+            
+                            for i = 1:length(bottomLines)
+                                line = bottomLines(i);
+                                pos = [ line.XData ; line.YData]';
+                                %disp(mat2str(pos,3));
+                                try
+                                    lineContextMenuItem = line.UIContextMenu.Children(end); % Last one is the top contextual menu, which contains the name (if imaging toolbox imline function existed)
+                                    if strcmp( lineContextMenuItem.Tag, 'nameContextMenuItem')
+                                        name = lineContextMenuItem.Text;
+                                    else
+                                        name = 'measure'; % set default name, if not imaging toolbox
+                                    end
+                                catch
+                                    name = 'measure'; % set default name, if crashes
+                                end
+            
+            
+                                switch bottomLines(i).UIContextMenu.UserData.orientation
+                                    case 'Axial'
+                                        shortOrientation = 'Ax';
+                                    case 'Coronal'
+                                        shortOrientation = 'Cor';
+                                    case 'Sagital'
+                                        shortOrientation = 'Sag';
+                                end
+            
+                                placement = [ 'Slice=' num2str( bottomLines(i).UIContextMenu.UserData.slice) ' (' shortOrientation ')' ];
+            
+                                [ measureLength, pixels, angle_degrees ] = displayLineCoordinates(app, lineContextMenuItem, pos);
+            
+                                s = [ s placement TAB name TAB num2str(measureLength) TAB num2str(pixels) TAB num2str(angle_degrees) EOL];
+                            end
+            
+                        %
+                        % To clipboard and command window
+                        %
+            
+                            disp(' ');
+                            disp('Measures copied to system clipboard :');
+                            disp(' ');
+            
+                            disp(s);
+                            clipboard('copy',s)
         end
 
         % Menu selected function: OpenRecent
         function openRecent_Callback(app, event)
-    % Create GUIDE-style callback args - Added by Migration Tool
-    [hObject, eventdata, handles] = myConvertToGUIDECallbackArguments(app); 
+            % Create GUIDE-style callback args - Added by Migration Tool
+            [hObject, eventdata, handles] = myConvertToGUIDECallbackArguments(app); 
 
-    
-                % Get recent file list
-                historyFile = [ '' prefdir filesep 'imlook4d_file_open_history.mat' ''];
-                try
-                    load(historyFile); % struct "history" should be loaded
-                catch
-                    % make empty struct "history"
-                    history = [];
-                    history.time = {};
-                    history.filePath = {};
-                end
-    
-                % Display list
-                pathList = flip(history.filePath);  % Reverse order, newest first
-                [index,ok] = listdlg('ListString', pathList,...
-                    'SelectionMode','single',...
-                    'ListSize', [900 400],...
-                    'Name', 'Open recent file');
-    
-                % Open if not cancelled
-                if ok
-                   %imlook4d_App( pathList{index});
+            
+                        % Get recent file list
+                        historyFile = [ '' prefdir filesep 'imlook4d_file_open_history.mat' ''];
+                        try
+                            load(historyFile); % struct "history" should be loaded
+                        catch
+                            % make empty struct "history"
+                            history = [];
+                            history.time = {};
+                            history.filePath = {};
+                        end
+            
+                        % Display list
+                        pathList = flip(history.filePath);  % Reverse order, newest first
+                        [index,ok] = listdlg('ListString', pathList,...
+                            'SelectionMode','single',...
+                            'ListSize', [900 400],...
+                            'Name', 'Open recent file');
+            
+                        % Open if not cancelled
+                        if ok
+                           %imlook4d_App( pathList{index});
 
-                   %app.OpenFile_OldCallback(hObject, eventdata, handles, pathList{index} ); 
-                   evalin( 'base', ...
-                       strcat('pause(2); imlook4d_App(', '''', pathList{index}, ''')' ) ...
-                       );
-                end
+                           %app.OpenFile_OldCallback(hObject, eventdata, handles, pathList{index} ); 
+                           evalin( 'base', ...
+                               strcat('pause(2); imlook4d_App(', '''', pathList{index}, ''')' ) ...
+                               );
+                        end
         end
 
         % Value changed function: orientationMenu
         function orientationMenu_Callback(app, event)
-    % Create GUIDE-style callback args - Added by Migration Tool
-    [hObject, eventdata, handles] = myConvertToGUIDECallbackArguments(app, event); 
-    
+            % Create GUIDE-style callback args - Added by Migration Tool
+            [hObject, eventdata, handles] = myConvertToGUIDECallbackArguments(app, event); 
             
-                        orientationNumber=get(hObject,'Value');
+            
+                    orientationNumber=get(hObject,'Value');
                     if app.DisplayHelp( hObject, eventdata, handles)
                         set(hObject,'Value', orientationNumber); % Reset value to when clicked
                         return
@@ -12812,6 +12843,7 @@ end
             app.axes1.NextPlot = 'replace';
             app.axes1.Interruptible = 'off';
             app.axes1.Tag = 'axes1';
+            colormap(app.axes1, 'parula')
             app.axes1.Position = [4 100 430 349];
 
             % Create matrixSize
