@@ -3,8 +3,12 @@
 % SCRIPT for imlook4d to obtain ROI from pixels above threshold, AND within existing ROI.
 %
 %
-% Strategy:  Reuse Threshold_ROI script to find pixels, and pick out the
+% Strategy:  Reuse "Threshold_ROI" script to find pixels, and pick out the
 % pixels that are both in original ROI (oldROI) and in newly Thresholded ROI.
+%
+% Because of this, the input dialog is from "Threshold_ROI.m", 
+% and stored default values are stored by "Threshold_ROI.m" in
+% "imlook4d_store.Threshold"
 %
 %
 % Jan Axelsson
@@ -78,6 +82,9 @@ temp_variable_list=imlook4d_variables_before_script;
         
     end    
     
-imlook4d_variables_before_script=temp_variable_list;    
+    
+temp_variable_list{end+1} = 'imlook4d_store';  % Keep this variable to remember input dialog from Threshold_ROI  
+imlook4d_variables_before_script = temp_variable_list; 
+
 ClearVariables    
 
