@@ -9472,7 +9472,7 @@ end
             s = handles.ROINumberMenu.Value;
             if length(ROINames) > 1
                 % Display list
-                [s,ok] = listdlg('PromptString','Select one or many ROIs as Reference Region',...
+                [s,ok] = listdlg('PromptString','Select one or many ROIs to merge (move to new compound ROI)',...
                     'SelectionMode','multiple',...
                     'ListSize', [700 400], ...
                     'ListString',ROINames(1:end-1),...
@@ -9952,7 +9952,7 @@ end
                             handles = resetOrientation(app, handles);
             
                             %[file,path] = uiputfile('ROIs.roi','ROI Save file name');
-                            [file,path] = uiputfile({'*.roi'; '*.nii'},'ROI Save file name','ROIs.roi');
+                            [file,path] = uiputfile({'*.roi'; '*.nii'},'ROI Save file name','ROIs');
                             fullPath=[path file];
                             [~,~,ext] = fileparts(file);
                             cd(path);
