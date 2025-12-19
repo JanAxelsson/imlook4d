@@ -42,17 +42,14 @@
             lowest = min( valuesInROI(:) );
            
             % Fast Calculate pixel value (use generateImage, thus gettting models, PCA-filter etc)
-            handles.image.Cdata = handles.image.Cdata(x,y,z,:);  % Call using [1,1,1,:] matrix for this pixel only
 
-			disp('dataCursorUpdateFunction2')
+            % 1-slice dynamic
+            handles.image.Cdata = handles.image.Cdata(:,:,z,:);
             
-            [tempData, explainedFraction, fullEigenValues]=imlook4d('generateImage',handles, 1, t);
+            tempData=imlook4d('generateImage',handles, 1, t);
             
-			disp('dataCursorUpdateFunction3')
-            
-            value = tempData;
-            
-            disp('dataCursorUpdateFunction') 
+            value = tempData(x,y);
+           
             
             output_txt = {  ...
                 ['Pixel value: ',num2str( value,'%10.5g\n') ], ...
@@ -68,10 +65,10 @@
 
                 output_txt = { output_txt{:}, EOL, '------------------------', EOL};
 
-
                 output_txt = { output_txt{:}, ...  
-                    ['ROI = "' roiNames{roi} '" (roi ' num2str(roi) ')'] ...
+                    ['Statistics for : "' roiNames{roi} '"'] ...
                 };
+
 
                 output_txt = { output_txt{:}, EOL}; 
 

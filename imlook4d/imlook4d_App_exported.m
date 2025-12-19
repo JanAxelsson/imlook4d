@@ -7200,7 +7200,7 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
             f = eval(['@app.' callbackName ]); 
 
             % Functions that need an output argument
-            callbackNamesRequireOut = {'DisplayHelp'};
+            callbackNamesRequireOut = {'DisplayHelp', 'generateImage'};
 
             if ismember( callbackName, callbackNamesRequireOut)
                 out = f(varargin{:});  % Best solution, since the return from DisplayHelp has to be handled differently (apparantly)
