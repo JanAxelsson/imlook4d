@@ -795,6 +795,7 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                        % 2) Modify helpToggleTool_OnCallback, and helpToggleTool_OffCallback functions above
 
 
+
                            if nargin == 2   
                                 % 
                                 % hObject = varargin{1}{1};
@@ -814,7 +815,26 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                                     hObject = varargin{1};
                                 end
                                 handles = varargin{3};
-                            end
+                           end
+
+
+                           % Standardize for different sorts of hObject
+                           % fields:
+                           %    Type  (input:  Type or Style)
+                           %    Value (input:  Value, Text, String)
+                           %    Tag
+                           %    hObject
+                           clickedItem = {};
+                           clickedItem.hObject = hObject;
+    
+                           disp('-------------------------')
+                           disp('DisplayHelp,  clickedItem =')
+                           try  clickedItem.Type =  hObject.Type; catch; end
+                           try  clickedItem.Type =  hObject.Style; catch; end
+
+                           try  clickedItem.Tag =  hObject.Tag; catch; end
+                           disp( clickedItem)
+
 
                            
             
@@ -842,14 +862,17 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
             
                            title= 'imlook4d help';
             
-                           % --------------------------------------
+                           % ----------------------------------------------------------------------------
+                           %
                            %     HELP
-                           % --------------------------------------
+                           %
+                           % ----------------------------------------------------------------------------
             
             
-                           %
-                           % If toolbar Help button is pressed, display html-help
-                           %
+                               %
+                               % If toolbar HELP button is pressed, display html-help
+                               %
+
                                %if strcmp(get(handles.helpToggleTool, 'State'), 'on') || strcmp(callBackFunctionName, 'Help_Callback')
                                if HelpFlag
             
@@ -976,153 +999,132 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
             
             
                                 end
-            
-            
-                           % --------------------------------------
-                           %    SCRIPTING
-                           % --------------------------------------
-                               if ScriptFlag
-                                   EOL = sprintf('\n');
-            
+
+
+                        
+                        % ----------------------------------------------------------------------------
+                        %
+                        %    SCRIPTING
+                        %
+                        % ----------------------------------------------------------------------------         
+                                %
+                                % If toolbar RECORD button is pressed, write commands to editor
+                                %
+
+                                if ( ScriptFlag )
+                                       % try  clickedItem.Type =  hObject.Type; catch; end
+                                       % try  clickedItem.Type =  hObject.Style; catch; end
+                                       % try  clickedItem.Tag =   hObject.Tag; catch; end
+
+
+                                   % Get command for different GUI components
+                                   switch clickedItem.Type
+
+                                       case 'uitoggletool'
+                                                cmd = [ 'ToolbarButton(''' clickedItem.Tag ''')' ];
+
+
+                                       case 'uipushtool'
+                                                cmd = [ 'ToolbarButton(''' clickedItem.Tag ''')' ];
+
+
+                                       case 'edit'
+                                                cmd = (['EditField(''' clickedItem.Tag ''', ''' hObject.String ''')']);
+
+                                       case 'pushbutton'
+                                                cmd = clickedItem.Tag;
+
+
+                                       case 'uiradiobutton'
+                                           cmd = [ 'Radiobutton(''' hObject.Text ''')' ];
+
+
+                                       case 'checkbox'
+                                           cmd = [ 'Checkbox(''' get(hObject,'String') ''')' ];
+
+
+                                       case 'figure'
+                                               % This is for instance figures from such as water_control
+                                               try
+                                                   if ~strcmp( clickedItem.Tag, 'imlook4d')
+                                                       cmd = [ 'Menu(''' clickedItem.Tag ''')' ];
+                                                   end
+                                               catch; end
+
+                                       case 'uiimage'
+                                           % Color-selection panel
+                                           if contains( char( hObject.ImageClickedFcn), 'applyColormap') 
+                                               %if strcmp( eventdata.EventName, 'WindowMousePress')
+                                                    [ p name] = fileparts( hObject.ImageSource)
+                                                    cmd = [ 'Menu(''' name ''')' ]; % Same callback as Edit/Color
+                                              % end
+                                           end
+
+
+                                       case 'popupmenu'
+
+                                           % ROINumberMenu
+                                           if strcmp( clickedItem.Tag, 'ROINumberMenu')
+                                               if (  hObject.Value == length( hObject.String) ) 
+                                                   cmd = 'MakeROI';
+                                               else
+                                                   cmd = ['SelectROI( ''' hObject.String{ hObject.Value} ''' );'];
+                                               end
+                                           end
+
+                                           % orientationMenu
+                                           if strcmp( clickedItem.Tag, 'orientationMenu')
+                                               %cmd = ['SelectOrientation( ' num2str(get(hObject,'Value')) ' );'];
+                                               index = hObject.Value;
+                                               strings=hObject.String;
+                                               cmd = ['SelectOrientation(''' strings{index} ''');'];
+                                           end
+
+
+                                       case 'uimenu'
+                                           cmd = [ 'Menu(''' hObject.Text ''')' ];
+                                           menuName = hObject.Text;
+
+                                           % Handle if OPEN menu
+                                           if strcmp( 'Open', menuName )
+                                               cmd = ['imlook4d_current_handle = Open(INPUTS{1}); % Handle to imlook4d window']
+                                           end
+
+                                           % Handle if SCRIPTS menu
+                                           if strcmp( 'SCRIPTS', menuName )
+                                               menuName = get( get( get(hObject,'Parent'),'Parent' ),'Label');
+                                               cmd = get(hObject,'Label');
+                                               cmd = strrep( cmd, ' ', '_');  % Make proper names ('_' was removed when making menues far above)
+
+                                               % Duplicate
+                                               if strcmp( 'Duplicate', get(hObject,'Label') )
+                                                   cmd = [cmd '; MakeCurrent;'];
+                                               end
+                                           end
+
+                                   end
+
+
+                                   % Put script command in editor
                                    try
-                                       switch get(hObject,'Type')
-                                           case 'figure'
-                                               % This is for instance figures from such
-                                               % as water_control
-                                               try
-                                                   if ~strcmp( get(hObject,'Tag'), 'imlook4d')
-                                                        cmd = [ 'Menu(''' get(hObject,'Tag') ''')' ];
-                                                   end
-                                               catch
-                                               end
-            
-                                           case 'uimenu'
-                                               % This is the important one -- the
-                                               % others are only visual things which
-                                               % should not be scriptable
-            
-                                               % Guess that not SCRIPTS menu
-                                               label = get(hObject,'Label');
-                                               % Clean if html in label (the
-                                               if contains(label,'<html>')
-                                                   label = get(hObject,'Tag');
-                                               end
-            
-            
-                                               cmd = [ 'Menu(''' label ''')' ];
-            
-                                               % Open menu
-                                               try
-                                                   menuName = get(hObject,'Label');
-                                                   if strcmp( 'Open', menuName )
-                                                       %cmd = [cmd '; imlook4d_current_handle = gcf;']
-                                                       cmd = ['imlook4d_current_handle = Open(INPUTS{1}); % Handle to imlook4d window']
-                                                   end
-                                               catch
-                                               end
-            
-            
-                                               % SCRIPTS menu
-                                               try
-                                                   menuName = get( get( get(hObject,'Parent'),'Parent' ),'Label');
-                                                   if strcmp( 'SCRIPTS', menuName )
-                                                       cmd = get(hObject,'Label');
-                                                       cmd = strrep( cmd, ' ', '_');  % Make proper names ('_' was removed when making menues far above)
-            
-                                                       % Duplicate
-                                                       if strcmp( 'Duplicate', get(hObject,'Label') )
-                                                            cmd = [cmd '; MakeCurrent;'];
-                                                       end
-                                                   end
-            
-                                               catch
-                                                   disp('Not SCRIPTS');
-                                               end
-            
-            
-            %                                    % Windows menu
-            %                                    try
-            %                                        menuName = get( get( hObject,'Parent' ),'Label');  % Is "Windows" if we are in a submenu of windows
-            %                                        if strcmp( 'Windows', menuName )
-            %                                            cmd = [ 'Windows' get(hObject,'Position') ];
-            %                                        end
-            %                                    catch
-            %                                        disp('Not SCRIPTS');
-            %                                    end
-            
-            %
-            %
-            %
-            %                                case 'uitoggletool'
-            %                                    cmd = (['REC: ' get(hObject,'Tag') '(' get(hObject,'State') ')']);
-                                            case 'uipushtool'
-                                                %cmd = (['REC: ' get(hObject,'Tag') ]);
-                                                cmd = [ 'ToolbarButton(''' get(hObject,'Tag') ''')' ];
-            %                                case 'figure'
-            %                                    % Do nothing
-                                          case 'uicontrol'
-                                                switch get(hObject,'Style')
-                                                    case 'popupmenu'
-                                                       cmd = get(hObject,'Tag');
-                                                       cmd = ['SelectROI( ' num2str(get(hObject,'Value')) ' );'];
-                                                       % ROINumberMenu
-                                                       if strcmp( get(hObject,'Tag'), 'ROINumberMenu')
-                                                           if (  get(hObject,'Value') == length( get(hObject,'String') ) )
-                                                               cmd = 'MakeROI';
-                                                           else
-                                                               cmd = ['SelectROI( ' num2str(get(hObject,'Value')) ' );'];
-                                                           end
-                                                       end
-            
-                                                       % orientationMenu
-                                                       if strcmp( get(hObject,'Tag'), 'orientationMenu')
-                                                           %cmd = ['SelectOrientation( ' num2str(get(hObject,'Value')) ' );'];
-                                                           index=get(hObject,'Value');
-                                                           strings=get(hObject,'String');
-                                                           cmd = ['SelectOrientation(''' strings{index} ''');'];
-                                                       end
-            
-                                                    case 'radiobutton'
-                                                        cmd = [ 'Radiobutton(''' get(hObject,'String') ''')' ];
-            %                                        case 'checkbox'
-            %                                            cmd = (['REC: ' get(hObject,'Tag') '(' num2str(get(hObject,'Value')) ')']);
-                                                   case 'pushbutton'
-                                                        %cmd = (['REC: ' get(hObject,'String') ]);
-                                                        cmd = [ 'Button(''' get(hObject,'String') ''')' ];
-                                                   case 'checkbox'
-                                                        %cmd = (['REC: ' get(hObject,'String') ]);
-                                                        cmd = [ 'Checkbox(''' get(hObject,'String') ''')' ];
-                                                    case 'edit'
-                                                        cmd = (['EditField(''' get(hObject,'Tag') ''', ''' get(hObject,'String') ''')']);
-            %                                        case 'slider'
-            %                                            cmd = (['REC: ' get(hObject,'Tag') '(' num2str(get(hObject,'Value')) ')']);
-            
-            %
-            %                                        otherwise
-            %                                            disp('NO MATCH Style');
-                                                end
-            %
-                                            otherwise
-            %                                    disp('NO MATCH Type');
-            
-                                       end % switch get(hObject,'Type')
-            
-            
+                                       disp( ['CMD = ' cmd ]);
+
+                                       EOL = sprintf('\n');
                                        handles.record.editor.appendText([cmd EOL EOL]);  % Insert text at caret
-            
                                    catch
                                    end
-            
+
+
                                end % if ScriptFlag
-            
-            
-            
+
+
+
                                if ScriptFlag   % true is normal mode, false displays command that could be useful for scripting
-                                       % Show scripting command
-                                       disp(callbackString)
-                                       disp(' ')
+                                   % Show scripting command
+                                   disp(callbackString)
+                                   disp(' ')
                                end
-            
+
                            %
                            % If toolbar Help button is pressed,
                            % toggle check boxes 
@@ -8004,7 +8006,8 @@ end
                     rowY = - 5 + parentPanel.Position(4) - rowIndex * (rowHeight + 0); % Calculate Y position
 
                     % Create a child panel for this row
-                    rowPanel = uipanel('Parent', parentPanel, ...
+                    rowPanel = uipanel( ...
+                        'Parent', parentPanel, ...
                         'Position', [0, rowY, parentPanel.Position(3)-3, rowHeight], ...
                         'BorderType', 'line', ...
                         'HighlightColor', [0 0 1]);  % Blue border when active
@@ -8021,6 +8024,8 @@ end
 
 
                     icon.ImageClickedFcn = @(src,evt) applyColormap( src, fileName);
+                    %imlook4d('Color_Callback',gcbo,[],guidata(gcbo), fileName );
+                    %icon.ImageClickedFcn = @(src,evt) Color_Callback( src, fileName);
                    
     
                     % Text label inside rowPanel
@@ -8033,13 +8038,6 @@ end
                         'HitTest', 'off', ...
                         'FontSize', 10);
 
-                    %label.Callback = @(src,evt) applyColormap( src, fileName);
-
-                    
-    
-                    % % Add hover effect
-                    % fig = ancestor(parentPanel, 'figure');
-                    % fig.WindowButtonMotionFcn = @(src, event) hoverEffect(fig, parentPanel);
                 end
 
 
@@ -8116,6 +8114,20 @@ end
     
                 % Apply colormap callback (clicked in color panel)
                 function applyColormap( src, fileName)
+
+% TODO: fix for record, help, and normal
+% Now it creates 2 entries when recording.  That is only real problem
+
+                    % % Create GUIDE-style callback args - Added by Migration Tool
+                    % [hObject, eventdata, handles] = myConvertToGUIDECallbackArguments(src);
+                    % hObject = src;
+                    % handles = guidata(src);
+                    % eventdata = [];
+                    % 
+                    % % Display HELP and get out of callback
+                    %  if app.DisplayHelp( hObject, eventdata, handles)
+                    %      return
+                    %  end
 
                     
                     disp(['Colormap selected: ' fileName]);
@@ -10442,8 +10454,8 @@ end
                         VisibleROIs = thisHandles.image.VisibleROIs;
                         LockedROIs = thisHandles.image.LockedROIs;
             
-                        %guidata(thisHandles.figure1, thisHandles);
-                        updateImage(thisHandles.figure1, [], thisHandles);
+                        guidata(thisHandles.figure1, thisHandles);
+                        updateImage(app, thisHandles.figure1, [], thisHandles);
             
                         % Loop through yoke'd images (but skip this one)
                         yokes=getappdata( thisHandles.figure1, 'yokes');
@@ -12843,7 +12855,6 @@ end
             app.axes1.NextPlot = 'replace';
             app.axes1.Interruptible = 'off';
             app.axes1.Tag = 'axes1';
-            colormap(app.axes1, 'parula')
             app.axes1.Position = [4 100 430 349];
 
             % Create matrixSize
