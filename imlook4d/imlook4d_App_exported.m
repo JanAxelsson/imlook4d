@@ -3476,6 +3476,7 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                    % - import from workspace may change number of frames or slices
                    [r,c,z,frames]=size(handles.image.Cdata);
                    middleSlice = round(z/2);
+                   middleFrame = round(frames/2);
             
                     % one or multiple slides
                     if z == 1
@@ -3493,6 +3494,29 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                             set(handles.SliceNumSlider,'visible','on','Min',1,'Max',z,...
                                 'SliderStep',[1.0/double(z-1) 1.0/double(z-1)], 'Value', middleSlice);
                             set(handles.SliceNumEdit,'String',num2str(middleSlice) );
+
+
+                            app.SliceNumSlider.Limits = [1 z];
+                            app.SliceNumSlider.Value  = middleSlice;
+                            %app.SliceNumSlider.Step   = 1;           % one slice per step Matalb 2025-
+                            app.SliceNumSlider.MinorTicks = [];
+
+                            % % Bonus on R2025+: native Step (absolute increment) -- Commented out because jitters with scroll-wheel
+                            % if isprop(app.SliceNumSlider,'Step')
+                            %     app.SliceNumSlider.Step = 1;
+                            % end
+
+
+                            app.FrameNumSlider.Limits = [1 z];
+                            app.FrameNumSlider.Value  = middleFrame;
+                            %app.FrameNumSlider.Step   = 1;           % one slice per step Matalb 2025-
+                            app.FrameNumSlider.MinorTicks = [];
+
+                            % % Bonus on R2025+: native Step (absolute increment) -- Commented out because jitters with scroll-wheel
+                            % if isprop(app.FrameNumSlider,'Step')
+                            %     app.FrameNumSlider.Step = 1;
+                            % end
+
                          end
             
                         % slice number > number of slices ?
@@ -3528,11 +3552,11 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                         % frame number > number of frames ?
                         if ( get(handles.FrameNumSlider,'Value')>frames)
             
+                            set(handles.FrameNumSlider,'Value', round(frames) );
+                            set(handles.FrameNumEdit,'String',num2str(round(frames)) );
+            
                             set(handles.FrameNumSlider,'visible','on','Min',1,'Max',frames,...
                                 'SliderStep',[1.0/double(frames-1) 1.0/double(frames-1)]);
-            
-                            set(handles.FrameNumSlider,'Value', round(frames/2) );
-                            set(handles.FrameNumEdit,'String',num2str(round(frames/2)) );
                         end
             
                         set(handles.FrameNumSlider,'visible','on','Min',1,'Max',frames,...
@@ -3841,7 +3865,7 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                                     %set(handles.infoText1, 'String', infoString);
                                     displayMessageRow(infoString);
                                 end
-                           catch
+                           catch 
                            end
             
                            % Empty message row if not DICOM
@@ -5847,45 +5871,96 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
         end
         
         function scrollSlices(app, hObject, eventdata, handles, direction)
-            
-                    % Initialize
-                        numberOfSlices=size(handles.image.Cdata,3);
-                        numberOfFrames=size(handles.image.Cdata,4);
-                        currentSlice = get(handles.SliceNumSlider,'Value');
-                        currentFrame = get(handles.FrameNumSlider,'Value');
-            
-                        newSlice=round(currentSlice+direction);
-                        newFrame=round(currentFrame+direction);
-            
-                    % Slice
-                        if (newSlice>numberOfSlices)
-                            newSlice=numberOfSlices;
-                        end
-            
-                        if (newSlice<1)
-                            newSlice=1;
-                        end
-            
-                    % Frame
-                        if (newFrame>numberOfFrames)
-                            newFrame=numberOfFrames;
-                        end
-            
-                        if (newFrame<1)
-                            newFrame=1;
-                        end
-            
-                    % Set Slice slider and edit box
-                        if ( strcmp( get(handles.figure1, 'currentmodifier'),'control') | strcmp( get(handles.figure1, 'currentmodifier'),'shift'))
-                            set(handles.FrameNumEdit,'String',num2str(newFrame));
-                            set(handles.FrameNumSlider,'Value',newFrame);
-                            updateImage(app, hObject, eventdata, handles);
-                        else
-                            set(handles.SliceNumEdit,'String',num2str(newSlice));
-                            set(handles.SliceNumSlider,'Value',newSlice);
-                            setSlice(app,  handles, newSlice , handles.figure1);
-                            updateImage(app, hObject, eventdata, handles);
-                        end
+
+            persistent currentSlice  currentFrame averageDirection historicalDirections
+
+            % Initialize
+            numberOfSlices=size(handles.image.Cdata,3);
+            numberOfFrames=size(handles.image.Cdata,4)
+            %currentSlice = get(handles.SliceNumSlider,'Value');
+            %currentFrame = get(handles.FrameNumSlider,'Value');
+
+
+
+            % Avoid jitter 
+                delta = 1/3;  % Step for each scroll
+                N = 3;  % Number of directions to average (to avoid jitter)
+    
+                if isempty(currentSlice)
+                    currentSlice = 1.01;        % Memory of non-integer slice
+                    currentFrame = 1.01;        % Memory of non-integer frame
+                    historicalDirections = zeros(1,N);  % Last N directions (to avoid jitter)
+                    averageDirection = 1;       % The general direction last N scrolls
+                end
+    
+                historicalDirections = [ direction historicalDirections(1:(N-1)) ];
+                averageDirection = median( historicalDirections);  % Use median to get a correct direction
+    
+                step = averageDirection * delta;
+
+
+            % Update slice or frame if too different from Edit values
+                absDiff = abs( app.SliceNumSlider.Value - currentSlice );
+                if ( absDiff > 1 )
+                    currentSlice = app.SliceNumSlider.Value;
+                end
+    
+                absDiff = abs( app.FrameNumSlider.Value - currentFrame );
+                if ( absDiff > 1 )
+                    currentFrame = app.FrameNumSlider.Value;
+                end
+
+
+            % Update slice 
+
+                newSlice=currentSlice+step;
+                newFrame=currentFrame+step;
+    
+                % Slice
+                if (newSlice>numberOfSlices)
+                    newSlice = numberOfSlices + 0.5;
+                end
+    
+                if (newSlice<1)
+                    newSlice=1.01;
+                end
+    
+                % Frame
+                if (newFrame>numberOfFrames)
+                    newFrame = numberOfFrames;
+                end
+    
+                if (newFrame<1)
+                    newFrame=1.01;
+                end
+    
+                % Make integer
+                newSliceInt = floor(newSlice);
+                newFrameInt = floor(newFrame);
+    
+    
+    
+                disp( [ 'int_slice = ' num2str(newSliceInt) ...
+                    '    slice = ' num2str(newSlice) ...
+                    '    int_frame = ' num2str(newFrameInt) ...
+                    '    frame = ' num2str(newFrame) ...
+                    ])
+
+
+            % Set Slice slider and edit box
+
+                if ( strcmp( get(handles.figure1, 'currentmodifier'),'control') | strcmp( get(handles.figure1, 'currentmodifier'),'shift'))
+                    set(handles.FrameNumEdit,'String',num2str(newFrameInt));
+                    set(handles.FrameNumSlider,'Value',newFrame);
+                    currentFrame = newFrame;
+                    updateImage(app, hObject, eventdata, handles);
+                else
+                    set(handles.SliceNumEdit,'String',num2str(newSliceInt));
+                    set(handles.SliceNumSlider,'Value',newSlice);
+                    setSlice(app,  handles, newSliceInt , handles.figure1);
+                    updateImage(app, hObject, eventdata, handles);
+                    currentSlice = newSlice;
+                end
 
         end
         
@@ -10223,6 +10298,14 @@ end
             if app.DisplayHelp( hObject, eventdata, handles)
                 return
             end
+            
+            if ( event.Value > event.Source.Value)
+                newValue = hObject.Value +1;
+            else
+
+                newValue = hObject.Value -1;
+            end
+            disp(newValue)
 
             setSlice(app,  handles,round( event.Value ) , handles.figure1)
             updateImage(app, hObject, eventdata, handles  );
@@ -10839,6 +10922,7 @@ end
             %[hObject, eventdata, handles] = myConvertToGUIDECallbackArguments(app, event); 
             [hObject, eventdata, handles] = myConvertToGUIDECallbackArguments(app); 
             eventdata = event;
+
             
             direction=-eventdata.VerticalScrollCount;
             scrollSlices(app, hObject, eventdata, handles, direction);
@@ -12897,7 +12981,6 @@ end
             % Create uipanel2
             app.uipanel2 = uipanel(app.figure1);
             app.uipanel2.Title = 'ROI';
-            app.uipanel2.BackgroundColor = [0.94 0.94 0.94];
             app.uipanel2.Tag = 'uipanel2';
             app.uipanel2.FontSize = 11;
             app.uipanel2.Position = [462 125 244 97];
@@ -12929,7 +13012,6 @@ end
             app.hideROIcheckbox.Tooltip = 'Check to  hide ROI-display.';
             app.hideROIcheckbox.Text = 'Hide';
             app.hideROIcheckbox.FontSize = 11;
-            app.hideROIcheckbox.FontColor = [0 0 0];
             app.hideROIcheckbox.Position = [112 23 76 26];
 
             % Create ContourCheckBox
@@ -12938,7 +13020,6 @@ end
             app.ContourCheckBox.Tag = 'ContourCheckBox';
             app.ContourCheckBox.Text = 'Contour';
             app.ContourCheckBox.FontSize = 11;
-            app.ContourCheckBox.FontColor = [0 0 0];
             app.ContourCheckBox.Position = [162 24 78 26];
 
             % Create ROINumberMenu
@@ -12947,8 +13028,6 @@ end
             app.ROINumberMenu.ValueChangedFcn = createCallbackFcn(app, @ROINumberMenu_Callback, true);
             app.ROINumberMenu.Tag = 'ROINumberMenu';
             app.ROINumberMenu.Tooltip = 'Add a new ROI, or select a ROI.  Right-click to edit ROI';
-            app.ROINumberMenu.FontColor = [0 0 0];
-            app.ROINumberMenu.BackgroundColor = [1 1 1];
             app.ROINumberMenu.Position = [6 2 162 22];
             app.ROINumberMenu.Value = 'Add ROI';
 
@@ -12979,7 +13058,6 @@ end
             app.BrushSize.Tag = 'BrushSize';
             app.BrushSize.HorizontalAlignment = 'center';
             app.BrushSize.FontSize = 11;
-            app.BrushSize.FontColor = [0 0 0];
             app.BrushSize.Tooltip = 'ROI drawing radius.  SHIFT-draw to erase';
             app.BrushSize.Position = [43 51 56 22];
             app.BrushSize.Value = '5';
@@ -12989,7 +13067,6 @@ end
             app.ClearRoiPushButton.ButtonPushedFcn = createCallbackFcn(app, @clearROI_Callback2, true);
             app.ClearRoiPushButton.Tag = 'ClearRoiPushButton';
             app.ClearRoiPushButton.BackgroundColor = [0.941176470588235 0.941176470588235 0.941176470588235];
-            app.ClearRoiPushButton.FontColor = [0 0 0];
             app.ClearRoiPushButton.Position = [174 52 67 23];
             app.ClearRoiPushButton.Text = 'Clear ROI';
 
@@ -13000,13 +13077,11 @@ end
             app.hideROIcheckbox_2.Tooltip = 'Check to  hide ROI-display.';
             app.hideROIcheckbox_2.Text = 'Erase';
             app.hideROIcheckbox_2.FontSize = 11;
-            app.hideROIcheckbox_2.FontColor = [0 0 0];
             app.hideROIcheckbox_2.Position = [112 49 76 26];
 
             % Create uipanel1
             app.uipanel1 = uipanel(app.figure1);
             app.uipanel1.Title = 'Intensity Scale ';
-            app.uipanel1.BackgroundColor = [0.94 0.94 0.94];
             app.uipanel1.Tag = 'uipanel1';
             app.uipanel1.FontSize = 11;
             app.uipanel1.Position = [462 289 175 89];
@@ -13063,7 +13138,6 @@ end
             % Create uipanel5
             app.uipanel5 = uipanel(app.figure1);
             app.uipanel5.Title = 'Orientation ';
-            app.uipanel5.BackgroundColor = [0.94 0.94 0.94];
             app.uipanel5.Tag = 'uipanel5';
             app.uipanel5.FontSize = 11;
             app.uipanel5.Position = [462 224 175 63];
@@ -13074,8 +13148,6 @@ end
             app.orientationMenu.ValueChangedFcn = createCallbackFcn(app, @orientationMenu_Callback, true);
             app.orientationMenu.Tag = 'orientationMenu';
             app.orientationMenu.Tooltip = 'Modify display orientation (and internally, the matrix)';
-            app.orientationMenu.FontColor = [0 0 0];
-            app.orientationMenu.BackgroundColor = [1 1 1];
             app.orientationMenu.Position = [118 19 54 22];
             app.orientationMenu.Value = 'Ax';
 
@@ -13092,7 +13164,7 @@ end
             app.SwapheadfeetCheckBox.ValueChangedFcn = createCallbackFcn(app, @SwapHeadFeetRadioButton_Callback, true);
             app.SwapheadfeetCheckBox.Tag = 'SwapHeadFeetRadioButton';
             app.SwapheadfeetCheckBox.Text = 'Swap head-feet';
-            app.SwapheadfeetCheckBox.Position = [8 0 107 22];
+            app.SwapheadfeetCheckBox.Position = [8 1 107 22];
 
             % Create uipanel7
             app.uipanel7 = uibuttongroup(app.figure1);
@@ -13106,7 +13178,6 @@ end
             app.ImageRadioButton.Tag = 'ImageRadioButton';
             app.ImageRadioButton.Text = 'Image';
             app.ImageRadioButton.FontSize = 11;
-            app.ImageRadioButton.FontColor = [0 0 0];
             app.ImageRadioButton.Position = [8 20 89 23];
             app.ImageRadioButton.Value = true;
 
@@ -13115,7 +13186,6 @@ end
             app.PCImageRadioButton.Tag = 'PCImageRadioButton';
             app.PCImageRadioButton.Text = 'PC Image';
             app.PCImageRadioButton.FontSize = 11;
-            app.PCImageRadioButton.FontColor = [0 0 0];
             app.PCImageRadioButton.Position = [8 1 104 23];
 
             % Create ResidualRadiobutton
@@ -13123,7 +13193,6 @@ end
             app.ResidualRadiobutton.Tag = 'ResidualRadiobutton';
             app.ResidualRadiobutton.Text = 'Residual';
             app.ResidualRadiobutton.FontSize = 11;
-            app.ResidualRadiobutton.FontColor = [0 0 0];
             app.ResidualRadiobutton.Position = [79 20 76 23];
 
             % Create PCAutoInvert
@@ -13133,12 +13202,11 @@ end
             app.PCAutoInvert.Tooltip = 'Automatically determine if PC images needs inverting';
             app.PCAutoInvert.Text = 'auto-invert PC';
             app.PCAutoInvert.FontSize = 11;
-            app.PCAutoInvert.Position = [81 0 94 22];
+            app.PCAutoInvert.Position = [80 1 94 22];
 
             % Create uipanel6
             app.uipanel6 = uipanel(app.figure1);
             app.uipanel6.Title = 'PCA filter';
-            app.uipanel6.BackgroundColor = [0.94 0.94 0.94];
             app.uipanel6.Tag = 'uipanel6';
             app.uipanel6.FontName = 'Arial';
             app.uipanel6.FontSize = 11;
@@ -13189,9 +13257,7 @@ end
             app.PC_high_slider.Orientation = 'vertical';
             app.PC_high_slider.ValueChangedFcn = createCallbackFcn(app, @PC_high_slider_Callback, true);
             app.PC_high_slider.MinorTicks = [1 112 223 334 445 556 667 778 889 1000];
-            app.PC_high_slider.Step = 0.03125;
             app.PC_high_slider.FontSize = 10.6666666666667;
-            app.PC_high_slider.FontColor = [0 0 0];
             app.PC_high_slider.BusyAction = 'cancel';
             app.PC_high_slider.Interruptible = 'off';
             app.PC_high_slider.Tag = 'PC_high_slider';
@@ -13204,9 +13270,7 @@ end
             app.PC_low_slider.Limits = [1 100000];
             app.PC_low_slider.MajorTicks = [];
             app.PC_low_slider.Orientation = 'vertical';
-            app.PC_low_slider.Step = 0.03125;
             app.PC_low_slider.FontSize = 10.6666666666667;
-            app.PC_low_slider.FontColor = [0 0 0];
             app.PC_low_slider.Tag = 'PC_low_slider';
             app.PC_low_slider.Visible = 'off';
             app.PC_low_slider.Tooltip = 'First principal component to keep';
@@ -13219,7 +13283,6 @@ end
             app.PC_high_edit.Tag = 'PC_high_edit';
             app.PC_high_edit.HorizontalAlignment = 'center';
             app.PC_high_edit.FontSize = 11;
-            app.PC_high_edit.FontColor = [0 0 0];
             app.PC_high_edit.Tooltip = 'Last principal component to keep';
             app.PC_high_edit.Position = [17 79 29 22];
             app.PC_high_edit.Value = '1000';
@@ -13229,7 +13292,6 @@ end
             app.PC_low_edit.Tag = 'PC_low_edit';
             app.PC_low_edit.HorizontalAlignment = 'center';
             app.PC_low_edit.FontSize = 10;
-            app.PC_low_edit.FontColor = [0 0 0];
             app.PC_low_edit.Visible = 'off';
             app.PC_low_edit.Tooltip = 'First principal component to keep';
             app.PC_low_edit.Position = [5 86 22.0862068965517 16.4];
@@ -13240,7 +13302,6 @@ end
             app.FirstFrame.Tag = 'FirstFrame';
             app.FirstFrame.HorizontalAlignment = 'center';
             app.FirstFrame.FontSize = 10.6666666666667;
-            app.FirstFrame.FontColor = [0 0 0];
             app.FirstFrame.Visible = 'off';
             app.FirstFrame.Tooltip = 'Exclude frames before first frames from PCA-filtering.';
             app.FirstFrame.Position = [17 43 27.3448275862069 16.5656565656566];
@@ -13252,7 +13313,6 @@ end
             app.FrameText.Tag = 'FrameText';
             app.FrameText.VerticalAlignment = 'top';
             app.FrameText.WordWrap = 'on';
-            app.FrameText.FontColor = [0 0 0];
             app.FrameText.Tooltip = 'Ctrl+ScrollWheel';
             app.FrameText.Position = [33 56 38 22];
             app.FrameText.Text = 'Frame';
@@ -13263,7 +13323,6 @@ end
             app.SliceText.Tag = 'SliceText';
             app.SliceText.VerticalAlignment = 'top';
             app.SliceText.WordWrap = 'on';
-            app.SliceText.FontColor = [0 0 0];
             app.SliceText.Tooltip = 'ScrollWheel';
             app.SliceText.Position = [33 36 31 22];
             app.SliceText.Text = 'Slice';
@@ -13275,9 +13334,7 @@ end
             app.FrameNumSlider.ValueChangedFcn = createCallbackFcn(app, @FrameNumSlider_Callback, true);
             app.FrameNumSlider.ValueChangingFcn = createCallbackFcn(app, @FrameNumSlider_Callback, true);
             app.FrameNumSlider.MinorTicks = [1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33];
-            app.FrameNumSlider.Step = 0.03125;
             app.FrameNumSlider.FontSize = 10.6666666666667;
-            app.FrameNumSlider.FontColor = [0 0 0];
             app.FrameNumSlider.BusyAction = 'cancel';
             app.FrameNumSlider.Interruptible = 'off';
             app.FrameNumSlider.Tag = 'FrameNumSlider';
@@ -13292,9 +13349,7 @@ end
             app.SliceNumSlider.ValueChangedFcn = createCallbackFcn(app, @SliceNumSlider_Callback, true);
             app.SliceNumSlider.ValueChangingFcn = createCallbackFcn(app, @SliceNumSlider_Callback, true);
             app.SliceNumSlider.MinorTicks = [1 3 5 7 9 11 13 15 17 19 21 23 25 27 29 31 33 35 37 39 41 43 45 47 49 51 53 55 57 59 61 63];
-            app.SliceNumSlider.Step = 0.0161290322580645;
             app.SliceNumSlider.FontSize = 10.6666666666667;
-            app.SliceNumSlider.FontColor = [0 0 0];
             app.SliceNumSlider.BusyAction = 'cancel';
             app.SliceNumSlider.Interruptible = 'off';
             app.SliceNumSlider.Tag = 'SliceNumSlider';
@@ -13308,7 +13363,6 @@ end
             app.SliceNumEdit.BusyAction = 'cancel';
             app.SliceNumEdit.Tag = 'SliceNumEdit';
             app.SliceNumEdit.HorizontalAlignment = 'center';
-            app.SliceNumEdit.FontColor = [0 0 0];
             app.SliceNumEdit.Position = [226 37 31 21];
             app.SliceNumEdit.Value = '1';
 
@@ -13318,7 +13372,6 @@ end
             app.FrameNumEdit.BusyAction = 'cancel';
             app.FrameNumEdit.Tag = 'FrameNumEdit';
             app.FrameNumEdit.HorizontalAlignment = 'center';
-            app.FrameNumEdit.FontColor = [0 0 0];
             app.FrameNumEdit.Position = [226 58 30 21];
             app.FrameNumEdit.Value = '1';
 
@@ -13348,7 +13401,6 @@ end
             app.infoText1.VerticalAlignment = 'top';
             app.infoText1.WordWrap = 'on';
             app.infoText1.FontSize = 9.33333333333333;
-            app.infoText1.FontColor = [0 0 0];
             app.infoText1.Position = [6 2 695 27];
             app.infoText1.Text = '';
 
@@ -13497,7 +13549,6 @@ end
 
             % Create Threshold_ROI
             app.Threshold_ROI = uimenu(app.AxesContextualMenu);
-            app.Threshold_ROI.ForegroundColor = [0 0 0];
             app.Threshold_ROI.Text = 'Threshold ROI';
             app.Threshold_ROI.Tag = 'Threshold_ROI';
 
