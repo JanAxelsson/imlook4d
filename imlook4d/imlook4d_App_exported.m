@@ -3563,6 +3563,9 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                              'SliderStep',[1.0/double(frames-1) 1.0/double(frames-1)]);
                         set(handles.FrameNumEdit,'visible','on');
                         set(handles.FrameText,'visible','on');
+
+
+                        set(handles.FrameNumEdit, 'String',num2str( handles.FrameNumSlider.Value)); % Copy value from Edit
             
                         set(handles.PC_low_slider,'visible','on');
                         set(handles.PC_high_slider,'visible','on');
