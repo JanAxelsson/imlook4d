@@ -13338,7 +13338,7 @@ end
             app.FrameNumSlider.BusyAction = 'cancel';
             app.FrameNumSlider.Interruptible = 'off';
             app.FrameNumSlider.Tag = 'FrameNumSlider';
-            app.FrameNumSlider.Tooltip = 'Ctrl+ScrollWheel';
+            app.FrameNumSlider.Tooltip = {'[Shift]+ScrollWheel'; 'or'; '[Shift] + up/down keyboard key'};
             app.FrameNumSlider.Position = [79 67 138 3];
             app.FrameNumSlider.Value = 1;
 
@@ -13353,7 +13353,7 @@ end
             app.SliceNumSlider.BusyAction = 'cancel';
             app.SliceNumSlider.Interruptible = 'off';
             app.SliceNumSlider.Tag = 'SliceNumSlider';
-            app.SliceNumSlider.Tooltip = 'ScrollWheel';
+            app.SliceNumSlider.Tooltip = {'ScrollWheel'; '   or'; 'Up/down keyboard keys'};
             app.SliceNumSlider.Position = [79 47 138 3];
             app.SliceNumSlider.Value = 1;
 
@@ -13363,6 +13363,7 @@ end
             app.SliceNumEdit.BusyAction = 'cancel';
             app.SliceNumEdit.Tag = 'SliceNumEdit';
             app.SliceNumEdit.HorizontalAlignment = 'center';
+            app.SliceNumEdit.Tooltip = {'ScrollWheel'; '   or'; 'Up/down keyboard keys'};
             app.SliceNumEdit.Position = [226 37 31 21];
             app.SliceNumEdit.Value = '1';
 
@@ -13372,6 +13373,7 @@ end
             app.FrameNumEdit.BusyAction = 'cancel';
             app.FrameNumEdit.Tag = 'FrameNumEdit';
             app.FrameNumEdit.HorizontalAlignment = 'center';
+            app.FrameNumEdit.Tooltip = {'[Shift]+ScrollWheel'; 'or'; '[Shift] + up/down keyboard key'};
             app.FrameNumEdit.Position = [226 58 30 21];
             app.FrameNumEdit.Value = '1';
 
