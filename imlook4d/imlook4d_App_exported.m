@@ -12942,6 +12942,7 @@ end
 
             % Create axes1
             app.axes1 = uiaxes(app.figure1);
+            app.axes1.Toolbar.Visible = 'off';
             app.axes1.LineWidth = 1;
             app.axes1.ZGrid = 'on';
             app.axes1.FontSize = 9.33333333333333;
