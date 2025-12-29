@@ -5875,11 +5875,11 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
         
         function scrollSlices(app, hObject, eventdata, handles, direction)
 
-            persistent currentSlice  currentFrame averageDirection historicalDirections
+            persistent currentSlice  currentFrame averageDirection historicalDirections lastTime
 
             % Initialize
             numberOfSlices=size(handles.image.Cdata,3);
-            numberOfFrames=size(handles.image.Cdata,4)
+            numberOfFrames=size(handles.image.Cdata,4);
             %currentSlice = get(handles.SliceNumSlider,'Value');
             %currentFrame = get(handles.FrameNumSlider,'Value');
 
@@ -5894,6 +5894,7 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                     currentFrame = 1.01;        % Memory of non-integer frame
                     historicalDirections = zeros(1,N);  % Last N directions (to avoid jitter)
                     averageDirection = 1;       % The general direction last N scrolls
+                    lastTime = tic;
                 end
     
                 historicalDirections = [ direction historicalDirections(1:(N-1)) ];
@@ -5942,8 +5943,11 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                 newFrameInt = floor(newFrame);
     
     
-    
-                disp( [ 'int_slice = ' num2str(newSliceInt) ...
+                t = num2str( lastTime );
+                t = t(1:9);
+                disp( [ 't = '  t ...
+                    '    dt = ' num2str( toc(lastTime) )...
+                    '    int_slice = ' num2str(newSliceInt) ...
                     '    slice = ' num2str(newSlice) ...
                     '    int_frame = ' num2str(newFrameInt) ...
                     '    frame = ' num2str(newFrame) ...
@@ -5964,6 +5968,8 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                     updateImage(app, hObject, eventdata, handles);
                     currentSlice = newSlice;
                 end
+
+                lastTime = tic;
 
         end
         
@@ -8618,7 +8624,7 @@ end
                             set(handles.figure1, 'Name', answer{1});
         end
 
-        % Callback function
+        % Value changed function: FirstFrame
         function FirstFrameInPCAFilter_Callback(app, event)
             % Create GUIDE-style callback args - Added by Migration Tool
             [hObject, eventdata, handles] = myConvertToGUIDECallbackArguments(app, event); 
@@ -9212,7 +9218,7 @@ end
                     updateImage(app, hObject, eventdata, handles  );
         end
 
-        % Callback function
+        % Value changed function: PC_low_slider
         function PC_low_slider_Callback(app, event)
             % Create GUIDE-style callback args - Added by Migration Tool
             [hObject, eventdata, handles] = myConvertToGUIDECallbackArguments(app, event); 
@@ -10329,7 +10335,7 @@ end
                     evalin('base', 'Time_activity_curve')
         end
 
-        % Callback function
+        % Value changed function: transparancyEdit
         function Transparancy_Callback(app, event)
             % Create GUIDE-style callback args - Added by Migration Tool
             [hObject, eventdata, handles] = myConvertToGUIDECallbackArguments(app, event); 
@@ -13109,6 +13115,7 @@ end
 
             % Create transparancyEdit
             app.transparancyEdit = uieditfield(app.transparancyPanel, 'text');
+            app.transparancyEdit.ValueChangedFcn = createCallbackFcn(app, @Transparancy_Callback, true);
             app.transparancyEdit.Tag = 'transparancyEdit';
             app.transparancyEdit.HorizontalAlignment = 'center';
             app.transparancyEdit.Visible = 'off';
@@ -13273,6 +13280,7 @@ end
             app.PC_low_slider.Limits = [1 100000];
             app.PC_low_slider.MajorTicks = [];
             app.PC_low_slider.Orientation = 'vertical';
+            app.PC_low_slider.ValueChangedFcn = createCallbackFcn(app, @PC_low_slider_Callback, true);
             app.PC_low_slider.FontSize = 10.6666666666667;
             app.PC_low_slider.Tag = 'PC_low_slider';
             app.PC_low_slider.Visible = 'off';
@@ -13302,6 +13310,7 @@ end
 
             % Create FirstFrame
             app.FirstFrame = uieditfield(app.uipanel6, 'text');
+            app.FirstFrame.ValueChangedFcn = createCallbackFcn(app, @FirstFrameInPCAFilter_Callback, true);
             app.FirstFrame.Tag = 'FirstFrame';
             app.FirstFrame.HorizontalAlignment = 'center';
             app.FirstFrame.FontSize = 10.6666666666667;
