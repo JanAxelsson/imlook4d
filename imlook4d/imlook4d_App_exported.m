@@ -12415,6 +12415,20 @@ end
 
 
         end
+
+        % Selection changed function: uipanel7
+        function ImageMode_Callback(app, event)
+            disp(event.NewValue)
+            switch event.NewValue.Text
+                case 'Image'
+                    app.FrameText.Text = 'Frame';
+                case 'Residual'
+                    app.FrameText.Text = 'Frame';
+                case 'PC Image'
+                    app.FrameText.Text = 'PC';
+
+            end
+        end
     end
 
     % Component initialization
@@ -13179,6 +13193,7 @@ end
 
             % Create uipanel7
             app.uipanel7 = uibuttongroup(app.figure1);
+            app.uipanel7.SelectionChangedFcn = createCallbackFcn(app, @ImageMode_Callback, true);
             app.uipanel7.Title = 'Image mode';
             app.uipanel7.Tag = 'uipanel7';
             app.uipanel7.FontSize = 11;
