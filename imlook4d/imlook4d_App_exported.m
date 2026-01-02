@@ -1142,6 +1142,8 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                                                set(hObject,'Value', 1);
                                            end
                                        end
+
+                                       app.figure1.Enable = 'off';app.figure1.Enable = 'on';
             
                                        restoreImageRadioButtonGroup(app, handles);
                                    end
@@ -10944,17 +10946,17 @@ end
             
                     releasedToggleButton(app,  hObject);
                     % Set textboxes etc on, to allow normal work when help button is not pressed
-                    set(handles.ROILevelEdit,'Enable', 'on');
-                    set(handles.BrushSize,'Enable', 'on');
-                    set(handles.FrameNumEdit,'Enable', 'on');
-                    set(handles.transparancyEdit,'Enable', 'on');
-                    set(handles.SliceNumEdit,'Enable', 'on');
-                    set(handles.PC_low_edit,'Enable', 'on');
-                    set(handles.PC_high_edit,'Enable', 'on');
+                    %set(handles.ROILevelEdit,'Enable', 'on');
+                    %set(handles.BrushSize,'Enable', 'on');
+                    %set(handles.FrameNumEdit,'Enable', 'on');
+                    %set(handles.transparancyEdit,'Enable', 'on');
+                    %set(handles.SliceNumEdit,'Enable', 'on');
+                    %set(handles.PC_low_edit,'Enable', 'on');
+                    %set(handles.PC_high_edit,'Enable', 'on');
                     set(handles.ROINumberMenu,'Enable', 'on');
                     set(handles.orientationMenu,'Enable', 'on');
                     set(handles.PC_low_slider,'Enable', 'on');
-                    set(handles.FirstFrame,'Enable', 'on');
+                    %set(handles.FirstFrame,'Enable', 'on');
                     set(handles.ColorBar, 'ButtonDownFcn', '@resetCurrentAxes');
             
                     % Close web browser
@@ -10972,18 +10974,18 @@ end
                     pressedToggleButton(app,  hObject);
                     % Make text boxes and other things that shouldn't be callbacked inactive
 
-                    set(handles.ROILevelEdit,'Enable', 'inactive');
-                    set(handles.ROILevelEdit,'Enable', 'inactive');
-                    set(handles.BrushSize,'Enable', 'inactive');
-                    set(handles.FrameNumEdit,'Enable', 'inactive');
-                    set(handles.transparancyEdit,'Enable', 'inactive');
-                    set(handles.SliceNumEdit,'Enable', 'inactive');
-                    set(handles.PC_low_edit,'Enable', 'inactive');
-                    set(handles.PC_high_edit,'Enable', 'inactive');
+                    %set(handles.ROILevelEdit,'Enable', 'inactive');
+                    %set(handles.ROILevelEdit,'Enable', 'inactive');
+                    %set(handles.BrushSize,'Enable', 'inactive');
+                    %set(handles.FrameNumEdit,'Enable', 'inactive');
+                    %set(handles.transparancyEdit,'Enable', 'inactive');
+                    %set(handles.SliceNumEdit,'Enable', 'inactive');
+                    %set(handles.PC_low_edit,'Enable', 'inactive');
+                    %set(handles.PC_high_edit,'Enable', 'inactive');
                     set(handles.ROINumberMenu,'Enable', 'inactive');
                     set(handles.orientationMenu,'Enable', 'inactive');
                     set(handles.PC_low_slider,'Enable', 'inactive');
-                    set(handles.FirstFrame,'Enable', 'inactive');
+                    %set(handles.FirstFrame,'Enable', 'inactive');
                     set(handles.ColorBar, 'ButtonDownFcn', @(hObject,eventdata)imlook4d('ColorBar_Callback',hObject,eventdata,guidata(hObject)) );
             
                     % Display interactive-help first page
