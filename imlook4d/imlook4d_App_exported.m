@@ -1125,6 +1125,12 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                                    disp(' ')
                                end
 
+
+                        % ----------------------------------------------------------------------------
+                        %
+                        %    HELP -- CLEAN UP (do not change value)
+                        %
+                        % ---------------------------------------------------------------------------- 
                            %
                            % If toolbar Help button is pressed,
                            % toggle check boxes 
@@ -1143,13 +1149,18 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                                            end
                                        end
 
-                                       app.figure1.Enable = 'off';app.figure1.Enable = 'on';
+
+                                       % Reset
+                                       app.PC_high_slider.Value = str2num( app.PC_high_edit.Value);
+                                       app.FrameNumSlider.Value = str2num( app.FrameNumEdit.Value);
+                                       app.SliceNumSlider.Value = str2num( app.SliceNumEdit.Value);
             
                                        restoreImageRadioButtonGroup(app, handles);
                                    end
                                catch
                                    % Property 'Value' not existing for this GUI widget
                                end
+
         end
         
         function FrameNumEdit_CreateFcn(app, hObject, eventdata, handles)
@@ -8681,10 +8692,10 @@ end
             % Create GUIDE-style callback args - Added by Migration Tool
             [hObject, eventdata, handles] = myConvertToGUIDECallbackArguments(app, event); 
             
-            oldVal= round(get(hObject,'Value'));
+            %oldVal= round(get(hObject,'Value'));
             % Display HELP and get out of callback
                  if app.DisplayHelp( hObject, eventdata, handles)
-                     set(hObject,'Value',oldVal);
+                     %set(hObject,'Value',oldVal);
                      return
                  end
 
@@ -9196,10 +9207,8 @@ end
             % Create GUIDE-style callback args - Added by Migration Tool
             [hObject, eventdata, handles] = myConvertToGUIDECallbackArguments(app, event); 
             
-                    oldVal= round(get(hObject,'Value'));
                     % Display HELP and get out of callback
                          if app.DisplayHelp( hObject, eventdata, handles)
-                             set(handles.PC_high_slider,'Value',oldVal);
                              return
                          end
             
