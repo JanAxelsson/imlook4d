@@ -307,6 +307,8 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                         try
                             if ( isempty(varargin) || openWithDialog )
                                 historyFile = [ '' prefdir filesep 'imlook4d_file_open_history.mat' ''];
+
+                                answer = 'File dialog'; % Default 
             
                                 % Handle response
                                 if (isempty(varargin) )
