@@ -1,0 +1,13 @@
+<h1>Select Reference ROIs</h1>
+<HR></HR>
+<!------------------->
+<p>
+	This script marks a ROI as a reference ROI. This can be used for background measurements, in for instance
+    "Threshold ROI", "Adaptive Threshold within ROI", etc
+</p>
+<p>
+    A reference ROI can mark multiple ROIs so that the average value of the ROI is used as a reference value.  
+    The reference ROI can be cleared using the script "Clear Reference ROIs"
+    
+</p>
+

@@ -1,0 +1,20 @@
+<h1>Frame Number</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	Sets the frame number.  Pressing the CTRL-key or SHIFT-key while using the mouse scroll-wheel can also be used to move up and down the frames.
+	</P>
+	
+	<P>
+	When "PC Image" radio-button is selected, this slider is used to set the principal component number.  
+	</P>
+	
+		
+	<P>
+	See also "PC Image" radio-button.
+	See also "Frame" slider.
+	</P>
+
+
+	
+

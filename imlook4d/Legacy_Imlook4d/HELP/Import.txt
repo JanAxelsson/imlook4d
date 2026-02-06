@@ -1,0 +1,15 @@
+<h1>Import to workspace</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	Imports variables from MATLAB workspace to imlook4d instance. Changes to imlook4d_Cdata will be imported.
+	</P>
+
+	<P>
+	<a href="export_details.html">Detailed information</a> 
+	</P>
+
+	
+	<P>
+	See also the Export to workspace menu. 
+	</P>

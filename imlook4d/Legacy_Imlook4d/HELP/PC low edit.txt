@@ -1,0 +1,12 @@
+<h1>PC low</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	Sets the lowest Principal Component to keep.  For more information click on the slider to the right.
+	</P>
+	
+	<P>
+	For instance, if component 3 is selected, components 1 and 2 are not used.
+	</P>
+
+

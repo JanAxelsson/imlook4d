@@ -1,0 +1,14 @@
+<h1>Contor ROI</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	If checked, the ROIs are drawn as contours <u>outside<u> the pixels representing the ROI.
+	</P>
+	<P>
+	If not checked, the ROIs are drawn as shaded areas <u>exactly<u> representing the the pixels of the ROI.
+	</P>
+
+	
+	<P>
+		NOTE: A nicer contour will be drawn if Matlab Imaging Toolbox is present. The contour will be drawn just outside the ROI pixels, meaning that a ROI will visually look slightly larger in volume. Calculations on ROI statistics are not affected. 
+	</P>	

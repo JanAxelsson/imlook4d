@@ -1,0 +1,7 @@
+<h1>Matlab menu</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	Adds the standard MATLAB figure menues (see MATLAB documentation)   
+	</P>
+

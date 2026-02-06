@@ -1,0 +1,7 @@
+<h1>Copy TACT </h1>
+<HR></HR>
+<!------------------->
+	<P>
+	Copies the Time-Activty curve (dynamic data) or ROI value (static data) to clipboard.  
+	</P>
+	

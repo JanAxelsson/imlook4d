@@ -1,0 +1,23 @@
+<h1>SPM view image</h1>
+<HR></HR>
+<!------------------->
+	<P>
+		Opens SPMs viewer, which can be used to modify file coordinates. 
+        This is the same viewer that can be opened from within SPM, using the [Display] button.
+	</P>
+
+	<P> 
+        This mode requires SPM packages to be added to the path.
+	</P>
+
+	<P> 
+        The SPM package can be found at <a href="http://www.fil.ion.ucl.ac.uk/spm/software/download.html">http://www.fil.ion.ucl.ac.uk/spm/software/download.html </a>
+	</P>
+
+	<P> 
+        This command opens the current nifti file using "SPM open".  Modifications can be saved to file from the SPM viewer.
+	</P>
+
+	<P> 
+        See also SPM open
+	</P>

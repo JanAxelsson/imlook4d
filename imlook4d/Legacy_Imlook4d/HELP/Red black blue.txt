@@ -1,0 +1,10 @@
+<h1>Red-black-blue color scale</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	Change color scale.  This scale works best where a normal value is centered on the intensity scale. Red is then higher
+and blue lower than this centered value.
+	</P>
+	<P>
+	From http://www.ncl.ucar.edu/Document/Graphics/ColorTables/GMT_split.shtml
+	</P>

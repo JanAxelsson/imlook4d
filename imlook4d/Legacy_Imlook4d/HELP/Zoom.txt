@@ -1,0 +1,20 @@
+<h1>Zoom Image </h1>
+<HR></HR>
+<!------------------->
+	<P>
+	Zooms an image with a fixed factor.  The Pan tool ("hand" toolbar button) can be used to move the image sideways.
+	</P>
+	
+	
+	<P>
+	Example zoom factors are:
+	
+	
+		<UL>
+			<LI> <B>Constant number </B> <BR> 
+				  2
+			<LI>  <B>Formula </B> <BR> 
+				   5/3
+		</UL>
+	</P>
+

@@ -1,0 +1,15 @@
+
+<h1>Background image - remove</h1>
+<HR></HR>
+<!------------------->
+<p> 
+This script is used to remove the background image from a fusion image. 
+</p>
+
+<p> 
+Compare this to the <code>Background image - add</code> script
+</p>
+
+
+
+

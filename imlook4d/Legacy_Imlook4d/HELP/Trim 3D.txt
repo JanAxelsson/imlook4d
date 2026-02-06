@@ -1,0 +1,12 @@
+<h1>Trim 3D</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	This script keeps a cube of pixels surrounding the 3-dimensional ROI.  The remaining pixels outside the ROI-cube are discarded.
+
+	</P>  
+	<p>		
+		<B>NOTE:</B><BR>
+		If the ROI is within a single slice, the z-direction will be truncated.  If the intention is to truncate only
+the x and y directions in the axial slice it is recommended to use Trim 2D instead.
+	</P>

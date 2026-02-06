@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.2  (Win32)">
+	<META NAME="AUTHOR" CONTENT="Jan Axelsson">
+	<META NAME="CREATED" CONTENT="20130311;9252500">
+	<META NAME="CHANGEDBY" CONTENT="Jan Axelsson">
+	<META NAME="CHANGED" CONTENT="20130314;8532600">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { margin: 0.79in }
+		P { margin-bottom: 0.08in }
+		H1 { margin-bottom: 0.08in }
+		H1.western { font-family: "Arial", sans-serif; font-size: 16pt }
+		H1.cjk { font-family: "SimSun"; font-size: 16pt }
+		H1.ctl { font-family: "Mangal"; font-size: 16pt }
+		H2 { margin-bottom: 0.08in }
+		H2.western { font-family: "Arial", sans-serif; font-size: 14pt; font-style: italic }
+		H2.cjk { font-family: "SimSun"; font-size: 14pt; font-style: italic }
+		H2.ctl { font-family: "Mangal"; font-size: 14pt; font-style: italic }
+		H3 { margin-bottom: 0.08in }
+		H3.western { font-family: "Arial", sans-serif }
+		H3.cjk { font-family: "SimSun" }
+		H3.ctl { font-family: "Mangal" }
+		A:link { so-language: zxx }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="en-GB" DIR="LTR">
+<H1 CLASS="western" ALIGN=LEFT>Thresholding in complex images</H1>
+<P ALIGN=LEFT>Jan Axelsson 2013-MAR-11</P>
+<H2 CLASS="western" ALIGN=LEFT>Background</H2>
+<P ALIGN=LEFT>In the vocabulary of imlook4d, there is no difference
+at all between a region-of-interest (ROI) and a volume-of-interest
+(VOI). Therefore, everything is called a ROI.</P>
+<P ALIGN=LEFT><BR><BR>
+</P>
+<P ALIGN=LEFT>A region-of-interest (ROI) can be delineated using the
+script &ldquo;Threshold ROI&rdquo;. This script will threshold
+everything in a defined volume, which could be a problem if for
+instance a tumour is in slices with other high uptake.</P>
+<P ALIGN=LEFT><BR><BR>
+</P>
+<P ALIGN=LEFT>The solution is to manually create a rough ROI (in
+multiple slices) and refine that by the tresholding algorithm in the
+script &ldquo;Threshold within ROI&rdquo;.  This way the rough ROI 
+</P>
+<H2 CLASS="western" ALIGN=LEFT>An example</H2>
+<P ALIGN=LEFT>Consider the image below, where a tumour and blood
+uptake is competing.</P>
+<P ALIGN=LEFT><BR><BR>
+</P>
+<H3 CLASS="western" ALIGN=LEFT>Create a ROI:</H3>
+<P ALIGN=LEFT>We first create a ROI by selecting &ldquo;Add ROI&rdquo;:</P>
+<P ALIGN=LEFT><IMG SRC="Thresholding_complex_images_html_m342da79b.png" NAME="graphics1" ALIGN=BOTTOM WIDTH=318 HEIGHT=253 BORDER=0></P>
+<P ALIGN=LEFT>and give it the name &ldquo;tumour&rdquo;</P>
+<P ALIGN=LEFT><IMG SRC="Thresholding_complex_images_html_632446e4.png" NAME="graphics2" ALIGN=BOTTOM WIDTH=96 HEIGHT=61 BORDER=0></P>
+<HR>
+<H3 CLASS="western" ALIGN=LEFT>Paint the ROI 
+</H3>
+<P ALIGN=LEFT>We now make a rough ROI with the cursor brush, defining
+the region within which we want to apply a thresholding algorithm. 
+It is good practice to make the rough ROI bigger than the actually
+tumour.  Also use the rough ROI to avoid regions that should <B>not</B>
+be included.</P>
+<P ALIGN=LEFT><IMG SRC="Thresholding_complex_images_html_m729fb24f.png" NAME="graphics3" ALIGN=BOTTOM WIDTH=322 HEIGHT=251 BORDER=0></P>
+<P ALIGN=LEFT>Here we have also utilized the zoom button to make the
+drawing easier<BR>(press 
+<IMG SRC="Thresholding_complex_images_html_713fc14c.png" NAME="graphics4" ALIGN=BOTTOM WIDTH=15 HEIGHT=18 BORDER=0>,
+click cursor in middle of the image, press 
+<IMG SRC="Thresholding_complex_images_html_713fc14c.png" NAME="graphics5" ALIGN=BOTTOM WIDTH=15 HEIGHT=18 BORDER=0>
+to finish).</P>
+<HR>
+<H3 CLASS="western" ALIGN=LEFT>Copy the ROI 
+</H3>
+<P ALIGN=LEFT>Running the &ldquo;Copy ROI&rdquo; script:</P>
+<P ALIGN=LEFT><IMG SRC="Thresholding_complex_images_html_5c73a35b.png" NAME="graphics6" ALIGN=BOTTOM WIDTH=354 HEIGHT=276 BORDER=0></P>
+<P ALIGN=LEFT><IMG SRC="Thresholding_complex_images_html_m2c7082ea.png" NAME="graphics7" ALIGN=MIDDLE WIDTH=189 HEIGHT=114 BORDER=0></P>
+<P ALIGN=LEFT>copies the currently selected ROI definition to slices
+17 to 28(this saves some painting).  The Destination ROI was set to
+1, which was the currently selected ROI.</P>
+<P ALIGN=LEFT>The same pixels in all slices 17 to 28 are now part of
+ROI 1 (the ROI we called &ldquo;tumour&rdquo;).</P>
+<HR>
+<H3 CLASS="western" ALIGN=LEFT>Inspect 
+</H3>
+<P ALIGN=LEFT>Inspect that the ROI is covering the tumour and nothing
+else by going through the slices. 
+</P>
+<P ALIGN=LEFT>TRICK: a nice trick is to click the Hide check-box
+off/on to better see the ROI.</P>
+<P ALIGN=LEFT><BR><BR>
+</P>
+<P ALIGN=LEFT>Modify if necessary by painting or erasing using the
+cursor as a brush. 
+</P>
+<P ALIGN=LEFT>TRICK: The eraser radio-button enables an eraser brush.
+Don't forget to turn it off before painting again.</P>
+<HR>
+<H3 CLASS="western" ALIGN=LEFT>Threshold within ROI 
+</H3>
+<P ALIGN=LEFT>We will now threshold inside the created ROI. This
+causes the ROI to shrink so that only pixels with values within a
+specified intensity range will remain in the ROI.</P>
+<P ALIGN=LEFT><IMG SRC="Thresholding_complex_images_html_26a4c816.png" NAME="graphics8" ALIGN=TEXTTOP WIDTH=354 HEIGHT=276 BORDER=0></P>
+<P ALIGN=LEFT><IMG SRC="Thresholding_complex_images_html_3c8da397.png" NAME="graphics9" ALIGN=BOTTOM WIDTH=122 HEIGHT=124 BORDER=0></P>
+<P ALIGN=LEFT>In this example, we have seen that the ROI intensity is
+13500 (Bq/ml), and we select the 50% threshold level which equals
+6500. The highest pixel level is 100% of the pixel within this frame,
+so we will threshold between 6500 and maximum pixel. The slice range
+should be kept at the default value 1 to end.</P>
+<P ALIGN=LEFT><BR><BR>
+</P>
+<P ALIGN=LEFT>Below are some examples of these thresholded ROIs: 
+</P>
+<P ALIGN=LEFT><IMG SRC="Thresholding_complex_images_html_m4f844503.png" NAME="graphics10" ALIGN=BOTTOM WIDTH=30% BORDER=0><IMG SRC="Thresholding_complex_images_html_e821bfa.png" NAME="graphics11" ALIGN=BOTTOM WIDTH=30% BORDER=0><IMG SRC="Thresholding_complex_images_html_m175fa7d1.png" NAME="graphics12" ALIGN=BOTTOM WIDTH=30% BORDER=0></P>
+<P ALIGN=LEFT>and the images with hidden ROI ( Hide check-box on),
+scaled as above</P>
+<P ALIGN=LEFT><IMG SRC="Thresholding_complex_images_html_44d7a82c.png" NAME="graphics16" ALIGN=BOTTOM WIDTH=30% BORDER=0><IMG SRC="Thresholding_complex_images_html_m63403e1.png" NAME="graphics17" ALIGN=BOTTOM WIDTH=30% BORDER=0><IMG SRC="Thresholding_complex_images_html_7e087700.png" NAME="graphics18" ALIGN=BOTTOM WIDTH=30% BORDER=0></P>
+<P ALIGN=LEFT><BR><BR>
+</P>
+<P ALIGN=LEFT><BR><BR>
+</P>
+</BODY>
+</HTML>

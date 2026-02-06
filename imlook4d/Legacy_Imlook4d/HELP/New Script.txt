@@ -1,0 +1,29 @@
+<h1>New Script </h1>
+<HR></HR>
+<!------------------->
+	<P>
+	This menu creates a new empty scripts and sets the path to the correct folder <code>USER_SCRIPTS</code> besides the <code>imlook4d</code>.
+If this folder does not exist, it is created.  When you have edited the script it should be saved in this folder, or within a folder that you create here.  Only one extra folder level is allowed.
+	</P>
+
+		<P>
+	<B>Note:</B>
+Matlab scripts have the extension ".m".  Scripts can only have the characters alllowed in MATLAB scripts.  According to MATLAB the rules are: <BR>
+ M-file names must start with an alphabetic character, may contain any alphanumeric characters or underscores, and must be no longer than the maximum allowed M-file name length 
+This means that spaces are not allowed.	If you wish a space-character to appear in the <code>SCRIPTS/USER</code> menu, write an "_" in the file name where you wish a space to appear.
+
+</P>
+	
+
+<P>
+Examples:<BR>
+<code>test_script.m</code> is shown as <code>SCRIPTS/USER/test script</code> in the menu
+</P>
+	
+
+<P>
+A short introduction to writing scripts can be found in: <BR>
+ <a href="matlab:open( which('Scripting-imlook4d.pdf') );">Scripting imlook4d</a>.
+
+
+</P>

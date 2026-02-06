@@ -1,0 +1,61 @@
+<h1>TACT (Time-activity curve)</h1>
+<HR></HR>
+<!------------------->
+<P>
+Plots a time-activity curve (TACT) in a separate window. 
+</P>
+
+<P>
+Menus in this  window, have different functions :
+
+<ul style="list-style-type:none;">
+    <li><B>File</B>
+
+    <ul style="list-style-type:circle;"> 
+        <li><B>Export Curves</B><BR>
+        One of the following formats can be selected using the file format dropbox:
+        <ul>
+        <li><b>imlook4d original format </b>, giving start time and duration, ROI values and standard deviations for each frame in units Bq/ml.
+        <li><b>Pmod format</b>, giving frame start and stop time, and ROI values for each frame in kBq/cc
+        <li><b>Sif format</b>, giving frame start and stop time.  The intention with this format is only to save time information, and possibly blood data, and is limited to two ROIs. 
+                imlook4d does not fill in time, study ID or isotope, but marks these with characters xxxx.  The saved sif file is useful for importing time information into dynamic Nifti data, where the time information is not present (see also help on File/Open menu).
+        </ul>
+    </ul><BR>
+
+    <li><B>Edit</B>
+
+    <ul style="list-style-type:circle;"> 
+        <li><B>Copy Curves</B><BR>
+        Copy marked curves to clipboard
+ 
+        <li><B>Copy All Curves</B><BR>
+        Copy all curves to clipboard
+ 
+        <li><B>Copy Table</B><BR>
+        Copy the table to clipboard
+ 
+        <li><B>Copy Plot</B><BR>
+        Copy the plot to clipboard
+
+    </ul><BR>
+
+
+    <li><B>Workspace</B><BR>
+
+    <ul style="list-style-type:circle;"> 
+ 
+        <li><B>Save to Variable</B><BR>
+        Saves the selected time-activity curve to variable "StoredTACT".  If more than one ROI name is selected, a two-dimensional matrix is saved into variable "StoredTACT".
+ 
+        <li><B>Save as input function (Cinp)</B><BR>
+        Saves the marked time-activity curve to variable "Cinp".  This menu is only active when a single ROI is selected.
+        This variable can be used as an image-derived input function for some non-reference tissue models, 
+        such as "Water" and "Patlak" (note, this requires knowledge about metabolite behaviour, blood-brain barrier transfer, etc, and is not working for all molecules).
+        For less well-behaved molecles, if you have knowledge and have performed metabolite measures you may write your own script to recalculate the Cinp to a proper input function.
+
+
+</ul> 
+</ul> 
+
+
+
