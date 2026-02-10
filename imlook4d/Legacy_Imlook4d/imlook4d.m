@@ -1,6 +1,8 @@
 % =========================================================================
 % 
-% imlook4d DOCUMENTATION  
+% LEGACY imlook4d (based on GUIDE)
+%
+% new version is based on appdesigner
 %
 % =========================================================================
     %
@@ -261,6 +263,38 @@
 % Begin initialization code - DO NOT EDIT
 function varargout = imlook4d(varargin)
 
+
+    %
+    % Legacy code -- call modern imlook4d first time, and let it set
+    % correct path
+    %
+
+        % Read session flags (set first time modern imlook4d is executed)
+        configured  = getappdata(0, 'imlook4d_path_configured');
+        selected    = getappdata(0, 'imlook4d_selected_version');
+
+        % Simulate new matlab session by:
+        %    setappdata(0, 'imlook4d_path_configured', false);
+    
+        % Only first time running imlook4d each session
+        if isempty(configured) || ~configured
+
+            rootDir     = fileparts(mfilename('fullpath'));     % Folder of this legacy script
+            modernPath  = fileparts(rootDir); % Path to modern imlook4d (above Legacy)
+            addpath(genpath(modernPath), '-begin');
+
+            legacyPath  = fullfile( modernPath, 'Legacy_Imlook4d'); % Path to legacy imlook4d
+            rmpath(genpath(legacyPath));
+
+            imlook4d; % Run modern imlook4d, which will make sure path is correct
+            return
+
+        end
+
+
+    %
+    % Continue starting legacy imlook4d as usual
+    %
 
     gui_Singleton = 0;
     gui_State = struct('gui_Name',       mfilename, ...
