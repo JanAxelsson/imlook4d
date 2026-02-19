@@ -829,13 +829,13 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                            clickedItem = {};
                            clickedItem.hObject = hObject;
     
-                           disp('-------------------------')
-                           disp('DisplayHelp,  clickedItem =')
+                           %disp('-------------------------')
+                           %disp('DisplayHelp,  clickedItem =')
                            try  clickedItem.Type =  hObject.Type; catch; end
                            try  clickedItem.Type =  hObject.Style; catch; end
 
                            try  clickedItem.Tag =  hObject.Tag; catch; end
-                           disp( clickedItem)
+                           %disp( clickedItem)
 
 
                            

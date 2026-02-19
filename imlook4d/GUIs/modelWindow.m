@@ -642,7 +642,12 @@ function workspaceMenu_Callback(hObject, eventdata, handles)
 function SaveVariableToWorkspace_Callback(hObject, eventdata, handles)
     selectedRoinumbers = handles.selectedRow;
     temp = cell2mat(handles.datastruct.Y')';
-    assignin('base', 'StoredTACT', temp(:, selectedRoinumbers));
+    defaultanswer = RetriveEarlierValues('modelWindowTACTVariableName', {'StoredTACT'} ); 
+    answer = inputdlg('Save to variable','Input function',1,defaultanswer);
+    variableName = answer{1};
+    StoreValues('modelWindowTACTVariableName', answer ); % Store answer as new dialog default
+
+    assignin('base', variableName, temp(:, selectedRoinumbers));
     
 function SaveAsInputFunction_Callback(hObject, eventdata, handles)
     selectedRoinumbers = handles.selectedRow; 
