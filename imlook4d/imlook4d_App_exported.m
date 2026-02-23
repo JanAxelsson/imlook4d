@@ -12456,7 +12456,7 @@ end
             % Create figure1 and hide until all components are created
             app.figure1 = uifigure('Visible', 'off');
             app.figure1.Color = [0.941176470588235 0.941176470588235 0.941176470588235];
-            app.figure1.Position = [615 714 713 459];
+            app.figure1.Position = [615 714 877 600];
             app.figure1.Name = 'imlook4d';
             app.figure1.SizeChangedFcn = createCallbackFcn(app, @figure1_ResizeFcn, true);
             app.figure1.WindowButtonDownFcn = createCallbackFcn(app, @mouseDown_Callback, true);
@@ -12976,7 +12976,7 @@ end
             app.axes1.NextPlot = 'replace';
             app.axes1.Interruptible = 'off';
             app.axes1.Tag = 'axes1';
-            app.axes1.Position = [4 100 430 349];
+            app.axes1.Position = [4 92 613 498];
 
             % Create matrixSize
             app.matrixSize = uilabel(app.figure1);
@@ -12988,7 +12988,7 @@ end
             app.matrixSize.WordWrap = 'on';
             app.matrixSize.FontSize = 9.33333333333333;
             app.matrixSize.FontColor = [0.501960784313725 0.501960784313725 0.501960784313725];
-            app.matrixSize.Position = [266 34 108 14];
+            app.matrixSize.Position = [252 33 108 14];
             app.matrixSize.Text = '[x,y]';
 
             % Create frameTimeMinutesText
@@ -13001,7 +13001,7 @@ end
             app.frameTimeMinutesText.WordWrap = 'on';
             app.frameTimeMinutesText.FontSize = 9.33333333333333;
             app.frameTimeMinutesText.FontColor = [0.501960784313725 0.501960784313725 0.501960784313725];
-            app.frameTimeMinutesText.Position = [264 46 99 18];
+            app.frameTimeMinutesText.Position = [250 45 99 18];
             app.frameTimeMinutesText.Text = ' ( ) min.';
 
             % Create frameTimeText
@@ -13012,7 +13012,7 @@ end
             app.frameTimeText.HorizontalAlignment = 'center';
             app.frameTimeText.VerticalAlignment = 'top';
             app.frameTimeText.WordWrap = 'on';
-            app.frameTimeText.Position = [265 64 99 18];
+            app.frameTimeText.Position = [251 63 99 18];
             app.frameTimeText.Text = '( ) s';
 
             % Create uipanel2
@@ -13020,7 +13020,7 @@ end
             app.uipanel2.Title = 'ROI';
             app.uipanel2.Tag = 'uipanel2';
             app.uipanel2.FontSize = 11;
-            app.uipanel2.Position = [462 125 244 97];
+            app.uipanel2.Position = [628 271 244 97];
 
             % Create TACT
             app.TACT = uibutton(app.uipanel2, 'push');
@@ -13121,7 +13121,7 @@ end
             app.uipanel1.Title = 'Intensity Scale ';
             app.uipanel1.Tag = 'uipanel1';
             app.uipanel1.FontSize = 11;
-            app.uipanel1.Position = [462 289 175 89];
+            app.uipanel1.Position = [628 435 175 89];
 
             % Create transparancyPanel
             app.transparancyPanel = uipanel(app.uipanel1);
@@ -13178,7 +13178,7 @@ end
             app.uipanel5.Title = 'Orientation ';
             app.uipanel5.Tag = 'uipanel5';
             app.uipanel5.FontSize = 11;
-            app.uipanel5.Position = [462 224 175 63];
+            app.uipanel5.Position = [628 370 175 63];
 
             % Create orientationMenu
             app.orientationMenu = uidropdown(app.uipanel5);
@@ -13210,7 +13210,7 @@ end
             app.uipanel7.Title = 'Image mode';
             app.uipanel7.Tag = 'uipanel7';
             app.uipanel7.FontSize = 11;
-            app.uipanel7.Position = [462 381 175 63];
+            app.uipanel7.Position = [628 527 175 63];
 
             % Create ImageRadioButton
             app.ImageRadioButton = uiradiobutton(app.uipanel7);
@@ -13249,7 +13249,7 @@ end
             app.uipanel6.Tag = 'uipanel6';
             app.uipanel6.FontName = 'Arial';
             app.uipanel6.FontSize = 11;
-            app.uipanel6.Position = [643 224 64 220];
+            app.uipanel6.Position = [809 370 64 220];
 
             % Create KaiserText
             app.KaiserText = uilabel(app.uipanel6);
@@ -13355,7 +13355,7 @@ end
             app.FrameText.VerticalAlignment = 'top';
             app.FrameText.WordWrap = 'on';
             app.FrameText.Tooltip = 'Ctrl+ScrollWheel';
-            app.FrameText.Position = [33 56 38 22];
+            app.FrameText.Position = [19 55 38 22];
             app.FrameText.Text = 'Frame';
 
             % Create SliceText
@@ -13365,7 +13365,7 @@ end
             app.SliceText.VerticalAlignment = 'top';
             app.SliceText.WordWrap = 'on';
             app.SliceText.Tooltip = 'ScrollWheel';
-            app.SliceText.Position = [33 36 31 22];
+            app.SliceText.Position = [19 35 31 22];
             app.SliceText.Text = 'Slice';
 
             % Create FrameNumSlider
@@ -13380,7 +13380,7 @@ end
             app.FrameNumSlider.Interruptible = 'off';
             app.FrameNumSlider.Tag = 'FrameNumSlider';
             app.FrameNumSlider.Tooltip = {'[Shift]+ScrollWheel'; 'or'; '[Shift] + up/down keyboard key'};
-            app.FrameNumSlider.Position = [79 67 138 3];
+            app.FrameNumSlider.Position = [65 66 138 3];
             app.FrameNumSlider.Value = 1;
 
             % Create SliceNumSlider
@@ -13395,7 +13395,7 @@ end
             app.SliceNumSlider.Interruptible = 'off';
             app.SliceNumSlider.Tag = 'SliceNumSlider';
             app.SliceNumSlider.Tooltip = {'ScrollWheel'; '   or'; 'Up/down keyboard keys'};
-            app.SliceNumSlider.Position = [79 47 138 3];
+            app.SliceNumSlider.Position = [65 46 138 3];
             app.SliceNumSlider.Value = 1;
 
             % Create SliceNumEdit
@@ -13405,7 +13405,7 @@ end
             app.SliceNumEdit.Tag = 'SliceNumEdit';
             app.SliceNumEdit.HorizontalAlignment = 'center';
             app.SliceNumEdit.Tooltip = {'ScrollWheel'; '   or'; 'Up/down keyboard keys'};
-            app.SliceNumEdit.Position = [226 37 31 21];
+            app.SliceNumEdit.Position = [212 36 31 21];
             app.SliceNumEdit.Value = '1';
 
             % Create FrameNumEdit
@@ -13415,7 +13415,7 @@ end
             app.FrameNumEdit.Tag = 'FrameNumEdit';
             app.FrameNumEdit.HorizontalAlignment = 'center';
             app.FrameNumEdit.Tooltip = {'[Shift]+ScrollWheel'; 'or'; '[Shift] + up/down keyboard key'};
-            app.FrameNumEdit.Position = [226 58 30 21];
+            app.FrameNumEdit.Position = [212 57 30 21];
             app.FrameNumEdit.Value = '1';
 
             % Create versionText
@@ -13426,7 +13426,7 @@ end
             app.versionText.VerticalAlignment = 'top';
             app.versionText.WordWrap = 'on';
             app.versionText.FontSize = 11;
-            app.versionText.Position = [468 100 238 22];
+            app.versionText.Position = [634 246 238 22];
             app.versionText.Text = 'this should display version info';
 
             % Create floatingTextEdit1
@@ -13434,7 +13434,7 @@ end
             app.floatingTextEdit1.Tag = 'floatingTextEdit1';
             app.floatingTextEdit1.FontSize = 13.3333333333333;
             app.floatingTextEdit1.Visible = 'off';
-            app.floatingTextEdit1.Position = [25 10 63 18];
+            app.floatingTextEdit1.Position = [11 9 63 18];
             app.floatingTextEdit1.Value = 'Edit Text';
 
             % Create infoText1
@@ -13444,7 +13444,7 @@ end
             app.infoText1.VerticalAlignment = 'top';
             app.infoText1.WordWrap = 'on';
             app.infoText1.FontSize = 9.33333333333333;
-            app.infoText1.Position = [6 2 695 27];
+            app.infoText1.Position = [4 5 695 27];
             app.infoText1.Text = '';
 
             % Create updateNeededText
@@ -13457,7 +13457,7 @@ end
             app.updateNeededText.FontSize = 13.3333333333333;
             app.updateNeededText.FontColor = [1 0 0];
             app.updateNeededText.Visible = 'off';
-            app.updateNeededText.Position = [468 59 235 18];
+            app.updateNeededText.Position = [634 205 235 18];
             app.updateNeededText.Text = '';
 
             % Create ROI
