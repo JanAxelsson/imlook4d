@@ -70,6 +70,10 @@
                   % Frame Ref. Time
                   try
                     out=dirtyDICOMHeaderData(sortedHeaders, i, '0054', '1300',mode);  % Frame ref time 
+                    % Handle empty string
+                    if out.valueLength == 0
+                        out.string='0'; 
+                    end
                   catch
                     out.string='0';
                   end
@@ -79,6 +83,10 @@
                   % Acq. time
                   try
                     out=dirtyDICOMHeaderData(sortedHeaders, i, '0008', '0032',mode);  % Acq time
+                    % Handle empty string
+                    if out.valueLength == 0
+                        out.string='0'; 
+                    end
                     indexlist(i,4)=str2num(out.string);
                   catch
                     out.string='0';   
@@ -90,6 +98,10 @@
                   % Acq. date
                   try
                     out=dirtyDICOMHeaderData(sortedHeaders, i, '0008', '0022',mode);  % Acq date
+                    % Handle empty string
+                    if out.valueLength == 0
+                        out.string='0'; 
+                    end
                   catch
                     out.string='0';    
                   end
