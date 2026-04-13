@@ -3770,11 +3770,16 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
             
                         try
                             % Fails if no imaging toolbox
-                            contextMenu = contextMenuItem.Parent;
-                            labelHandle = contextMenu.UserData.textHandle;
-                            name = labelHandle.String;
+                            % contextMenu = contextMenuItem.Parent;
+                            % labelHandle = contextMenu.UserData.textHandle;
+                            % name = labelHandle.String;
+                            name = contextMenuItem.UserData.textHandle.String
                         catch
-                            name = 'unnamed';
+                            try
+                                name = contextMenuItem.ContextMenu.UserData.textHandle.String
+                            catch
+                                name = 'unnamed';
+                            end
                         end
             
             
@@ -11291,7 +11296,7 @@ end
                         lobj = findobj(gcf, 'Type','images.roi.line');
                         simpleLines = findobj(gcf, 'Type','Line', 'Tag','imlook4d_measure');
                         n = length(lobj) + length(simpleLines) + 1;
-                        answer=inputdlg({'Enter ROI name:'},'Input ROI name',1,{['Measure ' num2str(n)]});
+                        answer=inputdlg({'Give the measurement a name:'},'Give name',1,{['Measure ' num2str(n)]});
                         name=answer{1};
             
             
@@ -11300,18 +11305,23 @@ end
                         %
                         slice=round(get(handles.SliceNumSlider,'Value'));
                         orientation = handles.image.plane; % 'Axial' / 'Sagital' / 'Coronal'
-            
+     
                         try
                             % If imaging toolbox missing
                             %throw( MException('MyComponent:Testing',' ')); % TEST - fall into non-image toolbox version
                             h = drawline(gca,'LineWidth',1 );  % Manually calling this : h = drawline(gca, 'Position', h.Position )
                             measureTapeContextualMenusImageToolbox(app,  h, name, slice, orientation);
+
+                            % Add listener displaying measure in message row
+                            addlistener(h,'ROIClicked', @(src,evnt) displayLineCoordinates(app, h, h.Position) );
             
                         catch
                             % If imaging toolbox missing, or other faults -- make a ?simpler line with less functionality
                             [x,y]= ginput(2);
                             h = line( x,y,'LineWidth',1, 'Tag','imlook4d_measure');
                             measureTapeContextualMenusNoToolbox(app,  h, name, slice, orientation);
+                            Position = [h.XData(:), h.YData(:)];
+                            h.ButtonDownFcn = @(src,evt) displayLineCoordinates(app, h, Position );
                         end
             
             
@@ -12976,6 +12986,7 @@ end
             app.axes1.NextPlot = 'replace';
             app.axes1.Interruptible = 'off';
             app.axes1.Tag = 'axes1';
+            colormap(app.axes1, 'parula')
             app.axes1.Position = [4 92 613 498];
 
             % Create matrixSize
