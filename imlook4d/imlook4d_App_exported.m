@@ -7263,7 +7263,8 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
             app.Savemat.MenuSelectedFcn = 'UNKNOWN Function';
             app.PC_low_edit.ValueChangedFcn = 'UNKNOWN Function';
             app.Help.MenuSelectedFcn = 'web( which(''Help.html'') );';
-            app.upgrade_menu.MenuSelectedFcn = 'if imlook4d(''app.DisplayHelp'',gcbo,[],guidata(gcbo));return;end;eval(''Update_imlook4d'')';
+            % Comment out legacy code from migration to appdesigner
+            %app.upgrade_menu.MenuSelectedFcn = 'if imlook4d(''app.DisplayHelp'',gcbo,[],guidata(gcbo));return;end;eval(''Update_imlook4d'')'; %
 
         end
 
@@ -12452,6 +12453,25 @@ end
 
             end
         end
+
+        % Menu selected function: upgrade_menu
+        function Update_imlook4d_Callback(app, event)
+            disp('ENTERED Update_imlook4d_Callback')
+            
+            %disp(event.NewValue)
+
+            % Create GUIDE-style callback args - Added by Migration Tool
+            [hObject, eventdata, handles] = myConvertToGUIDECallbackArguments(app, event); 
+            app.DisplayHelp( hObject, eventdata, handles)
+
+            % Display HELP and get out of callback
+                % if app.DisplayHelp( hObject, eventdata, handles)
+                %      return
+                % end
+
+            disp('Update menu clicked')
+            evalin('base','run("Update_imlook4d.m")')
+        end
     end
 
     % Component initialization
@@ -12831,6 +12851,7 @@ end
 
             % Create upgrade_menu
             app.upgrade_menu = uimenu(app.HelpMenu);
+            app.upgrade_menu.MenuSelectedFcn = createCallbackFcn(app, @Update_imlook4d_Callback, true);
             app.upgrade_menu.Text = 'Update';
             app.upgrade_menu.Tag = 'upgrade_menu';
 
@@ -12986,7 +13007,6 @@ end
             app.axes1.NextPlot = 'replace';
             app.axes1.Interruptible = 'off';
             app.axes1.Tag = 'axes1';
-            colormap(app.axes1, 'parula')
             app.axes1.Position = [4 92 613 498];
 
             % Create matrixSize
