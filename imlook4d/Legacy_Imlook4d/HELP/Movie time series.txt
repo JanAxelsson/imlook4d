@@ -1,0 +1,13 @@
+<h1>Movie -- time series</h1>
+<HR></HR>
+<!------------------->
+	<P>
+		Creates an mp4 or avi movie along the time dimension.  The movie will be 3 seconds long.
+	</P>
+
+
+	<P> 
+        The mp4 format is default, but format can be changed to avi by the drop down menu.
+	</P>
+
+   

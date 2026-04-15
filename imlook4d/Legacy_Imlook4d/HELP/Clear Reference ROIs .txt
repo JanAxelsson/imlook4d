@@ -1,0 +1,11 @@
+<h1>Clear Reference ROIs</h1>
+<HR></HR>
+<!------------------->
+<p>
+	This script clears the marks that make a ROI, or a combination of ROIs, a reference ROI.
+</p>
+<p>
+  ROIs can be marked as reference ROI using the script "Select Reference ROIs"
+    
+</p>
+

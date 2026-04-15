@@ -1,6 +1,23 @@
 <h1  id="top">Open </h1>
 <HR></HR>
 
+Loads medical images.  
+
+<h2><a id="OpenOptions">Initial Open Options dialog</a></h2>
+<!-------------------------------------->
+	<P>
+        First an "Open options" dialog is shown. The point of this is to select what type of open dialog to use in next step.  The dialog type is selected from one of the buttons :
+ 
+		<UL>
+			<LI> [File dialog]      - opens a simple dialog where any file can be selected
+			<LI> [Advanced dialog]  - opens an advanced dialog where file type filtering is allowed.  This is primary used for file filtering by extensions.  For <a href="javascript:;" onclick="document.location.hash='RDF';">GE PET Raw data</a> the selected filter also forces the opening mode.  
+			<LI> [Recent File ]     - opens a list of recently opened file
+		</UL>
+   
+	</P>
+ 
+
+<h2><a id="FileFormats">Available file formats</a></h2>
 <!------------------->
 	<P>
 		Loads medical images in one of the formats:
@@ -79,7 +96,7 @@
 <B>3. DICOM opening  - force using imaging toolbox</B>
 <!---------------------------------------->
  
-    <P> The Matlab imaging toolbox dicomreader can be forced, in the opening dialog.  
+    <P> The Matlab imaging toolbox dicomreader can be forced, in the opening dialog.  This requires first selecting [Advanced dialog] in the intial "Open options" dialog (see above).
         This is done by selecting the drop-down option 'DICOM imaging toolbox' in the opening dialog.
         This is beneficial if the imlook4d default reader does not work.  This is known to happen for certain compression formats, or for for color images such as for instance ultrasound.
     </P>
@@ -224,7 +241,7 @@
         Assuming that we hava a brain scan, the imlook4d axial view shows multiple projections of the brain at different ring differences.  The coronal imlook4d view shows classic 2D-like sinograms.
 
 	</P><P>	
-        In case you wish to read the full 4D sinogram, you can force this from the file open dialog. In the open dialog, select file type 'GE RAW (4D, w ToF)'.  
+        In case you wish to read the full 4D sinogram, you can force this from the file open dialog. In the open dialog, select file type 'GE RAW (4D, w ToF)'.  This requires first selecting [Advanced dialog] in the intial "Open options" dialog (see above).
         Data is presented in dimensions x = radial bin, y = projection plane, z = rotation angle, frame = time-of-flight bin.  On some systems (Macs?), you first have to press a button "Alternative" to be able to select the file type.
 	</P>
 

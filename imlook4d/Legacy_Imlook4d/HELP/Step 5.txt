@@ -1,0 +1,5 @@
+
+<h1>5 step color map</h1>
+<HR></HR>
+<!------------------->
+	Change color scale.  

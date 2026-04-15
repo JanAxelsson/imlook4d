@@ -1,0 +1,13 @@
+<h1>Export times to sif</h1>
+<HR></HR>
+<!------------------->
+
+	<P>
+	Nifti files do not carry information about time, which is necessary in some processing of dynamic scans.
+    This script exports time information from a DICOM file to a .sif file.
+	</P>
+
+
+	<P>
+	Nifti files can obtain time information by importing it from a .sif file. See "Import times from sif"
+	</P>

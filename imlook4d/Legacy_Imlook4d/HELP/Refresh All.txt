@@ -1,0 +1,9 @@
+
+<h1>Refresh All Script</h1>
+<HR></HR>
+<!------------------->
+<P>
+	This script refreshes all open imlook4d windows.  This can be useful if the imlook4d version has changed because imlook4d was upgrade in the current matlab session.
+</P><P>
+Another reason can be that figure files saved with an older version (see "Save Windows + Layout (all windows)" ) were opened with a later imlook4d version. 
+</P>

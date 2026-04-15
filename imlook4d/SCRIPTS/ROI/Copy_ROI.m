@@ -12,6 +12,7 @@
     %  selected
     disp('SCRIPTS/Profile_Slices.m entered');
     imlook4d('exportToWorkspace_Callback', imlook4d_current_handle,{},imlook4d_current_handles);
+    Export
     numberOfSlices=size(imlook4d_Cdata,3);
     
     ROINumber=get(imlook4d_current_handles.ROINumberMenu,'Value');

@@ -1,0 +1,10 @@
+<h1>Step 3 - WB Patlak </h1>
+<HR></HR>
+<!------------------->
+	<P>
+		Now, select the dynamic whole-body scans.  The DICOM-files from all scans must be in the same directory, and not split into subdirectories.
+	</P>
+
+<HR></HR>
+<!------------------->
+<a href="matlab:WB_Patlak; ">Continue </a>

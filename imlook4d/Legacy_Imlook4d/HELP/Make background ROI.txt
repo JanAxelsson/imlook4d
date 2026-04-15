@@ -1,0 +1,7 @@
+<h1>Make background ROI</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	This script creates a background ROI around the currently selected ROI.
+
+	</P>

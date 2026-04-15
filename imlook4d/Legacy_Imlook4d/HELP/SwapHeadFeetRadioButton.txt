@@ -1,0 +1,12 @@
+<h1>Swap head and feet</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	Reverses the slice order for image and drawn ROIs. 
+	</P>
+	
+	<P>
+	The image is saved in the displayed slice order 
+	</P>
+		
+

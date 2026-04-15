@@ -1,0 +1,6 @@
+1	Gray Matter
+2	White Matter
+3	CSF
+4	Bone
+5	Soft Tissue
+6	Air

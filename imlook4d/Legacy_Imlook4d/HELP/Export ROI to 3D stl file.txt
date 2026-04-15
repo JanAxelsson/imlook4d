@@ -1,0 +1,25 @@
+<h1>Export ROI to 3D stl file</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	This script exports the current ROI to an STL file, useable for 3D printing. 
+	</P>
+
+	<P>
+	Typically, a generated STL file requires some cleaning up.  I have found MeshMixer (freeware) to be useful.  If you are lucky, the "Analysis/Inspector" and "Auto Repair All" options works. 
+	</P>
+
+	<P>
+Otherwise, some more work may be required.  One option is to paint on the positions that has errors using the tool "Sculpt/Brushes/Robust Smooth", and then repeat the "Analysis/Inspector" and "Auto Repair All".
+
+	</P>
+
+	<P>
+
+    Also, the "Edit/Make Solid" option is useful for making a less hollow printed object.
+	</P>
+
+
+	<P>
+	Acknowledgement: this script uses the stlwrite from Mathworks
+	</P>

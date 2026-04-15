@@ -1,0 +1,18 @@
+<h1>Step 1 - PET Fat Removal </h1>
+<HR></HR>
+<!------------------->
+	<P>
+		The removal of fat uptake from PET requires two scans:
+		<UL>
+			<LI> A CT-attenuation scan (in Hounsfield units), with same slice spacing as the PET scan.
+			<LI> A PET attenuation-corrected scan.
+		</UL>
+	</P>		
+	<P>
+		Now, select the CTAC scan 
+		
+	</P>
+
+<HR></HR>
+<!------------------->
+<a href="matlab:Fat_Removal; ">Continue </a>

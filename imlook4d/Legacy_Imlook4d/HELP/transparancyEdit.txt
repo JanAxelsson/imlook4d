@@ -1,0 +1,11 @@
+<h1>Transparancy Edit</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	This value between 0-100 % sets the weight of the frontmost image.  A lower value shows more of the underlying image.
+	</P>
+
+
+	<P>
+	This setting is shown only if overlay images are shown.
+	</P>

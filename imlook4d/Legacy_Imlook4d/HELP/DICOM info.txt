@@ -1,0 +1,7 @@
+<h1>DICOM INFO</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	This script displays the DICOM header.  It requires java to be installed on the computer.
+	</P>
+

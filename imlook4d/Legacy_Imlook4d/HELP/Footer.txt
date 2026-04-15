@@ -1,0 +1,23 @@
+<HR></HR>
+<I>
+<P>
+<a href="matlab:handles=guidata(gcf);set(handles.helpToggleTool,'State','off')">Close help window</a>
+
+<!--- <BR>
+<a href="javascript:toggle()">Show/hide developers text</a>
+</P>
+
+</I>
+<script type="text/javascript">
+function toggle()
+{	
+var obj = document.getElementById("test");
+if(obj.style.display == "none") obj.style.display = "block";
+else obj.style.display = "none";
+}
+</script> --->
+
+
+
+
+
