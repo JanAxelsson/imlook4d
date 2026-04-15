@@ -1,0 +1,18 @@
+<h1>ROI to brush (to create arbitrarly shaped ROI brushes)</h1>
+<HR></HR>
+<!------------------->
+	<P>
+		This script  creates a new ROI brush using the shape of the current ROI.  
+		If the current ROI spans several slices, the ROI from the current slice will be used as the new brush.
+	</P>	
+	<P>
+		The brush is reset to circular shape by entering a number in the Brush Size text box.
+		 
+	 </P>	
+	<P>
+		The ROI to brush feature is useful if a ROI needs to be copied to multiple places.  
+	</P>	
+	<P>
+		To copy a ROI from another imlook4d instance, 
+		first save that ROI, then load the ROI in the imlook4d instance you want it.  Finaly, run the script "ROI to brush" to make that ROI the new brush.
+	 </P>

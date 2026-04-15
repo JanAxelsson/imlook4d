@@ -1,0 +1,24 @@
+<H1>Save Windows + Layout</H1>
+<HR></HR>
+<!------------------->
+
+<P>
+Saves all open windows, and their positions on screen. The matlab .fig files are saved in a user selected folder.<BR>
+</P>
+
+<P>
+To open the windows again, leave matlab and go into the file system.  Select the files (a few, or all) from the folder and drag and drop them into the Matlab console window.  
+</P>
+
+
+<P>
+You may also right-click and select Open, which works for systems where .fig files are configured as Matlab files.   
+</P>
+
+
+
+
+<P>
+<b>NOTE : </b> The fig file is saved as is, which means that menues etc that are changed in later imlook4d versions will not be updated when opening saved .fig files.
+The workaround, is to select SCRIPTS/Change/Duplicate on each window to get it to latest version (and then close the initial window)   
+</P>

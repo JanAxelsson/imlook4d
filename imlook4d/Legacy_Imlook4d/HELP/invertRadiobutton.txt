@@ -1,0 +1,7 @@
+<h1>Invert</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	Inverts the pixel values, before the color scale is calculated.   This is only for display purposes, and does not affect any calculations.  
+	</P>
+

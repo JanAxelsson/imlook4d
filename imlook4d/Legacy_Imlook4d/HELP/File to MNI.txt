@@ -1,0 +1,16 @@
+<h1>File to MNI</h1>
+<HR></HR>
+<!------------------->
+	<P>
+		Transforms the open file to MNI space, and loads the current atlas ROIs.   
+	</P>
+
+	<P> 
+                This script requires SPM packages to be added to the path.
+	</P>
+
+	<P> 
+                The SPM package can be found at <a href="http://www.fil.ion.ucl.ac.uk/spm/software/download.html">http://www.fil.ion.ucl.ac.uk/spm/software/download.html </a>
+	</P>
+
+

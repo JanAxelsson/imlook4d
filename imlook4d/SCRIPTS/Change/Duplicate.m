@@ -9,12 +9,16 @@
 % INITIALIZE
 %
      disp('SCRIPTS/Duplicate.m entered');
-     
+
+     %imlook4d_current_handle = gcf;
      imlook4d_current_handles=guidata(imlook4d_current_handle);
 
      % Create imlook4d
      newHandle=imlook4d(imlook4d_current_handles.image.Cdata);  % Create new imlook4d instance with image matrix only
-     newHandles=guidata(newHandle);                             % Get handles
+
+     
+     %newHandle = imlook4d_app.figure1; % Get the handle from app object
+     newHandles=guidata(newHandle);    % Get handles
 %      
 %      % Move window slightly offset to original
 %      dx = 30;
@@ -107,27 +111,27 @@
     end
     
     % Copy radiobuttons
-    style = 'radiobutton';
-    HmatchOld = findobj(imlook4d_current_handle,'Style',style);
-    HmatchNew = findobj(newHandle,'Style',style);
+    style = 'uiradiobutton';
+    HmatchOld = findobj(imlook4d_current_handle,'Type',style);
+    HmatchNew = findobj(newHandle,'Type',style);
     for i = 1: length(HmatchOld)
        set( HmatchNew(i), 'Value',  get( HmatchOld(i), 'Value') );
     end
     
     % Copy checkboxes
-    style = 'checkbox';
-    HmatchOld = findobj(imlook4d_current_handle,'Style',style);
-    HmatchNew = findobj(newHandle,'Style',style);
+    style = 'uicheckbox';
+    HmatchOld = findobj(imlook4d_current_handle,'Type',style);
+    HmatchNew = findobj(newHandle,'Type',style);
     for i = 1: length(HmatchOld)
        set( HmatchNew(i), 'Value',  get( HmatchOld(i), 'Value') );
     end
     
     % Copy edit fields
-    style = 'edit';
-    HmatchOld = findobj(imlook4d_current_handle,'Style',style);
-    HmatchNew = findobj(newHandle,'Style',style);
+    style = 'uiedit';
+    HmatchOld = findobj(imlook4d_current_handle,'Type',style);
+    HmatchNew = findobj(newHandle,'Type',style);
     for i = 1: length(HmatchOld)
-       set( HmatchNew(i), 'String',  get( HmatchOld(i), 'String') );
+       set( HmatchNew(i), 'Value',  get( HmatchOld(i), 'Value') );
     end
     
     % Copy status of transparancyPanel

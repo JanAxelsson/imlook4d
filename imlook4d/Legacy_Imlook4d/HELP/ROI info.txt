@@ -1,0 +1,62 @@
+<h1>ROI info</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	 <B>Statistics: </B>  This script displays the following info about the current ROI statistics (in current frame, if dynamic scan):
+	
+		<TABLE>
+			<TR>
+			<TD> <B> Average activity concentration &nbsp;</B></TD>
+			<TD> The average pixel value.  This is the mean activity concentration within the ROI.</TD>
+			</TR>
+			
+			<TR>
+			<TD> <B> Volume</B></TD>
+			<TD> The Volume of the ROI in milli-litres, assuming that pixel dimensions in DICOM file is in unit of mm.</TD>
+			</TR>
+			
+			<TR>
+			<TD> <B> Total activity</B></TD>
+			<TD> The total activity in the ROI, calculated as the [average activity concentration] * [Volume]</TD>
+			</TR>
+			
+			<TR>
+			<TD> <B> Max activity concentration</B></TD>
+			<TD> The highest pixel value in the ROI.</TD>
+			</TR>
+			
+			<TR>
+			<TD> <B> Std activity concentration</B> </TD>
+			<TD> Standard deviation of pixel values within ROI.</TD>
+			</TR>			
+			
+		</TABLE>
+
+	</P>
+
+	<P>
+	<B> Geometry: </B> This script displays the following info about the current ROI  geometry:
+	
+		<TABLE>
+			<TR>
+			<TD> <B> Centroid position (pixels)  &nbsp;</B></TD>
+			<TD> The centroid (center of gravity) of the pixels locations (x, y, z coordinates), with no weighting of the actual pixel uptake values taken into account </TD>
+			</TR>
+			
+			<TR>
+			<TD> <B> ROI dimensions (pixels) [x,y,z] &nbsp;</B></TD>
+			<TD> Length of longest dimension of the ROI (projected onto the x, y, z coordinate axes)  </TD>
+			</TR>		
+
+			<TR>
+			<TD> <B> Centroid position (mm)  &nbsp;</B></TD>
+			<TD> The centroid position (as above) in millimeters </TD>
+			</TR>
+			
+			<TR>
+			<TD> <B> ROI dimensions (mm) [x,y,z] &nbsp;</B></TD>
+			<TD> Length of longest dimension (as above) in millimeters  </TD>
+			</TR>				
+		</TABLE>
+
+	</P>

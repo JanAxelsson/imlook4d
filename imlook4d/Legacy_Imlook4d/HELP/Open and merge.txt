@@ -1,0 +1,15 @@
+<h1>Open and merge</h1>
+<HR></HR>
+<!------------------->
+<P>
+A special function to create dynamic whole body scans.
+</P>
+
+<P>
+Input data is a number of static whole-body PET scans, in DICOM format.  These files are placed in the same directory. </P>
+
+<P>
+Dynamic data is created, with time stamps taken from the <U><SPAN title="Tag='0008', '0032'">Acquisition Time DICOM-tag</SPAN></U>.
+</P>
+
+

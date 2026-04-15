@@ -1,0 +1,8 @@
+<h1>Slice min-max (CT)</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	Sets Hounsfield window between minimum and maximum values in current slice.  
+	This means that for a 5-frame dynamic scan, the minimum and maximum values are taken from all 5-frames (at current slice).  
+	</P>
+

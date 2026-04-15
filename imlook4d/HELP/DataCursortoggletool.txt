@@ -1,6 +1,11 @@
 <h1>Data cursor tool</h1>
 <HR></HR>
 <!------------------->
+<P>
 When down, data cursor is activated.  Click on a pixel to display value.
 When up, data cursor is off.
 
+</P>
+<P>
+You can click and drag, to continuosly update value
+</P>

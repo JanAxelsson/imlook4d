@@ -1,0 +1,9 @@
+<h1>Water model (simplified model)</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	This is a water model -- in a crude state.
+	For instance, the point after which the tissue has become linear is hard coded as lastFrame.
+	<B>Use this with care!</B>
+	</P>
+

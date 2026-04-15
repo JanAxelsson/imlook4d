@@ -48,7 +48,7 @@ imlook4d_current_handles=guidata(imlook4d_current_handle);
  
 % Set Orientation if index within range of existing ROIs 
      try
-         last = size( get(imlook4d_current_handles.ROINumberMenu,'String'),1 ) - 1;
+         last = size( get(imlook4d_current_handles.orientationMenu,'String'),1 );
          if ( index >= 1) & ( index <= last)  
             % Set menu to selected ROI
             set(imlook4d_current_handles.orientationMenu,'Value',index)

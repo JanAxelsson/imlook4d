@@ -1,0 +1,55 @@
+1	Accumbens_Core
+2	Accumbens_Shell
+3	Amygdala
+4	Bed_Nucleus_Stria_Terminalis
+5	Caudate_Putamen
+6	Cerebellum
+7	Corpus_Callosum
+8	Cortex_Auditory
+9	Cortex_Cingulate
+10	Cortex_Entorhinal
+11	Cortex_Frontal_Association
+12	Cortex_Insular
+13	Cortex_MedialPrefrontal
+14	Cortex_Motor
+15	Cortex_Orbitofrontal
+16	Cortex_Parietal
+17	Cortex_Piriform
+18	Cortex_Retrosplenial
+19	Cortex_Somatosensory
+20	Cortex_Temporal_Association
+21	Cortex_Visual
+22	Diagonal_Band
+23	Globus_Pallidus
+24	Hippocampus_Anterior
+25	Hippocampus_Posterior
+26	Hippocampus_PosteroDorsal
+27	Hippocampus_Subiculum
+28	Hippocampus_Ventral
+29	Hypothalamus_Lateral
+30	Hypothalamus_Medial
+31	Internal_Capsule
+32	IPAC
+33	Medial_Geniculate
+34	Medulla
+35	Mesencephalic_Region
+36	Olfactory_Nuclei
+37	Olfactory_Tubercle
+38	PAG
+39	Pons
+40	Raphe
+41	Septum
+42	Substantia_Innominata
+43	Substantia_Nigra
+44	Superior_Colliculus
+45	Thalamus_DorsoLateral
+46	Thalamus_MidlineDorsal
+47	Thalamus_Ventromedial
+48	Ventral_Pallidum
+49	Ventral_Tegmental_Area
+50	Zona_Incerta
+// SAMIT (Schwarz et al. 2006)
+// 
+// doi: 10.1371/journal.pone.0122363
+//
+// Index	Name

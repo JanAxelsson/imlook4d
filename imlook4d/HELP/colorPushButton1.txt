@@ -1,0 +1,11 @@
+<h1>Color scale menu</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	Change color scale by clicking the image.  
+	</P>
+	<P>
+	Close the menu, by clicking the toolbar icon again  
+	</P>
+
+

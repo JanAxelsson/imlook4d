@@ -1,0 +1,307 @@
+<h1  id="top">Open </h1>
+<HR></HR>
+
+<!------------------->
+	<P>
+		Loads medical images in one of the formats:
+
+		<UL>
+			<LI> <B><a href="javascript:;" onclick="document.location.hash='ROI';">ROI file + image </a> </B> (.roi)
+			<LI> <B><a href="javascript:;" onclick="document.location.hash='DICOM';">DICOM</a> </B>
+			<LI>  <B><a href="javascript:;" onclick="document.location.hash='Nifti';">Nifti</a> </B> (.nii, .hdr, .img)
+			<LI>  <B><a href="javascript:;" onclick="document.location.hash='Nifti-pmod';">Nifti PMOD</a> </B> (.nii)
+
+			<LI>  <B><a href="javascript:;" onclick="document.location.hash='ECAT';">Siemens/CTI ECAT 7</a></B> (.v)
+			<LI>  <B><a href="javascript:;" onclick="document.location.hash='Analyze';">Analyze</a> </B> (.hdr, .img)
+			<LI>  <B><a href="javascript:;" onclick="document.location.hash='Freesurfer';">Freesurfer</a> </B> (.mgz, .mgh)
+            <LI>  <B><a href="javascript:;" onclick="document.location.hash='ITK';">ITK</a> </B> (.mhd , and possibly .mha)
+			<LI>  <B><a href="javascript:;" onclick="document.location.hash='SHR';">Hamamatsu SHR-7700</a> </B> (.ima)
+			<LI>  <B><a href="javascript:;" onclick="document.location.hash='RDF';">GE PET Raw data</a> </B> 
+			<LI>  <B>Imlook4d state </B> (.mat) 
+				 (as saved from menu "File/Save state" )
+			<LI>  <B><a href="javascript:;" onclick="document.location.hash='Binary';">Binary</a> </B>
+			<LI>  <B><a href="javascript:;" onclick="document.location.hash='Hermes';">Hermes</a> (as taken from CD cache) </B>
+			<LI>  <B><a href="javascript:;" onclick="document.location.hash='Interfile';">Interfile</a></B>
+		</UL>
+
+		The program uses the appropriate file reader based on 1) extension, 2) DICOM header 3) Interfile header.  
+		If neither of these match, the file is assumed to be binary.
+	</P>
+
+<h2><a id="ROI">ROI file opening</a></h2>
+<!-------------------------------------->
+	<P>
+		Selecting  a .roi file opens the images that was used creating the ROI. The ROIs are loaded automatically into this image.  
+	</P><P>
+        The ROI file has to be created with imlook4d (version later than 5.0.17).  
+        The image file should be on the same file path as when the ROI file was created. 
+   </P><P>
+        If the data has been moved, the image file has changed location. If it has not moved relative the .roi file, imlook4d tries to identify a common folder from the .roi file path,
+        and derive the file from that. This may succeed if the relative paths has not changed, or if the .roi and the image file 
+        is in the same folder hierarchy. 
+	</P>
+
+<h2><a id="DICOM">DICOM file opening</a></h2>
+<!-------------------------------------->
+
+<B>1. DICOM user interface</B>
+	<P>DICOM files are opened by selecting a single DICOM file from a file browser.  
+    </P><P>Only little-endian DICOM files are supported.  
+    
+    
+    </P><P><B><I> a) One image in each file </I></B>
+    </P><P>
+		
+        If the selected DICOM file consists of a single image (generally the case), 
+        all the files in the directory of the selected file are opened.
+        If more than one series is found, a selection dialog is shown.  Here the correct series can be selected. 
+        
+	<!-- </P><P>
+		A dialog with a regular expression filter is opened.  The default is to open all files within the directory (filter&nbsp;"*").   
+        All DICOM files matching the regular expression are read, scaled, and sorted as described in the following section.  
+        Non-DICOM files are ignored.
+    -->
+    </P><P><B><I> b) Multiple images in the file </I></B>
+	</P><P>
+		If the selected DICOM file consists of multiple images (nuclear medicin), only this DICOM file is considered.  
+	</P>
+
+<B>2. DICOM opening  - supported formats</B>
+<!---------------------------------------->
+<UL>
+    <LI>Non-compressed little-endian DICOM files are supported using basic Matlab. 
+    <LI>Compressed formats supported by Matlab Imaging Toolbox are opened, if Imaging Toolbox is installed 
+    <LI>Color images (Typically UltraSound stored in RGB or Y'CrCb) are read by Matlab Imaging Toolbox, if Imaging Toolbox is installed. 
+        imlook4d converts to intensity by taking an average of the three channels, always assuming equal weights of all channels. 
+        This is only correct if the saved color-image is that of a grey-scale image.  Thus a real color image will give strange intensity values
+</UL>
+
+<B>3. DICOM opening  - force using imaging toolbox</B>
+<!---------------------------------------->
+ 
+    <P> The Matlab imaging toolbox dicomreader can be forced, in the opening dialog.  
+        This is done by selecting the drop-down option 'DICOM imaging toolbox' in the opening dialog.
+        This is beneficial if the imlook4d default reader does not work.  This is known to happen for certain compression formats, or for for color images such as for instance ultrasound.
+    </P>
+
+<B>4. DICOM opening  - how it works</B>
+<!---------------------------------------->
+	<P>
+
+		The DICOM files are sorted in the below order, using the tags that are available: 
+		<UL>
+			<LI>  <U><SPAN title="Tag='0020', '000E'">Series instance UID</SPAN></U>
+			<LI>  <U><SPAN title="Tag='0008', '0022'">Acquisition date</SPAN></U>
+			<LI> <U><SPAN title="Tag='0008', '0032'">Acquisition time</SPAN></U>
+			<LI> <U><SPAN title="Tag='0018', '1060'">Trigger time</SPAN></U>
+			<LI>  <U><SPAN title="Tag='0054', '1300'">Frame reference time</SPAN></U>
+			<LI>  <U><SPAN title="Tag='0020', '1041'">Slice location</SPAN></U>
+			<LI>  <U><SPAN title="Tag='0020', '0013'">Instance number</SPAN></U>
+		</UL>
+	</P><P>
+        The order of gated CT and MR are known to be hard to sort out.  
+        The best solution is to sort these only on instance number.
+        The program simply uses this fallback, whenever consecutive sorted images have the same slice location.
+	</P><P>
+		Finally, the number of frames are determined from the number of images with equal slice location,
+		and the data is displayed.
+	</P>
+
+<a href="javascript:;" onclick="document.location.hash='top';">[top]</a>
+
+
+<h2><a id="Nifti">Nifti file opening</a></h2>
+<!------------------------>
+
+	<P>
+		Opens  .nii files (one binary file), or .img + .hdr (two files as in Analyze format).  
+	</P>
+
+	<P>
+		If a .sif file with the same name exists, imlook4d takes the frame time information from this file.<BR> 
+		See the Analyze section above for information about .sif files.
+	</P>
+
+	<P>
+		If a nifti file's geometrical transforms fails, imloo4d tries to open it without performing transforms.
+        This is indicated by a warning dialog.
+        For some images, this may result in that axial, sagital and coronal views are exchanged.
+	</P>
+
+	<P>
+		A fix for nifti files that do not work with transformations, is to reslice them manually.  This is done
+        from Matlab command window with the command <code>reslice_nii( file_path, new_file_path , [ x y z ]);</code>
+        where x y z are the voxel dimensions in mm.  Example:
+        <code>reslice_nii( ’016.nii',  ’016_resliced.nii' , [ 1 1 1 ]);</code>
+	</P>
+		
+<a href="javascript:;" onclick="document.location.hash='top';">[top]</a>
+
+<h2><a id="Nifti-pmod">Nifti file opening (PMOD)</a></h2>
+<!------------------------>
+
+	<P>
+		Opens  .nii files (one binary file), converted from Dicom using PMOD. This is read-only. 
+	</P>
+
+	<P>
+		Time information from 4D PET is imported using the PMOD Nifti extension format.
+	</P>
+
+		
+<a href="javascript:;" onclick="document.location.hash='top';">[top]</a>
+<h2><a id="ECAT">Siemens ECAT file opening</a></h2>
+<!------------------------>
+
+	<P>
+		Opens a .v file.  Images are sorted in time order, solving a rare problem where frame order is scrambled.   
+	</P>
+
+
+<a href="javascript:;" onclick="document.location.hash='top';">[top]</a>
+
+ <h2><a id="Analyze">Analyze file opening</a></h2>
+<!------------------------>
+
+	<P>
+		Opens a .hdr or .img file.  
+	</P>
+
+	<P>
+		If a .sif file with the same name as the .hdr file exists, imlook4d takes the frame time information from this.<BR> 
+		The .sif file contains one header row, and then one row per frame.<BR>
+		These rows are organized in two columns with frame start and end times (in seconds from scan start), separated by space. 
+        Two additional columns contain data that can be used as weighting factors for curve fits (see Turku PET center web site)
+		</P>
+
+	<P>	
+        .sif files can be created from dynamic scans that contains time information (thus not Nifti).  
+        A good work flow would be to create a typical .sif file from the original DICOM data, and reuse that
+        for all subsequently created Nifti files (having the same dynamic scan protocol).  
+    </P>
+
+
+<a href="javascript:;" onclick="document.location.hash='top';">[top]</a>
+
+
+<h2><a id="Freesurfer">Freesurfer</a></h2>
+<!------------------------>
+	<P>
+		Opens Freesurfer MGH files, and compressed MGZ files.  Requires that the Freesurfer Matlab tools is installed.  
+	</P>
+
+		
+<a href="javascript:;" onclick="document.location.hash='top';">[top]</a>
+
+ <h2><a id="SHR">Hamamatsu file opening</a></h2>
+<!------------------------>
+
+	<P>
+		Hamamatsu SHR-7700 files are assumed to be 256*256 pixels.  
+		The user selects a single .ima (or .ima_01) file.  
+	</P><P>	
+		All .ima_* files in the same directory are then read.	
+		Scaling is performed by reading the scale factor from the .inf file in the same directory.
+		Timing data is read from the .mon file in the same directory.
+
+	</P>
+
+
+		
+<a href="javascript:;" onclick="document.location.hash='top';">[top]</a>
+
+ <h2><a id="RDF">GE PET Raw data</a></h2>
+<!------------------------>
+
+	<P>
+		Modern GE PET sinograms, rdf-files, are saved in a format called HDF.
+	</P><P>	
+		Opens decompressed GE sinograms extracted from modern GE PET scanners.
+        Location of files SINO0000, SINO0001 etc are determined by the "diagAnalysis" command line tool, and decompressed with "rdfDecomp" command (both on the scanner).
+
+	</P><P>	
+        Time-of-flight dimension is summed to conserve memory.  Data is presented in dimensions x = radial bin, y = projection plane, z = rotation angle.  
+        Assuming that we hava a brain scan, the imlook4d axial view shows multiple projections of the brain at different ring differences.  The coronal imlook4d view shows classic 2D-like sinograms.
+
+	</P><P>	
+        In case you wish to read the full 4D sinogram, you can force this from the file open dialog. In the open dialog, select file type 'GE RAW (4D, w ToF)'.  
+        Data is presented in dimensions x = radial bin, y = projection plane, z = rotation angle, frame = time-of-flight bin.  On some systems (Macs?), you first have to press a button "Alternative" to be able to select the file type.
+	</P>
+
+
+		
+<a href="javascript:;" onclick="document.location.hash='top';">[top]</a>
+
+ <h2><a id="Binary">Binary file opening</a></h2>
+<!------------------------>
+
+	<P>
+		If the file is not recognized, then it is assumed to be binary.  
+	</P><P>	
+		The following information has to be entered:
+		<UL>
+			<LI> Number of pixels in x-direction
+			<LI> Number of pixels in y-direction
+			<LI> Number of slices (you may use a formula here, see example below)
+			<LI> Number of frames (here it may be convenient to use a formula)
+			<LI> Byte order (b for big endian, and l for little endian)
+			<LI> Number format (int16, float32, or any other format specified by MATLAB)
+		</UL>
+	</P><P>	
+		The file is opened starting from first byte (no option to enter an offset)
+
+	</P><P>	
+        An example of using formulas for the number of frames is the case when the total number of images is displayed in the slices field (say 1269).
+        If you know the scanner's number of slices (for instance 47) then you can create a dynamic scan by typing: <BR>
+         47 into the <i>Number of slices</i> field. <BR>
+         the text "1269/47" into the <i>Number of frames</i> field.
+
+	</P>
+
+		
+<a href="javascript:;" onclick="document.location.hash='top';">[top]</a>
+
+ <h2><a id="ITK">ITK file opening</a></h2>
+<!------------------------>
+
+	<P>
+		Opens a file with the .mdh or .mda extension created by the ITK toolkit.  The binary opener is used internally.
+
+	</P>
+
+<a href="javascript:;" onclick="document.location.hash='top';">[top]</a>
+
+
+
+ <h2><a id="Hermes">Hermes file opening</a></h2>
+<!------------------------>
+
+	<P>
+		If the file is recognized as Hermes, it will be treated as a DICOM file.  
+		Hermes CD cache stores files in a near-DICOM format, excluding transfer syntax UID. 
+
+	</P><P>	
+		Read the information about opening DICOM above.
+	</P>
+
+
+
+		
+<a href="javascript:;" onclick="document.location.hash='top';">[top]</a>
+
+<h2><a id="Interfile">Interfile file opening</a></h2>
+<!------------------------>
+
+	<P>
+		An interfile file has two parts, a header file and a binary image file. 
+		The interfile header file is selected in the file opening dialog. 
+
+	</P><P>	
+		The image file defined by the header file is opened.
+
+	</P><P>	
+		Interfile support for dynamic sequences is not well defined.
+	</P>
+
+<a href="javascript:;" onclick="document.location.hash='top';">[top]</a>
+

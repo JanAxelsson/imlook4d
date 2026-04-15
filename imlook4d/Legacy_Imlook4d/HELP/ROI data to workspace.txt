@@ -1,0 +1,148 @@
+<h1>ROI data to workspace</h1>
+<HR></HR>
+<!------------------->
+<h2>Simple use</h2>
+
+	<P>
+	This script writes the ROI statistics to the MATLAB command window, as in below example :<BR>
+
+<pre>
+<b>ROI-name	  mean    	  median	  volume[cm3]	  #pixels	  max     	  min     	  stdev   	  skewness   	  kurtosis   	  uniformity   	  entropy   </b>
+ROI 1   	925.77220	928.00000	  0.08868	     1453	1111.00000	709.00000	 55.97754	 -0.21088	  3.44840	  0.01712	  6.11822	
+ROI 2   	2738.53213	3071.00000	  0.03040	      498	3071.00000	-471.00000	811.06522	 -2.33058	  7.03326	  0.67848	  1.68065	
+ROI 3   	-967.88095	-978.00000	  0.07947	     1302	-425.00000	-1000.00000	 48.21608	  5.77775	 46.54898	  0.07579	  4.07233
+--------------
+Pixel dimensions=(0.3125, 0.3125, 0.625) [mm]
+ 
+TABLE is in clipboard.     Copy important data to clipboard as single line :    <a  href="#" onclick="return false;">header</a>       <a  href="#" onclick="return false;">data only</a>
+</pre>
+
+
+</P>
+	<P> 
+For a dynamic scan, the table displays the data for the currently selected frame.
+	</P>
+
+
+    This table is automatically copied into the system clipboard, so it can be directly pasted into (for instance) Excel or Libre Office Calc.
+
+	</P><BR>
+
+
+
+	<P> 
+        The table data for multiple ROIs can be merged to a single line, useful to copy into Excel.  Then only the fields mean, median, stdev, volume, max, min are copied.
+
+
+	</P><P>         
+    Clicking the link '<a  href="#" onclick="return false;">header</a>' gives output 
+        <pre> ROI 1 - mean	ROI 1 - median	ROI 1 - stdev	ROI 1 - volume[cm3]	ROI 1 - max	ROI 1 - min	ROI 2 - mean	ROI 2 - median	ROI 2 - stdev	ROI 2 - volume[cm3]	ROI 2 - max	ROI 2 - min	ROI 3 - mean	ROI 3 - median	ROI 3 - stdev	ROI 3 - volume[cm3]	ROI 3 - max	ROI 3 - min	</pre>
+        and copies the headers describing multiple ROIs to the clipboard.  Usful to paste into a single row in Excel
+<BR><BR><BR>
+
+
+        Clicking the link '<a  href="#" onclick="return false;">data only</a>' gives output 
+        <pre> 928.00000	  0.08868	 -0.21088	1453.00000	709.00000	 55.97754	3071.00000	  0.03040	 -2.33058	498.00000	-471.00000	811.06522	-978.00000	  0.07947	  5.77775	1302.00000	-1000.00000	 48.21608	</pre>
+        and copies the data for multiple ROIs to the clipboard.  Usful to paste into a single row in Excel
+	</P>
+
+
+
+<h2>Advanced use (for programmers)</h2>
+
+	<P>
+    This script also writes detailed statistics to the workspace variable  <CODE>imlook4d_ROI_data </CODE> (which is a struct). <BR>
+    The struct contains the following variables:
+	</P>
+
+		<TABLE>
+			<TR>
+			<TD> <B> imlook4d_ROI_data.names &nbsp;</B></TD>
+			<TD> A cell struct [ROI] with names for each ROI </TD>
+			</TR>
+
+			<TR>
+			<TD> <B> imlook4d_ROI_data.centroid</B></TD>
+			<TD>  A cell struct with ROI centroid for x,y,z</TD>
+			</TR>
+
+			<TR>
+			<TD> <B> imlook4d_ROI_data.dimension</B></TD>
+			<TD>  A cell struct with ROI width (in pixels) for x,y,z</TD>
+			</TR>
+
+			<TR>
+			<TD> <B> imlook4d_ROI_data.mean &nbsp;</B></TD>
+			<TD> A 2D matrix [ROI, frame] with mean values for each frame and ROI </TD>
+			</TR>
+			
+			<TR>
+			<TD valign="top"> <B> imlook4d_ROI_data.std</B></TD>
+			<TD valign="top"> A 2D matrix [ROI, frame] with standard deviation calculated for each frame and ROI</TD>
+			</TR>
+			
+			<TR>
+			<TD> <B> imlook4d_ROI_data.max</B></TD>
+			<TD>  A 2D matrix [ROI, frame] with maximum pixel value for each frame and ROI</TD>
+			</TR>
+
+			<TR>
+			<TD> <B> imlook4d_ROI_data.min</B></TD>
+			<TD>  A 2D matrix [ROI, frame] with minimum pixel value for each frame and ROI</TD>
+			</TR>
+
+
+			<TR>
+			<TD> <B> imlook4d_ROI_data.skewness</B></TD>
+			<TD>  A 2D matrix [ROI, frame] with skewness value calculated for pixels in each frame and ROI</TD>
+			</TR>
+
+			<TR>
+			<TD> <B> imlook4d_ROI_data.kurtosis</B> </TD>
+			<TD>  A 2D matrix [ROI, frame] with kurtosis value calculated for pixels in each frame and ROI</TD>
+			</TR>
+
+			<TR>
+			<TD> <B> imlook4d_ROI_data.uniformity</B></TD>
+			<TD>  A 2D matrix [ROI, frame] with uniformity value calculated for pixels in each frame and ROI</TD>
+			</TR>
+
+			<TR>
+			<TD> <B> imlook4d_ROI_data.entropy</B></TD>
+			<TD>  A 2D matrix [ROI, frame] with the entropy value calculated for pixels in each frame and ROI</TD>
+			</TR>
+			
+			<TR>
+                <TD valign="top"> 
+                    <B> imlook4d_ROI_data.pixels</B>
+                </TD>
+
+                <TD valign="top"> A cell array with one 2D matrix per ROI.  The cell for a ROI contains a matrix [pixel,frame] with: 
+                    <UL>
+                        <LI> rows = one row per pixel in ROI</LI>
+                        <LI> column= one column per frame</LI>
+                    </UL>
+                </TD>
+			</TR>
+		</TABLE>
+
+	<P>
+	<B>The pixel values from a ROI can be extracted using the following formulas:</B>
+	</P>
+
+	<P>
+	Pixel values for ROI=roiNumber can be extracted into a matrix (one column per frame) with the command:  <BR>
+         <CODE> MyMatrix=imlook4d_ROI_data.pixels{roiNumber}</CODE> <BR><BR>
+	</P>
+
+	<P>
+	Pixel  values for frame=frameNumber and ROI=roiNumber can be extracted into a vector with the command:   <BR>
+         <CODE> MyVector=imlook4d_ROI_data.pixels{roiNumber}(:,frameNumber);</CODE> <BR>
+	</P>	
+
+	<P>
+	<B>The histogram for ROI-2 pixel values can be plotted as:</B><BR>
+           <CODE>figure;hist(imlook4d_ROI_data.pixels{2}(:,frameNumber))</CODE> <BR>
+           <CODE>figure;hist(imlook4d_ROI_data.pixels{2}(:,frameNumber),[-0.04:0.0025:0.04])</CODE> %(using a fixed range on the x-axis of histogram)<BR>
+	</P>
+

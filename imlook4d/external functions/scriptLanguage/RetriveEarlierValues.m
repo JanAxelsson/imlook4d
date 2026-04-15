@@ -5,8 +5,12 @@ function outCellArray = RetriveEarlierValues( name, defaultValues)
 %   name - the name to identify these settings
 %   defaultValues - values that will be returned in case no values exist. These values are also stored for later retrieval
 
-imlook4d_variables_before_script = evalin('base', 'imlook4d_variables_before_script');
-assignin('base','imlook4d_variables_before_script', [imlook4d_variables_before_script 'imlook4d_store']); % So ClearVariables won't clear imlook4d_store
+try
+    imlook4d_variables_before_script = evalin('base', 'imlook4d_variables_before_script');
+    assignin('base','imlook4d_variables_before_script', [imlook4d_variables_before_script 'imlook4d_store']); % So ClearVariables won't clear imlook4d_store
+catch
+    assignin('base','imlook4d_variables_before_script', ['imlook4d_store']);
+end
 
 try 
     % exists, do nothing

@@ -1,0 +1,7 @@
+<h1>Percentile (for instance for MRI)</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	Sets high window level to 90th percentile.   I have found that this is often useful to lighten up MR images  
+	</P>
+

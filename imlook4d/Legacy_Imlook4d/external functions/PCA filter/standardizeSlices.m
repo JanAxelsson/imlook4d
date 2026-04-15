@@ -1,0 +1,61 @@
+% standardizeSlices.m
+%
+% Principal Component Analysis on column data.  
+%
+% inputs:  matrix                 4D matrix [x, y, z ,frames]
+%
+% outputs: averageMatrix          2D matrix [slice, frame]
+%
+%          stdevMatrix            2D matrix [slice, frame]
+%
+%          scaledMatrix           4D matrix [x, y, z ,frames]
+%
+% This concept was originally developed for dynamic PET images.
+%
+% Jan Axelsson
+%
+
+function [averageMatrix, stdevMatrix, scaledMatrix]=standardizeSlices(matrix)
+    %
+    % Initialize
+    %
+   
+    %Define constants
+    numberOfSlices=size(matrix,3);
+    numberOfFrames=size(matrix,4);
+    
+    % Allocate memory
+    averageMatrix=zeros(numberOfSlices, numberOfFrames);
+    stdevMatrix=zeros(numberOfSlices, numberOfFrames);
+    scaledMatrix=zeros(size(matrix),'single');
+    
+    %
+    % Scale data
+    %
+    % Calculate mean and variance
+    for j=1:numberOfFrames    
+         for i=1:numberOfSlices  
+            temp=matrix(:,:, i,j);
+            stdevMatrix(i, j)=std(temp(:));
+            averageMatrix(i, j)=mean(temp(:));
+            
+            % AND some other methods that can be tried:
+            %stdevMatrix(i, j)=mean(temp(:));
+            %stdevMatrix(i, j)=var(temp(:));
+            %stdevMatrix(i, j)=max(temp(:));
+            %stdevMatrix(i, j)=min(temp(:));
+            %stdevMatrix(i, j)=median(temp(:));
+          
+
+            if stdevMatrix(i,j)==0
+                %error(['Error in standardizeSlices stdevMatrix(i,j)=0: (slice=' num2str(i) ' frame=' num2str(j) ')']);
+                stdevMatrix(i,j)=1e-38;  % This allows divide by stdevMatrix even if zero
+                scaledMatrix(:,:,i,j)=( matrix(:,:, i,j) -averageMatrix(i,j) )/stdevMatrix(i,j);
+            else
+                scaledMatrix(:,:,i,j)=( matrix(:,:, i,j) -averageMatrix(i,j) )/stdevMatrix(i,j);
+                %JANscaledMatrix(:,:,i,j)=( matrix(:,:, i,j) -averageMatrix(i,j) );
+            end
+        end % LOOP slices i
+   end % LOOP frames j
+    
+    

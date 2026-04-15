@@ -35,8 +35,8 @@ function  ExportROIs( roiNumbers)
         disp('failed importing imlook4d_current_handles from base workspace');
     end 
     
-%     StoreVariables
-%     Export
+     StoreVariables
+     Export
     try
         evalin('base', 'Menu(''Export (untouched)'')');    
         imlook4d_Cdata=evalin('base', 'imlook4d_Cdata');
@@ -384,7 +384,7 @@ function  ExportROIs( roiNumbers)
     ]);
     disp(' ');
     
-    %ClearVariables
+   ClearVariables
    assignin('base', 'imlook4d_ROI_data', imlook4d_ROI_data);
 
    

@@ -1,0 +1,13 @@
+<h1>Close window(s)</h1>
+<HR></HR>
+<!------------------->
+<P>
+Gives a selection to close one or multiple windows.  
+Both imlook4d instances, and figure windows will be listed.
+Only windows opened from the same MATLAB instance as the used imlook4d window can be closed.
+</P>
+
+<P>
+Close windows dialog defaults to selecting all windows <I> except </I> the current window.  You may alter the 
+selection, to choose any combinations of windows, including the current window.  
+</P>

@@ -8,24 +8,40 @@ function Menu(name,varargin)
           menuObject = findobj(gcf,'Label',name);
       end
       eventdata = {};
-      callbackFunctionHandle = get(menuObject,'Callback');
+      callbackFunctionHandle = get(menuObject,'MenuSelectedFcn');
       hObject = menuObject;
       gcbo = menuObject;  % Set in case needed for callback
       
-      % Massage callback function (remove initial "(a b )" if exists)
-      callbackString = char(callbackFunctionHandle);  % Go from function handle to string: @(hObject,eventdata)imlook4d('Hot_Callback',hObject,eventdata,guidata(hObject))
-      if startsWith(callbackString,'(') % Otherwise not "(a b) ..."
-          i = findstr(callbackString,')');  % index of first ')'
-          if ~(i(1)==length(callbackString) ) % 
-              callbackString = callbackString(i(1)+1:end);  % imlook4d(''Hot_Callback'',hObject,eventdata,guidata(hObject))
+      % % Massage callback function (remove initial "(a b )" if exists)
+      % callbackString = char(callbackFunctionHandle);  % Go from function handle to string: @(hObject,eventdata)imlook4d('Hot_Callback',hObject,eventdata,guidata(hObject))
+      % if startsWith(callbackString,'(') % Otherwise not "(a b) ..."
+      %     i = findstr(callbackString,')');  % index of first ')'
+      %     if ~(i(1)==length(callbackString) ) % 
+      %         callbackString = callbackString(i(1)+1:end);  % imlook4d(''Hot_Callback'',hObject,eventdata,guidata(hObject))
+      %     end
+      % end
+      % 
+      % i = findstr(callbackString,'imlook4d');
+      % callbackString = callbackString(i:end);
+      % 
+      % % Callback
+      % eval(callbackString);
+
+
+      % Fire its ValueChangedFcn:
+
+      evt = struct( ...
+          'Source',       hObject, ...
+          'EventName',    'MenuSelected');
+
+      fcn = hObject.MenuSelectedFcn;
+      if ~isempty(fcn)
+          try
+                feval(fcn, hObject, evt);
+          catch
+                eval(fcn); % Fallback to call the Guide-style callback
           end
       end
-      
-      i = findstr(callbackString,'imlook4d');
-      callbackString = callbackString(i:end);
-      
-      % Callback
-      eval(callbackString);
       
   catch
       disp('error in Menu.m')

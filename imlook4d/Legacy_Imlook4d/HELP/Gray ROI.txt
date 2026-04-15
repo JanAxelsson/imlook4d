@@ -1,0 +1,8 @@
+<h1>Gray ROI</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	Draw ROIs in gray color.  Solid gray is the selected ROI, and rasterized gray are the other ROIs.
+	</P>
+
+

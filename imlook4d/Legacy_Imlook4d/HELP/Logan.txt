@@ -1,0 +1,20 @@
+<h1> Reference Logan on ROIs </h1>
+<HR></HR>
+<!------------------->
+	<P>
+	Calculates Non-displaceable Binding Potential (BP), and Distribution-Volume-Ratio (DVR) for ROIs.  
+	</P>
+
+	<P>
+	The currently selected ROI is used as Reference Region. The selected frame is the first frame used for the straight line regression.
+	</P>
+
+
+
+	<P>
+	NOTE: The frames must have time values.  Nifti file format does not have time, but this can be read in from a .sif file. See help on TACT button.
+	</P>
+
+
+
+ 

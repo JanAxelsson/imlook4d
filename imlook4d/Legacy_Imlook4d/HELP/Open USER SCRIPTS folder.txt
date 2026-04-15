@@ -1,0 +1,15 @@
+<h1>Open USER_SCRIPTS folder</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	Opens the folder for USER SCRIPTS. This is the location of your own scripts, where you may remove, rename or arrange the scripts location.  
+	</P>
+
+	<P>
+    <B>Note:</B> You may only have one subfolder in this folder.  MATLAB script naming convention applies.
+	</P>
+
+	<P>
+    <B>Note:</B>  on some operating systems, if the folder is already open, you may have to look around for this window.
+	</P>
+

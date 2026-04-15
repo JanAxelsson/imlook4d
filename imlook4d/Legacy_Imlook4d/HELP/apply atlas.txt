@@ -1,0 +1,23 @@
+<h1>Apply atlas</h1>
+<HR></HR>
+<!------------------->
+	<P>
+		Makes region-of-interests (ROIs) from an atlas.   
+	</P>
+
+	<P>
+		If you have multiple co-registered images in your study, the ROIs can be used on any of the co-registered images.
+	</P>
+
+	<P> 
+                This script requires SPM packages to be added to the path.
+	</P>
+
+	<P> 
+                The SPM package can be found at <a href="http://www.fil.ion.ucl.ac.uk/spm/software/download.html">http://www.fil.ion.ucl.ac.uk/spm/software/download.html </a>
+	</P>
+
+	<P> 
+        The default is the Neuromorphometrics atlas included in SPM.  You can switch atlas with the <code> SCRIPTS/select atlas </code> command
+	</P>
+

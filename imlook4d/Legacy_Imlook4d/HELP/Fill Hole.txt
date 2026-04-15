@@ -1,0 +1,37 @@
+<h1> Fill Hole</h1>
+<HR></HR>
+<!------------------->
+This script fills a region of voxels within a hollow selected ROI, going slice by slice.  
+
+    <P>	
+
+
+	</P> 
+	<P>The input in the dialog is:
+	
+		<TABLE>
+
+
+			<tr>
+			<td> <b> Output ROI&nbsp;</b></td>
+			<td> This field can have the ROI number in the ROI list, "new", or "current" 
+                "new" means that the pixels in the hole will be added into a new ROI
+                "current" means that the current ROI will grow
+            </td>
+			</tr>
+			
+			<tr>
+			<td> <b> Filter size (pixels) </b></td>
+			<td> A pre-filter to fill smaller gaps and therefore close a wall. If you get slices that are not filled, try increasing this filter size </td>
+			</tr>
+
+
+
+		</TABLE>
+
+
+	</P> 
+
+	<P>
+		NOTE: Requires Matlab Imaging Toolbox
+	</P>	

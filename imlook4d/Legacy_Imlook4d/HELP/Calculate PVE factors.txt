@@ -1,0 +1,21 @@
+<h1>Calculate PVE factors</h1>
+<HR></HR>
+<!------------------->
+	<P>
+	This routines calculates Partial Volume correction factors from the ROIs, using the Geometric Transfer Matrix, GTM, method.
+	</P><P>	
+    Partial volume corrected ROI values are calculated with the "TACT" button, or with the script "ROI data to workspace".  
+    For static images, the corrected data is displayed in a separate column named "pvc-mean", close to the column "mean" which is the non-corrected mean.
+    For dynamic images, the corrected data is plotted as markers, and the original non-corrected data as lines.
+	</P><P>	
+     The partial volume correction factors are stored in the Matlab Workspace, in the variable "pveFactors".  Partial volume correction is turned off, with the command "clear pveFactors", or "clear all".
+
+	</P> 
+	<P>The full width half maximum (FWHM) measure in x, y, z directions are required, and input in a dialog. Unit for FWHM must be in mm.
+    </P><P>	
+        Documentation of routines for PVE correction can be found in the document 
+        <a href="matlab:openInFileManager( which('Instructions PVE corrections.pdf') );">Instructions PVE corrections.pdf</a>. 
+
+	</P>	
+
+

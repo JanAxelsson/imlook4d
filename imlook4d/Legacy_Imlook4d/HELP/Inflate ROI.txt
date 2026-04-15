@@ -1,0 +1,40 @@
+<h1> Inflate ROI</h1>
+<HR></HR>
+<!------------------->
+This script inflates (grows) the current ROI
+
+    <P>	
+
+
+	</P> 
+	<P>The input in the dialog is the amount to inflate in each direction:
+	
+		<TABLE>
+
+
+			<tr>
+			<td> <b> Width x (pixels)</b></td>
+			<td> Number of pixels in x-direction </td>
+			</tr>
+			
+
+			<tr>
+			<td> <b> Width y (pixels)</b></td>
+			<td> Number of pixels in y-direction </td>
+			</tr>
+			
+			<tr>
+			<td> <b> Width z (pixels)</b></td>
+			<td> Number of pixels in z-direction </td>
+			</tr>
+			
+
+
+		</TABLE>
+
+
+	</P> 
+
+	<P>
+		NOTE: Requires Matlab Imaging Toolbox
+	</P>	
