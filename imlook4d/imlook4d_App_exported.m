@@ -217,6 +217,15 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
     end
 
 
+
+    methods (Static)
+        function appInstance = myConvertFigureToApp(hObject)
+            hFig = ancestor(hObject, 'figure');
+            appInstance = hFig.RunningAppInstance;
+        end
+    end
+
+
     methods (Access = private)
 
         % Override app migration version, to allow two types of inputs:
@@ -276,6 +285,9 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                 error('Invalid number of arguments.');
             end
         end
+
+
+
         
         function OpenFile_OldCallback(app, hObject, eventdata, handles, varargin)
                         %
@@ -11469,16 +11481,21 @@ end
                     % Set for foreground image
                     handles = setOrientation(app, handles, orientationNumber);
                     guidata(handles.figure1, handles);
-            
-            
-            
+
+                    disp(['OrientationMenu_Callback for app window = ' app.figure1.Name])
+                    
+
                     % Set for background image (call orientationMenu_Callback for background image)
                     try
-                        backgroundHandles = guidata(handles.image.backgroundImageHandle);  % Handles from imlook4d instance of static background image
-                        set( backgroundHandles.orientationMenu,'Value', get(handles.orientationMenu,'Value'));
-                        orientationMenu_Callback(backgroundHandles.orientationMenu, {}, backgroundHandles);
+                        disp(['    Background image window = ' handles.image.backgroundImageHandle.Parent.Name])
+                        background_app = app.myConvertFigureToApp( handles.image.backgroundImageHandle);
+                        backgroundHandles = guidata(handles.image.backgroundImageHandle);
+                        backgroundHandles = setOrientation(background_app, backgroundHandles, orientationNumber);
+                        guidata( handles.image.backgroundImageHandle, backgroundHandles);
+                        updateImage(background_app, backgroundHandles.figure1,{}, backgroundHandles);
                     catch
                         % if not backgroundimage (this will happen when the backgroundimage itself is processed)
+                        disp('Not background image')
                     end
             
                     updateImage(app, hObject,{},handles);
@@ -13156,10 +13173,12 @@ end
 
             % Create transparancyPanel
             app.transparancyPanel = uipanel(app.uipanel1);
+            app.transparancyPanel.BorderType = 'none';
+            app.transparancyPanel.BorderWidth = 0;
             app.transparancyPanel.Title = 'overlay';
             app.transparancyPanel.Visible = 'off';
             app.transparancyPanel.Tag = 'transparancyPanel';
-            app.transparancyPanel.Position = [113 27 56 39];
+            app.transparancyPanel.Position = [116 24 56 42];
 
             % Create transparancyText
             app.transparancyText = uilabel(app.transparancyPanel);
@@ -13169,7 +13188,7 @@ end
             app.transparancyText.WordWrap = 'on';
             app.transparancyText.FontSize = 13.3333333333333;
             app.transparancyText.Visible = 'off';
-            app.transparancyText.Position = [37 8 15.7705538355693 13.8947368421053];
+            app.transparancyText.Position = [39 4 16 18];
             app.transparancyText.Text = '%';
 
             % Create transparancyEdit
@@ -13179,7 +13198,7 @@ end
             app.transparancyEdit.HorizontalAlignment = 'center';
             app.transparancyEdit.Visible = 'off';
             app.transparancyEdit.Tooltip = 'Weigth of overlay image (lower shows more of underlying image)';
-            app.transparancyEdit.Position = [5 1 33 22];
+            app.transparancyEdit.Position = [2 2 33 22];
             app.transparancyEdit.Value = '40';
 
             % Create AutocolorscaleCheckBox
