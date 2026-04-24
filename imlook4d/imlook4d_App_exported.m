@@ -9331,7 +9331,6 @@ end
 
             if length(args) == 4
                 [hObject, eventdata, handles] = myConvertToGUIDECallbackArguments(app,  args{1:3}); 
-                name = args{4};
             else
                 [hObject, eventdata, handles] = myConvertToGUIDECallbackArguments(app,  args); 
             end
@@ -9365,14 +9364,20 @@ end
                                 % Default ROI names only
                                 %contents={ contents{1:(n-1)}, ['ROI ' num2str(n)],contents{n}};
                                 %set(hObject,'String', contents);
+
+                                if length(args) == 4
+                                    name = args{4};
+                                else
+                                    name = ['ROI ' num2str(n)];
+                                end
                 
                                 %if length(args) == 3
                                 % Dialog option
                                     prompt={'Enter ROI name:'};
-                                    name='Input ROI name';
+                                    title='Input ROI name';
                                     numlines=1;
-                                    defaultanswer={['ROI ' num2str(n)]};
-                                    answer=inputdlg(prompt,name,numlines,defaultanswer);
+                                    defaultanswer={name};
+                                    answer=inputdlg(prompt,title,numlines,defaultanswer);
                                     name=answer{1};
                                 %end
     
