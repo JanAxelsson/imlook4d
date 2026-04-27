@@ -31,12 +31,19 @@ function [file,path, filterindex] = uigetfile(varargin)
           % Call default function instead
           shipped = getShaddowedFunction(this);
           [file,path, filterindex] = shipped(varargin{:});
-          
+
           answer = { [path file]};
           recordInputsText(answer);  % Insert text at caret
-         
+
       end
-  
+
+
+  % Focus window after this function is closed
+      appFig = ancestor(gcbo, 'figure');
+      if ~isempty(appFig)
+          cleanupObj = onCleanup(@() focus(appFig) );
+      end
+
   
   
 

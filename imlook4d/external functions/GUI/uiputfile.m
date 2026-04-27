@@ -37,5 +37,13 @@ function [file,path, filterindex] = uiputfile(varargin)
       end
   
   
+  % Focus window after this function is closed
+      appFig = ancestor(gcbo, 'figure');
+      if ~isempty(appFig)
+          cleanupObj = onCleanup(@() focus(appFig) );
+      end
+
+  
+  
   
 
