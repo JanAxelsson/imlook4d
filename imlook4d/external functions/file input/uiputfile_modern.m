@@ -1,4 +1,7 @@
 function [file, path, ind] = uiputfile_modern(filter, title, startPath)
+    % Jan Axelsson, 2026
+    % https://se.mathworks.com/matlabcentral/fileexchange/183758-file-dialogs-for-matlab-2025-and-above
+
     % 1. Robust filter handling
     if nargin < 1 || isempty(filter)
         filter = {'*.*', 'All Files (*.*)'};
