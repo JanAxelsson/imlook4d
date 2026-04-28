@@ -1,4 +1,4 @@
-function [file, path, ind] = uigetfile_modern(filter, title, startPath)
+function [file, path, ind] = uiputfile_modern(filter, title, startPath)
     % 1. Robust filter handling
     if nargin < 1 || isempty(filter)
         filter = {'*.*', 'All Files (*.*)'};
@@ -9,22 +9,27 @@ function [file, path, ind] = uigetfile_modern(filter, title, startPath)
         filter = [filter, filter];
     end
     
-    if nargin < 2 || isempty(title), title = 'Select File'; end
+    if nargin < 2 || isempty(title), title = 'Save File'; end
     
-    % Always trust pwd if no path is provided
+    % Default to MATLAB pwd
     if nargin < 3 || isempty(startPath), startPath = pwd; end
-    if ~exist(startPath, 'dir'), startPath = pwd; end
+    
+    defaultFile = '';
+    if ~exist(startPath, 'dir')
+        [parent, name, ext] = fileparts(startPath);
+        if exist(parent, 'dir'), currentDir = parent; defaultFile = [name ext];
+        else, currentDir = pwd; end
+    else, currentDir = startPath; end
     
     file = 0; path = 0; ind = 0;
-    currentDir = startPath;
-    selectedItem = ''; 
+    selectedItem = defaultFile; 
 
     % --- Create GUI ---
-    fig = uifigure('Name', title, 'Position', [500 400 750 600], 'WindowStyle', 'modal');
+    fig = uifigure('Name', title, 'Position', [500 400 750 650], 'WindowStyle', 'modal');
     fig.CloseRequestFcn = @(~,~) uiresume(fig);
     
-    g = uigridlayout(fig, [5 1]);
-    g.RowHeight = {40, 40, '1x', 40, 50};
+    g = uigridlayout(fig, [6 1]);
+    g.RowHeight = {40, 40, '1x', 40, 40, 50};
 
     % Row 1: Path
     pathGrid = uigridlayout(g, [1 2], 'ColumnWidth', {'1x', 60});
@@ -42,17 +47,21 @@ function [file, path, ind] = uigetfile_modern(filter, title, startPath)
         'ColumnWidth', {30, '1x', 90, 140}, ...
         'RowName', [], 'ColumnSortable', true, 'SelectionType', 'row');
 
-    % Row 4: Filter
+    % Row 4: Filename
+    nameGrid = uigridlayout(g, [1 2], 'ColumnWidth', {80, '1x'});
+    uilabel(nameGrid, 'Text', 'File name:');
+    nameField = uieditfield(nameGrid, 'Value', defaultFile);
+
+    % Row 5: Filter
     filterGrid = uigridlayout(g, [1 2], 'ColumnWidth', {80, '1x'});
-    uilabel(filterGrid, 'Text', 'File type:');
+    uilabel(filterGrid, 'Text', 'Save as:');
     filterDD = uidropdown(filterGrid, 'Items', filter(:,2), 'ItemsData', filter(:,1), ...
         'ValueChangedFcn', @(src,e) updateDisplay()); 
 
-    % Row 5: Buttons
+    % Row 6: Buttons
     btnGrid = uigridlayout(g, [1 3], 'ColumnWidth', {'1x', 100, 100});
     uibutton(btnGrid, 'Text', 'Cancel', 'ButtonPushedFcn', @(~,~) uiresume(fig));
-    openBtn = uibutton(btnGrid, 'Text', 'Open', 'FontWeight', 'bold', 'Enable', 'off', ...
-        'ButtonPushedFcn', @(~,~) uiresume(fig));
+    saveBtn = uibutton(btnGrid, 'Text', 'Save', 'FontWeight', 'bold', 'ButtonPushedFcn', @(~,~) trySave());
 
     % Callbacks
     fileTable.CellSelectionCallback = @(src, e) handleSingleClick(e);
@@ -87,15 +96,14 @@ function [file, path, ind] = uigetfile_modern(filter, title, startPath)
             else, data{i,1} = '📄'; data{i,3} = sprintf('%.1f KB', combined(i).bytes/1024); end
             data{i,2} = combined(i).name; data{i,4} = combined(i).date;
         end
-        fileTable.Data = data; pathField.Value = currentDir; openBtn.Enable = 'off';
+        fileTable.Data = data; pathField.Value = currentDir;
     end
 
     function handleSingleClick(e)
         if isempty(e.Indices), return; end
         vData = fileTable.Data; row = e.Indices(1);
         if isempty(vData) || row > size(vData, 1), return; end
-        selectedItem = vData{row, 2};
-        if strcmp(vData{row, 1}, '📄'), openBtn.Enable = 'on'; else, openBtn.Enable = 'off'; end
+        if strcmp(vData{row, 1}, '📄'), nameField.Value = vData{row, 2}; end
     end
 
     function handleDoubleClick()
@@ -103,13 +111,29 @@ function [file, path, ind] = uigetfile_modern(filter, title, startPath)
         vData = fileTable.Data; row = s(1);
         if strcmp(vData{row, 1}, '📁')
             currentDir = fullfile(currentDir, vData{row, 2}); searchField.Value = ''; updateDisplay();
-        else, selectedItem = vData{row, 2}; uiresume(fig); end
+        else, nameField.Value = vData{row, 2}; trySave(); end
     end
 
     function navigateUp()
-        p = fileparts(currentDir); if ~isempty(p) && ~strcmp(p, currentDir)
-            currentDir = p; searchField.Value = ''; updateDisplay(); 
+        p = fileparts(currentDir); if ~isempty(p) && ~strcmp(p, currentDir), currentDir = p; searchField.Value = ''; updateDisplay(); end
+    end
+
+    function trySave()
+        resFile = nameField.Value;
+        if isempty(resFile), uialert(fig, 'Please enter a file name.', 'Missing Name'); return; end
+        [~, ~, currentExt] = fileparts(resFile);
+        activeFilter = filterDD.Value;
+        if isempty(currentExt) && ~strcmp(activeFilter, '*.*')
+            allExts = strsplit(activeFilter, ';');
+            firstExt = strrep(allExts{1}, '*', '');
+            if contains(activeFilter, '.nii.gz'), resFile = [resFile '.nii.gz'];
+            else, resFile = [resFile firstExt]; end
         end
+        if exist(fullfile(currentDir, resFile), 'file')
+            ans = uiconfirm(fig, sprintf('File "%s" already exists. Replace?', resFile), 'Confirm Save', 'Options', {'Yes', 'No'}, 'DefaultOption', 'No');
+            if strcmp(ans, 'No'), return; end
+        end
+        selectedItem = resFile; uiresume(fig);
     end
 
     updateDisplay();

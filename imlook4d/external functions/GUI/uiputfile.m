@@ -29,7 +29,8 @@ function [file,path, filterindex] = uiputfile(varargin)
           evalin('base','clear INPUTS');
       catch
           % Call default function instead
-          shipped = getShaddowedFunction(this);
+          %shipped = getShaddowedFunction(this);
+          shipped = @uiputfile_modern;
           [file,path, filterindex] = shipped(varargin{:});
           INPUTS = {[ path file ]};
           recordInputsText(INPUTS);  % Insert text at caret
