@@ -10,8 +10,6 @@ function [file, path, ind] = uiputfile_modern(filter, title, startPath)
     end
     
     if nargin < 2 || isempty(title), title = 'Save File'; end
-    
-    % Default to MATLAB pwd
     if nargin < 3 || isempty(startPath), startPath = pwd; end
     
     defaultFile = '';
@@ -37,11 +35,12 @@ function [file, path, ind] = uiputfile_modern(filter, title, startPath)
     g = uigridlayout(fig, [6 1]);
     g.RowHeight = {40, 40, '1x', 40, 40, 50};
 
-    % Row 1: Path
-    pathGrid = uigridlayout(g, [1 2], 'ColumnWidth', {'1x', 60});
+    % Row 1: Path and Buttons
+    pathGrid = uigridlayout(g, [1 3], 'ColumnWidth', {'1x', 60, 100});
     pathField = uieditfield(pathGrid, 'Value', currentDir, 'Editable', 'on', ...
         'ValueChangedFcn', @(src,e) manualPathEdit(src.Value));
     uibutton(pathGrid, 'Text', 'Up ▲', 'ButtonPushedFcn', @(~,~) navigateUp());
+    uibutton(pathGrid, 'Text', 'New Folder', 'ButtonPushedFcn', @(~,~) makeNewFolder());
 
     % Row 2: Search
     searchField = uieditfield(g, 'Placeholder', 'Search in current folder...', ...
@@ -74,6 +73,25 @@ function [file, path, ind] = uiputfile_modern(filter, title, startPath)
     fileTable.DoubleClickedFcn = @(src, e) handleDoubleClick();
 
     % --- Functions ---
+    function makeNewFolder()
+        newName = inputdlg('Enter folder name:', 'New Folder', [1 50], {'New Folder'});
+        if isempty(newName), return; end
+        
+        newPath = fullfile(currentDir, newName{1});
+        if exist(newPath, 'dir')
+            uialert(fig, 'Folder already exists.', 'Error');
+        else
+            [status, msg] = mkdir(newPath);
+            if status
+                currentDir = newPath;
+                searchField.Value = '';
+                updateDisplay();
+            else
+                uialert(fig, msg, 'Error Creating Folder');
+            end
+        end
+    end
+
     function manualPathEdit(newPath)
         if exist(newPath, 'dir')
             currentDir = newPath; 
