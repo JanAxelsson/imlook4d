@@ -60,8 +60,14 @@ function [file, path, ind] = uigetfile_modern(filter, title, startPath)
 
     % --- Functions ---
     function manualPathEdit(newPath)
-        if exist(newPath, 'dir'), currentDir = newPath; searchField.Value = ''; updateDisplay();
-        else, uialert(fig, ['Folder not found: ' newPath], 'Invalid Path'); pathField.Value = currentDir; end
+        if exist(newPath, 'dir')
+            currentDir = newPath; 
+            searchField.Value = ''; 
+            updateDisplay();
+        else
+            uialert(fig, ['Folder not found: ' newPath], 'Invalid Path'); 
+            pathField.Value = currentDir;
+        end
     end
 
     function updateDisplay(searchTerm)
@@ -83,8 +89,11 @@ function [file, path, ind] = uigetfile_modern(filter, title, startPath)
         end
         data = cell(length(combined), 4);
         for i = 1:length(combined)
-            if combined(i).isdir, data{i,1} = '📁'; data{i,3} = '--';
-            else, data{i,1} = '📄'; data{i,3} = sprintf('%.1f KB', combined(i).bytes/1024); end
+            if combined(i).isdir
+                data{i,1} = '📁'; data{i,3} = '--';
+            else
+                data{i,1} = '📄'; data{i,3} = sprintf('%.1f KB', combined(i).bytes/1024);
+            end
             data{i,2} = combined(i).name; data{i,4} = combined(i).date;
         end
         fileTable.Data = data; pathField.Value = currentDir; openBtn.Enable = 'off';
@@ -95,20 +104,32 @@ function [file, path, ind] = uigetfile_modern(filter, title, startPath)
         vData = fileTable.Data; row = e.Indices(1);
         if isempty(vData) || row > size(vData, 1), return; end
         selectedItem = vData{row, 2};
-        if strcmp(vData{row, 1}, '📄'), openBtn.Enable = 'on'; else, openBtn.Enable = 'off'; end
+        if strcmp(vData{row, 1}, '📄')
+            openBtn.Enable = 'on'; 
+        else
+            openBtn.Enable = 'off'; 
+        end
     end
 
     function handleDoubleClick()
         s = fileTable.Selection; if isempty(s), return; end
         vData = fileTable.Data; row = s(1);
         if strcmp(vData{row, 1}, '📁')
-            currentDir = fullfile(currentDir, vData{row, 2}); searchField.Value = ''; updateDisplay();
-        else, selectedItem = vData{row, 2}; uiresume(fig); end
+            currentDir = fullfile(currentDir, vData{row, 2}); 
+            searchField.Value = ''; 
+            updateDisplay();
+        else
+            selectedItem = vData{row, 2}; 
+            uiresume(fig); 
+        end
     end
 
     function navigateUp()
-        p = fileparts(currentDir); if ~isempty(p) && ~strcmp(p, currentDir)
-            currentDir = p; searchField.Value = ''; updateDisplay(); 
+        p = fileparts(currentDir); 
+        if ~isempty(p) && ~strcmp(p, currentDir)
+            currentDir = p; 
+            searchField.Value = ''; 
+            updateDisplay(); 
         end
     end
 
@@ -116,7 +137,8 @@ function [file, path, ind] = uigetfile_modern(filter, title, startPath)
     uiwait(fig);
     if isvalid(fig)
         if ~isempty(selectedItem)
-            file = selectedItem; path = [currentDir filesep];
+            file = selectedItem; 
+            path = [currentDir filesep];
             [~, ind] = ismember(filterDD.Value, filter(:,1));
         end
         delete(fig);
