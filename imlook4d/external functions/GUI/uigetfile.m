@@ -30,6 +30,7 @@ function [file,path, filterindex] = uigetfile(varargin)
       catch
           % Call default function instead
           shipped = getShaddowedFunction(this);
+          shipped = @uigetfile_modern;
           [file,path, filterindex] = shipped(varargin{:});
 
           answer = { [path file]};
