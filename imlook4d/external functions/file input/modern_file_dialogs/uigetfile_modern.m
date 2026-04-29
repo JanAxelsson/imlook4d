@@ -20,9 +20,19 @@ function [file, path, ind] = uigetfile_modern(filter, title, startPath)
     imgDir = fullfile(fileparts(mfilename('fullpath')));
     s_folder = []; s_file = [];
     switch computer
-        case {'PCWIN', 'PCWIN64'}, fImg = 'win_folder.png'; fiImg = 'win_file.png';
-        case {'MACI64', 'MACA64'}, fImg = 'mac_folder.png'; fiImg = 'mac_file.png';
-        otherwise, fImg = 'lin_folder.png'; fiImg = 'lin_file.png';
+        case {'PCWIN', 'PCWIN64'}, fImg = 'win_folder.png'; fiImg = 'win_file';
+        case {'MACI64', 'MACA64'}, fImg = 'mac_folder.png'; fiImg = 'mac_file';
+        otherwise, fImg = 'lin_folder.png'; fiImg = 'lin_file';
+    end
+
+    % Dark mode backgrounds are typically around [0.15 0.15 0.15]
+    figColor = fig.Color;
+    isDark = mean(figColor) < 0.5; 
+
+    if isDark
+        fiImg = [fiImg '_dark.png']
+    else
+        fiImg = [fiImg '.png']
     end
     
     pf = fullfile(imgDir, fImg); pfi = fullfile(imgDir, fiImg);
