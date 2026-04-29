@@ -1,111 +1,111 @@
-function [file, path, ind] = uigetfile_modern(filter, title, startPath)
-    % --- Setup and Input Handling ---
+function [file, path, ind] = uiputfile_modern(filter, title, startPath)
+    % --- Setup ---
     if nargin < 1 || isempty(filter), filter = {'*.*', 'All Files (*.*)'}; end
     if ischar(filter), filter = {filter, sprintf('Filter (%s)', filter)}; end
     if iscell(filter) && size(filter, 2) == 1, filter = [filter, filter]; end
-    if nargin < 2 || isempty(title), title = 'Select File'; end
+    if nargin < 2 || isempty(title), title = 'Save File'; end
     if nargin < 3 || isempty(startPath), startPath = pwd; end
-    if ~exist(startPath, 'dir'), startPath = pwd; end
+    
+    defaultFile = '';
+    if ~exist(startPath, 'dir')
+        [parent, name, ext] = fileparts(startPath);
+        if exist(parent, 'dir'), currentDir = parent; defaultFile = [name ext]; else, currentDir = pwd; end
+    else, currentDir = startPath; end
     
     file = 0; path = 0; ind = 0;
-    currentDir = startPath;
-    selectedItem = ''; 
-    combined = []; 
+    selectedItem = defaultFile; 
+    combined = [];
 
-    % --- GUI Creation ---
-    fig = uifigure('Name', title, 'Position', [500 400 750 600], 'WindowStyle', 'modal');
+    % --- GUI ---
+    fig = uifigure('Name', title, 'Position', [500 400 750 650], 'WindowStyle', 'modal');
     fig.CloseRequestFcn = @(~,~) cleanClose();
     
-    % --- OS-Specific Icon Setup ---
-    imgDir = fullfile(fileparts(mfilename('fullpath')), 'images');
+    % OS-Icons
+    imgDir = fullfile(fileparts(mfilename('fullpath')));
     s_folder = []; s_file = [];
     switch computer
         case {'PCWIN', 'PCWIN64'}, fImg = 'win_folder.png'; fiImg = 'win_file.png';
         case {'MACI64', 'MACA64'}, fImg = 'mac_folder.png'; fiImg = 'mac_file.png';
         otherwise, fImg = 'lin_folder.png'; fiImg = 'lin_file.png';
     end
-    
     pf = fullfile(imgDir, fImg); pfi = fullfile(imgDir, fiImg);
     if exist(pf, 'file'), s_folder = uistyle('Icon', pf); end
     if exist(pfi, 'file'), s_file = uistyle('Icon', pfi); end
 
-    % --- Layout ---
-    g = uigridlayout(fig, [5 1]);
-    g.RowHeight = {40, 40, '1x', 40, 50};
+    g = uigridlayout(fig, [6 1]);
+    g.RowHeight = {40, 40, '1x', 40, 40, 50};
 
-    pathGrid = uigridlayout(g, [1 2], 'ColumnWidth', {'1x', 60});
+    pathGrid = uigridlayout(g, [1 3], 'ColumnWidth', {'1x', 60, 100});
     pathField = uieditfield(pathGrid, 'Value', currentDir, 'Editable', 'on', ...
         'ValueChangedFcn', @(src,e) manualPathEdit(src.Value));
     uibutton(pathGrid, 'Text', 'Up ▲', 'ButtonPushedFcn', @(~,~) navigateUp());
+    uibutton(pathGrid, 'Text', 'New Folder', 'ButtonPushedFcn', @(~,~) makeNewFolder());
 
-    searchField = uieditfield(g, 'Placeholder', 'Search in current folder...', ...
-        'ValueChangingFcn', @(src,e) updateDisplay(e.Value));
+    searchField = uieditfield(g, 'Placeholder', 'Search...', 'ValueChangingFcn', @(src,e) updateDisplay(e.Value));
 
     fileTable = uitable(g, 'ColumnName', {'', 'Name', 'Size', 'Date'}, ...
         'ColumnWidth', {35, '1x', 90, 140}, 'RowName', [], 'ColumnSortable', true, 'SelectionType', 'row');
 
+    nameGrid = uigridlayout(g, [1 2], 'ColumnWidth', {80, '1x'});
+    uilabel(nameGrid, 'Text', 'File name:');
+    nameField = uieditfield(nameGrid, 'Value', defaultFile);
+
     filterGrid = uigridlayout(g, [1 2], 'ColumnWidth', {80, '1x'});
-    uilabel(filterGrid, 'Text', 'File type:');
-    filterDD = uidropdown(filterGrid, 'Items', filter(:,2), 'ItemsData', filter(:,1), ...
-        'ValueChangedFcn', @(src,e) updateDisplay()); 
+    uilabel(filterGrid, 'Text', 'Save as:');
+    filterDD = uidropdown(filterGrid, 'Items', filter(:,2), 'ItemsData', filter(:,1), 'ValueChangedFcn', @(src,e) updateDisplay()); 
 
     btnGrid = uigridlayout(g, [1 3], 'ColumnWidth', {'1x', 100, 100});
     uibutton(btnGrid, 'Text', 'Cancel', 'ButtonPushedFcn', @(~,~) cleanClose());
-    openBtn = uibutton(btnGrid, 'Text', 'Open', 'FontWeight', 'bold', 'Enable', 'off', ...
-        'ButtonPushedFcn', @(~,~) uiresume(fig));
+    uibutton(btnGrid, 'Text', 'Save', 'FontWeight', 'bold', 'ButtonPushedFcn', @(~,~) trySave());
 
     fileTable.CellSelectionCallback = @(src, e) handleSingleClick(e);
     fileTable.DoubleClickedFcn = @(src, e) handleDoubleClick();
 
     % --- Functions ---
 
+    function makeNewFolder()
+        newName = inputdlg('Folder name:', 'New Folder', [1 50], {'New Folder'});
+        if isempty(newName), return; end
+        newP = fullfile(currentDir, newName{1});
+        if exist(newP, 'dir'), uialert(fig, 'Exists.', 'Error');
+        else, [s, m] = mkdir(newP); if s, currentDir = newP; updateDisplay(); else, uialert(fig, m, 'Error'); end; end
+    end
+
     function manualPathEdit(newPath)
-        if exist(newPath, 'dir'), currentDir = newPath; searchField.Value = ''; updateDisplay();
-        else, uialert(fig, ['Folder not found: ' newPath], 'Invalid Path'); pathField.Value = currentDir; end
+        if exist(newPath, 'dir'), currentDir = newPath; updateDisplay();
+        else, uialert(fig, 'Invalid path', 'Error'); pathField.Value = currentDir; end
     end
 
     function updateDisplay(searchTerm)
         if nargin < 1, searchTerm = searchField.Value; end
-        
-        % Kill any existing timer before starting a new folder load
         if isfield(fig.UserData, 'loadTimer') && isvalid(fig.UserData.loadTimer)
             stop(fig.UserData.loadTimer); delete(fig.UserData.loadTimer);
         end
 
-        d = dir(currentDir);
-        d = d(~strncmp({d.name}, '.', 1)); 
-        folders = d([d.isdir]);
-        files = d(~[d.isdir]);
+        d = dir(currentDir); d = d(~strncmp({d.name}, '.', 1)); 
+        folders = d([d.isdir]); files = d(~[d.isdir]);
         
         activeFilter = filterDD.Value;
         if ~isempty(files) && ~any(strcmp(activeFilter, {'*.*', '*'}))
-            extList = strsplit(activeFilter, ';');
-            matchIdx = false(1, length(files));
+            extList = strsplit(activeFilter, ';'); matchIdx = false(1, length(files));
             for i = 1:length(extList)
                 regStr = regexptranslate('wildcard', strtrim(extList{i}));
                 matchIdx = matchIdx | ~cellfun(@isempty, regexp({files.name}, regStr, 'once', 'ignorecase'));
             end
             files = files(matchIdx);
         end
-        
         combined = [folders; files];
         if ~isempty(searchTerm) && ~isempty(combined)
             combined = combined(contains(lower({combined.name}), lower(searchTerm)));
         end
         
-        fileTable.Data = {};
-        removeStyle(fileTable);
+        fileTable.Data = {}; removeStyle(fileTable);
         pathField.Value = currentDir;
-        openBtn.Enable = 'off';
-        
         if isempty(combined), return; end
         
-        % Stage 1: Load N files immediately
-        N = 50; 
-        totalItems = length(combined);
+        N = 50; totalItems = length(combined);
         processBatch(1, min(N, totalItems));
         
-        % Stage 2: Background Timer
         if totalItems > N
             t = timer('ExecutionMode', 'fixedSpacing', 'Period', 0.05, ...
                       'TimerFcn', @(~,~) timerBatchLoad(), 'UserData', N + 1); 
@@ -122,12 +122,10 @@ function [file, path, ind] = uigetfile_modern(filter, title, startPath)
         end
 
         function processBatch(sIdx, eIdx)
-            batchSize = eIdx - sIdx + 1;
-            batchData = cell(batchSize, 4);
+            batchData = cell(eIdx - sIdx + 1, 4);
             for i = sIdx:eIdx
                 row = i - sIdx + 1;
-                batchData{row, 2} = combined(i).name;
-                batchData{row, 4} = combined(i).date;
+                batchData{row, 2} = combined(i).name; batchData{row, 4} = combined(i).date;
                 if combined(i).isdir
                     batchData{row, 1} = ''; batchData{row, 3} = '--';
                     if ~isempty(s_folder), addStyle(fileTable, s_folder, 'cell', [i, 1]); else, batchData{row, 1} = '📁'; end
@@ -143,25 +141,36 @@ function [file, path, ind] = uigetfile_modern(filter, title, startPath)
     function handleSingleClick(e)
         if isempty(e.Indices), return; end
         row = e.Indices(1);
-        if row <= length(combined)
-            selectedItem = combined(row).name;
-            if ~combined(row).isdir, openBtn.Enable = 'on'; else, openBtn.Enable = 'off'; end
-        end
+        if row <= length(combined) && ~combined(row).isdir, nameField.Value = combined(row).name; end
     end
 
     function handleDoubleClick()
         s = fileTable.Selection; if isempty(s), return; end
         row = s(1);
         if row <= length(combined) && combined(row).isdir
-            currentDir = fullfile(currentDir, combined(row).name); searchField.Value = ''; updateDisplay();
+            currentDir = fullfile(currentDir, combined(row).name); updateDisplay();
         elseif row <= length(combined)
-            selectedItem = combined(row).name; uiresume(fig);
+            nameField.Value = combined(row).name; trySave();
         end
     end
 
     function navigateUp()
-        p = fileparts(currentDir);
-        if ~isempty(p) && ~strcmp(p, currentDir), currentDir = p; searchField.Value = ''; updateDisplay(); end
+        p = fileparts(currentDir); if ~isempty(p) && ~strcmp(p, currentDir), currentDir = p; updateDisplay(); end
+    end
+
+    function trySave()
+        resFile = nameField.Value;
+        if isempty(resFile), uialert(fig, 'Enter name.', 'Missing'); return; end
+        [~, ~, cExt] = fileparts(resFile);
+        if isempty(cExt) && ~strcmp(filterDD.Value, '*.*')
+            exs = strsplit(filterDD.Value, ';'); cleanE = strrep(exs{1}, '*', '');
+            if contains(filterDD.Value, '.nii.gz'), resFile = [resFile '.nii.gz']; else, resFile = [resFile cleanE]; end
+        end
+        if exist(fullfile(currentDir, resFile), 'file')
+            c = uiconfirm(fig, sprintf('Replace "%s"?', resFile), 'Confirm', 'Options', {'Yes', 'No'}, 'DefaultOption', 'No');
+            if strcmp(c, 'No'), return; end
+        end
+        selectedItem = resFile; uiresume(fig);
     end
 
     function cleanClose()
@@ -173,7 +182,6 @@ function [file, path, ind] = uigetfile_modern(filter, title, startPath)
 
     % --- ULTIMATE CLEANUP ---
     if isvalid(fig)
-        % Kill timer safely
         if isfield(fig.UserData, 'loadTimer') && isvalid(fig.UserData.loadTimer)
             stop(fig.UserData.loadTimer); delete(fig.UserData.loadTimer);
         end
