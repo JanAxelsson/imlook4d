@@ -2818,7 +2818,7 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
             
                                        %newPath=uigetdir(guessedDirectory,'Select directory to save files to');
                                       %newPath=java_uigetdir(guessedDirectory,'Make an empty directory to save all DICOM files within'); % Use java directory open dialog (nicer than windows)
-                                      newPath=java_uigetdir(previousDirectory,'Select/create directory to save files to'); % Use java directory open dialog (nicer than windows)
+                                      newPath=uigetdir_modern(previousDirectory,'Select/create directory to save files to'); % Use java directory open dialog (nicer than windows)
                                       if newPath == 0
                                           disp('Cancelled by user');
                                           return
@@ -5946,8 +5946,8 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                 minDt = 0.1;             % Tidgräns (sekunder). Långsammare än detta = ingen acceleration.
                 
                 % 1. Mät hastighet
-                dt = toc(app.lastScrollTime);
                 app.lastScrollTime = tic;
+                dt = toc(app.lastScrollTime);
                 if dt <= 0, dt = 0.01; end
                 
                 % 2. Beräkna multiplikator (Acceleration endast om man skrollar snabbt)
@@ -10253,7 +10253,7 @@ end
                          end
             
                     % Get folder name
-                        newPath=java_uigetdir( pwd(),'Select/create directory to save files to'); % Use java directory open dialog (nicer than windows)
+                        newPath=uigetdir_modern( pwd(),'Select/create directory to save files to'); % Use java directory open dialog (nicer than windows)
                         if newPath == 0
                             disp('Cancelled by user');
                             return
@@ -13105,7 +13105,6 @@ end
             app.frameTimeText.HorizontalAlignment = 'center';
             app.frameTimeText.VerticalAlignment = 'top';
             app.frameTimeText.WordWrap = 'on';
-            app.frameTimeText.FontColor = [0.129411764705882 0.129411764705882 0.129411764705882];
             app.frameTimeText.Position = [251 63 99 18];
             app.frameTimeText.Text = '( ) s';
 
@@ -13121,7 +13120,6 @@ end
             app.TACT.ButtonPushedFcn = createCallbackFcn(app, @TactButtonCallback, true);
             app.TACT.Tag = 'TACT';
             app.TACT.BackgroundColor = [0.941176470588235 0.941176470588235 0.941176470588235];
-            app.TACT.FontColor = [0.129411764705882 0.129411764705882 0.129411764705882];
             app.TACT.Tooltip = 'Calculate Time-Activity (TACT) curve on dynamic data';
             app.TACT.Position = [178 2 58 23];
             app.TACT.Text = 'TACT';
@@ -13133,7 +13131,6 @@ end
             app.text7.VerticalAlignment = 'top';
             app.text7.WordWrap = 'on';
             app.text7.FontSize = 10.6666666666667;
-            app.text7.FontColor = [0.129411764705882 0.129411764705882 0.129411764705882];
             app.text7.Tooltip = 'Brush diameter=1+2*[brush size]';
             app.text7.Position = [7 54 49.2760180995475 15.6976744186046];
             app.text7.Text = 'Brush';
@@ -13171,7 +13168,6 @@ end
             app.ROILeveltext.VerticalAlignment = 'top';
             app.ROILeveltext.WordWrap = 'on';
             app.ROILeveltext.FontSize = 10.6666666666667;
-            app.ROILeveltext.FontColor = [0.129411764705882 0.129411764705882 0.129411764705882];
             app.ROILeveltext.Tooltip = 'Draws ROI only  above this intensity level. ';
             app.ROILeveltext.Position = [8 29 49.4083333333333 15.8241758241758];
             app.ROILeveltext.Text = 'Level';
@@ -13182,7 +13178,6 @@ end
             app.ROILevelEdit.Tag = 'ROILevelEdit';
             app.ROILevelEdit.HorizontalAlignment = 'center';
             app.ROILevelEdit.FontSize = 11;
-            app.ROILevelEdit.FontColor = [0.129411764705882 0.129411764705882 0.129411764705882];
             app.ROILevelEdit.Tooltip = 'Draws ROI on pixels above this value.  Start with < to draw only below.  Right-click to reset ';
             app.ROILevelEdit.Position = [43 27 57 22];
             app.ROILevelEdit.Value = '-1000';
@@ -13237,7 +13232,6 @@ end
             app.transparancyText.VerticalAlignment = 'top';
             app.transparancyText.WordWrap = 'on';
             app.transparancyText.FontSize = 13.3333333333333;
-            app.transparancyText.FontColor = [0.129411764705882 0.129411764705882 0.129411764705882];
             app.transparancyText.Visible = 'off';
             app.transparancyText.Position = [39 4 16 18];
             app.transparancyText.Text = '%';
@@ -13247,7 +13241,6 @@ end
             app.transparancyEdit.ValueChangedFcn = createCallbackFcn(app, @Transparancy_Callback, true);
             app.transparancyEdit.Tag = 'transparancyEdit';
             app.transparancyEdit.HorizontalAlignment = 'center';
-            app.transparancyEdit.FontColor = [0.129411764705882 0.129411764705882 0.129411764705882];
             app.transparancyEdit.Visible = 'off';
             app.transparancyEdit.Tooltip = 'Weigth of overlay image (lower shows more of underlying image)';
             app.transparancyEdit.Position = [2 2 33 22];
@@ -13258,7 +13251,6 @@ end
             app.AutocolorscaleCheckBox.ValueChangedFcn = createCallbackFcn(app, @autoColorScaleRadioButton_Callback, true);
             app.AutocolorscaleCheckBox.Tag = 'autoColorScaleRadioButton';
             app.AutocolorscaleCheckBox.Text = 'Auto colorscale';
-            app.AutocolorscaleCheckBox.FontColor = [0.129411764705882 0.129411764705882 0.129411764705882];
             app.AutocolorscaleCheckBox.Position = [6 44 105 22];
             app.AutocolorscaleCheckBox.Value = true;
 
@@ -13267,7 +13259,6 @@ end
             app.HidenegativesCheckBox.ValueChangedFcn = createCallbackFcn(app, @removeNegativesRadioButton_Callback, true);
             app.HidenegativesCheckBox.Tag = 'removeNegativesRadioButton';
             app.HidenegativesCheckBox.Text = 'Hide negatives';
-            app.HidenegativesCheckBox.FontColor = [0.129411764705882 0.129411764705882 0.129411764705882];
             app.HidenegativesCheckBox.Position = [6 23 102 22];
 
             % Create InvertCheckBox
@@ -13275,7 +13266,6 @@ end
             app.InvertCheckBox.ValueChangedFcn = createCallbackFcn(app, @invertRadiobutton_Callback, true);
             app.InvertCheckBox.Tag = 'invertRadiobutton';
             app.InvertCheckBox.Text = 'Invert';
-            app.InvertCheckBox.FontColor = [0.129411764705882 0.129411764705882 0.129411764705882];
             app.InvertCheckBox.Position = [54 1 51 22];
 
             % Create uipanel5
@@ -13299,7 +13289,6 @@ end
             app.FliprotateCheckBox.ValueChangedFcn = createCallbackFcn(app, @FlipAndRotateRadioButton_Callback, true);
             app.FliprotateCheckBox.Tag = 'FlipAndRotateRadioButton';
             app.FliprotateCheckBox.Text = 'Flip+rotate';
-            app.FliprotateCheckBox.FontColor = [0.129411764705882 0.129411764705882 0.129411764705882];
             app.FliprotateCheckBox.Position = [8 21 80 18];
             app.FliprotateCheckBox.Value = true;
 
@@ -13308,7 +13297,6 @@ end
             app.SwapheadfeetCheckBox.ValueChangedFcn = createCallbackFcn(app, @SwapHeadFeetRadioButton_Callback, true);
             app.SwapheadfeetCheckBox.Tag = 'SwapHeadFeetRadioButton';
             app.SwapheadfeetCheckBox.Text = 'Swap head-feet';
-            app.SwapheadfeetCheckBox.FontColor = [0.129411764705882 0.129411764705882 0.129411764705882];
             app.SwapheadfeetCheckBox.Position = [8 1 107 22];
 
             % Create uipanel7
@@ -13348,7 +13336,6 @@ end
             app.PCAutoInvert.Tooltip = 'Automatically determine if PC images needs inverting';
             app.PCAutoInvert.Text = 'auto-invert PC';
             app.PCAutoInvert.FontSize = 11;
-            app.PCAutoInvert.FontColor = [0.129411764705882 0.129411764705882 0.129411764705882];
             app.PCAutoInvert.Position = [80 1 94 22];
 
             % Create uipanel6
@@ -13367,7 +13354,6 @@ end
             app.KaiserText.VerticalAlignment = 'top';
             app.KaiserText.WordWrap = 'on';
             app.KaiserText.FontSize = 10.6666666666667;
-            app.KaiserText.FontColor = [0.129411764705882 0.129411764705882 0.129411764705882];
             app.KaiserText.Tooltip = 'Normalized eigenvalue of lowest order principal component. A factor extracts the equivalent of one original variable gives an eigenvalue of 1.  Kaiser suggests this as a fair threshold on what to drop.';
             app.KaiserText.Position = [3 7 55.7413793103448 16.6746411483254];
             app.KaiserText.Text = 'EV: 0.621';
@@ -13380,7 +13366,6 @@ end
             app.ExplainedFractionText.VerticalAlignment = 'top';
             app.ExplainedFractionText.WordWrap = 'on';
             app.ExplainedFractionText.FontSize = 10.6666666666667;
-            app.ExplainedFractionText.FontColor = [0.129411764705882 0.129411764705882 0.129411764705882];
             app.ExplainedFractionText.Visible = 'off';
             app.ExplainedFractionText.Tooltip = 'Per cent variance of image data explained by selected filter';
             app.ExplainedFractionText.Position = [3 23 55.7413793103448 15.9223300970874];
@@ -13394,7 +13379,6 @@ end
             app.text22.VerticalAlignment = 'top';
             app.text22.WordWrap = 'on';
             app.text22.FontSize = 9.33333333333333;
-            app.text22.FontColor = [0.129411764705882 0.129411764705882 0.129411764705882];
             app.text22.Visible = 'off';
             app.text22.Tooltip = 'Exclude frames before first frames from PCA-filtering.';
             app.text22.Position = [3 55 54.7966101694915 17.3383084577114];
@@ -13537,7 +13521,6 @@ end
             app.versionText.VerticalAlignment = 'top';
             app.versionText.WordWrap = 'on';
             app.versionText.FontSize = 11;
-            app.versionText.FontColor = [0.129411764705882 0.129411764705882 0.129411764705882];
             app.versionText.Position = [634 246 238 22];
             app.versionText.Text = 'this should display version info';
 
@@ -13545,7 +13528,6 @@ end
             app.floatingTextEdit1 = uieditfield(app.figure1, 'text');
             app.floatingTextEdit1.Tag = 'floatingTextEdit1';
             app.floatingTextEdit1.FontSize = 13.3333333333333;
-            app.floatingTextEdit1.FontColor = [0.129411764705882 0.129411764705882 0.129411764705882];
             app.floatingTextEdit1.Visible = 'off';
             app.floatingTextEdit1.Position = [11 9 63 18];
             app.floatingTextEdit1.Value = 'Edit Text';
