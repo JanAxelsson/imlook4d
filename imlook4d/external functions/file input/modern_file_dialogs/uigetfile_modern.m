@@ -18,7 +18,7 @@ function [file, path, ind] = uigetfile_modern(filter, title, startPath)
     fig.WindowKeyPressFcn = @(src, e) handleKeyPress(e);
     
     % --- Icon Setup ---
-    imgDir = fullfile(fileparts(mfilename('fullpath')), 'images');
+    imgDir = fullfile(fileparts(mfilename('fullpath')));
     isDark = mean(fig.Color) < 0.5;
     switch computer
         case {'PCWIN', 'PCWIN64'}, fName = 'win_folder'; fiName = 'win_file';
