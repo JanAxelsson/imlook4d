@@ -2818,7 +2818,7 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
             
                                        %newPath=uigetdir(guessedDirectory,'Select directory to save files to');
                                       %newPath=java_uigetdir(guessedDirectory,'Make an empty directory to save all DICOM files within'); % Use java directory open dialog (nicer than windows)
-                                      newPath=java_uigetdir(previousDirectory,'Select/create directory to save files to'); % Use java directory open dialog (nicer than windows)
+                                      newPath=uigetdir_modern(previousDirectory,'Select/create directory to save files to'); % Use java directory open dialog (nicer than windows)
                                       if newPath == 0
                                           disp('Cancelled by user');
                                           return
@@ -10253,7 +10253,7 @@ end
                          end
             
                     % Get folder name
-                        newPath=java_uigetdir( pwd(),'Select/create directory to save files to'); % Use java directory open dialog (nicer than windows)
+                        newPath=uigetdir_modern( pwd(),'Select/create directory to save files to'); % Use java directory open dialog (nicer than windows)
                         if newPath == 0
                             disp('Cancelled by user');
                             return
