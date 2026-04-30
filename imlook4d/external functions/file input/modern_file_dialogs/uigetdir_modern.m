@@ -1,8 +1,7 @@
 function outputPath = uigetdir_modern(guessedDirectory, dialogTitle)
-    % UIGETDIR_MODERN Modern directory picker without Java
-    % Keyboard: Return/Enter is used ONLY for navigation, never for final selection.
-
-    % --- Setup ---
+    % UIGETDIR_MODERN - High-stability version to prevent MATLAB hangs
+    
+    % --- Initial Setup ---
     if nargin < 1 || isempty(guessedDirectory), guessedDirectory = pwd; end
     if nargin < 2 || isempty(dialogTitle), dialogTitle = 'Select Folder'; end
     if ~exist(guessedDirectory, 'dir'), guessedDirectory = pwd; end
@@ -11,24 +10,23 @@ function outputPath = uigetdir_modern(guessedDirectory, dialogTitle)
     currentDir = guessedDirectory;
     combined = []; 
 
-    % --- GUI Creation ---
-    fig = uifigure('Name', dialogTitle, 'Position', [500 400 750 650], 'WindowStyle', 'modal');
-    fig.CloseRequestFcn = @(~,~) cleanClose();
+    % --- GUI Figure with Failsafe ---
+    fig = uifigure('Name', dialogTitle, 'Position', [500 400 750 650], ...
+        'WindowStyle', 'modal', ...
+        'Visible', 'off'); % Create hidden, show when ready
     
-    % Keyboard Shortcuts
+    % CRITICAL: Always resume and delete properly
+    fig.CloseRequestFcn = @(~,~) cleanClose();
     fig.WindowKeyPressFcn = @(src, e) handleKeyPress(e);
     
     % --- OS and Theme-aware Icon Setup ---
     imgDir = fullfile(fileparts(mfilename('fullpath')), 'images');
-    % Robust detection based on background color
     isDark = mean(fig.Color) < 0.5;
-
     switch computer
         case {'PCWIN', 'PCWIN64'}, fName = 'win_folder'; fiName = 'win_file';
         case {'MACI64', 'MACA64'}, fName = 'mac_folder'; fiName = 'mac_file';
         otherwise, fName = 'lin_folder'; fiName = 'lin_file';
     end
-    
     if isDark, fN_f = [fName '_dark.png']; fiN_f = [fiName '_dark.png'];
     else, fN_f = [fName '.png']; fiN_f = [fiName '.png']; end
     
@@ -36,7 +34,6 @@ function outputPath = uigetdir_modern(guessedDirectory, dialogTitle)
     pf = fullfile(imgDir, fN_f); pfi = fullfile(imgDir, fiN_f);
     if isDark && ~exist(pf, 'file'), pf = fullfile(imgDir, [fName '.png']); end
     if isDark && ~exist(pfi, 'file'), pfi = fullfile(imgDir, [fiName '.png']); end
-    
     if exist(pf, 'file'), s_folder = uistyle('Icon', pf); end
     if exist(pfi, 'file'), s_file = uistyle('Icon', pfi); end
     s_grey = uistyle('FontColor', [0.5 0.5 0.5]);
@@ -45,105 +42,93 @@ function outputPath = uigetdir_modern(guessedDirectory, dialogTitle)
     g = uigridlayout(fig, [5 1]);
     g.RowHeight = {40, 40, '1x', 40, 50};
 
-    % Row 1: Path Navigation
+    % Navigation
     pathGrid = uigridlayout(g, [1 3], 'ColumnWidth', {'1x', 60, 100});
     pathField = uieditfield(pathGrid, 'Value', currentDir, 'Editable', 'on', ...
         'ValueChangedFcn', @(src,e) manualPathEdit(src.Value));
     uibutton(pathGrid, 'Text', 'Up ▲', 'ButtonPushedFcn', @(~,~) navigateUp());
     uibutton(pathGrid, 'Text', 'New Folder', 'ButtonPushedFcn', @(~,~) makeNewFolder());
 
-    % Row 2: Search
+    % Search
     searchField = uieditfield(g, 'Placeholder', 'Search...', ...
         'ValueChangingFcn', @(src,e) updateDisplay(e.Value));
 
-    % Row 3: Table
+    % Table
     folderTable = uitable(g, 'ColumnName', {'', 'Name', 'Size', 'Date'}, ...
-        'ColumnWidth', {35, '1x', 90, 140}, 'RowName', [], 'ColumnSortable', true, 'SelectionType', 'row');
+        'ColumnWidth', {35, '1x', 90, 140}, 'RowName', [], 'SelectionType', 'row', ...
+        'BusyAction', 'cancel', 'Interruptible', 'off'); % Prevent callback pile-up
+    folderTable.DoubleClickedFcn = @(src, e) handleDoubleClick();
 
-    % Row 4: Toggle Files
     showFilesCB = uicheckbox(g, 'Text', 'Show files', 'Value', false, ...
         'ValueChangedFcn', @(~,~) updateDisplay());
 
-    % Row 5: Action Buttons
+    % Actions
     btnGrid = uigridlayout(g, [1 3], 'ColumnWidth', {'1x', 100, 100});
     uibutton(btnGrid, 'Text', 'Cancel', 'ButtonPushedFcn', @(~,~) cleanClose());
-    selectBtn = uibutton(btnGrid, 'Text', 'Select Folder', 'FontWeight', 'bold', ...
+    uibutton(btnGrid, 'Text', 'Select Folder', 'FontWeight', 'bold', ...
         'ButtonPushedFcn', @(~,~) finalizeSelection());
 
-    folderTable.DoubleClickedFcn = @(src, e) handleDoubleClick();
+    % --- Protected Internal Functions ---
 
-    % --- Functions ---
-    
     function handleKeyPress(e)
-        focusedObj = fig.CurrentObject;
-        switch e.Key
-            case 'return'
-                % ENTER only navigates, never closes the dialog
-                if isequal(focusedObj, pathField)
-                    manualPathEdit(pathField.Value);
-                elseif isequal(focusedObj, folderTable)
-                    handleDoubleClick();
-                end
-            case 'escape'
-                cleanClose();
+        if ~isvalid(fig), return; end
+        if strcmp(e.Key, 'escape'), cleanClose(); end
+        if strcmp(e.Key, 'return')
+            if isequal(fig.CurrentObject, pathField), manualPathEdit(pathField.Value); end
+            % Enter does NOT finalize selection per your preference
         end
     end
 
     function manualPathEdit(newPath)
         if exist(newPath, 'dir')
-            currentDir = newPath;
-            searchField.Value = '';
+            currentDir = newPath; 
             updateDisplay();
         end
     end
 
-    function makeNewFolder()
-        newName = inputdlg('Folder name:', 'New Folder', [1 50], {'New Folder'});
-        if isempty(newName), return; end
-        newP = fullfile(currentDir, newName{1});
-        if exist(newP, 'dir'), uialert(fig, 'Exists.', 'Error');
-        else, [s, m] = mkdir(newP); if s, currentDir = newP; updateDisplay(); else, uialert(fig, m, 'Error'); end; end
-    end
-
     function updateDisplay(searchTerm)
-        if nargin < 1, searchTerm = searchField.Value; end
-        if ~exist(currentDir, 'dir'), return; end
-        
-        d = dir(currentDir);
-        d = d(~strncmp({d.name}, '.', 1)); 
-        if ~showFilesCB.Value, d = d([d.isdir]); end
-        
-        folders = d([d.isdir]); 
-        files = d(~[d.isdir]);
-        combined = [folders; files];
-        
-        if ~isempty(searchTerm) && ~isempty(combined)
-            combined = combined(contains(lower({combined.name}), lower(searchTerm)));
-        end
-        
-        folderTable.Data = {}; removeStyle(folderTable);
-        pathField.Value = currentDir;
-        if isempty(combined), return; end
-        
-        data = cell(length(combined), 4);
-        for i = 1:length(combined)
-            data{i,2} = combined(i).name; data{i,4} = combined(i).date;
-            if combined(i).isdir
-                data{i,1} = ''; data{i,3} = '--';
-                if ~isempty(s_folder), addStyle(folderTable, s_folder, 'cell', [i, 1]); else, data{i,1} = '📁'; end
-            else
-                data{i,1} = ''; data{i,3} = sprintf('%.1f KB', combined(i).bytes/1024);
-                if ~isempty(s_file), addStyle(folderTable, s_file, 'cell', [i, 1]); else, data{i,1} = '📄'; end
-                addStyle(folderTable, s_grey, 'row', i);
+        if ~isvalid(fig), return; end
+        try
+            if nargin < 1, searchTerm = searchField.Value; end
+            d = dir(currentDir);
+            d = d(~strncmp({d.name}, '.', 1)); 
+            if ~showFilesCB.Value, d = d([d.isdir]); end
+            
+            folders = d([d.isdir]); files = d(~[d.isdir]);
+            combined = [folders; files];
+            if ~isempty(searchTerm) && ~isempty(combined)
+                combined = combined(contains(lower({combined.name}), lower(searchTerm)));
             end
+            
+            % Update UI
+            folderTable.Data = {}; 
+            removeStyle(folderTable);
+            pathField.Value = currentDir;
+            
+            data = cell(length(combined), 4);
+            for i = 1:length(combined)
+                data{i,2} = combined(i).name; data{i,4} = combined(i).date;
+                if combined(i).isdir
+                    data{i,1} = ''; data{i,3} = '--';
+                    if ~isempty(s_folder), addStyle(folderTable, s_folder, 'cell', [i, 1]); end
+                else
+                    data{i,1} = ''; data{i,3} = sprintf('%.1f KB', combined(i).bytes/1024);
+                    if ~isempty(s_file), addStyle(folderTable, s_file, 'cell', [i, 1]); end
+                    addStyle(folderTable, s_grey, 'row', i);
+                end
+            end
+            folderTable.Data = data;
+        catch ME
+            fprintf('UI Update Error: %s\n', ME.message);
         end
-        folderTable.Data = data;
     end
 
     function handleDoubleClick()
-        s = folderTable.Selection; if isempty(s), return; end
+        if ~isvalid(fig), return; end
+        s = folderTable.Selection;
+        if isempty(s), return; end
         row = s(1);
-        if combined(row).isdir
+        if row <= length(combined) && combined(row).isdir
             currentDir = fullfile(currentDir, combined(row).name);
             searchField.Value = '';
             updateDisplay();
@@ -156,37 +141,31 @@ function outputPath = uigetdir_modern(guessedDirectory, dialogTitle)
     end
 
     function finalizeSelection()
-        enteredPath = pathField.Value;
-        
-        % If a subfolder is selected in the table, use that
+        if ~isvalid(fig), return; end
+        target = pathField.Value;
         s = folderTable.Selection;
-        if ~isempty(s)
-            row = s(1);
-            if combined(row).isdir
-                enteredPath = fullfile(currentDir, combined(row).name);
-            end
+        if ~isempty(s) && s(1) <= length(combined) && combined(s(1)).isdir
+            target = fullfile(currentDir, combined(s(1)).name);
         end
 
-        % Existence check
-        if ~exist(enteredPath, 'dir')
-            choice = uiconfirm(fig, sprintf('Folder does not exist:\n%s\n\nCreate it?', enteredPath), ...
-                'Create Folder?', 'Options', {'Yes', 'No'}, 'DefaultOption', 'Yes');
-            if strcmp(choice, 'Yes')
-                [status, msg] = mkdir(enteredPath);
-                if ~status, uialert(fig, msg, 'Error'); return; end
-            else, return; end
+        if ~exist(target, 'dir')
+            choice = uiconfirm(fig, 'Create new folder?', 'Confirm', 'Options', {'Yes', 'No'});
+            if strcmp(choice, 'Yes'), mkdir(target); else, return; end
         end
-        
-        outputPath = enteredPath;
+        outputPath = target;
         uiresume(fig);
     end
 
     function cleanClose()
         outputPath = 0;
-        uiresume(fig);
+        if isvalid(fig), uiresume(fig); end
     end
 
+    % --- Start ---
     updateDisplay();
+    fig.Visible = 'on';
     uiwait(fig);
+
+    % --- Final Failsafe ---
     if isvalid(fig), delete(fig); end
 end
