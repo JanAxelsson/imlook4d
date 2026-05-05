@@ -82,23 +82,40 @@ function out =  jjpatlak( L3, matrix, t, dt, Cinp, range)
         value_vector = cumsum( C.*dt);% -0.5 * C .* dt; % exclude activity from second half (after midtime)
     end        
 
+    % Hedman et al 2026, https://doi.org/10.1177/0271678x251384264
+    % showed that Bergström et al below was the better model.
+    % Therefore I have changed the default when L3 differs from 0
+
+        % SKIP -- not as good as Bergström below
+
+        % SPECIAL Modify Cinp if specific binding in reference region
+        % (following Johansson et al 2007, https://doi.org/doi:10.1016/j.jns.2007.01.057) 
+        
+        % if (false)
+        %     if (L3 ~= 0)
+        %         sub(1) = 0;
+        %         for i = 2 : length(t)
+        %             range = 1:i;
+        %             sub(i) =  sum( ...
+        %                 L3 ...
+        %                 * exp(L3 * ( tmid(range) - t(i) ) ) ... 
+        %                 .* Cinp( range ) ... 
+        %                 .* dt(range) ...
+        %             ); 
+        %         end
+        % 
+        %         % Subtract specific binding from reference region
+        %         Cinp = Cinp - sub;
+        %     end
+        % end
 
     % SPECIAL Modify Cinp if specific binding in reference region
-    if (L3 ~= 0)
-        sub(1) = 0;
-        for i = 2 : length(t)
-            range = 1:i;
-            sub(i) =  sum( ...
-                L3 ...
-                * exp(L3 * ( tmid(range) - t(i) ) ) ... 
-                .* Cinp( range ) ... 
-                .* dt(range) ...
-            ); % Convolution for time t(i)
+    % (following Bergström et al 1998,
+    % https://doi.org/10.1111/j.1600-0404.1998.tb07300.x) 
+    %   Cref = Cref * exp( -0.04 * t) , L3 is the term - 0.04 here
+        if (L3 ~= 0)
+            Cinp = Cinp .* exp( - L3 * tmid);
         end
-
-        % Subtract specific binding from reference region
-        Cinp = Cinp - sub;
-    end
 
     % ----------------
     %  Patlak model

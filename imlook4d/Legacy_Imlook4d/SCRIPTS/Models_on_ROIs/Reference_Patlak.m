@@ -33,6 +33,11 @@ endFrame = str2num( answer{2});
 range = [startFrame endFrame];
 L3 = str2num( answer{3});
 
+EXTRA = '';
+if (L3 ~= 0)
+    EXTRA = [ ' , L3 = ' num2str(L3) ];
+end
+
 %Cinp_for_this_script = tacts(imlook4d_ROI_number,:); % Input function in current ROI
 Cinp_for_this_script = generateReferenceTACT( imlook4d_current_handles);
 
@@ -55,7 +60,7 @@ a = jjpatlak( L3, tact, imlook4d_time/60, imlook4d_duration/60, Cinp_for_this_sc
 modelWindow( ...
     a , ...
     imlook4d_ROINames(1:end-1), ...
-    [model_name ' (Frames = '  num2str(startFrame) ' - ' num2str(endFrame) ')' ] ...
+    [model_name EXTRA ' (Frames = '  num2str(startFrame) ' - ' num2str(endFrame) ')' ] ...
     );
 
 disp('Done!');
