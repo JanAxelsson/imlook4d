@@ -5941,13 +5941,14 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                 
                 
                 % --- Inställningar för precision ---
-                sensitivity = 1.0;       % Höj till 1.0 för att kräva mer "energi" för ett steg
-                accelerationScale = 0.5; % Sänk för att dämpa farten något
+                sensitivity = 1;       % Höj till 1.0 för att kräva mer "energi" för ett steg
+                accelerationScale = 0.2; % Sänk för att dämpa farten något
                 minDt = 0.1;             % Tidgräns (sekunder). Långsammare än detta = ingen acceleration.
                 
                 % 1. Mät hastighet
-                app.lastScrollTime = tic;
                 dt = toc(app.lastScrollTime);
+                app.lastScrollTime = tic;
+
                 if dt <= 0, dt = 0.01; end
                 
                 % 2. Beräkna multiplikator (Acceleration endast om man skrollar snabbt)
@@ -5956,7 +5957,7 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                 else
                     multiplier = 1; % Garanterar exakt 1:1 vid långsam skroll
                 end
-                multiplier = min(multiplier, 50); 
+                multiplier = min(multiplier, 50);
                 
                 % 3. Ackumulera
                 app.scrollAccumulator = app.scrollAccumulator + (direction * multiplier);
@@ -6019,6 +6020,7 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
     
     
                 disp( [ 'steps = ', num2str(step) ...
+                    '    dt = ' num2str(dt) ...
                     '    int_slice = ' num2str(newSliceInt) ...
                     '    slice = ' num2str(newSlice) ...
                     '    int_frame = ' num2str(newFrameInt) ...
@@ -13069,6 +13071,7 @@ end
             app.axes1.NextPlot = 'replace';
             app.axes1.Interruptible = 'off';
             app.axes1.Tag = 'axes1';
+            colormap(app.axes1, 'parula')
             app.axes1.Position = [4 92 613 498];
 
             % Create matrixSize
