@@ -20,6 +20,10 @@ function out =  jjpatlak( L3, matrix, t, dt, Cinp, range)
     %   out.pars  = cell array with matrices { Ki, intercept}; 
     %   out.names = { 'Ki', 'intercept'};
     %   out.units = { 'min-1','1'};
+    %
+    %   out.t       = frame start time in minutes (vector)
+    %   out.midtime = frame midtime in minutes from start of scan (vector)
+    %   out.dt      = frame length in minutes (vector)
     %  
     %   Cell array with cells for each ROI:
     %     out.X = Patlak X-axis 
@@ -148,6 +152,7 @@ function out =  jjpatlak( L3, matrix, t, dt, Cinp, range)
             out.Xmodel{i} = out.X{i}(regressionRange);
             out.Ymodel{i} = Ki(i) * out.Xmodel{i} + intercept(i); % Calculate model answer
             out.residual{i} = out.Y{i}(regressionRange) - out.Ymodel{i};
+
             
         end
 
@@ -163,6 +168,12 @@ function out =  jjpatlak( L3, matrix, t, dt, Cinp, range)
     
     out.xlabel = '\int_{0}^{t} C_a dt / C_a';
     out.ylabel = 'C_t / C_a';
+
+
+    % Add time info
+    out.midtime = tmid;
+    out.t = t;
+    out.dt = dt;
 
     
     % --------
