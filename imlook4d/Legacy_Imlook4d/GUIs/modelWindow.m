@@ -433,15 +433,30 @@ function output_txt = modelWindowDataCursorUpdateFunction(~,event_obj)
         % output_txt   Data cursor text (string or cell array 
         %              of strings)
 
-        
         pos = get(event_obj,'Position')          
         x = pos(1);
         y = pos(2);
 
         frame = find( abs(event_obj.Target.XData -x) < 1e-6);
-        
-        %output_txt = {['X=',num2str(x) '\n  Y=',num2str(y)  '   frame =' num2str(frame) ]};
+ 
         output_txt = sprintf(['X=',num2str(x) '\nY=',num2str(y)  '\nframe =' num2str(frame) ]);
+
+        % If model gave midtime
+        handles = guidata(event_obj.Target);
+
+        if isfield( handles.datastruct, 'midtime') % Exists in Patlak
+            midtime = handles.datastruct.midtime;
+            midtimeString = sprintf('%.2f', midtime(frame));
+            output_txt = sprintf( [ output_txt '\ntime =' midtimeString ' \n(frame midtime)'] );
+
+        elseif isfield( handles.datastruct, 't') % Exists in Logan and Zouh where startime is used
+            starttime = handles.datastruct.t(frame);
+            timeString = sprintf('%.2f', starttime);
+            output_txt = sprintf( [ output_txt '\ntime =' timeString ' [min] \n(frame starttime)'] );
+        else
+
+            % midtime or t (start time) did not exist.  Skip
+        end
     
 function export_curve_menu_Callback(hObject, eventdata, handles)
     TACThandles = buildTACTs(handles); % TODO : Use this in below functions, to get time info into copied TACTS

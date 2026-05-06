@@ -214,6 +214,9 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
     properties (Access = private)
         %record = struct('enabled', false);  % Initialize with default value
         MouseIsDown = false;
+        
+        scrollAccumulator = 0; % Kommer ihåg värdet
+        lastScrollTime = [];   % Kommer ihåg tiden
     end
 
 
@@ -327,13 +330,22 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
             
                                     % Select way to open file
                                     if ( exist(historyFile) == 2 ) % Only if historyFile exists, otherwise assume file dialog
+                                       
+                                        % Ditch Simple File Dialog (comment out)
+
+                                        % answer = questdlg('What do you want to open', ...
+                                        %     'Open options', ...
+                                        %     'File dialog','Advanced dialog','Recent File','File dialog');
+        
+                                        % Replace Simple File dialog -- make Advanced the standard.
                                         answer = questdlg('What do you want to open', ...
                                             'Open options', ...
-                                            'File dialog','Advanced dialog','Recent File','File dialog');
-            
+                                            'File dialog','Recent File','File dialog');
+
                                         % Handle response
                                         switch answer
                                             case 'File dialog'
+                                                answer = 'Advanced dialog';  % Ditch Simple File Dialog, always use Advanced
                                                 % Just continue below
                                             case 'Recent File'
                                                 openRecent_Callback(app, struct('Source', []))
@@ -353,15 +365,17 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                                         currentFilePath = '';  % Gets here if not opening from menu
                                     end
             
-                                    % Select file
-                                    if strcmp(answer,'File dialog')
-                                        [file,path] = uigetfile( '*', 'Select one file to open',currentFilePath)
-
-                                        DicomWithToolbox = false; % 'Force DICOM using Imaging Toolbox'
-
-                                        SelectedRaw3D = false; % 'GE RAW (3D, sum ToF)'
-                                        SelectedRaw4D = false; % 'GE RAW (4D, w ToF)'
-                                    end
+                                    % Ditch Simple File Dialog (comment out)
+                                    
+                                    % % Select file
+                                    % if strcmp(answer,'File dialog')
+                                    %     [file,path] = uigetfile( '*', 'Select one file to open',currentFilePath)
+                                    % 
+                                    %     DicomWithToolbox = false; % 'Force DICOM using Imaging Toolbox'
+                                    % 
+                                    %     SelectedRaw3D = false; % 'GE RAW (3D, sum ToF)'
+                                    %     SelectedRaw4D = false; % 'GE RAW (4D, w ToF)'
+                                    % end
 
                                     if strcmp(answer,'Advanced dialog')
                                         [file,path,indx] = uigetfile( ...
@@ -2804,7 +2818,7 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
             
                                        %newPath=uigetdir(guessedDirectory,'Select directory to save files to');
                                       %newPath=java_uigetdir(guessedDirectory,'Make an empty directory to save all DICOM files within'); % Use java directory open dialog (nicer than windows)
-                                      newPath=java_uigetdir(previousDirectory,'Select/create directory to save files to'); % Use java directory open dialog (nicer than windows)
+                                      newPath=uigetdir_modern(previousDirectory,'Select/create directory to save files to'); % Use java directory open dialog (nicer than windows)
                                       if newPath == 0
                                           disp('Cancelled by user');
                                           return
@@ -5907,33 +5921,22 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
         
         function scrollSlices(app, hObject, eventdata, handles, direction)
 
-            persistent currentSlice  currentFrame averageDirection historicalDirections lastTime
+            persistent currentSlice  currentFrame 
+
+            if ~strcmp('WindowScrollWheel', eventdata.EventName)
+                return
+            end
 
             % Initialize
             numberOfSlices=size(handles.image.Cdata,3);
             numberOfFrames=size(handles.image.Cdata,4);
-            %currentSlice = get(handles.SliceNumSlider,'Value');
-            %currentFrame = get(handles.FrameNumSlider,'Value');
 
-
-
-            % Avoid jitter 
-                delta = 1/3;  % Step for each scroll
-                N = 3;  % Number of directions to average (to avoid jitter)
-    
-                if isempty(currentSlice)
-                    currentSlice = 1.01;        % Memory of non-integer slice
-                    currentFrame = 1.01;        % Memory of non-integer frame
-                    historicalDirections = zeros(1,N);  % Last N directions (to avoid jitter)
-                    averageDirection = 1;       % The general direction last N scrolls
-                    lastTime = tic;
-                end
-    
-                historicalDirections = [ direction historicalDirections(1:(N-1)) ];
-                averageDirection = median( historicalDirections);  % Use median to get a correct direction
-    
-                step = averageDirection * delta;
-
+            if isempty(currentSlice)
+                currentSlice = 1.01;        % Memory of non-integer slice
+                currentFrame = 1.01;        % Memory of non-integer frame
+            end
+            direction = eventdata.VerticalScrollCount; 
+            [step dt]  = filterScroll(direction, numberOfSlices, numberOfFrames, handles);
 
             % Update slice or frame if too different from Edit values
                 absDiff = abs( app.SliceNumSlider.Value - currentSlice );
@@ -5975,10 +5978,8 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
                 newFrameInt = floor(newFrame);
     
     
-                t = num2str( lastTime );
-                t = t(1:9);
-                disp( [ 't = '  t ...
-                    '    dt = ' num2str( toc(lastTime) )...
+                disp( [ 'steps = ', num2str(step) ...
+                    '    dt = ' num2str(dt) ...
                     '    int_slice = ' num2str(newSliceInt) ...
                     '    slice = ' num2str(newSlice) ...
                     '    int_frame = ' num2str(newFrameInt) ...
@@ -6003,7 +6004,85 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
 
                 lastTime = tic;
 
+
+
+            %
+            % INTERNAL FUNCTION
+            %
+function [step, dt] = filterScroll(direction, numberOfSlices, numberOfFrames, handles)
+    persistent lastScrollTime scrollAccumulator
+    
+    % --- INSTÄLLNINGAR FÖR TIDSAXEN ---
+    FAST_INTERVAL_MS = 30;   % Vid detta intervall (eller snabbare) får vi MAX acceleration
+    SLOW_INTERVAL_MS = 100;  % Långsammare än detta = exakt 1 steg per klick
+    
+    % --- INITIALISERING ---
+    if isempty(lastScrollTime)
+        lastScrollTime = tic;
+        scrollAccumulator = 0;
+    end
+
+    % 1. Mät tiden sedan förra eventet
+    dt_sec = toc(lastScrollTime);
+    dt_ms = dt_sec * 1000;
+    lastScrollTime = tic;
+
+    % 2. Avgör maxSteps (taket för hur många steg ett enskilt event kan ge)
+    modifier = get(handles.figure1, 'CurrentModifier');
+    isModKey = any(strcmp(modifier, 'control')) || any(strcmp(modifier, 'shift'));
+    limitBase = numberOfSlices;
+    if isModKey, limitBase = numberOfFrames; end
+    maxAllowedSteps = max(1, round(limitBase / 5));
+
+    % 3. Beräkna steg-multiplikator baserat på tidsintervall
+    % Vi mappar tiden (dt_ms) till en kurva
+    if dt_ms < FAST_INTERVAL_MS
+        % Om vi skrollar extremt snabbt, tillåt max acceleration
+        multiplier = maxAllowedSteps;
+    elseif dt_ms < SLOW_INTERVAL_MS
+        % Linjär interpolation: ju snabbare vi skrollar, desto fler steg per event
+        % Vi skalar mellan 1 steg och maxAllowedSteps
+        ratio = (SLOW_INTERVAL_MS - dt_ms) / (SLOW_INTERVAL_MS - FAST_INTERVAL_MS);
+        multiplier = 1 + (ratio * (maxAllowedSteps - 1));
+    else
+        % Långsam skroll eller enstaka klick
+        multiplier = 1.0;
+    end
+
+    % 4. Ackumulera (hanterar frirullningens små värden)
+    % direction är oftast 1 eller -1. 
+    % Om musen skickar t.ex. 0.1 (vid frirullning), tar det 10 events 
+    % i långsamt tempo att nå 1 steg, men i snabbt tempo går det direkt.
+    scrollAccumulator = scrollAccumulator + (direction * multiplier);
+
+    % 5. Skapa heltalet (step)
+    step = 0;
+    if abs(scrollAccumulator) >= 1.0
+        step = fix(scrollAccumulator);
+        
+        % Säkerhetsspärr mot max-taket
+        if abs(step) > maxAllowedSteps
+            step = sign(step) * maxAllowedSteps;
         end
+        
+        % Behåll "resten" i ackumulatorn för mjukhet
+        scrollAccumulator = scrollAccumulator - step;
+    end
+    
+    % 6. Nollställ vid paus (Viktigt för att inte "hoppa" till efter att ha vilat)
+    if dt_ms > 300
+        scrollAccumulator = 0;
+    end
+    
+    dt = dt_sec;
+end
+
+
+
+
+        end
+
+
         
         function setColorBar(app, varargin)
                         %
@@ -10213,7 +10292,7 @@ end
                          end
             
                     % Get folder name
-                        newPath=java_uigetdir( pwd(),'Select/create directory to save files to'); % Use java directory open dialog (nicer than windows)
+                        newPath=uigetdir_modern( pwd(),'Select/create directory to save files to'); % Use java directory open dialog (nicer than windows)
                         if newPath == 0
                             disp('Cancelled by user');
                             return
@@ -13029,6 +13108,7 @@ end
             app.axes1.NextPlot = 'replace';
             app.axes1.Interruptible = 'off';
             app.axes1.Tag = 'axes1';
+            colormap(app.axes1, 'parula')
             app.axes1.Position = [4 92 613 498];
 
             % Create matrixSize

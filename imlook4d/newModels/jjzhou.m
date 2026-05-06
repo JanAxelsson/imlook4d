@@ -18,6 +18,9 @@ function out =  jjzhou( matrix, t, dt, Cr, range)
     %   out.pars  = cell array with matrices { BPND, DVR, intercept}; 
     %   out.names = { 'BPND', 'DVR', 'intercept'};
     %   out.units = { '1','1','min'};
+    %
+    %   out.t       = frame start time in minutes (vector)
+    %   out.midtime = frame midtime in minutes from start of scan (vector)
     %  
     %   Cell array with cells for each ROI:
     %     out.X = Zhou X-axis 
@@ -137,6 +140,10 @@ function out =  jjzhou( matrix, t, dt, Cr, range)
     end
 
     
+    % Add time info
+    out.t = t;
+    out.dt = dt;
+
     % --------
     % Clean up
     % --------

@@ -20,6 +20,10 @@ function out =  jjpatlak( L3, matrix, t, dt, Cinp, range)
     %   out.pars  = cell array with matrices { Ki, intercept}; 
     %   out.names = { 'Ki', 'intercept'};
     %   out.units = { 'min-1','1'};
+    %
+    %   out.t       = frame start time in minutes (vector)
+    %   out.midtime = frame midtime in minutes from start of scan (vector)
+    %   out.dt      = frame length in minutes (vector)
     %  
     %   Cell array with cells for each ROI:
     %     out.X = Patlak X-axis 
@@ -82,23 +86,40 @@ function out =  jjpatlak( L3, matrix, t, dt, Cinp, range)
         value_vector = cumsum( C.*dt);% -0.5 * C .* dt; % exclude activity from second half (after midtime)
     end        
 
+    % Hedman et al 2026, https://doi.org/10.1177/0271678x251384264
+    % showed that Bergström et al below was the better model.
+    % Therefore I have changed the default when L3 differs from 0
+
+        % SKIP -- not as good as Bergström below
+
+        % SPECIAL Modify Cinp if specific binding in reference region
+        % (following Johansson et al 2007, https://doi.org/doi:10.1016/j.jns.2007.01.057) 
+        
+        % if (false)
+        %     if (L3 ~= 0)
+        %         sub(1) = 0;
+        %         for i = 2 : length(t)
+        %             range = 1:i;
+        %             sub(i) =  sum( ...
+        %                 L3 ...
+        %                 * exp(L3 * ( tmid(range) - t(i) ) ) ... 
+        %                 .* Cinp( range ) ... 
+        %                 .* dt(range) ...
+        %             ); 
+        %         end
+        % 
+        %         % Subtract specific binding from reference region
+        %         Cinp = Cinp - sub;
+        %     end
+        % end
 
     % SPECIAL Modify Cinp if specific binding in reference region
-    if (L3 ~= 0)
-        sub(1) = 0;
-        for i = 2 : length(t)
-            range = 1:i;
-            sub(i) =  sum( ...
-                L3 ...
-                * exp(L3 * ( tmid(range) - t(i) ) ) ... 
-                .* Cinp( range ) ... 
-                .* dt(range) ...
-            ); % Convolution for time t(i)
+    % (following Bergström et al 1998,
+    % https://doi.org/10.1111/j.1600-0404.1998.tb07300.x) 
+    %   Cref = Cref * exp( -0.04 * t) , L3 is the term - 0.04 here
+        if (L3 ~= 0)
+            Cinp = Cinp .* exp( - L3 * tmid);
         end
-
-        % Subtract specific binding from reference region
-        Cinp = Cinp - sub;
-    end
 
     % ----------------
     %  Patlak model
@@ -131,6 +152,7 @@ function out =  jjpatlak( L3, matrix, t, dt, Cinp, range)
             out.Xmodel{i} = out.X{i}(regressionRange);
             out.Ymodel{i} = Ki(i) * out.Xmodel{i} + intercept(i); % Calculate model answer
             out.residual{i} = out.Y{i}(regressionRange) - out.Ymodel{i};
+
             
         end
 
@@ -146,6 +168,12 @@ function out =  jjpatlak( L3, matrix, t, dt, Cinp, range)
     
     out.xlabel = '\int_{0}^{t} C_a dt / C_a';
     out.ylabel = 'C_t / C_a';
+
+
+    % Add time info
+    out.midtime = tmid;
+    out.t = t;
+    out.dt = dt;
 
     
     % --------

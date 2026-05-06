@@ -29,7 +29,8 @@ function [file,path, filterindex] = uigetfile(varargin)
           evalin('base','clear INPUTS');
       catch
           % Call default function instead
-          shipped = getShaddowedFunction(this);
+          %shipped = getShaddowedFunction(this);
+          shipped = @uigetfile_modern;
           [file,path, filterindex] = shipped(varargin{:});
 
           answer = { [path file]};

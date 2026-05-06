@@ -17,6 +17,9 @@ function out =  jjlogan( matrix, t, dt, Cr, range, k2ref)
     %   out.names = { 'BPND', 'DVR', 'intercept'};
     %   out.units = { '1','1','min'};
     %
+    %   out.t       = frame start time in minutes (vector)
+    %   out.midtime = frame midtime in minutes from start of scan (vector)
+    %
     %   If zero inputs arguments, then out.names and out.units are
     %   returned.  This may be used for dialog boxes previous to running
     %   this function
@@ -138,6 +141,9 @@ function out =  jjlogan( matrix, t, dt, Cr, range, k2ref)
     
     out.pars = {BP, DVR, intercept};
 
+    % Add time info
+    out.t = t;
+    out.dt = dt;
     
     if IS_ROI
         out.Xref = out.X{i};
