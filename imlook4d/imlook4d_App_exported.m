@@ -5923,61 +5923,20 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
 
             persistent currentSlice  currentFrame 
 
+            if ~strcmp('WindowScrollWheel', eventdata.EventName)
+                return
+            end
+
             % Initialize
             numberOfSlices=size(handles.image.Cdata,3);
             numberOfFrames=size(handles.image.Cdata,4);
-            %currentSlice = get(handles.SliceNumSlider,'Value');
-            %currentFrame = get(handles.FrameNumSlider,'Value');
 
-
-
-            % Avoid jitter + handle slow and accelerated scroll
-    
-                if isempty(currentSlice)
-                    currentSlice = 1.01;        % Memory of non-integer slice
-                    currentFrame = 1.01;        % Memory of non-integer frame
-                end
-    
-                
-                
-                % --- Inställningar för precision ---
-                sensitivity = 1;       % Höj till 1.0 för att kräva mer "energi" för ett steg
-                accelerationScale = 0.2; % Sänk för att dämpa farten något
-                minDt = 0.1;             % Tidgräns (sekunder). Långsammare än detta = ingen acceleration.
-                
-                % 1. Mät hastighet
-                dt = toc(app.lastScrollTime);
-                app.lastScrollTime = tic;
-
-                if dt <= 0, dt = 0.01; end
-                
-                % 2. Beräkna multiplikator (Acceleration endast om man skrollar snabbt)
-                if dt < minDt
-                    multiplier = 1 + (accelerationScale / dt);
-                else
-                    multiplier = 1; % Garanterar exakt 1:1 vid långsam skroll
-                end
-                multiplier = min(multiplier, 50);
-                
-                % 3. Ackumulera
-                app.scrollAccumulator = app.scrollAccumulator + (direction * multiplier);
-                
-                % 4. Beräkna steg
-                step = 0;
-                if abs(app.scrollAccumulator) >= sensitivity
-                    step = fix(app.scrollAccumulator / sensitivity);
-                    
-                    % Uppdatera buffert
-                    if abs(step) > 1
-                        app.scrollAccumulator = 0; 
-                    else
-                        % Behåll precision vid 1-stegs skroll
-                        app.scrollAccumulator = app.scrollAccumulator - (step * sensitivity);
-                    end
-                end
-
-
-
+            if isempty(currentSlice)
+                currentSlice = 1.01;        % Memory of non-integer slice
+                currentFrame = 1.01;        % Memory of non-integer frame
+            end
+            direction = eventdata.VerticalScrollCount; 
+            [step dt]  = filterScroll(direction, numberOfSlices, numberOfFrames, handles);
 
             % Update slice or frame if too different from Edit values
                 absDiff = abs( app.SliceNumSlider.Value - currentSlice );
@@ -6045,7 +6004,85 @@ classdef imlook4d_App_exported < matlab.apps.AppBase
 
                 lastTime = tic;
 
+
+
+            %
+            % INTERNAL FUNCTION
+            %
+function [step, dt] = filterScroll(direction, numberOfSlices, numberOfFrames, handles)
+    persistent lastScrollTime scrollAccumulator
+    
+    % --- INSTÄLLNINGAR FÖR TIDSAXEN ---
+    FAST_INTERVAL_MS = 30;   % Vid detta intervall (eller snabbare) får vi MAX acceleration
+    SLOW_INTERVAL_MS = 100;  % Långsammare än detta = exakt 1 steg per klick
+    
+    % --- INITIALISERING ---
+    if isempty(lastScrollTime)
+        lastScrollTime = tic;
+        scrollAccumulator = 0;
+    end
+
+    % 1. Mät tiden sedan förra eventet
+    dt_sec = toc(lastScrollTime);
+    dt_ms = dt_sec * 1000;
+    lastScrollTime = tic;
+
+    % 2. Avgör maxSteps (taket för hur många steg ett enskilt event kan ge)
+    modifier = get(handles.figure1, 'CurrentModifier');
+    isModKey = any(strcmp(modifier, 'control')) || any(strcmp(modifier, 'shift'));
+    limitBase = numberOfSlices;
+    if isModKey, limitBase = numberOfFrames; end
+    maxAllowedSteps = max(1, round(limitBase / 5));
+
+    % 3. Beräkna steg-multiplikator baserat på tidsintervall
+    % Vi mappar tiden (dt_ms) till en kurva
+    if dt_ms < FAST_INTERVAL_MS
+        % Om vi skrollar extremt snabbt, tillåt max acceleration
+        multiplier = maxAllowedSteps;
+    elseif dt_ms < SLOW_INTERVAL_MS
+        % Linjär interpolation: ju snabbare vi skrollar, desto fler steg per event
+        % Vi skalar mellan 1 steg och maxAllowedSteps
+        ratio = (SLOW_INTERVAL_MS - dt_ms) / (SLOW_INTERVAL_MS - FAST_INTERVAL_MS);
+        multiplier = 1 + (ratio * (maxAllowedSteps - 1));
+    else
+        % Långsam skroll eller enstaka klick
+        multiplier = 1.0;
+    end
+
+    % 4. Ackumulera (hanterar frirullningens små värden)
+    % direction är oftast 1 eller -1. 
+    % Om musen skickar t.ex. 0.1 (vid frirullning), tar det 10 events 
+    % i långsamt tempo att nå 1 steg, men i snabbt tempo går det direkt.
+    scrollAccumulator = scrollAccumulator + (direction * multiplier);
+
+    % 5. Skapa heltalet (step)
+    step = 0;
+    if abs(scrollAccumulator) >= 1.0
+        step = fix(scrollAccumulator);
+        
+        % Säkerhetsspärr mot max-taket
+        if abs(step) > maxAllowedSteps
+            step = sign(step) * maxAllowedSteps;
         end
+        
+        % Behåll "resten" i ackumulatorn för mjukhet
+        scrollAccumulator = scrollAccumulator - step;
+    end
+    
+    % 6. Nollställ vid paus (Viktigt för att inte "hoppa" till efter att ha vilat)
+    if dt_ms > 300
+        scrollAccumulator = 0;
+    end
+    
+    dt = dt_sec;
+end
+
+
+
+
+        end
+
+
         
         function setColorBar(app, varargin)
                         %
