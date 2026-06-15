@@ -65,7 +65,10 @@ function out = imlook4d(varargin)
             matlabIsOld = verLessThan('matlab', '24');  % adjust cutoff to your actual requirement
     
             % Always start with new imlook4d -- remove legacy
-            rmpath(genpath(legacyPath));
+
+            if contains(path, legacyPath)
+                rmpath(genpath(legacyPath))
+            end
 
             % TEST -- force legacy.  Run this from cli first : setappdata(0, 'imlook4d_path_configured', false);
             %matlabIsOld = true; 
