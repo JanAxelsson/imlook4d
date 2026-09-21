@@ -140,6 +140,34 @@ function outputPath = uigetdir_modern(guessedDirectory, dialogTitle)
         if ~isempty(p) && ~strcmp(p, currentDir), currentDir = p; updateDisplay(); end
     end
 
+    function makeNewFolder()
+        if ~isvalid(fig), return; end
+
+        % Ask the user for a new folder name
+        newName = inputdlg('Enter new folder name:', 'New Folder', [1 50], {'New Folder'});
+
+        % If user cancels or provides an empty string, do nothing
+        if isempty(newName) || isempty(strtrim(newName{1}))
+            return; 
+        end
+
+        % Construct the complete path and create the folder
+        targetPath = fullfile(currentDir, strtrim(newName{1}));
+
+        if ~exist(targetPath, 'dir')
+            [status, msg] = mkdir(targetPath);
+            if status
+                % Refresh the view to show the new folder
+                updateDisplay();
+            else
+                uiconfirm(fig, ['Failed to create folder: ' msg], 'Error', 'Icon', 'error');
+            end
+        else
+            uiconfirm(fig, 'A folder with this name already exists.', 'Warning', 'Icon', 'warning');
+        end
+    end
+
+
     function finalizeSelection()
         if ~isvalid(fig), return; end
         target = pathField.Value;
