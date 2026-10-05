@@ -70,10 +70,11 @@ function out = imlook4d(varargin)
                 rmpath(genpath(legacyPath))
             end
 
-            % TEST -- force legacy.  Run this from cli first : setappdata(0, 'imlook4d_path_configured', false);
-            %matlabIsOld = true; 
+            % TEST -- force legacy :
+            %   setImlook4dVersion 'legacy' % forces legacy
+            %   setImlook4dVersion 'new   ' % sets it back to new
     
-            if matlabIsOld
+            if matlabIsOld || strcmp( 'legacy', selected)
                 % Use LEGACY → add legacy path on top
                 addpath(genpath(legacyPath), '-begin');
                 selected = "legacy";
